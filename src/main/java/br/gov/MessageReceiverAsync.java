@@ -1,15 +1,18 @@
 package br.gov;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Properties;
 
+import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
-import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import org.jboss.logging.Logger;
+
 
 import br.gov.model.UnidadeMedida;
 import br.gov.model.UnidadeMedidaEJB;
@@ -21,7 +24,9 @@ import br.gov.model.UnidadeMedidaEJB;
 )
 public class MessageReceiverAsync implements MessageListener {
 	
-	@Inject
+	private static Logger logger = Logger.getLogger(MessageReceiverAsync.class);
+	
+	@EJB
 	private UnidadeMedidaEJB ejb;
 
     @Override
@@ -32,8 +37,12 @@ public class MessageReceiverAsync implements MessageListener {
             for(UnidadeMedida item: ejb.list()){
             	System.out.println(item.getDescricao());
             }
+            JobOperator jo = BatchRuntime.getJobOperator();
+            long jid = jo.start("myJob", new Properties());
+            logger.info("Job submitted: " + jid);
+            
         } catch (JMSException ex) {
-            Logger.getLogger(MessageReceiverAsync.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Erro na inicializacao do batch: ", ex);
         }
     }
 }
