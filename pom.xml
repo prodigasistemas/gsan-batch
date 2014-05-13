@@ -5,7 +5,7 @@
     <groupId>br.gov</groupId>
     <artifactId>gsan-batch</artifactId>
     <version>0.1</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>gsan-batch</name>
 
@@ -15,6 +15,25 @@
     </properties>
 
     <dependencies>
+    	<dependency>
+		    <groupId>br.gov</groupId>
+		    <artifactId>gsan-persistence</artifactId>
+		    <version>0.1</version>    	
+    	</dependency>
+    	
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.2</version>
+			<scope>compile</scope>
+		</dependency>    
+    
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>javax.jms-api</artifactId>
@@ -27,6 +46,20 @@
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
         </dependency>
+        
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.3.5.Final</version>
+		</dependency>
+		
+   		<dependency>
+			<groupId>org.wildfly</groupId>
+			<artifactId>wildfly-ejb-client-bom</artifactId>
+			<version>8.0.0.Final</version>
+			<type>pom</type>
+			<scope>compile</scope>
+		</dependency>	       
     </dependencies>
 
     <build>
@@ -36,8 +69,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <compilerArguments>
                         <endorseddirs>${endorsed.dir}</endorseddirs>
                     </compilerArguments>
@@ -45,10 +78,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ejb-plugin</artifactId>
-                <version>2.3</version>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
                 <configuration>
-                    <ejbVersion>3.1</ejbVersion>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
             <plugin>
@@ -78,5 +111,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
