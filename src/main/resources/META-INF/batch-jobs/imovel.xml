@@ -1,0 +1,10 @@
+<job id="imovel" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+    <step id="processar_dados_diarios" >
+        <chunk item-count="100">
+            <reader ref="ImovelReader"/>
+            <processor ref="ImovelProcessor"/>
+            <writer ref="ImovelWriter"/>
+        </chunk>	
+    </step>
+</job>
+

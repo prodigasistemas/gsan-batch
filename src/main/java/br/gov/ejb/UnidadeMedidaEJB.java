@@ -1,10 +1,12 @@
-package br.gov.model;
+package br.gov.ejb;
 
 import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import br.gov.model.UnidadeMedida;
 
 @Stateless
 public class UnidadeMedidaEJB{

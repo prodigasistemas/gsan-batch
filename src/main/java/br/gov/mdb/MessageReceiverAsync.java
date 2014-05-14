@@ -1,4 +1,4 @@
-package br.gov;
+package br.gov.mdb;
 
 import java.util.Properties;
 
@@ -11,11 +11,11 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+
 import org.jboss.logging.Logger;
 
-
+import br.gov.ejb.UnidadeMedidaEJB;
 import br.gov.model.UnidadeMedida;
-import br.gov.model.UnidadeMedidaEJB;
 
 @MessageDriven(
 	activationConfig = {
@@ -38,7 +38,7 @@ public class MessageReceiverAsync implements MessageListener {
             	System.out.println(item.getDescricao());
             }
             JobOperator jo = BatchRuntime.getJobOperator();
-            long jid = jo.start("myJob", new Properties());
+            long jid = jo.start(tm.getText(), new Properties());
             logger.info("Job submitted: " + jid);
             
         } catch (JMSException ex) {
