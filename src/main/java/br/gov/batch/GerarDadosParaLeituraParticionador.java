@@ -5,10 +5,10 @@ import java.util.Properties;
 import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
+import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.jboss.logging.Logger;
 
@@ -21,16 +21,19 @@ public class GerarDadosParaLeituraParticionador implements PartitionMapper {
 
     @EJB
     private ImovelEJB ejb;
+    
+    @Inject
+    private JobContext jobCtx;    
 
     public PartitionPlan mapPartitions() throws Exception {
         return new PartitionPlanImpl() {
         	
         	public int getThreads(){
-        		return 10;
+        		return Integer.valueOf(jobCtx.getProperties().getProperty("num_particoes"));
         	}
 
             public int getPartitions() {
-                return 10;
+            	return Integer.valueOf(jobCtx.getProperties().getProperty("num_particoes"));
             }
 
             public Properties[] getPartitionProperties() {
