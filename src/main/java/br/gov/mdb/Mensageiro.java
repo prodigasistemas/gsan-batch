@@ -10,11 +10,13 @@ import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
+import javax.jms.ObjectMessage;
 
 import org.jboss.logging.Logger;
 
-import br.gov.ejb.UnidadeMedidaEJB;
+import br.gov.ejb.ProcessoEJB;
+import br.gov.model.batch.ProcessoIniciado;
+import br.gov.model.batch.ProcessoSituacao;
 
 @MessageDriven(
 	activationConfig = {
@@ -26,15 +28,22 @@ public class Mensageiro implements MessageListener {
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
 	@EJB
-	private UnidadeMedidaEJB ejb;
+	private ProcessoEJB processoEJB;
 
     public void onMessage(Message mensagem) {
         try {
-            TextMessage tm = (TextMessage) mensagem;
-            logger.info("Mensagem recebida para batch: " + tm.getText());
+        	ProcessoIniciado processoIniciado = (ProcessoIniciado)((ObjectMessage) mensagem).getObject();
+            logger.info("Processo recebido: " + processoIniciado);
+            
             JobOperator jo = BatchRuntime.getJobOperator();
-            long jid = jo.start(tm.getText(), new Properties());
-            logger.info("Processo submetido com id : " + jid);
+            
+            Properties processoParametros = processoEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
+            
+            long jid = jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
+            
+            processoEJB.atualizaSituacaoProcesso(processoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
+            logger.info("Batch Iniciado: " + processoIniciado.getProcesso().getNomeArquivoBatch() + " - JID:" + jid);
+            
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);
         }
