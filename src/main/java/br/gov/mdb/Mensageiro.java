@@ -15,32 +15,26 @@ import javax.jms.TextMessage;
 import org.jboss.logging.Logger;
 
 import br.gov.ejb.UnidadeMedidaEJB;
-import br.gov.model.operacao.UnidadeMedida;
 
 @MessageDriven(
 	activationConfig = {
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:global/jms/myQueue")
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:global/jms/processosFila")
 	}
 )
-public class MessageReceiverAsync implements MessageListener {
+public class Mensageiro implements MessageListener {
 	
-	private static Logger logger = Logger.getLogger(MessageReceiverAsync.class);
+	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
 	@EJB
 	private UnidadeMedidaEJB ejb;
 
-    @Override
-    public void onMessage(Message message) {
+    public void onMessage(Message mensagem) {
         try {
-            TextMessage tm = (TextMessage) message;
-            System.out.println("Message received on MDB: " + tm.getText());
-            for(UnidadeMedida item: ejb.list()){
-            	System.out.println(item.getDescricao());
-            }
+            TextMessage tm = (TextMessage) mensagem;
+            logger.info("Mensagem recebida para batch: " + tm.getText());
             JobOperator jo = BatchRuntime.getJobOperator();
             long jid = jo.start(tm.getText(), new Properties());
-            logger.info("Job submitted: " + jid);
-            
+            logger.info("Processo submetido com id : " + jid);
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);
         }

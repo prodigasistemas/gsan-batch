@@ -14,20 +14,7 @@ public class UnidadeMedidaEJB{
 	@PersistenceContext
 	private EntityManager entity;
 	
-	public void salvar(UnidadeMedida obj) {
-		entity.persist(obj);
-	}
-	
-	public List<UnidadeMedida> list(){
+	public List<UnidadeMedida> listar(){
 		return entity.createQuery("from UnidadeMedida", UnidadeMedida.class).getResultList();
 	}
-
-	public void atualizar(UnidadeMedida obj) throws Exception {
-		entity.merge(obj);
-	}
-	
-	public void excluir(UnidadeMedida obj) {
-		UnidadeMedida objRemover = entity.find(UnidadeMedida.class, obj.getCodigo());
-		entity.remove(objRemover);		
-	}	
 }

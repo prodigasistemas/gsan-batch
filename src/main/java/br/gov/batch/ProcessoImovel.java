@@ -6,15 +6,14 @@ import javax.inject.Named;
 import br.gov.model.cadastro.Imovel;
 
 @Named
-public class ImovelProcessor implements ItemProcessor {
+public class ProcessoImovel implements ItemProcessor {
 	
-	public ImovelProcessor() {
+	public ProcessoImovel() {
 	}
 
-    @Override
     public Imovel processItem(Object param) {
-        System.out.println("processItem: " + param);
-        
-        return new Imovel();
+    	Imovel i = new Imovel();
+    	i.setNumeroImovel((String) param);
+        return i;
     }
 }

@@ -10,17 +10,21 @@ import javax.persistence.PersistenceContext;
 import org.jboss.logging.Logger;
 
 @Named
-public class ImovelWriter extends AbstractItemWriter {
+public class ProcessoImovelFim extends AbstractItemWriter {
 	
-	private static Logger logger = Logger.getLogger(ImovelWriter.class);
+	private static int qtd = 0;
+	
+	private static Logger logger = Logger.getLogger(ProcessoImovelFim.class);
 	
 	@PersistenceContext
 	EntityManager em;
 
-	public ImovelWriter() {
+	public ProcessoImovelFim() {
 	}
 
     public void writeItems(List list) {
     	logger.info("Imoveis processados: " + list);
+    	qtd += list.size();
+    	logger.info("Total: " + qtd);
     }
 }

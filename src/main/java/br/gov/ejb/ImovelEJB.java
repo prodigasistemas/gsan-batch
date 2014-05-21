@@ -15,11 +15,13 @@ public class ImovelEJB{
 	@PersistenceContext
 	private EntityManager entity;
 	
-	public void salvar(UnidadeMedida obj) {
-		entity.persist(obj);
+	public List<Imovel> listar(long firstItem, long numItems){
+		return entity.createQuery("from Imovel where id < 13000", Imovel.class)
+				.setFirstResult((int) firstItem).setMaxResults((int) numItems)
+				.getResultList();
 	}
 	
-	public List<Imovel> list(){
-		return entity.createQuery("from Imovel", Imovel.class).getResultList();
+	public long quantidadeImoveis(){
+		return entity.createQuery("select count (i) from Imovel i where i.id < 13000", Long.class).getSingleResult();
 	}
 }
