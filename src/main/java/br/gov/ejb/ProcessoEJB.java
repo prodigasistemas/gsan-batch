@@ -36,13 +36,13 @@ public class ProcessoEJB {
 				.getResultList();
 	}
 	
-	public boolean atualizaSituacaoProcesso(ProcessoIniciado processo, ProcessoSituacao situacao){
+	public boolean atualizaSituacaoProcesso(Integer idProcessoIniciado, ProcessoSituacao situacao){
 		int result = entity.createQuery("update ProcessoIniciado set situacao = :situacao, inicio = :inicio, ultimaAlteracao = :ultimaAlteracao "
 										+ "where id = :processoId ")
 						.setParameter("situacao", situacao.getId())
 						.setParameter("inicio", new Date())
 						.setParameter("ultimaAlteracao", new Date())
-						.setParameter("processoId", processo.getId())
+						.setParameter("processoId", idProcessoIniciado)
 						.executeUpdate();
 		return result >= 1;
 	}

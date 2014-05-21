@@ -23,4 +23,18 @@ public class ImovelEJB{
 	public long quantidadeImoveis(){
 		return entity.createQuery("select count (i) from Imovel i where i.id < 13000", Long.class).getSingleResult();
 	}
+	
+	
+	public long totalImoveisParaPreFaturamento(int idRota){
+		return entity.createNamedQuery("imovel.totalImoveisParaPreFaturamento", Long.class)
+				.setParameter("rotaId", idRota)
+				.getSingleResult();
+	}
+	
+	public List<Imovel> imoveisParaPreFaturamento(int idRota, int firstItem, int numItems) {
+		return entity.createNamedQuery("imovel.pesquisarImovelParaPreFaturamento", Imovel.class)
+				.setParameter("rotaId", idRota)
+				.setFirstResult(firstItem).setMaxResults(numItems)
+				.getResultList();
+	}
 }
