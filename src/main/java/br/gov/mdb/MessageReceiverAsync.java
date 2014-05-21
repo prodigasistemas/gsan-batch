@@ -15,7 +15,7 @@ import javax.jms.TextMessage;
 import org.jboss.logging.Logger;
 
 import br.gov.ejb.UnidadeMedidaEJB;
-import br.gov.model.UnidadeMedida;
+import br.gov.model.operacao.UnidadeMedida;
 
 @MessageDriven(
 	activationConfig = {

@@ -6,7 +6,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import br.gov.model.UnidadeMedida;
+import br.gov.model.operacao.UnidadeMedida;
 
 @Stateless
 public class UnidadeMedidaEJB{
