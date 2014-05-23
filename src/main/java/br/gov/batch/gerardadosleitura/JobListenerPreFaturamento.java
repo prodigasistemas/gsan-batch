@@ -11,9 +11,9 @@ import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
-import br.gov.ejb.ProcessoEJB;
 import br.gov.mdb.Mensageiro;
 import br.gov.model.batch.ProcessoSituacao;
+import br.gov.servicos.batch.ProcessoEJB;
 
 @Named
 public class JobListenerPreFaturamento implements JobListener{
@@ -35,7 +35,7 @@ public class JobListenerPreFaturamento implements JobListener{
 		
         processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
         
-        logger.info("Batch Iniciado: " + jobParams.getProperty("nomeArquivoBatch") + " - ExecutionId:" + execId);
+        logger.info("Batch Iniciado: " + jobParams.getProperty("nomeArquivoBatch") + " - ExecutionId: " + execId);
 	}
 
 	@Override

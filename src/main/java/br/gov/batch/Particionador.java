@@ -8,11 +8,10 @@ import javax.batch.api.partition.PartitionPlanImpl;
 import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
-import br.gov.ejb.ImovelEJB;
+import br.gov.servicos.cadastro.ImovelEJB;
 
 public abstract class Particionador implements PartitionMapper {
 	

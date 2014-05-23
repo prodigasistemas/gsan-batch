@@ -15,8 +15,8 @@ import javax.inject.Named;
 import org.jboss.logging.Logger;
 
 import br.gov.batch.ItemNumberCheckpoint;
-import br.gov.ejb.ImovelEJB;
 import br.gov.model.cadastro.Imovel;
+import br.gov.servicos.cadastro.ImovelEJB;
 
 @Named
 public class InicioPreFaturamento extends AbstractItemReader {

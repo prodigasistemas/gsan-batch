@@ -14,9 +14,8 @@ import javax.jms.ObjectMessage;
 
 import org.jboss.logging.Logger;
 
-import br.gov.ejb.ProcessoEJB;
 import br.gov.model.batch.ProcessoIniciado;
-import br.gov.model.batch.ProcessoSituacao;
+import br.gov.servicos.batch.ProcessoEJB;
 
 @MessageDriven(
 	activationConfig = {
@@ -38,8 +37,6 @@ public class Mensageiro implements MessageListener {
             JobOperator jo = BatchRuntime.getJobOperator();
             
             Properties processoParametros = processoEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
-            processoParametros.setProperty("idProcessoIniciado", String.valueOf(processoIniciado.getId()));
-            processoParametros.setProperty("nomeArquivoBatch", processoIniciado.getProcesso().getNomeArquivoBatch());
             
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
         } catch (JMSException ex) {
