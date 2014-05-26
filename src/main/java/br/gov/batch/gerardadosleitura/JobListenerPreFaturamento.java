@@ -40,8 +40,6 @@ public class JobListenerPreFaturamento implements JobListener{
 
 	@Override
 	public void afterJob() throws Exception {
-		// TODO Auto-generated method stub
 		
 	}
-
 }

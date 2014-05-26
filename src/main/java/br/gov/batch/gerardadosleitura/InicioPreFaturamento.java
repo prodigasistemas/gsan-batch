@@ -17,6 +17,7 @@ import org.jboss.logging.Logger;
 import br.gov.batch.ItemNumberCheckpoint;
 import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelEJB;
+import br.gov.util.BatchUtil;
 
 @Named
 public class InicioPreFaturamento extends AbstractItemReader {
@@ -28,12 +29,9 @@ public class InicioPreFaturamento extends AbstractItemReader {
     @Inject
     private JobContext jobCtx;
     
-    private Iterator<Imovel> imoveis;
-    
-    private ItemNumberCheckpoint checkpoint;
-    
-    private StringTokenizer tokens = null;
-    
+    @Inject
+    private BatchUtil util;
+        
     @Inject
     @BatchProperty(name = "primeiroItem")
     private String primeiroItem;
@@ -41,6 +39,12 @@ public class InicioPreFaturamento extends AbstractItemReader {
     @Inject
     @BatchProperty(name = "numItens")
     private String numItens;
+    
+    private ItemNumberCheckpoint checkpoint;
+    
+    private StringTokenizer tokens = null;
+    
+    private Integer anoMesFaturamento = 0;
 
     public void open(Serializable ckpt) throws Exception {
         long firstItem0 = Long.valueOf(primeiroItem);
@@ -59,21 +63,27 @@ public class InicioPreFaturamento extends AbstractItemReader {
 
     	List<Imovel> lista = ejb.listar(firstItem, numItems);
     	
-    	imoveis = lista.iterator();
-    	
     	StringBuilder builder = new StringBuilder();
     	for (Imovel imovel : lista) {
-    		builder.append(imovel.getNumeroImovel());
+    		builder.append(imovel.getId());
     		builder.append(";");
 		}
     	tokens = new StringTokenizer(builder.toString(), ";");
     	
+    	anoMesFaturamento = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
+    	
     	logger.info(String.format("Processando [ %s ] a partir de [ %s ]", numItems, firstItem));
     }
 
-    public String readItem() {
+    public ImovelPreFaturamento readItem() {
     	if (tokens.hasMoreTokens()){
-    		return tokens.nextToken();
+    		long idImovel = Long.valueOf(tokens.nextToken());
+    		if (!ejb.existeContaImovel(idImovel, anoMesFaturamento)){
+    			ImovelPreFaturamento imovel = new ImovelPreFaturamento();
+    			imovel.setAnoMesFaturamento(anoMesFaturamento);
+    			imovel.setIdImovel(idImovel);
+    			return imovel;
+    		}
     	}
     	return null;
     }

@@ -38,6 +38,10 @@ public class Mensageiro implements MessageListener {
             
             Properties processoParametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
             
+            processoParametros.setProperty("anoMesFaturamento" , "201405");
+            processoParametros.setProperty("idProcessoIniciado" , "1224");
+            processoParametros.setProperty("nomeArquivoBatch" , "NOVO_BATCH");
+            
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);
