@@ -15,7 +15,7 @@ import javax.jms.ObjectMessage;
 import org.jboss.logging.Logger;
 
 import br.gov.model.batch.ProcessoIniciado;
-import br.gov.servicos.batch.ProcessoEJB;
+import br.gov.servicos.batch.ProcessoParametroEJB;
 
 @MessageDriven(
 	activationConfig = {
@@ -27,7 +27,7 @@ public class Mensageiro implements MessageListener {
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
 	@EJB
-	private ProcessoEJB processoEJB;
+	private ProcessoParametroEJB processoParametroEJB;
 
     public void onMessage(Message mensagem) {
         try {
@@ -36,7 +36,7 @@ public class Mensageiro implements MessageListener {
             
             JobOperator jo = BatchRuntime.getJobOperator();
             
-            Properties processoParametros = processoEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
+            Properties processoParametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
             
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
         } catch (JMSException ex) {
