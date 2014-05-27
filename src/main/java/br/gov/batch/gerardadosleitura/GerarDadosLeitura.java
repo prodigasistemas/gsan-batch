@@ -1,4 +1,4 @@
-package br.gov.batch;
+package br.gov.batch.gerardadosleitura;
 
 import javax.batch.api.chunk.ItemProcessor;
 import javax.inject.Named;
@@ -6,9 +6,9 @@ import javax.inject.Named;
 import br.gov.model.cadastro.Imovel;
 
 @Named
-public class ProcessoImovel implements ItemProcessor {
+public class GerarDadosLeitura implements ItemProcessor {
 	
-	public ProcessoImovel() {
+	public GerarDadosLeitura() {
 	}
 
     public Imovel processItem(Object param) {

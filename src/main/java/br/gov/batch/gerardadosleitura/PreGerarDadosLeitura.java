@@ -1,4 +1,4 @@
-package br.gov.batch;
+package br.gov.batch.gerardadosleitura;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -18,8 +18,8 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelEJB;
 
 @Named
-public class ProcessoImovelInicio extends AbstractItemReader {
-	private Logger logger = Logger.getLogger(ProcessoImovelInicio.class);
+public class PreGerarDadosLeitura extends AbstractItemReader {
+	private Logger logger = Logger.getLogger(PreGerarDadosLeitura.class);
 	
     @EJB
     private ImovelEJB ejb;
@@ -28,8 +28,6 @@ public class ProcessoImovelInicio extends AbstractItemReader {
     private JobContext jobCtx;
     
     private Iterator<Imovel> imoveis;
-    
-    private ItemNumberCheckpoint checkpoint;
     
     private StringTokenizer tokens = null;
     
@@ -41,19 +39,11 @@ public class ProcessoImovelInicio extends AbstractItemReader {
     @BatchProperty(name = "numItens")
     private String numItens;
 
-    public void open(Serializable ckpt) throws Exception {
+    public void open(Serializable checkpoint) throws Exception {
         long firstItem0 = Long.valueOf(primeiroItem);
         long numItems0  = Long.valueOf(numItens);
         
-        if (ckpt == null) {
-            checkpoint = new ItemNumberCheckpoint();
-            checkpoint.setItemNumber(firstItem0);
-            checkpoint.setNumItems(numItems0);
-        } else {
-            checkpoint = (ItemNumberCheckpoint) ckpt;
-        }
-        
-        long firstItem = checkpoint.getItemNumber();
+        long firstItem = firstItem0;
         long numItems = numItems0 - (firstItem - firstItem0);
 
     	List<Imovel> lista = ejb.listar(firstItem, numItems);

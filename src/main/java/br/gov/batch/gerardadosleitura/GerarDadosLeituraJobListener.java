@@ -16,7 +16,7 @@ import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoEJB;
 
 @Named
-public class JobListenerPreFaturamento implements JobListener{
+public class GerarDadosLeituraJobListener implements JobListener{
 	
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
@@ -41,7 +41,6 @@ public class JobListenerPreFaturamento implements JobListener{
 	@Override
 	public void afterJob() throws Exception {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

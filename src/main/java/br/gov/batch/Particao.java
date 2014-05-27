@@ -13,9 +13,9 @@ import org.jboss.logging.Logger;
 
 import br.gov.servicos.cadastro.ImovelEJB;
 
-public abstract class Particionador implements PartitionMapper {
+public abstract class Particao implements PartitionMapper {
 	
-	private static Logger logger = Logger.getLogger(Particionador.class);
+	private static Logger logger = Logger.getLogger(Particao.class);
 
     @EJB
     protected ImovelEJB ejb;
@@ -29,7 +29,7 @@ public abstract class Particionador implements PartitionMapper {
         return new PartitionPlanImpl() {
         	
         	public int getThreads(){
-        		return Integer.valueOf(jobCtx.getProperties().getProperty("num_particoes"));
+        		return getPartitions();
         	}
 
             public int getPartitions() {
