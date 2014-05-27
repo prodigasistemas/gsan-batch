@@ -31,7 +31,7 @@ public class JobListenerPreFaturamento implements JobListener{
     	long execId = jobCtx.getExecutionId();
     	Properties jobParams = BatchRuntime.getJobOperator().getParameters(execId);
     	
-    	Integer idProcessoIniciado = Integer.valueOf(jobParams.getProperty("idProcessoIniciado"));
+    	Long idProcessoIniciado = Long.valueOf(jobParams.getProperty("idProcessoIniciado"));
 		
         processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
         
