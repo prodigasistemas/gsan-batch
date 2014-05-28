@@ -16,7 +16,7 @@ import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoEJB;
 
 @Named
-public class JobListenerPreFaturamento implements JobListener{
+public class GerarDadosLeituraJobListener implements JobListener{
 	
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
@@ -38,8 +38,6 @@ public class JobListenerPreFaturamento implements JobListener{
         logger.info("Batch Iniciado: " + jobParams.getProperty("nomeArquivoBatch") + " - ExecutionId: " + execId);
 	}
 
-	@Override
 	public void afterJob() throws Exception {
-		
 	}
 }

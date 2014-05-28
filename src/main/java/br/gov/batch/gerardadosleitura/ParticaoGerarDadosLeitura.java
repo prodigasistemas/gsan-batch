@@ -5,10 +5,10 @@ import java.util.Properties;
 import javax.batch.runtime.BatchRuntime;
 import javax.inject.Named;
 
-import br.gov.batch.Particionador;
+import br.gov.batch.Particao;
 
 @Named
-public class ParticionadorPreFaturamento extends Particionador {
+public class ParticaoGerarDadosLeitura extends Particao {
 	
     public long totalItens(){
     	long execId = jobCtx.getExecutionId();
