@@ -38,9 +38,6 @@ public class GerarDadosLeituraJobListener implements JobListener{
         logger.info("Batch Iniciado: " + jobParams.getProperty("nomeArquivoBatch") + " - ExecutionId: " + execId);
 	}
 
-	@Override
 	public void afterJob() throws Exception {
-		// TODO Auto-generated method stub
 	}
-
 }

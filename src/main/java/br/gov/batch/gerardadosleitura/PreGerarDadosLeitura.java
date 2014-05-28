@@ -1,9 +1,9 @@
 package br.gov.batch.gerardadosleitura;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.ArrayDeque;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Queue;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemReader;
@@ -16,6 +16,7 @@ import org.jboss.logging.Logger;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelEJB;
+import br.gov.util.BatchUtil;
 
 @Named
 public class PreGerarDadosLeitura extends AbstractItemReader {
@@ -27,10 +28,9 @@ public class PreGerarDadosLeitura extends AbstractItemReader {
     @Inject
     private JobContext jobCtx;
     
-    private Iterator<Imovel> imoveis;
-    
-    private StringTokenizer tokens = null;
-    
+    @Inject
+    private BatchUtil util;
+        
     @Inject
     @BatchProperty(name = "primeiroItem")
     private String primeiroItem;
@@ -38,8 +38,12 @@ public class PreGerarDadosLeitura extends AbstractItemReader {
     @Inject
     @BatchProperty(name = "numItens")
     private String numItens;
+    
+    private Queue<Imovel> imoveis = new ArrayDeque<Imovel>();
+    
+    private Integer anoMesFaturamento = 0;
 
-    public void open(Serializable checkpoint) throws Exception {
+    public void open(Serializable ckpt) throws Exception {
         long firstItem0 = Long.valueOf(primeiroItem);
         long numItems0  = Long.valueOf(numItens);
         
@@ -48,21 +52,19 @@ public class PreGerarDadosLeitura extends AbstractItemReader {
 
     	List<Imovel> lista = ejb.listar(firstItem, numItems);
     	
-    	imoveis = lista.iterator();
-    	
-    	StringBuilder builder = new StringBuilder();
-    	for (Imovel imovel : lista) {
-    		builder.append(imovel.getNumeroImovel());
-    		builder.append(";");
-		}
-    	tokens = new StringTokenizer(builder.toString(), ";");
+    	imoveis = new ArrayDeque<Imovel>(lista);
+    	    	
+    	anoMesFaturamento = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
     	
     	logger.info(String.format("Processando [ %s ] a partir de [ %s ]", numItems, firstItem));
     }
 
-    public String readItem() {
-    	if (tokens.hasMoreTokens()){
-    		return tokens.nextToken();
+    public Imovel readItem() {
+    	if (!imoveis.isEmpty()){
+    		Imovel imovel = imoveis.poll();
+    		if (!ejb.existeContaImovel(imovel.getId(), anoMesFaturamento)){
+    			return imovel;
+    		}
     	}
     	return null;
     }
