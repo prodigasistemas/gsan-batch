@@ -37,7 +37,7 @@ public class Mensageiro implements MessageListener {
             JobOperator jo = BatchRuntime.getJobOperator();
             
             Properties processoParametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
-            
+                        
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);

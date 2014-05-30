@@ -6,7 +6,7 @@
 		<property name="num_particoes" value="10" />
 	</properties>
 	<step id="pesquisarImoveisParaPreFaturamento">
-		<chunk checkpoint-policy="item" item-count="500">
+		<chunk checkpoint-policy="item" item-count="8">
 			<reader ref="preGerarDadosLeitura">
 				<properties>
 					<property name="primeiroItem" value="#{partitionPlan['primeiroItem']}" />
