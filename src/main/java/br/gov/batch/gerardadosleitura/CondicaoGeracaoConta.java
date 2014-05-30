@@ -1,31 +1,30 @@
 package br.gov.batch.gerardadosleitura;
 
 import java.util.Collection;
-import java.util.Iterator;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.faturamento.DebitoACobrar;
+import br.gov.model.faturamento.CreditoRealizar;
+import br.gov.model.faturamento.DebitoCobrar;
+import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.model.faturamento.DebitoTipo;
+import br.gov.servicos.faturamento.CreditoRealizarEJB;
 
 @Stateless
 public class CondicaoGeracaoConta {
+	
+	@EJB
+	private CreditoRealizarEJB creditoRealizar;
 
 	public boolean verificarNaoGeracaoConta(Imovel imovel, boolean valoresAguaEsgotoZerados, int anoMesFaturamento) throws Exception {
-		boolean primeiraCondicaoNaoGerarConta = false;
-
-		if (valoresAguaEsgotoZerados
-			|| (!valoresAguaEsgotoZerados 
-				&& aguaEsgotoDesligados(imovel)
-				&& !imovelPertenceACondominio(imovel))
-			) {
-			primeiraCondicaoNaoGerarConta = true;
-		}
+		boolean primeiraCondicaoNaoGerarConta = primeiraCondicaoNaoGerarConta(imovel, valoresAguaEsgotoZerados);
 
 		boolean segundaCondicaoNaoGerarConta = false;
-		Collection<DebitoACobrar> debitosACobrar = this.obterDebitoACobrarImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		Collection<DebitoCobrar> debitosACobrar = this.obterDebitoACobrarImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
 		if (naoHaDebitosHaCobrar(debitosACobrar)) {
 			segundaCondicaoNaoGerarConta = true;
@@ -34,7 +33,7 @@ public class CondicaoGeracaoConta {
 		} else if (!existeDebitoSemPagamento(debitosACobrar)) {
 			segundaCondicaoNaoGerarConta = true;
 		} else {
-			Collection creditosARealizar = repositorioFaturamento.pesquisarCreditoARealizar(imovel.getId(),	DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+			Collection<CreditoRealizar> creditosARealizar = creditoRealizar.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
 			boolean existeCreditoComDevolucao = existeCreditoComDevolucao(creditosARealizar);
 
@@ -42,10 +41,10 @@ public class CondicaoGeracaoConta {
 				DebitoTipo debitoTipo = null;
 				segundaCondicaoNaoGerarConta = true;
 
-				for (DebitoACobrar debitoACobrar: debitosACobrar) {
-					debitoTipo = repositorioFaturamento.getDebitoTipo(debitoACobrar.getDebitoTipo().getId());
+				for (DebitoCobrar debitoACobrar: debitosACobrar) {
+					debitoTipo = creditoRealizar.getDebitoTipo(debitoACobrar.getDebitoTipo().getId());
 
-					if (debitoTipo.getIndicadorGeracaoConta().shortValue() != 2) {
+					if (debitoTipo.getIndicadorGeracaoConta() != 2) {
 						segundaCondicaoNaoGerarConta = false;
 					}
 				}
@@ -55,54 +54,36 @@ public class CondicaoGeracaoConta {
 		return !(primeiraCondicaoNaoGerarConta && segundaCondicaoNaoGerarConta);
 	}
 
-	private boolean naoHaCreditoARealizar(Collection creditosARealizar) {
-		return creditosARealizar == null || creditosARealizar.isEmpty();
+	public boolean primeiraCondicaoNaoGerarConta(Imovel imovel, boolean valoresAguaEsgotoZerados) {
+		if (valoresAguaEsgotoZerados || (aguaEsgotoDesligados(imovel) && !imovelPertenceACondominio(imovel))) {
+			return true;
+		}else{
+			return false;
+		}
 	}
 
-	private boolean existeCreditoComDevolucao(Collection creditosARealizar) {
-		boolean existeCreditoComDevolucao = false;
-		if (creditosARealizar != null && !creditosARealizar.isEmpty()) {
-			Iterator iteratorColecaoCreditosARealizar = creditosARealizar.iterator();
-			CreditoARealizar creditoARealizar = null;
-
-			while (iteratorColecaoCreditosARealizar.hasNext()) {
-				Object[] arrayCreditosACobrar = (Object[]) iteratorColecaoCreditosARealizar.next();
-				creditoARealizar = new CreditoARealizar();
-				creditoARealizar.setId((Integer) arrayCreditosACobrar[0]);
-
-				FiltroDevolucao filtroDevolucao = new FiltroDevolucao();
-				filtroDevolucao.adicionarParametro(new ParametroSimples(FiltroDevolucao.CREDITO_A_REALIZAR_ID,creditoARealizar.getId()));
-				Collection devolucoes = getControladorUtil().pesquisar(filtroDevolucao, Devolucao.class.getName());
-
-				if (devolucoes != null && !devolucoes.isEmpty()) {
-					existeCreditoComDevolucao = true;
-					break;
-				}
-			}
-		}
-		return existeCreditoComDevolucao;
+	private Collection<DebitoCobrar> obterDebitoACobrarImovel(Long id, DebitoCreditoSituacao normal, int anoMesFaturamento) {
+		return null;
 	}
 
-	private boolean existeDebitoSemPagamento(Collection<DebitoACobrar> debitosACobrar) {
-		boolean existeDebitoSemPagamento = false;
-		for (DebitoACobrar debitoACobrar: debitosACobrar) {
-			FiltroPagamento filtroPagamento = new FiltroPagamento();
-			filtroPagamento.adicionarParametro(new ParametroSimples(FiltroPagamento.DEBITO_A_COBRAR, debitoACobrar.getId()));
-			Collection colecaoPagamentos = getControladorUtil().pesquisar(filtroPagamento, Pagamento.class.getName());
-			if (colecaoPagamentos == null || colecaoPagamentos.isEmpty()) {
-				existeDebitoSemPagamento = true;
-				break;
-			}
-		}
-		return existeDebitoSemPagamento;
+	private boolean naoHaCreditoARealizar(Collection<CreditoRealizar> creditosRealizar) {
+		return creditosRealizar == null || creditosRealizar.isEmpty();
+	}
+
+	private boolean existeCreditoComDevolucao(Collection<CreditoRealizar> creditosARealizar) {
+		return false;
+	}
+
+	private boolean existeDebitoSemPagamento(Collection<DebitoCobrar> debitosACobrar) {
+		return false;
 	}
 
 	private boolean paralisacaoFaturamento(Imovel imovel) {
-		return imovel.getFaturamentoSituacaoTipo()!= null && imovel.getFaturamentoSituacaoTipo().getIndicadorParalisacaoFaturamento().equals(ConstantesSistema.SIM);
+		return false;
 	}
 
-	private boolean naoHaDebitosHaCobrar(Collection<DebitoACobrar> colecaoDebitosACobrar) {
-		return colecaoDebitosACobrar == null || colecaoDebitosACobrar.isEmpty();
+	private boolean naoHaDebitosHaCobrar(Collection<DebitoCobrar> colecaoDebitosACobrar) {
+		return false;
 	}
 
 	private boolean imovelPertenceACondominio(Imovel imovel) {
@@ -110,7 +91,7 @@ public class CondicaoGeracaoConta {
 	}
 
 	private boolean aguaEsgotoDesligados(Imovel imovel) {
-		return !imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO) 
-			&& !imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
+		return !imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO)
+				 && !imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
 	}		
 }
