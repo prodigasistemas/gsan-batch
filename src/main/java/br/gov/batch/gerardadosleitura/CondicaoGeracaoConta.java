@@ -1,10 +1,13 @@
 package br.gov.batch.gerardadosleitura;
 
+import io.undertow.attribute.ConstantExchangeAttribute;
+
 import java.util.Collection;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
@@ -12,78 +15,72 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.faturamento.DebitoTipo;
+import br.gov.servicos.arrecadacao.PagamentoEJB;
 import br.gov.servicos.faturamento.CreditoRealizarEJB;
+import br.gov.servicos.faturamento.DebitoCobrarEJB;
 
 @Stateless
 public class CondicaoGeracaoConta {
 	
 	@EJB
 	private CreditoRealizarEJB creditoRealizar;
+	
+	@EJB
+	private DebitoCobrarEJB debitoCobrar;
+	
+	@EJB
+	private PagamentoEJB pagamentoEJB;
+	
 
 	public boolean verificarNaoGeracaoConta(Imovel imovel, boolean valoresAguaEsgotoZerados, int anoMesFaturamento) throws Exception {
 		boolean primeiraCondicaoNaoGerarConta = primeiraCondicaoNaoGerarConta(imovel, valoresAguaEsgotoZerados);
+		
+		boolean segundaCondicaoGerarConta = segundaCondicaoGerarConta(imovel, anoMesFaturamento);
 
-		boolean segundaCondicaoNaoGerarConta = false;
-		Collection<DebitoCobrar> debitosACobrar = this.obterDebitoACobrarImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		return !(primeiraCondicaoNaoGerarConta && !segundaCondicaoGerarConta);
+	}
 
-		if (naoHaDebitosHaCobrar(debitosACobrar)) {
-			segundaCondicaoNaoGerarConta = true;
+	public boolean segundaCondicaoGerarConta(Imovel imovel, int anoMesFaturamento) {
+		
+		boolean segundaCondicaoGerarConta = true;
+		Collection<DebitoCobrar> debitosACobrar = debitoCobrar.debitosCobrarPorImovelESituacao(imovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		
+		if (naoHaDebitosACobrar(debitosACobrar)) {
+			segundaCondicaoGerarConta = false;
 		} else if (paralisacaoFaturamento(imovel)) {
-			segundaCondicaoNaoGerarConta = true;
-		} else if (!existeDebitoSemPagamento(debitosACobrar)) {
-			segundaCondicaoNaoGerarConta = true;
+			segundaCondicaoGerarConta = false;
+		} else if (!pagamentoEJB.existeDebitoSemPagamento(debitosACobrar)) {
+			segundaCondicaoGerarConta = false;
 		} else {
 			Collection<CreditoRealizar> creditosARealizar = creditoRealizar.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
-			boolean existeCreditoComDevolucao = existeCreditoComDevolucao(creditosARealizar);
-
-			if (naoHaCreditoARealizar(creditosARealizar) || existeCreditoComDevolucao) {
-				DebitoTipo debitoTipo = null;
-				segundaCondicaoNaoGerarConta = true;
+			if (naoHaCreditoARealizar(creditosARealizar) || creditoRealizar.existeCreditoComDevolucao(creditosARealizar)) {
+				segundaCondicaoGerarConta = false;
 
 				for (DebitoCobrar debitoACobrar: debitosACobrar) {
-					debitoTipo = creditoRealizar.getDebitoTipo(debitoACobrar.getDebitoTipo().getId());
-
-					if (debitoTipo.getIndicadorGeracaoConta() != 2) {
-						segundaCondicaoNaoGerarConta = false;
+					if (debitoACobrar.getDebitoTipo().getIndicadorGeracaoConta() == Status.ATIVO) {
+						segundaCondicaoGerarConta = true;
 					}
 				}
 			}
 		}
-
-		return !(primeiraCondicaoNaoGerarConta && segundaCondicaoNaoGerarConta);
+		return segundaCondicaoGerarConta;
 	}
 
 	public boolean primeiraCondicaoNaoGerarConta(Imovel imovel, boolean valoresAguaEsgotoZerados) {
-		if (valoresAguaEsgotoZerados || (aguaEsgotoDesligados(imovel) && !imovelPertenceACondominio(imovel))) {
-			return true;
-		}else{
-			return false;
-		}
-	}
-
-	private Collection<DebitoCobrar> obterDebitoACobrarImovel(Long id, DebitoCreditoSituacao normal, int anoMesFaturamento) {
-		return null;
+		return valoresAguaEsgotoZerados || (aguaEsgotoDesligados(imovel) && !imovelPertenceACondominio(imovel));
 	}
 
 	private boolean naoHaCreditoARealizar(Collection<CreditoRealizar> creditosRealizar) {
 		return creditosRealizar == null || creditosRealizar.isEmpty();
 	}
 
-	private boolean existeCreditoComDevolucao(Collection<CreditoRealizar> creditosARealizar) {
-		return false;
-	}
-
-	private boolean existeDebitoSemPagamento(Collection<DebitoCobrar> debitosACobrar) {
-		return false;
-	}
-
 	private boolean paralisacaoFaturamento(Imovel imovel) {
-		return false;
+		return imovel.getFaturamentoSituacaoTipo() != null && imovel.getFaturamentoSituacaoTipo().getParalisacaoFaturamento() == Status.ATIVO;
 	}
 
-	private boolean naoHaDebitosHaCobrar(Collection<DebitoCobrar> colecaoDebitosACobrar) {
-		return false;
+	private boolean naoHaDebitosACobrar(Collection<DebitoCobrar> colecaoDebitosACobrar) {
+		return colecaoDebitosACobrar == null || colecaoDebitosACobrar.isEmpty();
 	}
 
 	private boolean imovelPertenceACondominio(Imovel imovel) {
