@@ -69,17 +69,17 @@ public class CondicaoGeracaoContaTest {
 	@Test
 	public void primeiraCondicaoNaoGeraContaComAguaEsgotoZerados() throws Exception {
 		aguaEsgotoZerado = true;
-		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoNaoGerarConta(imovel, aguaEsgotoZerado);
+		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoGerarConta(imovel, aguaEsgotoZerado);
 		
-		assertTrue(naoGeraConta);
+		assertFalse(naoGeraConta);
 	}
 	
 	@Test
 	public void primeiraCondicaoGeraContaSemAguaEsgotoZeradosELigado() throws Exception {
 		aguaEsgotoZerado = false;
-		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoNaoGerarConta(imovel, aguaEsgotoZerado);
+		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoGerarConta(imovel, aguaEsgotoZerado);
 		
-		assertFalse(naoGeraConta);
+		assertTrue(naoGeraConta);
 	}
 
 	@Test
@@ -89,9 +89,9 @@ public class CondicaoGeracaoContaTest {
 		ligacaoAguaSituacao.setId(0);
 		ligacaoEsgotoSituacao.setId(0);
 		
-		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoNaoGerarConta(imovel, aguaEsgotoZerado);
+		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoGerarConta(imovel, aguaEsgotoZerado);
 		
-		assertTrue(naoGeraConta);
+		assertFalse(naoGeraConta);
 	}
 	
 	@Test
@@ -101,9 +101,9 @@ public class CondicaoGeracaoContaTest {
 		ligacaoAguaSituacao.setId(0);
 		ligacaoEsgotoSituacao.setId(0);
 		
-		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoNaoGerarConta(imovel, aguaEsgotoZerado);
+		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoGerarConta(imovel, aguaEsgotoZerado);
 		
-		assertTrue(naoGeraConta);
+		assertFalse(naoGeraConta);
 	}
 	
 	@Test
@@ -115,9 +115,9 @@ public class CondicaoGeracaoContaTest {
 		
 		imovel.setImovelCondominio(new Imovel());
 		
-		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoNaoGerarConta(imovel, aguaEsgotoZerado);
+		boolean naoGeraConta = condicaoGeracaoConta.primeiraCondicaoGerarConta(imovel, aguaEsgotoZerado);
 		
-		assertFalse(naoGeraConta);
+		assertTrue(naoGeraConta);
 	}
 	
 	@Test

@@ -33,11 +33,10 @@ public class CondicaoGeracaoConta {
 	
 
 	public boolean verificarNaoGeracaoConta(Imovel imovel, boolean valoresAguaEsgotoZerados, int anoMesFaturamento) throws Exception {
-		boolean primeiraCondicaoNaoGerarConta = primeiraCondicaoNaoGerarConta(imovel, valoresAguaEsgotoZerados);
-		
+		boolean primeiraCondicaoGerarConta = primeiraCondicaoGerarConta(imovel, valoresAguaEsgotoZerados);
 		boolean segundaCondicaoGerarConta = segundaCondicaoGerarConta(imovel, anoMesFaturamento);
 
-		return !(primeiraCondicaoNaoGerarConta && !segundaCondicaoGerarConta);
+		return !(!primeiraCondicaoGerarConta && !segundaCondicaoGerarConta);
 	}
 
 	public boolean segundaCondicaoGerarConta(Imovel imovel, int anoMesFaturamento) {
@@ -67,8 +66,8 @@ public class CondicaoGeracaoConta {
 		return segundaCondicaoGerarConta;
 	}
 
-	public boolean primeiraCondicaoNaoGerarConta(Imovel imovel, boolean valoresAguaEsgotoZerados) {
-		return valoresAguaEsgotoZerados || (aguaEsgotoDesligados(imovel) && !imovelPertenceACondominio(imovel));
+	public boolean primeiraCondicaoGerarConta(Imovel imovel, boolean valoresAguaEsgotoZerados) {
+		return !valoresAguaEsgotoZerados && (!aguaEsgotoDesligados(imovel) || imovelPertenceACondominio(imovel));
 	}
 
 	private boolean naoHaCreditoARealizar(Collection<CreditoRealizar> creditosRealizar) {
