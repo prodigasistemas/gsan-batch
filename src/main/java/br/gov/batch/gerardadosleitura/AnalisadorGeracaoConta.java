@@ -55,6 +55,10 @@ public class AnalisadorGeracaoConta {
 		return segundaCondicaoGerarConta;
 	}
 
+	public boolean verificarSituacaoImovelParaGerarConta(boolean valoresAguaEsgotoZerados) {
+		return !valoresAguaEsgotoZerados && (aguaEsgotoLigados() || imovelPertenceACondominio());
+	}
+
 	private boolean haDebitosCobrarAtivos(Collection<DebitoCobrar> debitosACobrar) {
 		boolean haDebitosCobrarAtivos = false;
 		for (DebitoCobrar debitoACobrar: debitosACobrar) {
@@ -64,10 +68,6 @@ public class AnalisadorGeracaoConta {
 			}
 		}
 		return haDebitosCobrarAtivos;
-	}
-
-	public boolean verificarSituacaoImovelParaGerarConta(boolean valoresAguaEsgotoZerados) {
-		return !valoresAguaEsgotoZerados && (!aguaEsgotoDesligados() || imovelPertenceACondominio());
 	}
 
 	private boolean naoHaCreditoARealizar(Collection<CreditoRealizar> creditosRealizar) {
@@ -86,8 +86,8 @@ public class AnalisadorGeracaoConta {
 		return imovel.getImovelCondominio() != null;
 	}
 
-	private boolean aguaEsgotoDesligados() {
-		return !imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO)
-				 && !imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
+	private boolean aguaEsgotoLigados() {
+		return imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO)
+				 && imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
 	}		
 }
