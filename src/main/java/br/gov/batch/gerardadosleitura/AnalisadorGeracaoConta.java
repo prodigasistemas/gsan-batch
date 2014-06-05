@@ -12,23 +12,25 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
-import br.gov.servicos.arrecadacao.PagamentoEJB;
-import br.gov.servicos.faturamento.CreditoRealizarEJB;
-import br.gov.servicos.faturamento.DebitoCobrarEJB;
+import br.gov.servicos.arrecadacao.PagamentoRepositorio;
+import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
+import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
 @Stateless
 public class AnalisadorGeracaoConta {
 	
 	@EJB
-	private CreditoRealizarEJB creditoRealizar;
+	private CreditoRealizarRepositorio creditoRealizarRepositorio;
 	
 	@EJB
-	private DebitoCobrarEJB debitoCobrar;
+	private DebitoCobrarRepositorio debitoCobrarRepositorio;
 	
 	@EJB
-	private PagamentoEJB pagamentoEJB;
+	private PagamentoRepositorio pagamentoRepositorio;
 	
 	private Imovel imovel;
+	
+	public AnalisadorGeracaoConta(){}
 	
 	public AnalisadorGeracaoConta(Imovel imovel){
 		this.imovel = imovel;
@@ -40,15 +42,15 @@ public class AnalisadorGeracaoConta {
 
 	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento) {
 		
-		Collection<DebitoCobrar> debitosACobrar = debitoCobrar.debitosCobrarPorImovelESituacao(imovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
-		if (naoHaDebitosACobrar(debitosACobrar) || paralisacaoFaturamento() || !pagamentoEJB.existeDebitoSemPagamento(debitosACobrar)) {
+		Collection<DebitoCobrar> debitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelESituacao(imovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		if (naoHaDebitosACobrar(debitosACobrar) || paralisacaoFaturamento() || !pagamentoRepositorio.existeDebitoSemPagamento(debitosACobrar)) {
 			return false;
 		}
 		
 		boolean segundaCondicaoGerarConta = true;
-		Collection<CreditoRealizar> creditosARealizar = creditoRealizar.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		Collection<CreditoRealizar> creditosARealizar = creditoRealizarRepositorio.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
-		if (naoHaCreditoARealizar(creditosARealizar) || creditoRealizar.existeCreditoComDevolucao(creditosARealizar)) {
+		if (naoHaCreditoARealizar(creditosARealizar) || creditoRealizarRepositorio.existeCreditoComDevolucao(creditosARealizar)) {
 			segundaCondicaoGerarConta = haDebitosCobrarAtivos(debitosACobrar);
 		}
 

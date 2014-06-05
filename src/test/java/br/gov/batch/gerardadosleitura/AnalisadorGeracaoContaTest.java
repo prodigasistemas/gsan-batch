@@ -24,9 +24,9 @@ import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.faturamento.DebitoTipo;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
-import br.gov.servicos.arrecadacao.PagamentoEJB;
-import br.gov.servicos.faturamento.CreditoRealizarEJB;
-import br.gov.servicos.faturamento.DebitoCobrarEJB;
+import br.gov.servicos.arrecadacao.PagamentoRepositorio;
+import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
+import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
 @RunWith(EasyMockRunner.class)
 public class AnalisadorGeracaoContaTest {
@@ -41,13 +41,13 @@ public class AnalisadorGeracaoContaTest {
 	private int anoMesFaturamento;
 	
 	@Mock
-	private DebitoCobrarEJB debitoCobrarEJBMock;
+	private DebitoCobrarRepositorio debitoCobrarEJBMock;
 	
 	@Mock
-	private PagamentoEJB pagamentoEJBMock;
+	private PagamentoRepositorio pagamentoEJBMock;
 	
 	@Mock
-	private CreditoRealizarEJB creditoRealizarEJBMock;
+	private CreditoRealizarRepositorio creditoRealizarEJBMock;
 	
 	@Before
 	public void setup(){

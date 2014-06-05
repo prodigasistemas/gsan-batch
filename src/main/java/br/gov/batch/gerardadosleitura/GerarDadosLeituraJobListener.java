@@ -13,7 +13,7 @@ import org.jboss.logging.Logger;
 
 import br.gov.mdb.Mensageiro;
 import br.gov.model.batch.ProcessoSituacao;
-import br.gov.servicos.batch.ProcessoEJB;
+import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
 public class GerarDadosLeituraJobListener implements JobListener{
@@ -21,7 +21,7 @@ public class GerarDadosLeituraJobListener implements JobListener{
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
 	@EJB
-	private ProcessoEJB processoEJB;
+	private ProcessoRepositorio processoEJB;
 
 	@Inject
     protected JobContext jobCtx;

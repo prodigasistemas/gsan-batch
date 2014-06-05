@@ -15,7 +15,7 @@ import javax.inject.Named;
 import org.jboss.logging.Logger;
 
 import br.gov.model.cadastro.Imovel;
-import br.gov.servicos.cadastro.ImovelEJB;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.util.BatchUtil;
 
 @Named
@@ -23,7 +23,7 @@ public class PreGerarDadosLeitura extends AbstractItemReader {
 	private Logger logger = Logger.getLogger(PreGerarDadosLeitura.class);
 	
     @EJB
-    private ImovelEJB ejb;
+    private ImovelRepositorio ejb;
     
     @Inject
     private JobContext jobCtx;

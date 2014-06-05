@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.cadastro.servicos.ImovelEJB;
+import br.gov.cadastro.servicos.ImovelBO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizado;
@@ -19,12 +19,14 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
 import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.servicos.to.CreditoRealizadoTO;
+import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
 
 @Stateless
-public class CreditoRealizadoEJB {
+public class CreditoRealizadoBO {
 	
 	@EJB
-	private ImovelEJB imovelEJB;
+	private ImovelBO imovelBO;
 
 	public CreditoRealizadoTO gerarCreditoRealizado(Imovel imovel, Integer anoMesFaturamento,
 			ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos,
@@ -264,7 +266,7 @@ public class CreditoRealizadoEJB {
 						colecaoCategoriasObterValor.add(categoria);
 					}
 
-					Collection<BigDecimal> colecaoCategoriasCalculadasValor = imovelEJB.obterValorPorCategoria(colecaoCategoriasObterValor, valorCredito);
+					Collection<BigDecimal> colecaoCategoriasCalculadasValor = imovelBO.obterValorPorCategoria(colecaoCategoriasObterValor, valorCredito);
 
 					Iterator<BigDecimal> colecaoCategoriasCalculadasValorIterator = colecaoCategoriasCalculadasValor.iterator();
 					Iterator<Categoria> colecaoCategoriasObterValorIterator = colecaoCategoriasObterValor.iterator();

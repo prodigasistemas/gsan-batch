@@ -15,7 +15,7 @@ import javax.jms.ObjectMessage;
 import org.jboss.logging.Logger;
 
 import br.gov.model.batch.ProcessoIniciado;
-import br.gov.servicos.batch.ProcessoParametroEJB;
+import br.gov.servicos.batch.ProcessoParametroRepositorio;
 
 @MessageDriven(
 	activationConfig = {
@@ -27,7 +27,7 @@ public class Mensageiro implements MessageListener {
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
 	@EJB
-	private ProcessoParametroEJB processoParametroEJB;
+	private ProcessoParametroRepositorio processoParametroEJB;
 
     public void onMessage(Message mensagem) {
         try {

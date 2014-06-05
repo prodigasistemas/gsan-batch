@@ -13,7 +13,7 @@ import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
-import br.gov.servicos.faturamento.FaturamentoSituacaoEJB;
+import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 import br.gov.util.BatchUtil;
 
 @Named
@@ -21,7 +21,7 @@ public class GerarDadosLeitura implements ItemProcessor {
 	private static Logger logger = Logger.getLogger(GerarDadosLeitura.class);
 	
 	@EJB
-	private FaturamentoSituacaoEJB faturamentoSituacaoEJB;
+	private FaturamentoSituacaoRepositorio faturamentoSituacaoEJB;
 	
     @Inject
     private BatchUtil util;
