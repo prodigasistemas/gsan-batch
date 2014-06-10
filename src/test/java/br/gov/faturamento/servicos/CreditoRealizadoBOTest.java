@@ -37,6 +37,7 @@ public class CreditoRealizadoBOTest {
 	
 	private CreditoRealizadoTO creditoRealizadoTO;
 	private ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO;
+	private CreditoRealizar creditoRealizar;
 
 	@Before
 	public void setup(){
@@ -48,8 +49,66 @@ public class CreditoRealizadoBOTest {
 		
 		anoMesFaturamento = 201406;
 		
+		creditoRealizar = new CreditoRealizar();
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("2"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("0"));
+		creditoRealizar.setValorResidualMesAnterior(new BigDecimal("0.00"));
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("1"));
+		creditoRealizar.setValorCredito(new BigDecimal("2.00"));
+		
 		creditoRealizadoTO = new CreditoRealizadoTO();
 		valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+	}
+	
+	@Test
+	public void calculaValorCorrespondenteParcelaMesComNumeroPrestacoesRealizadasMaiorQueNumeroPrestacoesCredito(){
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("2"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("3"));
+		
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		
+		assertEquals(new BigDecimal("0.00"), retorno);
+	}
+	
+	@Test
+	public void calculaValorCorrespondenteParcelaMesComNumeroPrestacoesRealizadasMenorQueNumeroPrestacoesCreditoEEhUltimaParcela(){
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("1"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("0"));
+		
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		
+		assertEquals(new BigDecimal("2.00"), retorno);
+	}
+	
+	@Test
+	public void calculaValorCorrespondenteParcelaMesComNumeroPrestacoesRealizadasMenorQueNumeroPrestacoesCreditoComMaisParcelasEEhUltimaParcela(){
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("4"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("3"));
+		
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		
+		assertEquals(new BigDecimal("0.50"), retorno);
+	}
+	
+	@Test
+	public void calculaValorCorrespondenteParcelaMesComNumeroPrestacoesRealizadasMenorQueNumeroPrestacoesCreditoENaoEhUltimaParcela(){
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("4"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("2"));
+		
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		
+		assertEquals(new BigDecimal("0.50"), retorno);
+	}
+	
+	@Test
+	public void calculaValorCorrespondenteParcelaMesComNumeroPrestacoesRealizadasMenorQueNumeroPrestacoesCreditoEEhUltimaParcelaEHaValorResidual(){
+		creditoRealizar.setNumeroPrestacaoCredito(new Short("2"));
+		creditoRealizar.setNumeroPrestacaoRealizada(new Short("1"));
+		creditoRealizar.setValorResidualMesAnterior(new BigDecimal("0.50"));
+		
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		
+		assertEquals(new BigDecimal("1.50"), retorno);
 	}
 	
 	@Test
