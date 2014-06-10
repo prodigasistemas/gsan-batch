@@ -10,7 +10,7 @@ import javax.ejb.Stateless;
 import br.gov.model.cadastro.Categoria;
 
 @Stateless
-public class ImovelBO {
+public class CategoriaBO {
 
 	public Collection<BigDecimal> obterValorPorCategoria(Collection<Categoria> colecaoCategorias, BigDecimal valor) {
 
