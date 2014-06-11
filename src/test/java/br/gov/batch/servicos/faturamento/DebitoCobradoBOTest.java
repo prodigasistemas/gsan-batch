@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.to.DebitoCobradoTO;
 
@@ -45,9 +46,9 @@ public class DebitoCobradoBOTest {
 	}
 	
 	@Test
-	public void testDebitoCobrarPrimeiraParcela(){
+	public void testParcelaDebito(){
 		List<DebitoCobrar> debitos = new ArrayList<DebitoCobrar>();
-		debitos.add(debitoCobrarComParcelasENaPrimeiraParcela());
+		debitos.add(debitoCobrar());
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
@@ -67,8 +68,22 @@ public class DebitoCobradoBOTest {
 		
 		assertEquals(5.34, to.getValorDebito().doubleValue(), 0);
 	}
+	
+	@Test
+	public void testIncrementouParcela(){
+		List<DebitoCobrar> debitos = new ArrayList<DebitoCobrar>();
+		debitos.add(debitoCobrar());
+		
+		preparaMocks(anoMesFaturamento, debitos);
+		
+		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
+		
+		DebitoCobrado debitoCobrado = to.getDebitosCobrados().get(0);
+		
+		assertEquals(debitoCobrado.getNumeroPrestacaoDebito().intValue(), debitoCobrar().getNumeroPrestacaoCobradas() + 1);
+	}
 
-	private DebitoCobrar debitoCobrarComParcelasENaPrimeiraParcela() {
+	private DebitoCobrar debitoCobrar() {
 		DebitoCobrar d = new DebitoCobrar();
 		d.setId(3L);
 		d.setValorDebito(new BigDecimal(29));
