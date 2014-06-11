@@ -1,4 +1,4 @@
-package br.gov.batch.cadastro;
+package br.gov.batch.test;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;

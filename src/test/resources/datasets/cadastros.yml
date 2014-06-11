@@ -3,6 +3,7 @@ cadastro.localidade:
     loca_nmlocalidade: "Belem"
 cadastro.imovel:
   - imov_id: 1
+  - imov_id: 5
 cadastro.sistema_parametros:
   - parm_id: 1
     parm_amreferenciafaturamento: 201403

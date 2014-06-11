@@ -1,6 +1,8 @@
-package br.gov.batch.cadastro;
+package br.gov.batch.servicos.faturamento;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -14,12 +16,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.batch.test.ShrinkWrapBuilder;
-import br.gov.model.cadastro.Localidade;
-import br.gov.servicos.cadastro.LocalidadeRepositorio;
+import br.gov.model.cadastro.Imovel;
+import br.gov.model.faturamento.DebitoCobrar;
+import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
 
 @RunWith(Arquillian.class)
-public class LocalidadeTest {
+public class RepositorioDebitoCobrarTest {
 		
 	@Deployment
     public static Archive<?> createDeployment() {
@@ -27,21 +30,17 @@ public class LocalidadeTest {
     }
 	
 	@Inject
-	LocalidadeRepositorio localidadeRepositorio;
+	DebitoCobrarRepositorio repositorio;
 	
 	@Test
-	@UsingDataSet("cadastros.yml")
+	@UsingDataSet({"cadastros.yml","debitosCobrar.yml"})
 	@Transactional(TransactionMode.ROLLBACK)
 	public void buscarImovelPorId2() throws Exception {
-		System.out.println(" ********************************************************************* ");
+		Imovel imovel = new Imovel();
+		imovel.setId(1L);
+
+		Collection<DebitoCobrar> debitos = repositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
 		
-		StringBuilder sql = new StringBuilder();
-		sql.append("select lo from Localidade lo ");
-		
-		Localidade lo = localidadeRepositorio.find(1L);
-		
-		System.out.println("************ " + lo.getNome());
-		
-		assertEquals("Belem", lo.getNome());
+		assertTrue(debitos.size() == 1);
 	}
 }

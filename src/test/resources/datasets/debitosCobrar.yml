@@ -5,3 +5,48 @@ faturamento.debito_a_cobrar:
     dbac_nnprestacaocobradas: 3
     imov_id: 1
     dcst_idatual: 0
+    
+  - dbac_id: 2 #nao passa numeroPrestacaoCobradas >= numeroPrestacaoDebito
+    dbac_vldebito: 100
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 4
+    imov_id: 1
+    dcst_idatual: 0
+
+  - dbac_id: 3 #nao passa numeroPrestacaoCobradas >= numeroPrestacaoDebito - numeroParcelaBonus
+    dbac_vldebito: 100
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 3
+    dbac_nnparcelabonus: 1
+    imov_id: 1
+    dcst_idatual: 0
+         
+  - dbac_id: 4 #nao passa contaMotivoRevisao <> null
+    dbac_vldebito: 78
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 3
+    imov_id: 1
+    dcst_idatual: 0
+    cmrv_id: 2
+    
+  - dbac_id: 5 #nao passa situacaoAtual <> NORMAL
+    dbac_vldebito: 78
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 3
+    imov_id: 1
+    dcst_idatual: 3
+    
+  - dbac_id: 6 #nao passa por ser de outro imovel
+    dbac_vldebito: 78
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 3
+    imov_id: 5
+    dcst_idatual: 0
+    
+  - dbac_id: 7 #nao passa dataRevisao <> null
+    dbac_vldebito: 100
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 2
+    dbac_dtrevisao: 2014-05-02
+    imov_id: 1
+    dcst_idatual: 0        

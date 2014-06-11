@@ -28,7 +28,7 @@ public class DebitoCobrarBO {
 		Collection<DebitoCobrar> debitos = new ArrayList<DebitoCobrar>();
 		
 		for (DebitoCobrar debito : lista) {
-			if (!(debito.parcelamentoAVencer(anoMesFaturamento) && debito.primeiraParcela())){
+			if (!(debito.emParcelamento(anoMesFaturamento))){
 				debitos.add(debito);
 			}
 		}
