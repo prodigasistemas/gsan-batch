@@ -116,7 +116,7 @@ public class AnalisadorGeracaoContaTest {
 	@Test
 	public void geraContaComDebitoCobrar() throws Exception {
 
-		mockDebitosCobrarPorImovelESituacao(null);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(null);
 		
 		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
 	}
@@ -126,7 +126,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarVazio(false);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.ATIVO);
 		
@@ -138,7 +138,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarVazio(false);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, false);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
@@ -151,7 +151,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarComDebitoTipo(Status.INATIVO);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		mockPesquisarCreditoARealizar(null);
 		
@@ -165,7 +165,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarComDebitoTipo(Status.ATIVO);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		mockPesquisarCreditoARealizar(null);
 		
@@ -179,7 +179,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarComDebitoTipo(Status.INATIVO);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		
 		Collection<CreditoRealizar> creditosRealizar = buildCollectionCreditosRealizar();
@@ -197,7 +197,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarComDebitoTipo(Status.ATIVO);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		
 		Collection<CreditoRealizar> creditosRealizar = buildCollectionCreditosRealizar();
@@ -216,7 +216,7 @@ public class AnalisadorGeracaoContaTest {
 
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarVazio(false);
 		
-		mockDebitosCobrarPorImovelESituacao(debitosCobrar);
+		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		
 		Collection<CreditoRealizar> creditosRealizar = buildCollectionCreditosRealizar();
@@ -260,8 +260,8 @@ public class AnalisadorGeracaoContaTest {
 	}
 
 
-	private void mockDebitosCobrarPorImovelESituacao(Collection<DebitoCobrar> debitosCobrar) {
-		expect(debitoCobrarEJBMock.debitosCobrarPorImovelESituacao(imovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+	private void mockDebitosCobrarPorImovelComPendenciaESemRevisao(Collection<DebitoCobrar> debitosCobrar) {
+		expect(debitoCobrarEJBMock.debitosCobrarPorImovelComPendenciaESemRevisao(imovel))
 			.andReturn(debitosCobrar);
 		replay(debitoCobrarEJBMock);
 	}

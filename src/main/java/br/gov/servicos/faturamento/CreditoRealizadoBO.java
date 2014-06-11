@@ -1,4 +1,4 @@
-package br.gov.faturamento.servicos;
+package br.gov.servicos.faturamento;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,8 +16,6 @@ import br.gov.model.faturamento.CreditoRealizadoCategoria;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
-import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
-import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
 

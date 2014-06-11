@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.servicos.faturamento.CreditoRealizadoBO;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
