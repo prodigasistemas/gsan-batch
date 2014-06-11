@@ -32,7 +32,7 @@ public class DebitoCobradoBO {
 		for (DebitoCobrar debitoACobrar : colecaoDebitosACobrar) {
 			valorPrestacao = debitoACobrar.getValorPrestacao();
 			
-			valorPrestacao = valorPrestacao.add(valorResidual(valorPrestacao, debitoACobrar)).setScale(2);
+			valorPrestacao = valorPrestacao.add(debitoACobrar.getResiduoPrestacao()).setScale(2);
 			valorDebito = valorDebito.add(valorPrestacao);
 			
 			DebitoCobrado debitoCobrado = new DebitoCobrado();
@@ -49,26 +49,5 @@ public class DebitoCobradoBO {
 			to.addValorDebito(valorDebito);
 		}
 		return to;
-	}
-
-	private BigDecimal valorResidual(BigDecimal valorPrestacao, DebitoCobrar debitoACobrar) {
-		short numeroParcelaBonus = debitoACobrar.getNumeroParcelaBonus() != null? debitoACobrar.getNumeroParcelaBonus() : 0;
-		
-		BigDecimal residuo = new BigDecimal(0);
-		
-		// Caso seja a ultima prestacao
-		if (debitoACobrar.getNumeroPrestacaoCobradas() == debitoACobrar.getNumeroPrestacaoDebito() - numeroParcelaBonus - 1) {
-			// Obtem o numero de prestacao debito
-			BigDecimal numeroPrestacaoDebito = new BigDecimal(debitoACobrar.getNumeroPrestacaoDebito());
-
-			// Mutiplica o (valor da prestacao * numero da prestacao debito) - numeroParcelaBonus
-
-			BigDecimal multiplicacao = valorPrestacao.multiply(numeroPrestacaoDebito).setScale(2);
-
-			// Subtrai o valor do debito pelo resultado da multiplicacao
-			residuo = debitoACobrar.getValorDebito().subtract(multiplicacao).setScale(2);
-		}
-		
-		return residuo;
 	}
 }
