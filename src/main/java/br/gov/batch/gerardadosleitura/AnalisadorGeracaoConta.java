@@ -42,7 +42,7 @@ public class AnalisadorGeracaoConta {
 
 	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento) {
 		
-		Collection<DebitoCobrar> debitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelESituacao(imovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		Collection<DebitoCobrar> debitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
 		if (naoHaDebitosACobrar(debitosACobrar) || paralisacaoFaturamento() || !pagamentoRepositorio.existeDebitoSemPagamento(debitosACobrar)) {
 			return false;
 		}

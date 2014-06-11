@@ -1,0 +1,7 @@
+faturamento.debito_a_cobrar:
+  - dbac_id: 1
+    dbac_vldebito: 78
+    dbac_nnprestacaodebito: 4
+    dbac_nnprestacaocobradas: 3
+    imov_id: 1
+    dcst_idatual: 0
