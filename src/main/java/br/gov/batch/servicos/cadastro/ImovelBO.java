@@ -1,4 +1,4 @@
-package br.gov.servicos.cadastro;
+package br.gov.batch.servicos.cadastro;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
