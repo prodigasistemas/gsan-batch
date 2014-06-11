@@ -1,42 +1,36 @@
 package br.gov.batch.servicos.faturamento;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import br.gov.model.MergeProperties;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.faturamento.DebitoCobrarGeral;
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
-import br.gov.model.faturamento.DebitoCreditoSituacao;
-import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
+import br.gov.model.faturamento.DebitoCobrarGeral;
 import br.gov.servicos.to.DebitoCobradoTO;
 
 @Stateless
 public class DebitoCobradoBO {
 
 	@EJB
-	private DebitoCobrarRepositorio debitoCobrarRepositorio;
+	private DebitoCobrarBO debitoCobrarBO;
 	
 	public DebitoCobradoTO gerarDebitoCobrado(Imovel imovel, int anoMesFaturamento){
 		DebitoCobradoTO to = new DebitoCobradoTO();
 		
-		Collection<DebitoCobrar> colecaoDebitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
+		Collection<DebitoCobrar> colecaoDebitosACobrar = debitoCobrarBO.debitosCobrarVigentes(imovel);
 		
 		BigDecimal valorPrestacao = null;
 		
 		BigDecimal valorDebito = new BigDecimal(0.0);
 		
-		Collection<DebitoCobrado> debitosCobrados = new ArrayList<DebitoCobrado>();
 		for (DebitoCobrar debitoACobrar : colecaoDebitosACobrar) {
-			valorPrestacao = debitoACobrar.getValorDebito().divide(new BigDecimal(debitoACobrar.getNumeroPrestacaoDebito()), 2, BigDecimal.ROUND_DOWN);
+			valorPrestacao = debitoACobrar.getValorPrestacao();
 			
 			valorPrestacao = valorPrestacao.add(valorResidual(valorPrestacao, debitoACobrar)).setScale(2);
 			valorDebito = valorDebito.add(valorPrestacao);
@@ -51,10 +45,9 @@ public class DebitoCobradoBO {
 			debitoCobrado.setValorPrestacao(valorPrestacao);
 			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
 			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
-			debitosCobrados.add(debitoCobrado);
+			to.addDebitoCobrado(debitoCobrado);
+			to.addValorDebito(valorDebito);
 		}
-		to.setDebitosCobrados(debitosCobrados);
-		to.setValorDebito(valorDebito);
 		return to;
 	}
 
