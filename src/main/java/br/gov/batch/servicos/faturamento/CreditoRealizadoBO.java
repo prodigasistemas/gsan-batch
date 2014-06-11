@@ -1,4 +1,4 @@
-package br.gov.servicos.faturamento;
+package br.gov.batch.servicos.faturamento;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizado;
@@ -18,7 +19,6 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
 import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
-import br.gov.servicos.cadastro.ImovelBO;
 import br.gov.servicos.to.CreditoRealizadoTO;
 import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
 
