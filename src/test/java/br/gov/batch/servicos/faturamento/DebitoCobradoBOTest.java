@@ -60,7 +60,7 @@ public class DebitoCobradoBOTest {
 	@Test
 	public void testDebitoCobrarUltimaParcelaComResiduo(){
 		List<DebitoCobrar> debitos = new ArrayList<DebitoCobrar>();
-		debitos.add(debitoCobrarComParcelasENaUltimaParcela());
+		debitos.add(debitoCobrarParceladoENaUltimaParcela());
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
@@ -92,7 +92,7 @@ public class DebitoCobradoBOTest {
 		return d;
 	}
 	
-	private DebitoCobrar debitoCobrarComParcelasENaUltimaParcela() {
+	private DebitoCobrar debitoCobrarParceladoENaUltimaParcela() {
 		DebitoCobrar d = new DebitoCobrar();
 		d.setId(3L);
 		d.setValorDebito(new BigDecimal(16));
