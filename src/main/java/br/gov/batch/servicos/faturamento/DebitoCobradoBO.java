@@ -3,6 +3,7 @@ package br.gov.batch.servicos.faturamento;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -10,7 +11,9 @@ import javax.ejb.Stateless;
 import br.gov.model.MergeProperties;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.DebitoCobrado;
+import br.gov.model.faturamento.DebitoCobradoCategoria;
 import br.gov.model.faturamento.DebitoCobrar;
+import br.gov.model.faturamento.DebitoCobrarCategoria;
 import br.gov.model.faturamento.DebitoCobrarGeral;
 import br.gov.servicos.to.DebitoCobradoTO;
 
@@ -19,6 +22,12 @@ public class DebitoCobradoBO {
 
 	@EJB
 	private DebitoCobrarBO debitoCobrarBO;
+	
+	@EJB
+	private DebitoCobradoCategoriaBO debitoCobradoCategoriaBO;
+	
+	@EJB
+	private DebitoCobrarCategoriaBO debitoCobrarCategoriaBO;
 	
 	public DebitoCobradoTO gerarDebitoCobrado(Imovel imovel, int anoMesFaturamento){
 		DebitoCobradoTO to = new DebitoCobradoTO();
@@ -45,8 +54,16 @@ public class DebitoCobradoBO {
 			debitoCobrado.setValorPrestacao(valorPrestacao);
 			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
 			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
+			
+			List<DebitoCobrarCategoria> dCobrarCategoria   = debitoCobrarCategoriaBO.dividePrestacaoDebitoPelasEconomias(debitoACobrar.getId(), valorPrestacao);
+			
+			debitoACobrar.setNumeroPrestacaoCobradas(new Integer(debitoACobrar.getNumeroPrestacaoCobradas() + 1).shortValue());
+			debitoACobrar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
+
 			to.addDebitoCobrado(debitoCobrado);
 			to.addValorDebito(valorDebito);
+			to.addDebitoCobrarAtualizado(debitoACobrar);
+			to.setCategorias(debitoCobradoCategoriaBO.listaDebitoCobradoCategoriaPeloCobrar(dCobrarCategoria));
 		}
 		return to;
 	}
