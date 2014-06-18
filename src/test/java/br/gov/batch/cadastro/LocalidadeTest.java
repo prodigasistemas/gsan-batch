@@ -13,6 +13,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.test.ShrinkWrapBuilder;
 import br.gov.model.cadastro.Localidade;
 import br.gov.servicos.cadastro.LocalidadeRepositorio;
 
