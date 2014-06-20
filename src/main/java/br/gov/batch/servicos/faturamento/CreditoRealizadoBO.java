@@ -15,6 +15,7 @@ import br.gov.model.faturamento.CreditoRealizado;
 import br.gov.model.faturamento.CreditoRealizadoCategoria;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
+import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
@@ -32,6 +33,9 @@ public class CreditoRealizadoBO {
 
 	@EJB
 	private CreditoRealizarRepositorio creditoRealizarRepositorio;
+	
+	private CreditoRealizadoTO creditoRealizadoTO;
+	private BigDecimal valorACobrar;
 
 	public CreditoRealizadoTO gerarCreditoRealizado(Imovel imovel, Integer anoMesFaturamento,
 			ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos,
@@ -47,63 +51,75 @@ public class CreditoRealizadoBO {
 	private CreditoRealizadoTO gerarCreditoRealizado(Integer anoMesFaturamento, BigDecimal valorTotalACobrar, 
 			boolean gerarAtividadeGrupoFaturamento, boolean preFaturamento, Collection<CreditoRealizar> colecaoCreditosRealizar) {
 
-		CreditoRealizadoTO creditoRealizadoTO = new CreditoRealizadoTO();
+		creditoRealizadoTO = new CreditoRealizadoTO();
+		valorACobrar = valorTotalACobrar;
 
 		Iterator<CreditoRealizar> iteratorColecaoCreditosARealizar = colecaoCreditosRealizar.iterator();
 		CreditoRealizar creditoRealizar = null;
 
-		while (iteratorColecaoCreditosARealizar.hasNext() && valorTotalACobrar.compareTo(new BigDecimal("0.00")) == 1) {
+		while (iteratorColecaoCreditosARealizar.hasNext() && valorTotalACobrar.compareTo(BigDecimal.ZERO) == 1) {
 
 			creditoRealizar = (CreditoRealizar) iteratorColecaoCreditosARealizar.next();
 
 			creditoRealizar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
 			creditoRealizar.setValorResidualConcedidoMes(creditoRealizar.getValorResidualMesAnterior());
 			
-			Short numeroParcelaBonus = getNumeroParcelaBonus(creditoRealizar);
-			if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar, numeroParcelaBonus)) {
+			if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar)) {
 				creditoRealizar.setNumeroPrestacaoRealizada(new Integer(creditoRealizar.getNumeroPrestacaoRealizada().intValue() + 1).shortValue());
 			}
 
-			BigDecimal valorCredito = calculaValorCorrespondenteParcelaMes(creditoRealizar, numeroParcelaBonus);
-
+			BigDecimal valorCreditoParcelaMes = calculaValorCorrespondenteParcelaMes(creditoRealizar);
+			
 			if (!preFaturamento) {
-				valorTotalACobrar = valorTotalACobrar.subtract(valorCredito);
+				valorACobrar = valorACobrar.subtract(valorCreditoParcelaMes);
+			}
+			
+			creditoRealizar.setValorResidualMesAnterior(calculaValorResidualMesAnterior(preFaturamento, creditoRealizar));
+
+			if (valorACobrarEhMenorQueZero()) {
+				valorCreditoParcelaMes = valorCreditoParcelaMes.subtract(creditoRealizar.getValorResidualMesAnterior());
+				valorACobrar = BigDecimal.ZERO;
 			}
 
-			if (valorTotalACobrar.compareTo(new BigDecimal("0.00")) == -1) {
-
-				creditoRealizar.setValorResidualMesAnterior(valorTotalACobrar.multiply(new BigDecimal("-1")));
-
-				valorCredito = valorCredito.subtract(creditoRealizar.getValorResidualMesAnterior());
-
-				valorTotalACobrar = new BigDecimal("0.00");
-
-			} else if (!preFaturamento) {
-				creditoRealizar.setValorResidualMesAnterior(new BigDecimal("0.00"));
-			}
-
-			creditoRealizadoTO.somaValorTotalCreditos(valorCredito);
+			creditoRealizadoTO.somaValorTotalCreditos(valorCreditoParcelaMes);
 
 			if (gerarAtividadeGrupoFaturamento) {
-
-				CreditoRealizado creditoRealizado = criarCreditoRealizado(creditoRealizar, numeroParcelaBonus, valorCredito);
-
-				Collection<CreditoRealizadoCategoria> colecaoCreditosRealizadoCategoria = obterColecaoCreditosRealizadoCategoria(
-						creditoRealizado, creditoRealizar, valorCredito);
-
-				creditoRealizadoTO.putCategoriasPorCreditoRealizado(creditoRealizado, colecaoCreditosRealizadoCategoria);
-				creditoRealizadoTO.addCreditoRealizar(creditoRealizar);
+				criarAtividadeGrupoFaturamento(creditoRealizar, valorCreditoParcelaMes);
 			}
 
 			if (creditoRealizadoTO.possuiCreditoTipo(creditoRealizar.getCreditoTipo())) {
-				BigDecimal valor = creditoRealizadoTO.getMapValoresPorTipoCredito().get(creditoRealizar.getCreditoTipo());
-				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), somaBigDecimal(valor, valorCredito));
+				BigDecimal valorTotal = somaValorCreditoTipoEValorCreditoParcelaMes(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
+				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorTotal);
 			} else {
-				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCredito);
+				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
 			}
 		}
 
 		return creditoRealizadoTO;
+	}
+
+	private void criarAtividadeGrupoFaturamento(CreditoRealizar creditoRealizar, BigDecimal valorCreditoParcelaMes) {
+		CreditoRealizado creditoRealizado = criarCreditoRealizado(creditoRealizar, valorCreditoParcelaMes);
+
+		Collection<CreditoRealizadoCategoria> colecaoCreditosRealizadoCategoria = obterColecaoCreditosRealizadoCategoria(
+				creditoRealizado, creditoRealizar, valorCreditoParcelaMes);
+
+		creditoRealizadoTO.putCategoriasPorCreditoRealizado(creditoRealizado, colecaoCreditosRealizadoCategoria);
+		creditoRealizadoTO.addCreditoRealizar(creditoRealizar);
+	}
+
+	private BigDecimal calculaValorResidualMesAnterior(boolean preFaturamento, CreditoRealizar creditoRealizar) {
+		if (valorACobrarEhMenorQueZero()) {
+			return valorACobrar.multiply(new BigDecimal("-1"));
+		} else if (!preFaturamento) {
+			return BigDecimal.ZERO;
+		}
+		
+		return creditoRealizar.getValorResidualMesAnterior();
+	}
+
+	private boolean valorACobrarEhMenorQueZero() {
+		return valorACobrar.compareTo(BigDecimal.ZERO) == -1;
 	}
 
 	private Collection<CreditoRealizadoCategoria> obterColecaoCreditosRealizadoCategoria(CreditoRealizado creditoRealizado, 
@@ -150,7 +166,7 @@ public class CreditoRealizadoBO {
 		return colecaoCategorias;
 	}
 
-	private CreditoRealizado criarCreditoRealizado(CreditoRealizar creditoRealizar, Short numeroParcelaBonus, BigDecimal valorCredito) {
+	private CreditoRealizado criarCreditoRealizado(CreditoRealizar creditoRealizar, BigDecimal valorCredito) {
 		CreditoRealizado creditoRealizado = new CreditoRealizado();
 		creditoRealizado.setCreditoTipo(creditoRealizar.getCreditoTipo());
 		creditoRealizado.setCreditoRealizado(creditoRealizar.getGeracaoCredito());
@@ -166,20 +182,20 @@ public class CreditoRealizadoBO {
 		creditoRealizado.setValorCredito(valorCredito);
 		creditoRealizado.setCreditoOrigem(creditoRealizar.getCreditoOrigem());
 		creditoRealizado.setNumeroPrestacao(creditoRealizar.getNumeroPrestacaoCredito());
-		creditoRealizado.setNumeroParcelaBonus(numeroParcelaBonus);
+		creditoRealizado.setNumeroParcelaBonus(creditoRealizar.getNumeroParcelaBonus());
 		creditoRealizado.setNumeroPrestacaoCredito(creditoRealizar.getNumeroPrestacaoRealizada());
 		creditoRealizado.setCreditoRealizarGeral(creditoRealizar.getCreditoRealizarGeral());
 		return creditoRealizado;
 	}
 
-	public BigDecimal calculaValorCorrespondenteParcelaMes(CreditoRealizar creditoRealizar, Short numeroParcelaBonus) {
-		BigDecimal valorCorrespondenteParcelaMes = new BigDecimal("0.00");
+	public BigDecimal calculaValorCorrespondenteParcelaMes(CreditoRealizar creditoRealizar) {
+		BigDecimal valorCorrespondenteParcelaMes = BigDecimal.ZERO;
 
-		if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar, numeroParcelaBonus)) {
+		if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar)) {
 			valorCorrespondenteParcelaMes = creditoRealizar.getValorCredito().divide(new BigDecimal(
 					creditoRealizar.getNumeroPrestacaoCredito()), 2, BigDecimal.ROUND_DOWN);
 
-			if (ehUltimaParcela(creditoRealizar, numeroParcelaBonus)) {
+			if (ehUltimaParcela(creditoRealizar)) {
 
 				BigDecimal valorMesVezesPrestacaoCredito = valorCorrespondenteParcelaMes.multiply(
 						new BigDecimal(creditoRealizar.getNumeroPrestacaoCredito())).setScale(2);
@@ -191,22 +207,14 @@ public class CreditoRealizadoBO {
 		return valorCorrespondenteParcelaMes.add(creditoRealizar.getValorResidualMesAnterior());
 	}
 
-	private boolean ehUltimaParcela(CreditoRealizar creditoRealizar, Short numeroParcelaBonus) {
+	private boolean ehUltimaParcela(CreditoRealizar creditoRealizar) {
 		return creditoRealizar.getNumeroPrestacaoRealizada().intValue() == 
-				((creditoRealizar.getNumeroPrestacaoCredito().intValue() - numeroParcelaBonus.intValue()) - 1);
+				((creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue()) - 1);
 	}
 
-	private boolean numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(CreditoRealizar creditoRealizar, Short numeroParcelaBonus) {
+	private boolean numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(CreditoRealizar creditoRealizar) {
 		return creditoRealizar.getNumeroPrestacaoRealizada().intValue() <
-		(creditoRealizar.getNumeroPrestacaoCredito().intValue() - numeroParcelaBonus.intValue());
-	}
-
-	private Short getNumeroParcelaBonus(CreditoRealizar creditoRealizar) {
-		if (creditoRealizar.getNumeroParcelaBonus() != null) {
-			return creditoRealizar.getNumeroParcelaBonus();
-		} else {
-			return 0;
-		}
+		(creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue());
 	}
 
 	private Collection<CreditoRealizar> getColecaoCreditosRealizar(Imovel imovel, Integer anoMesFaturamento, boolean preFaturamento) {
@@ -233,24 +241,20 @@ public class CreditoRealizadoBO {
 		if (preFaturamento) {
 			return BigDecimal.ONE;
 		}
-		BigDecimal valorTotalACobrar = new BigDecimal("0.00");
+		
+		BigDecimal valorTotalACobrar = BigDecimal.ZERO;
 		BigDecimal somaAguaEsgoto = valoresAguaEsgotoTO.getValorTotalAgua().add(valoresAguaEsgotoTO.getValorTotalEsgoto());
 
 		return valorTotalACobrar.add(somaAguaEsgoto).add(valorTotalDebitos);
 	}
 
-	public BigDecimal somaBigDecimal(BigDecimal value1, BigDecimal value2) {
-
-		BigDecimal v1 = BigDecimal.ZERO;
-		BigDecimal v2 = BigDecimal.ZERO;
-
-		if (value1 != null) {
-			v1 = value1;
+	public BigDecimal somaValorCreditoTipoEValorCreditoParcelaMes(CreditoTipo creditoTipo, BigDecimal valorCreditoParcelaMes) {
+		BigDecimal valorCreditoTipo = creditoRealizadoTO.getValorCreditoTipo(creditoTipo);
+		
+		if (valorCreditoParcelaMes == null) {
+			valorCreditoParcelaMes = BigDecimal.ZERO;
 		}
-		if (value2 != null) {
-			v2 = value2;
-		}
-
-		return v1.add(v2);
+		
+		return valorCreditoTipo.add(valorCreditoParcelaMes);
 	}
 }

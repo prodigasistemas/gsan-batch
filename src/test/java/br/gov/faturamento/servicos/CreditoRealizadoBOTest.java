@@ -66,7 +66,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoCredito(new Short("2"));
 		creditoRealizar.setNumeroPrestacaoRealizada(new Short("3"));
 		
-		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar);
 		
 		assertEquals(new BigDecimal("0.00"), retorno);
 	}
@@ -76,7 +76,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoCredito(new Short("1"));
 		creditoRealizar.setNumeroPrestacaoRealizada(new Short("0"));
 		
-		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar);
 		
 		assertEquals(new BigDecimal("2.00"), retorno);
 	}
@@ -86,7 +86,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoCredito(new Short("4"));
 		creditoRealizar.setNumeroPrestacaoRealizada(new Short("3"));
 		
-		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar);
 		
 		assertEquals(new BigDecimal("0.50"), retorno);
 	}
@@ -96,7 +96,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoCredito(new Short("4"));
 		creditoRealizar.setNumeroPrestacaoRealizada(new Short("2"));
 		
-		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar);
 		
 		assertEquals(new BigDecimal("0.50"), retorno);
 	}
@@ -107,7 +107,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoRealizada(new Short("1"));
 		creditoRealizar.setValorResidualMesAnterior(new BigDecimal("0.50"));
 		
-		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar, new Short("0"));
+		BigDecimal retorno = creditoRealizadoBO.calculaValorCorrespondenteParcelaMes(creditoRealizar);
 		
 		assertEquals(new BigDecimal("1.50"), retorno);
 	}
