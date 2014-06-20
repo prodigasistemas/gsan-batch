@@ -14,9 +14,9 @@ import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
+import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelRepositorio;
-import br.gov.util.BatchUtil;
 
 @Named
 public class PreGerarDadosLeitura extends AbstractItemReader {
