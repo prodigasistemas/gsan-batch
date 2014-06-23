@@ -112,8 +112,7 @@ public class ImpostosConta {
 			retorno.setValorBaseCalculo(baseCalculo);
 
 		} catch (Exception ex) {
-			//			sessionContext.setRollbackOnly();
-			//			throw new ControladorException("erro.sistema", ex);
+			ex.printStackTrace();
 		}
 
 		return retorno;
@@ -128,7 +127,7 @@ public class ImpostosConta {
 	}
 
 	private BigDecimal calculaValorImpostoDeduzido(ImpostoTipoAliquota impostoTipoAliquota, BigDecimal percetagemAliquota) {
-		BigDecimal percetagem = dividirArredondando(percetagemAliquota, new BigDecimal("100.00"));
+		BigDecimal percetagem = dividiArredondando(percetagemAliquota, new BigDecimal("100.00"));
 		BigDecimal valor = baseCalculo.multiply(percetagem);
 		
 		return valor.setScale(2, BigDecimal.ROUND_HALF_DOWN);
@@ -155,7 +154,7 @@ public class ImpostosConta {
 		return baseCalculo;
 	}
 
-	public static BigDecimal dividirArredondando(BigDecimal dividendo, BigDecimal divisor) {
+	private static BigDecimal dividiArredondando(BigDecimal dividendo, BigDecimal divisor) {
 
 		BigDecimal resultado = null;
 
