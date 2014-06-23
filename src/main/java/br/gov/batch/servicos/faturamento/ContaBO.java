@@ -18,30 +18,41 @@ public class ContaBO {
 	private ClienteRepositorio clienteRepositorio;
 	
 	public Date determinarVencimentoConta(Imovel imovel){
+		ContaTO contaTO = new ContaTO();
+		contaTO = vencimentoAlternativo(contaTO);
 		
+		if (contaTO.comVencimentoAlternativo()){
+			if (contaTO.vencimentoMesSeguinte()){
+				contaTO.adicionaMesAoVencimento();
+			}else{
+				contaTO.ajustaDiaVencimentoAlternativo();
+				
+				if (contaTO.vencimentoRotaSuperiorAoAlternativo()){
+					Date dataAtualMaisDiasMinimoEmissao = Utilitarios.adicionarDias(new Date(),	contaTO.getNumeroMinimoDiasEmissaoVencimento());
+					
+					
+				}
+			}
+		}
 		return null;
 	}
 	
-	public ContaTO vencimentoAlternativo(Imovel imovel, Date dataContaVencimento){
-		ContaTO contaTO = new ContaTO();
-		
-		if (imovel.existeDiaVencimento() && !imovel.emissaoExtratoFaturamento()) {
-			contaTO.setDiaVencimentoAlternativo(imovel.getDiaVencimento());
-			contaTO.setIndicadorVencimentoMesSeguinte(imovel.getIndicadorVencimentoMesSeguinte());
+	public ContaTO vencimentoAlternativo(ContaTO contaTO){
+		if (contaTO.getImovel().existeDiaVencimento() && !contaTO.getImovel().emissaoExtratoFaturamento()) {
+			contaTO.setDiaVencimentoAlternativo(contaTO.getImovel().getDiaVencimento());
+			contaTO.setIndicadorVencimentoMesSeguinte(contaTO.getImovel().getIndicadorVencimentoMesSeguinte());
 		} else {
-			
-			Cliente cliente = clienteRepositorio.buscarClienteResponsavelPorImovel(imovel.getId());
+			Cliente cliente = clienteRepositorio.buscarClienteResponsavelPorImovel(contaTO.getImovel().getId());
 
 			if (cliente != null) {
 				if (cliente.existeDiaVencimento()) {
 					contaTO.setDiaVencimentoAlternativo(cliente.getDiaVencimento());
 					contaTO.setIndicadorVencimentoMesSeguinte(cliente.getIndicadorVencimentoMesSeguinte());
 				}
-				else if (imovel.emissaoExtratoFaturamento()) {
-					contaTO.setDiaVencimentoAlternativo(Utilitarios.obterUltimoDiaMes(dataContaVencimento));
+				else if (contaTO.getImovel().emissaoExtratoFaturamento()) {
+					contaTO.setDiaVencimentoAlternativo(Utilitarios.obterUltimoDiaMes(contaTO.getDataVencimentoConta()));
 				}
 			}
-			
 		}
 		
 		return contaTO;
