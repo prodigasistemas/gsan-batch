@@ -26,7 +26,10 @@ public class ContaBO {
 	
 	public Conta gerarConta(Imovel imovel, Date dataVencimentoRota){
 		Conta.Builder builder = new Conta.Builder();
-		builder.dataVencimentoConta(this.determinarVencimentoConta(imovel, dataVencimentoRota));
+		builder.imovel(imovel)
+			.dataVencimentoConta(this.determinarVencimentoConta(imovel, dataVencimentoRota))
+			.validadeConta(sistemaParametros.getNumeroMesesValidadeConta());
+		
 		Conta conta = builder.build();
 		
 		return conta;
