@@ -16,7 +16,6 @@ public class CategoriaBO {
 
 		Collection<BigDecimal> colecaoValoresPorCategoria = new ArrayList<BigDecimal>();
 
-		//acuama a quantidae de ecnomias das acategorias
 		int somatorioQuantidadeEconomiasCadaCategoria = 0;
 		if (colecaoCategorias != null && !colecaoCategorias.isEmpty()) {
 			Iterator<Categoria> iteratorColecaoCategorias = colecaoCategorias.iterator();
@@ -27,22 +26,18 @@ public class CategoriaBO {
 			}
 		}
 
-		//	 calcula o fator de multiplicação
-		BigDecimal fatorMultiplicacao = valor.divide(new BigDecimal(somatorioQuantidadeEconomiasCadaCategoria),2,BigDecimal.ROUND_DOWN);
+		BigDecimal fatorMultiplicacao = valor.divide(new BigDecimal(somatorioQuantidadeEconomiasCadaCategoria), 2, BigDecimal.ROUND_DOWN);
 
-		BigDecimal valorPorCategoriaAcumulado = new BigDecimal(0);
+		BigDecimal valorPorCategoriaAcumulado = BigDecimal.ZERO;
 
 
-		//	 para cada categoria, calcula o Valor por Cageoria
 		if (colecaoCategorias != null && !colecaoCategorias.isEmpty()) {
 			Iterator<Categoria> iteratorColecaoCategorias = colecaoCategorias.iterator();
 
 			while (iteratorColecaoCategorias.hasNext()) {
 				Categoria categoria = (Categoria) iteratorColecaoCategorias.next();
 
-				BigDecimal valorPorCategoria = new BigDecimal(0);
-
-				valorPorCategoria = fatorMultiplicacao.multiply(new BigDecimal(categoria.getQuantidadeEconomiasCategoria()));
+				BigDecimal valorPorCategoria = fatorMultiplicacao.multiply(new BigDecimal(categoria.getQuantidadeEconomiasCategoria()));
 
 				BigDecimal valorTruncado = valorPorCategoria.setScale(2, BigDecimal.ROUND_DOWN);
 
@@ -54,19 +49,15 @@ public class CategoriaBO {
 
 		valorPorCategoriaAcumulado = valorPorCategoriaAcumulado.setScale(7);
 
-		// caso o valor por categoria acumulado seja menor que o valor
-		// acuma a diferença no valor por cageoria da primeira
 		if (valorPorCategoriaAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(valor.setScale(2, BigDecimal.ROUND_HALF_UP)) == -1) {
 
-			BigDecimal diferenca = valor.subtract(valorPorCategoriaAcumulado);
-
-			diferenca = diferenca.setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal diferenca = valor.subtract(valorPorCategoriaAcumulado).setScale(2, BigDecimal.ROUND_HALF_UP);
 
 			BigDecimal categoriaPrimeira = (BigDecimal) colecaoValoresPorCategoria.iterator().next();
 
 			categoriaPrimeira = categoriaPrimeira.add(diferenca);
 
-			((ArrayList<BigDecimal>)colecaoValoresPorCategoria).set(0, categoriaPrimeira);
+			((ArrayList<BigDecimal>) colecaoValoresPorCategoria).set(0, categoriaPrimeira);
 
 		}
 

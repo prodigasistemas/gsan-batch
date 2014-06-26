@@ -115,7 +115,7 @@ public class CreditoRealizadoBOTest {
 	@Test
 	public void gerarCreditoRealizadoSemCreditoRealizarNaoEhPreFaturamento(){
 		Collection<CreditoRealizar> creditosRealizar = new ArrayList<CreditoRealizar>();
-		expect(creditoRealizarRepositorioMock.obterCreditoRealizarImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
 			.andReturn(creditosRealizar);
 		replay(creditoRealizarRepositorioMock);
 		

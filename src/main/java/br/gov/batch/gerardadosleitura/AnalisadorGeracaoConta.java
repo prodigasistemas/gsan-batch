@@ -12,6 +12,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
 import br.gov.servicos.arrecadacao.PagamentoRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
@@ -27,6 +28,9 @@ public class AnalisadorGeracaoConta {
 	
 	@EJB
 	private PagamentoRepositorio pagamentoRepositorio;
+	
+	@EJB
+	private DevolucaoRepositorio devolucaoRepositorio;
 	
 	private Imovel imovel;
 	
@@ -48,9 +52,11 @@ public class AnalisadorGeracaoConta {
 		}
 		
 		boolean segundaCondicaoGerarConta = true;
-		Collection<CreditoRealizar> creditosARealizar = creditoRealizarRepositorio.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		Collection<CreditoRealizar> creditosARealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(imovel.getId(), 
+																													DebitoCreditoSituacao.NORMAL, 
+																													anoMesFaturamento);
 
-		if (naoHaCreditoARealizar(creditosARealizar) || creditoRealizarRepositorio.existeCreditoComDevolucao(creditosARealizar)) {
+		if (naoHaCreditoARealizar(creditosARealizar) || devolucaoRepositorio.existeCreditoComDevolucao(creditosARealizar)) {
 			segundaCondicaoGerarConta = haDebitosCobrarAtivos(debitosACobrar);
 		}
 
