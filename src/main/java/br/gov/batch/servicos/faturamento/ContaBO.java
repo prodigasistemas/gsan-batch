@@ -1,5 +1,6 @@
 package br.gov.batch.servicos.faturamento;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.ejb.EJB;
@@ -24,10 +25,21 @@ public class ContaBO {
 	@EJB
 	private SistemaParametros sistemaParametros;
 	
-	public Conta gerarConta(Imovel imovel, Date dataVencimentoRota){
+	public Conta gerarConta(Imovel imovel, Date dataVencimentoRota, Integer anoMesFaturamento, BigDecimal valorTotalCreditos, BigDecimal valorTotalDebitos
+			, BigDecimal valorTotalImposto, BigDecimal percentualEsgoto, BigDecimal percentualColeta){
 		Conta.Builder builder = new Conta.Builder();
 		builder.imovel(imovel)
+			.referenciaFaturamento(anoMesFaturamento)
+			.referenciaContabil(anoMesFaturamento)
 			.dataVencimentoConta(this.determinarVencimentoConta(imovel, dataVencimentoRota))
+			.indicadorAlteracaoVencimento((short) 2)
+			.valorAgua(BigDecimal.ZERO)
+			.valorEsgoto(BigDecimal.ZERO)
+			.valorCreditos(valorTotalCreditos)
+			.valorDebitos(valorTotalDebitos)
+			.valorImposto(valorTotalImposto)
+			.percentualEsgoto(percentualEsgoto)
+			.percentualColeta(percentualColeta)
 			.validadeConta(sistemaParametros.getNumeroMesesValidadeConta());
 		
 		Conta conta = builder.build();
