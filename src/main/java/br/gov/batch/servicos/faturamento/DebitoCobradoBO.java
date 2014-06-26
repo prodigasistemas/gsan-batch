@@ -11,7 +11,6 @@ import javax.ejb.Stateless;
 import br.gov.model.MergeProperties;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.DebitoCobrado;
-import br.gov.model.faturamento.DebitoCobradoCategoria;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCobrarCategoria;
 import br.gov.model.faturamento.DebitoCobrarGeral;

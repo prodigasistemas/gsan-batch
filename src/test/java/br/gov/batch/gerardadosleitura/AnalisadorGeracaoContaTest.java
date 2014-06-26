@@ -24,6 +24,7 @@ import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.faturamento.DebitoTipo;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
+import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
 import br.gov.servicos.arrecadacao.PagamentoRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
@@ -48,6 +49,9 @@ public class AnalisadorGeracaoContaTest {
 	
 	@Mock
 	private CreditoRealizarRepositorio creditoRealizarEJBMock;
+	
+	@Mock
+	private DevolucaoRepositorio devolucaoEJBMock;
 	
 	@Before
 	public void setup(){
@@ -186,6 +190,7 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
 		replay(creditoRealizarEJBMock);
+		replay(devolucaoEJBMock);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -238,12 +243,12 @@ public class AnalisadorGeracaoContaTest {
 	}
 	
 	private void mockPesquisarCreditoARealizar(Collection<CreditoRealizar> retorno) {
-		expect(creditoRealizarEJBMock.pesquisarCreditoARealizar(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+		expect(creditoRealizarEJBMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
 			.andReturn(retorno);
 	}
 	
 	private void mockExisteCreditoComDevolucao(Collection<CreditoRealizar> creditosRealizar, boolean retorno) {
-		expect(creditoRealizarEJBMock.existeCreditoComDevolucao(creditosRealizar))
+		expect(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
 			.andReturn(retorno);
 	}
 	

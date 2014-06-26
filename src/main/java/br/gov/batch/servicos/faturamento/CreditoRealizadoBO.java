@@ -151,7 +151,7 @@ public class CreditoRealizadoBO {
 	}
 
 	private Collection<Categoria> obterColecaoCategorias(CreditoRealizar creditoRealizar) {
-		Collection<CreditoRealizarCategoria> colecaoCreditoARealizarCategoria = creditoRealizarCategoriaRepositorio.obterCreditoRealizarCategoria(creditoRealizar.getId());
+		Collection<CreditoRealizarCategoria> colecaoCreditoARealizarCategoria = creditoRealizarCategoriaRepositorio.buscarCreditoRealizarCategoria(creditoRealizar.getId());
 
 		Iterator<CreditoRealizarCategoria> colecaoCreditoARealizarCategoriaIterator = colecaoCreditoARealizarCategoria.iterator();
 		Collection<Categoria> colecaoCategorias = new ArrayList<Categoria>();
@@ -218,7 +218,7 @@ public class CreditoRealizadoBO {
 	}
 
 	private Collection<CreditoRealizar> getColecaoCreditosRealizar(Imovel imovel, Integer anoMesFaturamento, boolean preFaturamento) {
-		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.obterCreditoRealizarImovel(
+		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 				imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
 		if (colecaoCreditosRealizar == null) {
@@ -226,7 +226,7 @@ public class CreditoRealizadoBO {
 		}
 
 		if (preFaturamento) {
-			Collection<CreditoRealizar> colecaoCreditosRealizarNitrato = creditoRealizarRepositorio.obterCreditoRealizarImovel(
+			Collection<CreditoRealizar> colecaoCreditosRealizarNitrato = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 					imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento);
 
 			if (colecaoCreditosRealizarNitrato != null && !colecaoCreditosRealizarNitrato.isEmpty()) {

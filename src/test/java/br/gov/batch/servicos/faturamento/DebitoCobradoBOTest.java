@@ -29,6 +29,12 @@ public class DebitoCobradoBOTest {
 	@Mock
 	private DebitoCobrarBO debitoCobrarEJBMock;
 	
+	@Mock
+	private DebitoCobrarCategoriaBO debitoCobrarCategoriaEJBMock;
+	
+	@Mock
+	private DebitoCobradoCategoriaBO debitoCobradoCategoriaEJBMock;
+	
 	private Imovel imovel;
 	
 	private int anoMesFaturamento = 201403;
@@ -41,8 +47,20 @@ public class DebitoCobradoBOTest {
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
 		expect(debitoCobrarEJBMock.debitosCobrarVigentes(imovel))
-		.andReturn(debitos);
+									.andReturn(debitos);
 		replay(debitoCobrarEJBMock);
+		
+		for (DebitoCobrar debitoCobrar : debitos) {
+			BigDecimal valorPrestacao = debitoCobrar.getValorPrestacao();
+			valorPrestacao = valorPrestacao.add(debitoCobrar.getResiduoPrestacao()).setScale(2);
+			expect(debitoCobrarCategoriaEJBMock.dividePrestacaoDebitoPelasEconomias(debitoCobrar.getId(), valorPrestacao)).andReturn(null);
+
+			expect(debitoCobradoCategoriaEJBMock.listaDebitoCobradoCategoriaPeloCobrar(null)).andReturn(null);
+		}
+		replay(debitoCobrarCategoriaEJBMock);
+		replay(debitoCobradoCategoriaEJBMock);
+		
+		
 	}
 	
 	@Test
