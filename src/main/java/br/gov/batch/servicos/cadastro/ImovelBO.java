@@ -8,6 +8,7 @@ import java.util.Iterator;
 import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Categoria;
+import br.gov.model.cadastro.ICategoria;
 
 @Stateless
 public class ImovelBO {
@@ -22,8 +23,8 @@ public class ImovelBO {
 			Iterator<Categoria> iteratorColecaoCategorias = colecaoCategorias.iterator();
 
 			while (iteratorColecaoCategorias.hasNext()) {
-				Categoria categoria = (Categoria) iteratorColecaoCategorias.next();
-				somatorioQuantidadeEconomiasCadaCategoria = somatorioQuantidadeEconomiasCadaCategoria + categoria.getQuantidadeEconomiasCategoria().intValue();
+				ICategoria categoria = (ICategoria) iteratorColecaoCategorias.next();
+				somatorioQuantidadeEconomiasCadaCategoria = somatorioQuantidadeEconomiasCadaCategoria + categoria.getQuantidadeEconomias().intValue();
 			}
 		}
 
@@ -38,11 +39,11 @@ public class ImovelBO {
 			Iterator<Categoria> iteratorColecaoCategorias = colecaoCategorias.iterator();
 
 			while (iteratorColecaoCategorias.hasNext()) {
-				Categoria categoria = (Categoria) iteratorColecaoCategorias.next();
+				ICategoria categoria = (ICategoria) iteratorColecaoCategorias.next();
 
 				BigDecimal valorPorCategoria = new BigDecimal(0);
 
-				valorPorCategoria = fatorMultiplicacao.multiply(new BigDecimal(categoria.getQuantidadeEconomiasCategoria()));
+				valorPorCategoria = fatorMultiplicacao.multiply(new BigDecimal(categoria.getQuantidadeEconomias()));
 
 				BigDecimal valorTruncado = valorPorCategoria.setScale(2, BigDecimal.ROUND_DOWN);
 

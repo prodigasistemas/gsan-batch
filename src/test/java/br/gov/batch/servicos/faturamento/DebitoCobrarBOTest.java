@@ -2,10 +2,10 @@ package br.gov.batch.servicos.faturamento;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.easymock.EasyMockRunner;
@@ -13,9 +13,6 @@ import org.easymock.Mock;
 import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
 import org.junit.runner.RunWith;
 
 import br.gov.model.cadastro.Imovel;

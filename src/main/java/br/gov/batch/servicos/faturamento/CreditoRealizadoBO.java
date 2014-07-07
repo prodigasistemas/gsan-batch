@@ -20,7 +20,7 @@ import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
-import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
+import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 
 @Stateless
 public class CreditoRealizadoBO {
@@ -38,7 +38,7 @@ public class CreditoRealizadoBO {
 	private BigDecimal valorACobrar;
 
 	public CreditoRealizadoTO gerarCreditoRealizado(Imovel imovel, Integer anoMesFaturamento,
-			ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos,
+			FaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos,
 			boolean gerarAtividadeGrupoFaturamento, boolean preFaturamento) {
 
 		Collection<CreditoRealizar> colecaoCreditosRealizar = getColecaoCreditosRealizar(imovel, anoMesFaturamento, preFaturamento);
@@ -143,7 +143,7 @@ public class CreditoRealizadoBO {
 			creditoRealizadoCategoria.setValorCategoria(valorPorCategoria);
 			creditoRealizadoCategoria.setCreditoRealizado(creditoRealizado);
 			creditoRealizadoCategoria.setCategoria(categoria);
-			creditoRealizadoCategoria.setQuantidadeEconomia(categoria.getQuantidadeEconomiasCategoria());
+			creditoRealizadoCategoria.setQuantidadeEconomia(categoria.getQuantidadeEconomias());
 			colecaoCreditosRealizadoCategoria.add(creditoRealizadoCategoria);
 		}
 
@@ -160,7 +160,7 @@ public class CreditoRealizadoBO {
 			CreditoRealizarCategoria creditoRealizarCategoria = (CreditoRealizarCategoria) colecaoCreditoARealizarCategoriaIterator.next();
 			Categoria categoria = new Categoria();
 			categoria.setId(creditoRealizarCategoria.getCategoriaId());
-			categoria.setQuantidadeEconomiasCategoria(creditoRealizarCategoria.getQuantidadeEconomia());
+			categoria.setQuantidadeEconomias(creditoRealizarCategoria.getQuantidadeEconomia());
 			colecaoCategorias.add(categoria);
 		}
 		return colecaoCategorias;
@@ -237,7 +237,7 @@ public class CreditoRealizadoBO {
 		return colecaoCreditosRealizar;
 	}
 
-	public BigDecimal calculaValorTotalACobrar(ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos, boolean preFaturamento) {
+	public BigDecimal calculaValorTotalACobrar(FaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos, boolean preFaturamento) {
 		if (preFaturamento) {
 			return BigDecimal.ONE;
 		}

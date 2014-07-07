@@ -21,7 +21,7 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
-import br.gov.servicos.to.ValoresFaturamentoAguaEsgotoTO;
+import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 
 @RunWith(EasyMockRunner.class)
 public class CreditoRealizadoBOTest {
@@ -37,7 +37,7 @@ public class CreditoRealizadoBOTest {
 	private int anoMesFaturamento;
 	
 	private CreditoRealizadoTO creditoRealizadoTO;
-	private ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO;
+	private FaturamentoAguaEsgotoTO valoresAguaEsgotoTO;
 	private CreditoRealizar creditoRealizar;
 
 	@Before
@@ -58,7 +58,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setValorCredito(new BigDecimal("2.00"));
 		
 		creditoRealizadoTO = new CreditoRealizadoTO();
-		valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 	}
 	
 	@Test
@@ -129,7 +129,7 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void calculaValorTotalACobrarEhPreFaturamento() {
-		ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
 		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
 		BigDecimal valorTotalDebitos = new BigDecimal("0.00");
@@ -141,7 +141,7 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void calculaValorTotalACobrarZeradoNaoEhPreFaturamento() {
-		ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
 		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
 		BigDecimal valorTotalDebitos = new BigDecimal("0.00");
@@ -151,7 +151,7 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void calculaValorTotalACobrarAguaZeradoNaoEhPreFaturamento() {
-		ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
 		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("1.00"));
 		BigDecimal valorTotalDebitos = new BigDecimal("1.00");
@@ -163,7 +163,7 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void calculaValorTotalACobrarAguaEEsgotoZeradosNaoEhPreFaturamento() {
-		ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
 		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
 		BigDecimal valorTotalDebitos = new BigDecimal("1.00");
@@ -175,7 +175,7 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void calculaValorTotalACobrarTotalDebitosZeradosNaoEhPreFaturamento() {
-		ValoresFaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new ValoresFaturamentoAguaEsgotoTO();
+		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("1.00"));
 		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("1.00"));
 		BigDecimal valorTotalDebitos = new BigDecimal("0.00");

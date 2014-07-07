@@ -18,7 +18,7 @@ import br.gov.servicos.to.ImpostoDeduzidoTO;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @Stateless
-public class ImpostosConta {
+public class ImpostosContaBO {
 
 	@EJB
 	private ClienteRepositorio clienteRepositorio;
