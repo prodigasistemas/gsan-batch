@@ -1,6 +1,6 @@
 package br.gov.batch.cadastro;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import javax.inject.Inject;
 
@@ -33,16 +33,16 @@ public class LocalidadeTest {
 	@Test
 	@UsingDataSet("cadastros.yml")
 	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void buscarImovelPorId2() throws Exception {
-		System.out.println(" ********************************************************************* ");
-		
-		StringBuilder sql = new StringBuilder();
-		sql.append("select lo from Localidade lo ");
-		
-		Localidade lo = localidadeRepositorio.find(1L);
-		
-		System.out.println("************ " + lo.getNome());
-		
-		assertEquals("Belem", lo.getNome());
+	public void buscarLocalidadeExistente() throws Exception {
+		Localidade localidade = localidadeRepositorio.find(1L);
+		assertEquals("Belem", localidade.getNome());
+	}
+	
+	@Test
+	@UsingDataSet("cadastros.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+	public void buscarLocalidadeInexistente() throws Exception {
+		Localidade localidade = localidadeRepositorio.find(10L);
+		assertEquals(null, localidade);
 	}
 }
