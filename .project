@@ -3,6 +3,7 @@
 	<name>gsan-batch</name>
 	<comment></comment>
 	<projects>
+		<project>gsan-persistence</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

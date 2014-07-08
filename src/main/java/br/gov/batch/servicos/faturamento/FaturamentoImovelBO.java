@@ -29,6 +29,7 @@ import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 import br.gov.servicos.to.DebitoCobradoTO;
 import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
+import br.gov.servicos.to.GerarContaTO;
 import br.gov.servicos.to.ImovelSubcategoriaTO;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
@@ -109,12 +110,16 @@ public class FaturamentoImovelBO {
 								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
 								gerarDebitoCobradoHelper.getValorDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
 
-				Conta conta = contaBO.gerarConta(imovel, null, anoMesFaturamento, 
-													gerarCreditoRealizadoHelper.getValorTotalCreditos(), 
-													gerarDebitoCobradoHelper.getValorDebito(), 
-													gerarImpostosDeduzidosContaHelper.getValorTotalImposto(),
-													helperValoresAguaEsgoto.getPercentualEsgoto(),
-													helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+				GerarContaTO gerarTO = new GerarContaTO();
+				gerarTO.setImovel(imovel);
+				gerarTO.setDataVencimentoRota(faturamentoAtivCronRota.getDataContaVencimento());
+				gerarTO.setAnoMesFaturamento(anoMesFaturamento);
+				gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
+				gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
+				gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
+				gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
+				gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+				Conta conta = contaBO.gerarConta(gerarTO);
 
 				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
 

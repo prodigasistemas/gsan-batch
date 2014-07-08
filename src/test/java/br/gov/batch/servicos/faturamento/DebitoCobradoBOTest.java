@@ -54,9 +54,8 @@ public class DebitoCobradoBOTest {
 			BigDecimal valorPrestacao = debitoCobrar.getValorPrestacao();
 			valorPrestacao = valorPrestacao.add(debitoCobrar.getResiduoPrestacao()).setScale(2);
 			expect(debitoCobrarCategoriaEJBMock.dividePrestacaoDebitoPelasEconomias(debitoCobrar.getId(), valorPrestacao)).andReturn(null);
-
-			expect(debitoCobradoCategoriaEJBMock.listaDebitoCobradoCategoriaPeloCobrar(null)).andReturn(null);
 		}
+		expect(debitoCobradoCategoriaEJBMock.listaDebitoCobradoCategoriaPeloCobrar(null)).andReturn(null);
 		replay(debitoCobrarCategoriaEJBMock);
 		replay(debitoCobradoCategoriaEJBMock);
 		

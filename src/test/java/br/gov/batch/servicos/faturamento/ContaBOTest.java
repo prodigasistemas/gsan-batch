@@ -38,7 +38,7 @@ public class ContaBOTest {
 	
 	private String textoDia10MesSeguinte;
 	
-	private Date dia15MesSeguinte;
+	private Date dia15ProximoMes;
 	
 	private DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 	
@@ -50,7 +50,7 @@ public class ContaBOTest {
 		cal.setTime(new Date());
 		cal.add(Calendar.MONTH, 1);
 		cal.set(Calendar.DAY_OF_MONTH, 15);
-		dia15MesSeguinte = cal.getTime();
+		dia15ProximoMes = cal.getTime();
 		textoDia10MesSeguinte = format.format(cal.getTime());
 		
 		imovel = new Imovel();
@@ -83,21 +83,21 @@ public class ContaBOTest {
 		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
 		replayAll();
 		
-		assertEquals(textoDia10MesSeguinte, format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(textoDia10MesSeguinte, format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
 	public void vencimentoAlternativoImovelAntesVencerRota(){
 		imovel.setDiaVencimento((short) 5);
 		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
+		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 5);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
@@ -108,10 +108,10 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 25);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 
 	@Test
@@ -122,11 +122,11 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 5);
 		cal.add(Calendar.MONTH, 1);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
@@ -139,11 +139,11 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 5);
 		cal.add(Calendar.MONTH, 1);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 		
 	@Test
@@ -151,14 +151,14 @@ public class ContaBOTest {
 		Cliente cliente = new Cliente();
 		cliente.setDiaVencimento((short) 5);
 		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
+		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 5);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
@@ -171,11 +171,11 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, 5);
 		cal.add(Calendar.MONTH, 1);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
@@ -187,10 +187,10 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.set(Calendar.DAY_OF_MONTH, cal.getMaximum(Calendar.DAY_OF_MONTH));
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 	@Test
@@ -205,10 +205,10 @@ public class ContaBOTest {
 		replayAll();
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15MesSeguinte);
+		cal.setTime(dia15ProximoMes);
 		cal.add(Calendar.DAY_OF_MONTH, 10);
 		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15MesSeguinte)));
+		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	
 }
