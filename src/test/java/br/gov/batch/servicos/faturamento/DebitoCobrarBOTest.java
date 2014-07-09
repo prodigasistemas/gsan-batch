@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.cobranca.Parcelamento;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
@@ -37,19 +38,25 @@ public class DebitoCobrarBOTest {
 	
 	private int anoMesReferencia = 201403;
 	
+	private SistemaParametros parametros;
+	
 	@Before
 	public void setup() {
 		imovel = new Imovel();
 		business = new DebitoCobrarBO();
+		parametros = new SistemaParametros();
+		parametros.setAnoMesFaturamento(anoMesReferencia);
 	}
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
 		expect(debitoCobrarEJBMock.debitosCobrarPorImovelComPendenciaESemRevisao(imovel))
 		.andReturn(debitos);
-		expect(parametrosMock.getAnoMesFaturamento())
-		.andReturn(anoMesFaturamento);
+		expect(parametrosMock.getSistemaParametros())
+		.andReturn(parametros);
 		replay(debitoCobrarEJBMock);
-		replay(parametrosMock);		
+		replay(parametrosMock);
+		
+		business.init();
 	}
 	
 	@Test

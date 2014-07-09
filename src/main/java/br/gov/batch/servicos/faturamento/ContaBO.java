@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -47,6 +48,11 @@ public class ContaBO {
 	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 	
 	private SistemaParametros sistemaParametros;
+	
+	@PostConstruct
+	private void init(){
+		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+	}
 	
 	public Conta gerarConta(GerarContaTO to){
 		ContaGeral contaGeral = new ContaGeral();

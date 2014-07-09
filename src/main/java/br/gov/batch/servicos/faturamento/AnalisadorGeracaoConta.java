@@ -1,4 +1,4 @@
-package br.gov.batch.gerardadosleitura;
+package br.gov.batch.servicos.faturamento;
 
 import java.util.Collection;
 

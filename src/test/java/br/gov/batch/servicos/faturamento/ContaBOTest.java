@@ -1,214 +1,72 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.math.BigDecimal;
 import java.util.Date;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.IExpectationSetters;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
-import org.junit.Before;
+import javax.inject.Inject;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.persistence.Cleanup;
+import org.jboss.arquillian.persistence.CleanupStrategy;
+import org.jboss.arquillian.persistence.TestExecutionPhase;
+import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.model.Status;
-import br.gov.model.cadastro.Cliente;
+import br.gov.batch.test.ShrinkWrapBuilder;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.ImovelContaEnvio;
-import br.gov.model.cadastro.SistemaParametros;
-import br.gov.servicos.cadastro.ClienteRepositorio;
+import br.gov.model.cadastro.Quadra;
+import br.gov.model.cadastro.SetorComercial;
+import br.gov.model.faturamento.Conta;
+import br.gov.servicos.to.GerarContaTO;
 
-@RunWith(EasyMockRunner.class)
+@RunWith(Arquillian.class)
 public class ContaBOTest {
 	
-	@TestSubject
+	@Deployment
+    public static Archive<?> createDeployment() {
+		return ShrinkWrapBuilder.createDeployment();
+    }
+	
+	@Inject
 	private ContaBO contaBO;
 	
-	@Mock
-	private ClienteRepositorio clienteRepositorioMock;
+	GerarContaTO to = new GerarContaTO();
 	
-	@Mock
-	private SistemaParametros sistemaParametrosMock;
-	
-	private String textoDia10MesSeguinte;
-	
-	private Date dia15ProximoMes;
-	
-	private DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-	
-	private Imovel imovel;
-	
-	@Before
-	public void setUp(){
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.MONTH, 1);
-		cal.set(Calendar.DAY_OF_MONTH, 15);
-		dia15ProximoMes = cal.getTime();
-		textoDia10MesSeguinte = format.format(cal.getTime());
+	private void gerarContaSimples(){
+		SetorComercial setor = new SetorComercial();
+		setor.setId(1);
+		setor.setCodigo(8);
 		
-		imovel = new Imovel();
+		Quadra quadra = new Quadra();
+		quadra.setId(1);
+		quadra.setNumeroQuadra(200);
+		
+		Imovel imovel = new Imovel();
 		imovel.setId(1L);
+		imovel.setSetorComercial(setor);
+		imovel.setQuadra(quadra);
 		
+		to.setImovel(imovel);
+		to.setAnoMesFaturamento(201405);
+		to.setValorTotalDebitos(BigDecimal.ZERO);
 		
-		contaBO = new ContaBO();
-	}
-	
-	private void replayAll() {
-		replay(clienteRepositorioMock);
-		replay(sistemaParametrosMock);
-	}
-	
-	private IExpectationSetters<Cliente> mountClienteRepositorioMock() {
-		return expect(clienteRepositorioMock.buscarClienteResponsavelPorImovel(1L));
-	}
-	
-	private IExpectationSetters<Short> mountSistemaParametrosRepositorioMock() {
-		return expect(sistemaParametrosMock.getNumeroMinimoDiasEmissaoVencimento());
-	}
-	
-	private IExpectationSetters<Short> mountSistemaParametrosRepositorioDiasCorreiosMock() {
-		return expect(sistemaParametrosMock.getNumeroDiasAdicionaisCorreios());
+		to.setDataVencimentoRota(new Date());
+		
 	}
 	
 	@Test
-	public void semVencimentoAlternativo(){
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+	@UsingDataSet("criarContaInput.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+	public void criarConta(){
+		gerarContaSimples();
 		
-		assertEquals(textoDia10MesSeguinte, format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
+		Conta conta = contaBO.gerarConta(to);
+		
+		assertEquals(BigDecimal.ZERO, conta.getValorDebitos());
 	}
-	
-	@Test
-	public void vencimentoAlternativoImovelAntesVencerRota(){
-		imovel.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
-	@Test
-	public void vencimentoAlternativoImovelAposVencerRota(){
-		imovel.setDiaVencimento((short) 25);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 25);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-
-	@Test
-	public void vencimentoAlternativoImovelComDiasParaEmissaoSuperiorAoVencimento(){
-		imovel.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 60);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
-		cal.add(Calendar.MONTH, 1);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
-	@Test
-	public void vencimentoAlternativcoImovelComExtratoFaturamentoVencimentoMesSeguinte(){
-		imovel.setDiaVencimento((short) 5);
-		imovel.setIndicadorEmissaoExtratoFaturamento((short) 2);
-		imovel.setIndicadorVencimentoMesSeguinte((short) 1);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
-		cal.add(Calendar.MONTH, 1);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-		
-	@Test
-	public void vencimentoAlternativoCliente(){
-		Cliente cliente = new Cliente();
-		cliente.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
-	@Test
-	public void vencimentoAlternativoClienteMesSeguinte(){
-		Cliente cliente = new Cliente();
-		cliente.setDiaVencimento((short) 5);
-		cliente.setIndicadorVencimentoMesSeguinte((short) 1);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
-		cal.add(Calendar.MONTH, 1);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
-	@Test
-	public void vencimentoAlternativoImovelPorEmissaoExtratoFaturamento(){
-		Cliente cliente = new Cliente();
-		imovel.setIndicadorEmissaoExtratoFaturamento((short) 1);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getMaximum(Calendar.DAY_OF_MONTH));
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
-	@Test
-	public void semVencimentoAlternativoDebitoEmContaEEnvioPelosCorreios(){
-		Cliente cliente = new Cliente();
-		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL);
-		imovel.setIndicadorDebitoConta(Status.INATIVO);
-		
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		mountSistemaParametrosRepositorioDiasCorreiosMock().andReturn((short) 10);
-		replayAll();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dia15ProximoMes);
-		cal.add(Calendar.DAY_OF_MONTH, 10);
-		
-		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
-	}
-	
 }

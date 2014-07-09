@@ -8,7 +8,7 @@ import java.util.Iterator;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.cadastro.servicos.CategoriaBO;
+import br.gov.batch.servicos.cadastro.CategoriaBO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizado;

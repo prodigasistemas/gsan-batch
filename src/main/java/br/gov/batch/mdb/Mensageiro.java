@@ -1,4 +1,4 @@
-package br.gov.mdb;
+package br.gov.batch.mdb;
 
 import java.util.Properties;
 

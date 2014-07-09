@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.AnalisadorGeracaoConta;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;

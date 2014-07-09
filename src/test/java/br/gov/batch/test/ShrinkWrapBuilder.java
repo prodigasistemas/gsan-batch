@@ -21,10 +21,16 @@ public class ShrinkWrapBuilder {
                 .addPackages(true, "br.gov.model.operacao")
                 .addPackages(true, "br.gov.model.util")
                 .addPackages(true, "br.gov.servicos.arrecadacao")
+                .addPackages(true, "br.gov.servicos.atendimentopublico")
                 .addPackages(true, "br.gov.servicos.batch")
                 .addPackages(true, "br.gov.servicos.cadastro")
                 .addPackages(true, "br.gov.servicos.faturamento")
+                .addPackages(true, "br.gov.servicos.micromedicao")
                 .addPackages(true, "br.gov.servicos.to")
+
+                .addPackages(true, "br.gov.batch.servicos.cadastro")
+                .addPackages(true, "br.gov.batch.servicos.faturamento")
+                
             .addAsResource("persistence-test.xml", "META-INF/persistence.xml");		
 	}
 }

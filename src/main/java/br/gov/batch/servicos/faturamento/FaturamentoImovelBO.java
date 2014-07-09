@@ -9,13 +9,11 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.batch.gerardadosleitura.AnalisadorGeracaoConta;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
 import br.gov.model.faturamento.ContaCategoriaPK;
@@ -59,9 +57,6 @@ public class FaturamentoImovelBO {
 	
 	@EJB
 	private ContaBO contaBO;
-	
-	@EJB
-	private SistemaParametros sistemaParametros;
 	
 	@EJB
 	private ContaCategoriaRepositorio contaCategoriaRepositorio;

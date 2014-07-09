@@ -3,10 +3,12 @@ package br.gov.batch.servicos.faturamento;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
@@ -18,8 +20,15 @@ public class DebitoCobrarBO {
 	private DebitoCobrarRepositorio debitoCobrarRepositorio;
 	
 	@EJB
-	private SistemaParametrosRepositorio parametros;
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
+
+	private SistemaParametros parametros;
 	
+	@PostConstruct
+	public void init(){
+		parametros = sistemaParametrosRepositorio.getSistemaParametros();
+	}
+
 	public Collection<DebitoCobrar> debitosCobrarVigentes(Imovel imovel){
 		Collection<DebitoCobrar> lista = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
 		

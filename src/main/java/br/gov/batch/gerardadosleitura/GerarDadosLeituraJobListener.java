@@ -11,7 +11,7 @@ import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
-import br.gov.mdb.Mensageiro;
+import br.gov.batch.mdb.Mensageiro;
 import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
