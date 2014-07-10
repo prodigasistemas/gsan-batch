@@ -1,7 +1,5 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -11,6 +9,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.persistence.Cleanup;
 import org.jboss.arquillian.persistence.CleanupStrategy;
+import org.jboss.arquillian.persistence.ShouldMatchDataSet;
 import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.shrinkwrap.api.Archive;
@@ -21,7 +20,6 @@ import br.gov.batch.test.ShrinkWrapBuilder;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SetorComercial;
-import br.gov.model.faturamento.Conta;
 import br.gov.servicos.to.GerarContaTO;
 
 @RunWith(Arquillian.class)
@@ -35,7 +33,7 @@ public class ContaBOTest {
 	@Inject
 	private ContaBO contaBO;
 	
-	GerarContaTO to = new GerarContaTO();
+	Imovel imovel = new Imovel();
 	
 	private void gerarContaSimples(){
 		SetorComercial setor = new SetorComercial();
@@ -46,27 +44,56 @@ public class ContaBOTest {
 		quadra.setId(1);
 		quadra.setNumeroQuadra(200);
 		
-		Imovel imovel = new Imovel();
 		imovel.setId(1L);
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
-		
-		to.setImovel(imovel);
-		to.setAnoMesFaturamento(201405);
-		to.setValorTotalDebitos(BigDecimal.ZERO);
-		
-		to.setDataVencimentoRota(new Date());
-		
 	}
 	
 	@Test
 	@UsingDataSet("criarContaInput.yml")
+	@ShouldMatchDataSet("criarContaOutput01.yml")
 	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void criarConta(){
+	public void criarContaComValoresZerados(){
 		gerarContaSimples();
 		
-		Conta conta = contaBO.gerarConta(to);
+		contaBO.gerarConta(toContaZerados());
+	}
+	
+	@Test
+	@UsingDataSet("criarContaInput.yml")
+	@ShouldMatchDataSet("criarContaOutput02.yml")
+	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
+	public void criarContaComValoresPreenchidos(){
+		gerarContaSimples();
 		
-		assertEquals(BigDecimal.ZERO, conta.getValorDebitos());
+		contaBO.gerarConta(toContaPreenchidos());
+	}
+	
+	private GerarContaTO toContaZerados(){
+		GerarContaTO to = new GerarContaTO();
+		to.setImovel(imovel);
+		to.setAnoMesFaturamento(201405);
+		to.setValorTotalDebitos(BigDecimal.ZERO);
+		to.setValorTotalImposto(BigDecimal.ZERO);
+		to.setValorTotalCreditos(BigDecimal.ZERO);
+		to.setPercentualColeta(BigDecimal.ZERO);
+		to.setPercentualEsgoto(BigDecimal.ZERO);
+		to.setDataVencimentoRota(new Date());
+		
+		return to;
+	}
+	
+	private GerarContaTO toContaPreenchidos(){
+		GerarContaTO to = new GerarContaTO();
+		to.setImovel(imovel);
+		to.setAnoMesFaturamento(201405);
+		to.setValorTotalDebitos(new BigDecimal("5.45"));
+		to.setValorTotalImposto(new BigDecimal("0.78"));
+		to.setValorTotalCreditos(new BigDecimal("2.45"));
+		to.setPercentualColeta(new BigDecimal("5.60"));
+		to.setPercentualEsgoto(new BigDecimal("5.60"));
+		to.setDataVencimentoRota(new Date());
+		
+		return to;
 	}
 }

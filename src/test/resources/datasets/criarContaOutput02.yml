@@ -1,0 +1,27 @@
+faturamento.conta_geral:
+  - cnta_id: 1
+    cntg_ichistorico: 2
+  - cnta_id: 2
+    cntg_ichistorico: 2
+
+faturamento.conta:
+  - cnta_id: 1
+    cnta_amreferenciaconta: 201405
+    cnta_amreferenciacontabil: 201405
+    cnta_vlagua: 0
+    cnta_vlesgoto: 0
+    cnta_vlcreditos: 0
+    cnta_vldebitos: 0
+    cnta_vlimpostos: 0
+    cnta_pcesgoto: 0
+    cnta_pccoleta: 0
+  - cnta_id: 2
+    cnta_amreferenciaconta: 201405
+    cnta_amreferenciacontabil: 201405
+    cnta_vlagua: 0
+    cnta_vlesgoto: 0
+    cnta_vlcreditos: 2.45
+    cnta_vldebitos: 5.45
+    cnta_vlimpostos: 0.78
+    cnta_pcesgoto: 5.60
+    cnta_pccoleta: 5.60
