@@ -105,15 +105,8 @@ public class FaturamentoImovelBO {
 								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
 								gerarDebitoCobradoHelper.getValorDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
 
-				GerarContaTO gerarTO = new GerarContaTO();
-				gerarTO.setImovel(imovel);
-				gerarTO.setDataVencimentoRota(faturamentoAtivCronRota.getDataContaVencimento());
-				gerarTO.setAnoMesFaturamento(anoMesFaturamento);
-				gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
-				gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
-				gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
-				gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
-				gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+				GerarContaTO gerarTO = buildGerarContaTO(imovel, faturamentoAtivCronRota, anoMesFaturamento, gerarDebitoCobradoHelper,
+															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
 				Conta conta = contaBO.gerarConta(gerarTO);
 
 				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
@@ -145,6 +138,21 @@ public class FaturamentoImovelBO {
 //													gerarDebitoCobradoHelper, gerarCreditoRealizadoHelper, colecaoResumoFaturamento, imovel,
 //													gerarAtividadeGrupoFaturamento, faturamentoAtivCronRota, faturamentoGrupo, anoMesReferenciaResumoFaturamento, true);
 		}
+	}
+
+	private GerarContaTO buildGerarContaTO(Imovel imovel, FaturamentoAtividadeCronogramaRota faturamentoAtivCronRota, Integer anoMesFaturamento,
+			DebitoCobradoTO gerarDebitoCobradoHelper, CreditoRealizadoTO gerarCreditoRealizadoHelper,
+			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
+		GerarContaTO gerarTO = new GerarContaTO();
+		gerarTO.setImovel(imovel);
+		gerarTO.setDataVencimentoRota(faturamentoAtivCronRota.getDataContaVencimento());
+		gerarTO.setAnoMesFaturamento(anoMesFaturamento);
+		gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
+		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
+		gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
+		gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
+		gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+		return gerarTO;
 	}
 	
 	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Conta conta, Collection<ImovelSubcategoriaTO> colecaoCategorias) throws Exception {
