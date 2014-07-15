@@ -1,16 +1,15 @@
 package br.gov.batch.servicos.faturamento;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
@@ -22,8 +21,6 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
 import br.gov.model.faturamento.ContaCategoriaPK;
-import br.gov.model.faturamento.FaturamentoAtividadeCronogramaRota;
-import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
 import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
@@ -119,7 +116,6 @@ public class FaturamentoImovelBO {
 
 				GerarContaTO gerarTO = buildGerarContaTO(imovel, faturamentoTO.getDataVencimentoConta(), anoMesFaturamento, gerarDebitoCobradoHelper,
 															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
-				
 				Conta conta = contaBO.gerarConta(gerarTO);
 
 //				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
