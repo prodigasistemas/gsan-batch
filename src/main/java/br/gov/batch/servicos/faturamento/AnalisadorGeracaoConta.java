@@ -32,22 +32,16 @@ public class AnalisadorGeracaoConta {
 	@EJB
 	private DevolucaoRepositorio devolucaoRepositorio;
 	
-	private Imovel imovel;
-	
 	public AnalisadorGeracaoConta(){}
 	
-	public AnalisadorGeracaoConta(Imovel imovel){
-		this.imovel = imovel;
+	public boolean verificarNaoGeracaoConta(boolean valoresAguaEsgotoZerados, int anoMesFaturamento, Imovel imovel) throws Exception {
+		return !(verificarSituacaoImovelParaGerarConta(valoresAguaEsgotoZerados, imovel) && verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 
-	public boolean verificarNaoGeracaoConta(boolean valoresAguaEsgotoZerados, int anoMesFaturamento) throws Exception {
-		return !(verificarSituacaoImovelParaGerarConta(valoresAguaEsgotoZerados) && verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
-	}
-
-	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento) {
+	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento, Imovel imovel) {
 		
 		Collection<DebitoCobrar> debitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
-		if (naoHaDebitosACobrar(debitosACobrar) || paralisacaoFaturamento() || !pagamentoRepositorio.existeDebitoSemPagamento(debitosACobrar)) {
+		if (naoHaDebitosACobrar(debitosACobrar) || paralisacaoFaturamento(imovel) || !pagamentoRepositorio.existeDebitoSemPagamento(debitosACobrar)) {
 			return false;
 		}
 		
@@ -63,8 +57,8 @@ public class AnalisadorGeracaoConta {
 		return segundaCondicaoGerarConta;
 	}
 
-	public boolean verificarSituacaoImovelParaGerarConta(boolean valoresAguaEsgotoZerados) {
-		return !valoresAguaEsgotoZerados && (aguaEsgotoLigados() || imovelPertenceACondominio());
+	public boolean verificarSituacaoImovelParaGerarConta(boolean valoresAguaEsgotoZerados, Imovel imovel) {
+		return !valoresAguaEsgotoZerados && (aguaEsgotoLigados(imovel) || imovelPertenceACondominio(imovel));
 	}
 
 	private boolean haDebitosCobrarAtivos(Collection<DebitoCobrar> debitosACobrar) {
@@ -82,7 +76,7 @@ public class AnalisadorGeracaoConta {
 		return creditosRealizar == null || creditosRealizar.isEmpty();
 	}
 
-	private boolean paralisacaoFaturamento() {
+	private boolean paralisacaoFaturamento(Imovel imovel) {
 		return imovel.getFaturamentoSituacaoTipo() != null && imovel.getFaturamentoSituacaoTipo().getParalisacaoFaturamento() == Status.ATIVO;
 	}
 
@@ -90,12 +84,14 @@ public class AnalisadorGeracaoConta {
 		return colecaoDebitosACobrar == null || colecaoDebitosACobrar.isEmpty();
 	}
 
-	private boolean imovelPertenceACondominio() {
+	private boolean imovelPertenceACondominio(Imovel imovel) {
 		return imovel.getImovelCondominio() != null;
 	}
 
-	private boolean aguaEsgotoLigados() {
-		return imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO)
-				 && imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
+	private boolean aguaEsgotoLigados(Imovel imovel) {
+		return imovel.getLigacaoAguaSituacao() != null
+				&& imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO)
+				&& imovel.getLigacaoEsgotoSituacao() != null
+				&& imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO);
 	}		
 }

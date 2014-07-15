@@ -10,20 +10,19 @@ import javax.persistence.PersistenceContext;
 import org.jboss.logging.Logger;
 
 @Named
-public class PosGerarDadosLeitura extends AbstractItemWriter {
+public class PosGerarConta extends AbstractItemWriter {
 	
-	private static int qtd = 0;
+//	private static int qtd = 0;
 	
-	private static Logger logger = Logger.getLogger(PosGerarDadosLeitura.class);
+	private static Logger logger = Logger.getLogger(PosGerarConta.class);
 	
 	@PersistenceContext
 	EntityManager em;
 
-	public PosGerarDadosLeitura() {
+	public PosGerarConta() {
 	}
 
     public void writeItems(List list) {
-    	qtd += list.size();
-    	logger.info("Total: " + qtd);
+    	logger.info("Total: " + list.size());
     }
 }

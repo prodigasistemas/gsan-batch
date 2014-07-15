@@ -8,7 +8,7 @@ import javax.inject.Named;
 import br.gov.batch.Particao;
 
 @Named
-public class ParticaoGerarDadosLeitura extends Particao {
+public class ParticaoPreFaturamento extends Particao {
 	
     public long totalItens(){
     	long execId = jobCtx.getExecutionId();

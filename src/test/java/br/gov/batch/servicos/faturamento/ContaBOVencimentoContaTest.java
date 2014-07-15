@@ -196,7 +196,7 @@ public class ContaBOVencimentoContaTest {
 	@Test
 	public void semVencimentoAlternativoDebitoEmContaEEnvioPelosCorreios(){
 		Cliente cliente = new Cliente();
-		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL);
+		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId());
 		imovel.setIndicadorDebitoConta(Status.INATIVO);
 		
 		mountClienteRepositorioMock().andReturn(cliente);

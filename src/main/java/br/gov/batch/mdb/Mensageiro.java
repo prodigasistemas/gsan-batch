@@ -37,6 +37,12 @@ public class Mensageiro implements MessageListener {
             JobOperator jo = BatchRuntime.getJobOperator();
             
             Properties processoParametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
+            
+            processoParametros.put("idProcessoIniciado", "200");
+            processoParametros.put("idRota", "1");
+            processoParametros.put("anoMesFaturamento", "201402");
+            processoParametros.put("idGrupoFaturamento", "50");
+            
                         
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
         } catch (JMSException ex) {

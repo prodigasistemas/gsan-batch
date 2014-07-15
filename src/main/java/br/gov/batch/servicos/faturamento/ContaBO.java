@@ -1,12 +1,13 @@
 package br.gov.batch.servicos.faturamento;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.Status;
 import br.gov.model.cadastro.Cliente;
@@ -54,10 +55,10 @@ public class ContaBO {
 		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 	}
 	
-	public Conta gerarConta(GerarContaTO to){
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public Conta gerarConta(GerarContaTO to) throws Exception{
 		ContaGeral contaGeral = new ContaGeral();
 		contaGeral.setIndicadorHistorico(Status.INATIVO.getId());
-		contaGeral.setUltimaAlteracao(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
 
 		Conta.Builder builder = new Conta.Builder();
 		builder.imovel(to.getImovel())
@@ -117,7 +118,7 @@ public class ContaBO {
 			}
 		}
 		
-		if ((imovel.getImovelContaEnvio() == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL || imovel.getImovelContaEnvio() == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL)
+		if ((imovel.getImovelContaEnvio() == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId() || imovel.getImovelContaEnvio() == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL.getId())
 				&& !contaTO.comVencimentoAlternativo()
 				&& imovel.getIndicadorDebitoConta() == Status.INATIVO) {
 			contaTO.adicionaDiasAoVencimento(sistemaParametros.getNumeroDiasAdicionaisCorreios());

@@ -27,7 +27,9 @@ public class CategoriaBO {
 			}
 		}
 
-		BigDecimal fatorMultiplicacao = valor.divide(new BigDecimal(somatorioQuantidadeEconomiasCadaCategoria), 2, BigDecimal.ROUND_DOWN);
+		BigDecimal fatorMultiplicacao = somatorioQuantidadeEconomiasCadaCategoria > 0 
+				? valor.divide(new BigDecimal(somatorioQuantidadeEconomiasCadaCategoria), 2, BigDecimal.ROUND_DOWN)
+				: BigDecimal.ZERO;
 
 		BigDecimal valorPorCategoriaAcumulado = BigDecimal.ZERO;
 
@@ -49,18 +51,20 @@ public class CategoriaBO {
 		}
 
 		valorPorCategoriaAcumulado = valorPorCategoriaAcumulado.setScale(7);
-
-		if (valorPorCategoriaAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(valor.setScale(2, BigDecimal.ROUND_HALF_UP)) == -1) {
-
-			BigDecimal diferenca = valor.subtract(valorPorCategoriaAcumulado).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-			BigDecimal categoriaPrimeira = (BigDecimal) colecaoValoresPorCategoria.iterator().next();
-
-			categoriaPrimeira = categoriaPrimeira.add(diferenca);
-
-			((ArrayList<BigDecimal>) colecaoValoresPorCategoria).set(0, categoriaPrimeira);
-
+		
+		if (colecaoValoresPorCategoria.iterator().hasNext()){
+			if (valorPorCategoriaAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(valor.setScale(2, BigDecimal.ROUND_HALF_UP)) == -1) {
+				
+				BigDecimal diferenca = valor.subtract(valorPorCategoriaAcumulado).setScale(2, BigDecimal.ROUND_HALF_UP);
+				
+				BigDecimal categoriaPrimeira = (BigDecimal) colecaoValoresPorCategoria.iterator().next();
+				
+				categoriaPrimeira = categoriaPrimeira.add(diferenca);
+				
+				((ArrayList<BigDecimal>) colecaoValoresPorCategoria).set(0, categoriaPrimeira);
+			}
 		}
+
 
 		return colecaoValoresPorCategoria;
 	}

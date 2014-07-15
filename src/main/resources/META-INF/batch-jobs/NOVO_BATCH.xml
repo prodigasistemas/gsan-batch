@@ -1,23 +1,24 @@
 <job id="gerar_dados_leitura" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
-		<listener ref="gerarDadosLeituraJobListener"/>
+		<listener ref="preFaturamentoJobListener"/>
 	</listeners>
 	<properties>
 		<property name="num_particoes" value="10" />
 	</properties>
-	<step id="pesquisarImoveisParaPreFaturamento">
-		<chunk checkpoint-policy="item" item-count="8">
-			<reader ref="preGerarDadosLeitura">
+	
+	<step id="preFaturamentoImovel">
+		<chunk>
+			<reader ref="preGerarConta">
 				<properties>
 					<property name="primeiroItem" value="#{partitionPlan['primeiroItem']}" />
 					<property name="numItens" value="#{partitionPlan['numItens']}" />
 				</properties>
 			</reader>
-			<processor ref="gerarDadosLeitura" />
-			<writer ref="posGerarDadosLeitura" />
+			<processor ref="gerarConta" />
+			<writer ref="posGerarConta" />
 		</chunk>
 		<partition>
-			<mapper ref="particaoGerarDadosLeitura" />
+			<mapper ref="particaoPreFaturamento" />
 		</partition>
 	</step>
 </job>

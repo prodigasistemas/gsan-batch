@@ -1,13 +1,18 @@
 package br.gov.batch.servicos.faturamento;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.transaction.Transactional;
+
+import org.jboss.logging.Logger;
 
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
@@ -33,7 +38,8 @@ import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @Stateless
 public class FaturamentoImovelBO {
-
+	private static Logger logger = Logger.getLogger(FaturamentoImovelBO.class);
+	
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio; 
 
@@ -63,8 +69,11 @@ public class FaturamentoImovelBO {
 	
 	private FaturamentoAguaEsgotoTO helperValoresAguaEsgoto;
 
-	public void preDeterminarFaturamentoImovel(Imovel imovel, boolean gerarAtividadeGrupoFaturamento, FaturamentoAtividadeCronogramaRota faturamentoAtivCronRota,
-			Collection colecaoResumoFaturamento, boolean faturamentoAntecipado, Integer anoMesFaturamento, FaturamentoGrupo faturamentoGrupo) throws Exception {
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
+		Imovel imovel = faturamentoTO.getImovel();
+		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
+		Boolean gerarAtividadeGrupoFaturamento = faturamentoTO.getGerarAtividadeGrupoFaturamento();
 
 		Collection<ImovelSubcategoriaTO> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
 
@@ -82,12 +91,15 @@ public class FaturamentoImovelBO {
 				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
 			}
 
-			LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorId(imovel.getId());
-			helperValoresAguaEsgoto.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, imovel));
-			helperValoresAguaEsgoto.setPercentualColetaEsgoto(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+			LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(imovel.getId());
+			
+			if (ligacaoEsgoto != null){
+				helperValoresAguaEsgoto.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, imovel));
+				helperValoresAguaEsgoto.setPercentualColetaEsgoto(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+			}
 		}
 
-		boolean gerarConta = analisadorGeracaoConta.verificarNaoGeracaoConta(valoresAguaEsgotoZerados(helperValoresAguaEsgoto, imovel), anoMesFaturamento);
+		boolean gerarConta = analisadorGeracaoConta.verificarNaoGeracaoConta(valoresAguaEsgotoZerados(helperValoresAguaEsgoto, imovel), anoMesFaturamento, imovel);
 		
 		if (gerarConta) {
 			helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
@@ -105,23 +117,17 @@ public class FaturamentoImovelBO {
 								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
 								gerarDebitoCobradoHelper.getValorDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
 
-				GerarContaTO gerarTO = new GerarContaTO();
-				gerarTO.setImovel(imovel);
-				gerarTO.setDataVencimentoRota(faturamentoAtivCronRota.getDataContaVencimento());
-				gerarTO.setAnoMesFaturamento(anoMesFaturamento);
-				gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
-				gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
-				gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
-				gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
-				gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+				GerarContaTO gerarTO = buildGerarContaTO(imovel, faturamentoTO.getDataVencimentoConta(), anoMesFaturamento, gerarDebitoCobradoHelper,
+															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
+				
 				Conta conta = contaBO.gerarConta(gerarTO);
 
-				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
-
-				if (contasCategoria != null && !contasCategoria.isEmpty()) {
-					contaCategoriaRepositorio.inserirContasCategoria(contasCategoria);
-				}
-
+//				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
+//
+//				if (contasCategoria != null && !contasCategoria.isEmpty()) {
+//					contaCategoriaRepositorio.inserirContasCategoria(contasCategoria);
+//				}
+//
 //				this.inserirClienteConta(conta, imovel);
 //				this.inserirContaImpostosDeduzidos(conta, gerarImpostosDeduzidosContaHelper);
 //				this.inserirDebitoCobrado(gerarDebitoCobradoHelper.getMapDebitosCobrados(), conta);
@@ -145,6 +151,21 @@ public class FaturamentoImovelBO {
 //													gerarDebitoCobradoHelper, gerarCreditoRealizadoHelper, colecaoResumoFaturamento, imovel,
 //													gerarAtividadeGrupoFaturamento, faturamentoAtivCronRota, faturamentoGrupo, anoMesReferenciaResumoFaturamento, true);
 		}
+	}
+
+	private GerarContaTO buildGerarContaTO(Imovel imovel, Date dataVencimentoConta, Integer anoMesFaturamento,
+			DebitoCobradoTO gerarDebitoCobradoHelper, CreditoRealizadoTO gerarCreditoRealizadoHelper,
+			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
+		GerarContaTO gerarTO = new GerarContaTO();
+		gerarTO.setImovel(imovel);
+		gerarTO.setDataVencimentoRota(dataVencimentoConta);
+		gerarTO.setAnoMesFaturamento(anoMesFaturamento);
+		gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
+		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
+		gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
+		gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
+		gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+		return gerarTO;
 	}
 	
 	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Conta conta, Collection<ImovelSubcategoriaTO> colecaoCategorias) throws Exception {
@@ -170,7 +191,7 @@ public class FaturamentoImovelBO {
 			contaCategoria.setConsumoMinimoAgua(0);
 			contaCategoria.setValorTarifaMinimaEsgoto(new BigDecimal("0.00"));
 			contaCategoria.setConsumoMinimoEsgoto(0);
-			contaCategoria.setUltimaAlteracao(new Date(System.currentTimeMillis()));
+			contaCategoria.setUltimaAlteracao(new java.sql.Date(System.currentTimeMillis()));
 			
 			helper.add(contaCategoria);
 		}

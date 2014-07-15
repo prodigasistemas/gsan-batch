@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.batch.api.listener.JobListener;
 import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -16,7 +17,7 @@ import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
-public class GerarDadosLeituraJobListener implements JobListener{
+public class PreFaturamentoJobListener implements JobListener{
 	
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	

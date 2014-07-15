@@ -53,7 +53,7 @@ public class ContaBOTest {
 	@UsingDataSet("criarContaInput.yml")
 	@ShouldMatchDataSet("criarContaOutput01.yml")
 	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void criarContaComValoresZerados(){
+	public void criarContaComValoresZerados() throws Exception{
 		gerarContaSimples();
 		
 		contaBO.gerarConta(toContaZerados());
@@ -63,7 +63,7 @@ public class ContaBOTest {
 	@UsingDataSet("criarContaInput.yml")
 	@ShouldMatchDataSet("criarContaOutput02.yml")
 	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
-	public void criarContaComValoresPreenchidos(){
+	public void criarContaComValoresPreenchidos() throws Exception{
 		gerarContaSimples();
 		
 		contaBO.gerarConta(toContaPreenchidos());

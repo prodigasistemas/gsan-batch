@@ -68,7 +68,7 @@ public class AnalisadorGeracaoContaTest {
 		ligacaoEsgotoSituacao.setId(LigacaoEsgotoSituacao.LIGADO);
 		imovel.setLigacaoEsgotoSituacao(ligacaoEsgotoSituacao);
 
-		analisadorGeracaoConta = new AnalisadorGeracaoConta(imovel);
+		analisadorGeracaoConta = new AnalisadorGeracaoConta();
 	}
 	
 
@@ -76,14 +76,14 @@ public class AnalisadorGeracaoContaTest {
 	public void naoGeraContaComAguaEsgotoZerados() throws Exception {
 		aguaEsgotoZerado = true;
 		
-		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado));
+		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado, imovel));
 	}
 	
 	@Test
 	public void geraContaSemAguaEsgotoZeradosELigado() throws Exception {
 		aguaEsgotoZerado = false;
 		
-		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado));
+		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado, imovel));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class AnalisadorGeracaoContaTest {
 		ligacaoAguaSituacao.setId(0);
 		ligacaoEsgotoSituacao.setId(0);
 		
-		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado));
+		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado, imovel));
 	}
 	
 	@Test
@@ -103,7 +103,7 @@ public class AnalisadorGeracaoContaTest {
 		ligacaoAguaSituacao.setId(0);
 		ligacaoEsgotoSituacao.setId(0);
 		
-		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado));
+		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado, imovel));
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		imovel.setImovelCondominio(new Imovel());
 		
-		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado));
+		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerado, imovel));
 	}
 	
 	@Test
@@ -123,7 +123,7 @@ public class AnalisadorGeracaoContaTest {
 
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(null);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.ATIVO);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -148,7 +148,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -162,7 +162,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -176,7 +176,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -195,7 +195,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -214,7 +214,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -233,7 +233,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento));
+		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	private Collection<CreditoRealizar> buildCollectionCreditosRealizar() {
