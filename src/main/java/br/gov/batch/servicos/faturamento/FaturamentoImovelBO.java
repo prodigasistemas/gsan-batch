@@ -114,7 +114,7 @@ public class FaturamentoImovelBO {
 								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
 								gerarDebitoCobradoHelper.getValorDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
 
-				GerarContaTO gerarTO = buildGerarContaTO(imovel, faturamentoTO.getDataVencimentoConta(), anoMesFaturamento, gerarDebitoCobradoHelper,
+				GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
 															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
 				Conta conta = contaBO.gerarConta(gerarTO);
 
@@ -149,13 +149,16 @@ public class FaturamentoImovelBO {
 		}
 	}
 
-	private GerarContaTO buildGerarContaTO(Imovel imovel, Date dataVencimentoConta, Integer anoMesFaturamento,
+	private GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
 			DebitoCobradoTO gerarDebitoCobradoHelper, CreditoRealizadoTO gerarCreditoRealizadoHelper,
 			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
 		GerarContaTO gerarTO = new GerarContaTO();
-		gerarTO.setImovel(imovel);
-		gerarTO.setDataVencimentoRota(dataVencimentoConta);
-		gerarTO.setAnoMesFaturamento(anoMesFaturamento);
+		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
+		gerarTO.setImovel(faturamentoTO.getImovel());
+		gerarTO.setRota(faturamentoTO.getRota());
+		gerarTO.setDataVencimentoRota(faturamentoTO.getDataVencimentoConta());
+		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
+		gerarTO.setAnoMesFaturamento(faturamentoTO.getAnoMesFaturamento());
 		gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
 		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
 		gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());

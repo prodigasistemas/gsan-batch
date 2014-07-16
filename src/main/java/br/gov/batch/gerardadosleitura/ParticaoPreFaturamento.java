@@ -1,19 +1,19 @@
 package br.gov.batch.gerardadosleitura;
 
-import java.util.Properties;
-
-import javax.batch.runtime.BatchRuntime;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.Particao;
+import br.gov.batch.util.BatchUtil;
 
 @Named
 public class ParticaoPreFaturamento extends Particao {
+
+    @Inject
+    private BatchUtil util;
 	
     public long totalItens(){
-    	long execId = jobCtx.getExecutionId();
-    	Properties jobParams = BatchRuntime.getJobOperator().getParameters(execId);
-    	int idRota = Integer.valueOf(jobParams.getProperty("idRota"));
+    	int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
     	return ejb.totalImoveisParaPreFaturamento(idRota);
     }
 }

@@ -27,9 +27,6 @@ public class PreGerarConta extends AbstractItemReader {
     private ImovelRepositorio repositorio;
     
     @Inject
-    private JobContext jobCtx;
-    
-    @Inject
     private BatchUtil util;
         
     @Inject

@@ -7,6 +7,7 @@ import java.util.Date;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoAtividadeCronogramaRota;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.Rota;
 
 public class FaturamentoImovelTO implements Serializable{
 	private static final long serialVersionUID = -8120350363915598518L;
@@ -14,12 +15,19 @@ public class FaturamentoImovelTO implements Serializable{
 	private Imovel imovel;
 	private Boolean gerarAtividadeGrupoFaturamento;
 	private Date dataVencimentoConta;
+	private Rota rota;
 	private FaturamentoAtividadeCronogramaRota faturamentoAtivCronRota;
 	private Collection colecaoResumoFaturamento;
 	private Boolean faturamentoAntecipado;
 	private Integer anoMesFaturamento;
 	private FaturamentoGrupo faturamentoGrupo;
 	
+	public Rota getRota() {
+		return rota;
+	}
+	public void setRota(Rota rota) {
+		this.rota = rota;
+	}
 	public Imovel getImovel() {
 		return imovel;
 	}

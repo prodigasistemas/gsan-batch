@@ -41,7 +41,7 @@ public class Mensageiro implements MessageListener {
             processoParametros.put("idProcessoIniciado", "200");
             processoParametros.put("idRota", "1");
             processoParametros.put("anoMesFaturamento", "201402");
-            processoParametros.put("idGrupoFaturamento", "50");
+            processoParametros.put("idGrupoFaturamento", "330");
             
                         
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);
