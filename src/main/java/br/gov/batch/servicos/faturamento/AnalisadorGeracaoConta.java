@@ -13,7 +13,7 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
-import br.gov.servicos.arrecadacao.PagamentoRepositorio;
+import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 

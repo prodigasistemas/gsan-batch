@@ -6,6 +6,11 @@
 		<property name="num_particoes" value="10" />
 	</properties>
 	
+	<step id="apagarDados" next="preFaturamentoImovel">
+		<batchlet ref="apagarDadosGerados">
+		</batchlet>
+	</step>
+	
 	<step id="preFaturamentoImovel">
 		<chunk>
 			<reader ref="preGerarConta">

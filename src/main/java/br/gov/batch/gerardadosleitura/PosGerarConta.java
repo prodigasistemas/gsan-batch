@@ -23,6 +23,6 @@ public class PosGerarConta extends AbstractItemWriter {
 	}
 
     public void writeItems(List list) {
-    	logger.info("Total: " + list.size());
+    	logger.info("Total de imoveis com contas geradas: " + list.size());
     }
 }

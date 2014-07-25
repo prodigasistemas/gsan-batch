@@ -26,7 +26,7 @@ import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.faturamento.DebitoTipo;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
-import br.gov.servicos.arrecadacao.PagamentoRepositorio;
+import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
