@@ -7,14 +7,13 @@ import java.util.Queue;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemReader;
-import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.rowset.spi.SyncResolver;
 
 import org.jboss.logging.Logger;
 
+import br.gov.batch.servicos.micromedicao.RotaBO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelRepositorio;
@@ -25,6 +24,9 @@ public class PreGerarConta extends AbstractItemReader {
 	
     @EJB
     private ImovelRepositorio repositorio;
+    
+    @EJB
+    private RotaBO rotaBO;
     
     @Inject
     private BatchUtil util;
@@ -50,7 +52,7 @@ public class PreGerarConta extends AbstractItemReader {
 
         Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
         
-    	List<Imovel> lista = repositorio.imoveisParaPreFaturamento(idRota, firstItem, numItems);
+    	List<Imovel> lista = rotaBO.imoveisParaPreFaturamento(idRota, firstItem, numItems);
     	
     	imoveis = new ArrayDeque<Imovel>(lista);
     	    	

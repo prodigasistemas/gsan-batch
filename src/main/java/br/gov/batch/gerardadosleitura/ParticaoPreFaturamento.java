@@ -14,6 +14,6 @@ public class ParticaoPreFaturamento extends Particao {
 	
     public long totalItens(){
     	int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	return ejb.totalImoveisParaPreFaturamento(idRota);
+    	return rotaBO.totalImoveisParaPreFaturamento(idRota);
     }
 }

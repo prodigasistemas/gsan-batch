@@ -12,14 +12,14 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 import br.gov.batch.exception.ParticionamentoException;
-import br.gov.servicos.cadastro.ImovelRepositorio;
+import br.gov.batch.servicos.micromedicao.RotaBO;
 
 public abstract class Particao implements PartitionMapper {
 	
 	private static Logger logger = Logger.getLogger(Particao.class);
 
     @EJB
-    protected ImovelRepositorio ejb;
+    protected RotaBO rotaBO;
     
     @Inject
     protected JobContext jobCtx;

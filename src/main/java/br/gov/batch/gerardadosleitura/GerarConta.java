@@ -15,6 +15,8 @@ import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Rota;
+import br.gov.servicos.faturamento.FaturamentoAtividadeCronRotaRepositorio;
+import br.gov.servicos.to.CronogramaFaturamentoRotaTO;
 
 @Named
 public class GerarConta implements ItemProcessor {
@@ -22,6 +24,9 @@ public class GerarConta implements ItemProcessor {
 	
 	@EJB
 	private FaturamentoImovelBO faturamentoImovelBO;
+	
+	@EJB
+	private FaturamentoAtividadeCronRotaRepositorio faturamentoAtividadeCronRotaRepositorio;
 	
     @Inject
     private BatchUtil util;
@@ -31,19 +36,24 @@ public class GerarConta implements ItemProcessor {
 
     public Imovel processItem(Object param) throws Exception {
     	Imovel imovel = (Imovel) param;
+    	Integer idRota             = Integer.valueOf(util.parametroDoBatch("idRota"));
+    	Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
+    	Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
+    	
+    	CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(idRota, idGrupoFaturamento, anoMesFaturamento);
     	
     	Rota rota = new Rota();
-    	rota.setId(Integer.valueOf(util.parametroDoBatch("idRota")));
+    	rota.setId(idRota);
     	
     	FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo();
-    	faturamentoGrupo.setId(Long.valueOf(util.parametroDoBatch("idGrupoFaturamento")));
+    	faturamentoGrupo.setId(idGrupoFaturamento);
     	
     	FaturamentoImovelTO to = new FaturamentoImovelTO();
     	to.setRota(rota);
     	to.setImovel(imovel);
     	to.setFaturamentoGrupo(faturamentoGrupo);
-    	to.setAnoMesFaturamento(Integer.valueOf(util.parametroDoBatch("anoMesFaturamento")));
-    	to.setDataVencimentoConta(Calendar.getInstance().getTime());
+    	to.setAnoMesFaturamento(anoMesFaturamento);
+    	to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
     	to.setGerarAtividadeGrupoFaturamento(true);
     	
 		faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
