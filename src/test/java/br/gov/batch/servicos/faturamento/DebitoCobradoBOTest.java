@@ -71,7 +71,7 @@ public class DebitoCobradoBOTest {
 		
 		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
 		
-		assertEquals(7.25, to.getValorDebito().doubleValue(), 0);
+		assertEquals(7.25, to.getValorTotalDebito().doubleValue(), 0);
 	}
 	
 	@Test
@@ -83,7 +83,7 @@ public class DebitoCobradoBOTest {
 		
 		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
 		
-		assertEquals(5.34, to.getValorDebito().doubleValue(), 0);
+		assertEquals(5.34, to.getValorTotalDebito().doubleValue(), 0);
 	}
 	
 	@Test

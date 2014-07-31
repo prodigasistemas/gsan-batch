@@ -120,7 +120,7 @@ public class ContaBO {
 		
 		if ((imovel.getImovelContaEnvio() == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId() || imovel.getImovelContaEnvio() == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL.getId())
 				&& !contaTO.comVencimentoAlternativo()
-				&& imovel.getIndicadorDebitoConta() == Status.INATIVO) {
+				&& imovel.getIndicadorDebitoConta() == Status.INATIVO.getId()) {
 			contaTO.adicionaDiasAoVencimento(sistemaParametros.getNumeroDiasAdicionaisCorreios());
 		}
 

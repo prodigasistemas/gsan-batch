@@ -1,7 +1,5 @@
 package br.gov.batch.gerardadosleitura;
 
-import java.util.Calendar;
-
 import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Inject;

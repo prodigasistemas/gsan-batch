@@ -106,13 +106,13 @@ public class FaturamentoImovelBO {
 
 			DebitoCobradoTO gerarDebitoCobradoHelper = debitoCobradoBO.gerarDebitoCobrado(imovel, anoMesFaturamento);
 
-			CreditoRealizadoTO gerarCreditoRealizadoHelper = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, helperValoresAguaEsgoto, gerarDebitoCobradoHelper.getValorDebito(), gerarAtividadeGrupoFaturamento, preFaturamento);
+			CreditoRealizadoTO gerarCreditoRealizadoHelper = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, helperValoresAguaEsgoto, gerarDebitoCobradoHelper.getValorTotalDebito(), gerarAtividadeGrupoFaturamento, preFaturamento);
 
 			if (gerarAtividadeGrupoFaturamento) {
 
 				ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
 								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
-								gerarDebitoCobradoHelper.getValorDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
+								gerarDebitoCobradoHelper.getValorTotalDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
 
 				GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
 															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
@@ -160,7 +160,7 @@ public class FaturamentoImovelBO {
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
 		gerarTO.setAnoMesFaturamento(faturamentoTO.getAnoMesFaturamento());
 		gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
-		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorDebito());
+		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorTotalDebito());
 		gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
 		gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
 		gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
