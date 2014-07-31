@@ -35,13 +35,10 @@ public class DebitoCobradoBO {
 		
 		BigDecimal valorPrestacao = null;
 		
-		BigDecimal valorDebito = new BigDecimal(0.0);
-		
 		for (DebitoCobrar debitoACobrar : colecaoDebitosACobrar) {
 			valorPrestacao = debitoACobrar.getValorPrestacao();
 			
 			valorPrestacao = valorPrestacao.add(debitoACobrar.getResiduoPrestacao()).setScale(2);
-			valorDebito = valorDebito.add(valorPrestacao);
 			
 			DebitoCobrado debitoCobrado = new DebitoCobrado();
 			MergeProperties.mergeProperties(debitoCobrado, debitoACobrar);
@@ -60,7 +57,7 @@ public class DebitoCobradoBO {
 			debitoACobrar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
 
 			to.addDebitoCobrado(debitoCobrado);
-			to.addValorDebito(valorDebito);
+			to.addValorDebito(valorPrestacao);
 			to.addDebitoCobrarAtualizado(debitoACobrar);
 			to.setCategorias(debitoCobradoCategoriaBO.listaDebitoCobradoCategoriaPeloCobrar(dCobrarCategoria));
 		}
