@@ -70,7 +70,6 @@ public class FaturamentoImovelBO {
 	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
 		Imovel imovel = faturamentoTO.getImovel();
 		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
-		Boolean gerarAtividadeGrupoFaturamento = faturamentoTO.getGerarAtividadeGrupoFaturamento();
 
 		Collection<ImovelSubcategoriaTO> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
 
@@ -78,9 +77,7 @@ public class FaturamentoImovelBO {
 
 		if (possuiLigacaoAguaEsgotoAtivo(imovel) || possuiHidrometro(imovel)) { 
 
-			boolean faturar = deveFaturar(imovel, anoMesFaturamento);
-
-			if (faturar) {
+			if (deveFaturar(imovel, anoMesFaturamento)) {
 				helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ONE);
 				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ONE);
 			} else {
@@ -102,39 +99,36 @@ public class FaturamentoImovelBO {
 			helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
 			helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
 
-			boolean preFaturamento = true;
-
 			DebitoCobradoTO gerarDebitoCobradoHelper = debitoCobradoBO.gerarDebitoCobrado(imovel, anoMesFaturamento);
 
-			CreditoRealizadoTO gerarCreditoRealizadoHelper = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, helperValoresAguaEsgoto, gerarDebitoCobradoHelper.getValorTotalDebito(), gerarAtividadeGrupoFaturamento, preFaturamento);
+			CreditoRealizadoTO gerarCreditoRealizadoHelper = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, helperValoresAguaEsgoto, 
+																				gerarDebitoCobradoHelper.getValorTotalDebito());
 
-			if (gerarAtividadeGrupoFaturamento) {
 
-				ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
-								anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
-								gerarDebitoCobradoHelper.getValorTotalDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos(), preFaturamento);
+			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
+							anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
+							gerarDebitoCobradoHelper.getValorTotalDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos());
 
-				GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
-															gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
-				Conta conta = contaBO.gerarConta(gerarTO);
+			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
+														gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
+			Conta conta = contaBO.gerarConta(gerarTO);
 
-//				Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
+//			Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
 //
-//				if (contasCategoria != null && !contasCategoria.isEmpty()) {
-//					contaCategoriaRepositorio.inserirContasCategoria(contasCategoria);
-//				}
+//			if (contasCategoria != null && !contasCategoria.isEmpty()) {
+//				contaCategoriaRepositorio.inserirContasCategoria(contasCategoria);
+//			}
 //
-//				this.inserirClienteConta(conta, imovel);
-//				this.inserirContaImpostosDeduzidos(conta, gerarImpostosDeduzidosContaHelper);
-//				this.inserirDebitoCobrado(gerarDebitoCobradoHelper.getMapDebitosCobrados(), conta);
-//				this.atualizarDebitoACobrarFaturamento(gerarDebitoCobradoHelper.getColecaoDebitoACobrar());
-//				this.inserirCreditoRealizado(gerarCreditoRealizadoHelper.getMapCreditoRealizado(), conta);
-//				this.atualizarCreditoARealizar(gerarCreditoRealizadoHelper.getColecaoCreditoARealizar());
+//			this.inserirClienteConta(conta, imovel);
+//			this.inserirContaImpostosDeduzidos(conta, gerarImpostosDeduzidosContaHelper);
+//			this.inserirDebitoCobrado(gerarDebitoCobradoHelper.getMapDebitosCobrados(), conta);
+//			this.atualizarDebitoACobrarFaturamento(gerarDebitoCobradoHelper.getColecaoDebitoACobrar());
+//			this.inserirCreditoRealizado(gerarCreditoRealizadoHelper.getMapCreditoRealizado(), conta);
+//			this.atualizarCreditoARealizar(gerarCreditoRealizadoHelper.getColecaoCreditoARealizar());
 
-//				if (imovel.getIndicadorDebitoConta().equals(ConstantesSistema.SIM) && conta.getContaMotivoRevisao() == null) {
-//					this.gerarMovimentoDebitoAutomatico(imovel, conta, faturamentoGrupo);
-//				}
-			}
+//			if (imovel.getIndicadorDebitoConta().equals(ConstantesSistema.SIM) && conta.getContaMotivoRevisao() == null) {
+//				this.gerarMovimentoDebitoAutomatico(imovel, conta, faturamentoGrupo);
+//			}
 
 //			Integer anoMesReferenciaResumoFaturamento = null;
 //			if (faturamentoAntecipado) {

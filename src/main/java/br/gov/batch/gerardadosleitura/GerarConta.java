@@ -52,7 +52,6 @@ public class GerarConta implements ItemProcessor {
     	to.setFaturamentoGrupo(faturamentoGrupo);
     	to.setAnoMesFaturamento(anoMesFaturamento);
     	to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
-    	to.setGerarAtividadeGrupoFaturamento(true);
     	
 		faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
     	

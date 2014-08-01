@@ -33,7 +33,6 @@ public class CreditoRealizadoBOTest {
 	private CreditoRealizarRepositorio creditoRealizarRepositorioMock;
 
 	private Imovel imovel;
-	private boolean preFaturamento;
 	private int anoMesFaturamento;
 	
 	private CreditoRealizadoTO creditoRealizadoTO;
@@ -43,7 +42,6 @@ public class CreditoRealizadoBOTest {
 	@Before
 	public void setup(){
 		creditoRealizadoBO = new CreditoRealizadoBO();
-		preFaturamento = false;
 		
 		imovel = new Imovel();
 		imovel.setId(1L);
@@ -113,75 +111,17 @@ public class CreditoRealizadoBOTest {
 	}
 	
 	@Test
-	public void gerarCreditoRealizadoSemCreditoRealizarNaoEhPreFaturamento(){
+	public void gerarCreditoRealizadoSemCreditoRealizar(){
 		Collection<CreditoRealizar> creditosRealizar = new ArrayList<CreditoRealizar>();
 		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
 			.andReturn(creditosRealizar);
 		replay(creditoRealizarRepositorioMock);
 		
-		CreditoRealizadoTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, valoresAguaEsgotoTO, new BigDecimal("0.00"), false, preFaturamento);
+		CreditoRealizadoTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, valoresAguaEsgotoTO, new BigDecimal("0.00"));
 		
 		assertEquals(creditoRealizadoTO.getColecaoCreditosARealizarUpdate().size(), creditoRealizadoTORetorno.getColecaoCreditosARealizarUpdate().size());
 		assertEquals(creditoRealizadoTO.getMapValoresPorTipoCredito().size(), creditoRealizadoTORetorno.getMapValoresPorTipoCredito().size());
 		assertEquals(creditoRealizadoTO.getMapCreditoRealizado().size(), creditoRealizadoTORetorno.getMapCreditoRealizado().size());
 		assertEquals(new BigDecimal("0.00"), creditoRealizadoTORetorno.getValorTotalCreditos());
-	}
-	
-	@Test
-	public void calculaValorTotalACobrarEhPreFaturamento() {
-		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
-		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
-		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
-		BigDecimal valorTotalDebitos = new BigDecimal("0.00");
-		
-		preFaturamento = true;
-		
-		assertEquals(new BigDecimal("1"), creditoRealizadoBO.calculaValorTotalACobrar(valoresAguaEsgotoTO, valorTotalDebitos, preFaturamento));
-	}
-	
-	@Test
-	public void calculaValorTotalACobrarZeradoNaoEhPreFaturamento() {
-		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
-		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
-		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
-		BigDecimal valorTotalDebitos = new BigDecimal("0.00");
-		
-		assertEquals(new BigDecimal("0.00"), creditoRealizadoBO.calculaValorTotalACobrar(valoresAguaEsgotoTO, valorTotalDebitos, preFaturamento));
-	}
-	
-	@Test
-	public void calculaValorTotalACobrarAguaZeradoNaoEhPreFaturamento() {
-		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
-		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
-		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("1.00"));
-		BigDecimal valorTotalDebitos = new BigDecimal("1.00");
-		
-		assertEquals(new BigDecimal("2.00"), creditoRealizadoBO.calculaValorTotalACobrar(valoresAguaEsgotoTO, valorTotalDebitos, preFaturamento));
-		assertEquals(new BigDecimal("1.00"), valoresAguaEsgotoTO.getValorTotalEsgoto());
-		assertEquals(new BigDecimal("0.00"), valoresAguaEsgotoTO.getValorTotalAgua());
-	}
-	
-	@Test
-	public void calculaValorTotalACobrarAguaEEsgotoZeradosNaoEhPreFaturamento() {
-		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
-		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("0.00"));
-		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("0.00"));
-		BigDecimal valorTotalDebitos = new BigDecimal("1.00");
-		
-		assertEquals(new BigDecimal("1.00"), creditoRealizadoBO.calculaValorTotalACobrar(valoresAguaEsgotoTO, valorTotalDebitos, preFaturamento));
-		assertEquals(new BigDecimal("0.00"), valoresAguaEsgotoTO.getValorTotalEsgoto());
-		assertEquals(new BigDecimal("0.00"), valoresAguaEsgotoTO.getValorTotalAgua());
-	}
-	
-	@Test
-	public void calculaValorTotalACobrarTotalDebitosZeradosNaoEhPreFaturamento() {
-		FaturamentoAguaEsgotoTO valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
-		valoresAguaEsgotoTO.setValorTotalAgua(new BigDecimal("1.00"));
-		valoresAguaEsgotoTO.setValorTotalEsgoto(new BigDecimal("1.00"));
-		BigDecimal valorTotalDebitos = new BigDecimal("0.00");
-		
-		assertEquals(new BigDecimal("2.00"), creditoRealizadoBO.calculaValorTotalACobrar(valoresAguaEsgotoTO, valorTotalDebitos, preFaturamento));
-		assertEquals(new BigDecimal("1.00"), valoresAguaEsgotoTO.getValorTotalEsgoto());
-		assertEquals(new BigDecimal("1.00"), valoresAguaEsgotoTO.getValorTotalAgua());
 	}
 }

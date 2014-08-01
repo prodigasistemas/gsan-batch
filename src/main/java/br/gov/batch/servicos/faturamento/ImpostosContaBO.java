@@ -38,8 +38,7 @@ public class ImpostosContaBO {
 	private ImpostoDeduzidoTO impostoDeduzidoTO = null;
 
 	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Long idImovel, Integer anoMesReferencia, 
-			BigDecimal valorAgua, BigDecimal valorEsgoto, BigDecimal valorDebito, BigDecimal valorCredito, 
-			boolean preFaturamento) {
+			BigDecimal valorAgua, BigDecimal valorEsgoto, BigDecimal valorDebito, BigDecimal valorCredito) {
 
 		ImpostosDeduzidosContaTO retorno = new ImpostosDeduzidosContaTO();
 
@@ -57,7 +56,7 @@ public class ImpostosContaBO {
 
 			inicializaValoresCalculo();
 
-			baseCalculo = calculaBaseCalculo(valorAgua, valorEsgoto, valorDebito, valorCredito, preFaturamento);
+			baseCalculo = new BigDecimal("0.00");
 
 			Iterator<ImpostoTipo> iteratorImpostoTipo = impostoTipoRepositorio.buscarImpostoTipoAtivos().iterator();
 
@@ -76,29 +75,21 @@ public class ImpostosContaBO {
 				impostoDeduzidoTO = new ImpostoDeduzidoTO();
 
 				if (iteratorImpostoTipo.hasNext()) {
-
 					valorImpostoDeduzido = calculaValorImpostoDeduzido(impostoTipoAliquota, impostoTipoAliquota.getPercentualAliquota());
 
-					if (valorImpostoDeduzido.compareTo(new BigDecimal("0.00")) == 1 || preFaturamento) {
+					atualizaImpostoDeduzidoTO(impostoTipoAliquota);
 						
-						atualizaImpostoDeduzidoTO(impostoTipoAliquota);
-						
-						valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.add(valorImpostoDeduzido);
-					}
+					valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.add(valorImpostoDeduzido);
 				} else {
-
 					valorImpostoDeduzidoTotal = calculaValorImpostoDeduzido(impostoTipoAliquota, percetagemTotalAliquota);
 
 					valorImpostoDeduzido = valorImpostoDeduzidoTotal.subtract(valorImpostoDeduzidoFinal);
 
 					valorImpostoDeduzido = valorImpostoDeduzido.setScale(2, BigDecimal.ROUND_DOWN);
-
-					if (valorImpostoDeduzido.compareTo(new BigDecimal("0.00")) == 1 || preFaturamento) {
 						
-						atualizaImpostoDeduzidoTO(impostoTipoAliquota);
-						
-						valorImpostoDeduzidoFinal = valorImpostoDeduzidoTotal;
-					}
+					atualizaImpostoDeduzidoTO(impostoTipoAliquota);
+					
+					valorImpostoDeduzidoFinal = valorImpostoDeduzidoTotal;
 				}
 
 				colecaoHelper.add(impostoDeduzidoTO);
@@ -138,20 +129,6 @@ public class ImpostosContaBO {
 		valorImpostoDeduzidoFinal = new BigDecimal("0.00");
 		percetagemTotalAliquota = new BigDecimal("0.00");
 		valorImpostoDeduzidoTotal = new BigDecimal("0.00");
-	}
-
-	private BigDecimal calculaBaseCalculo(BigDecimal valorAgua, BigDecimal valorEsgoto, BigDecimal valorDebito, BigDecimal valorCredito, boolean preFaturamento) {
-		BigDecimal baseCalculo = valorAgua.add(valorEsgoto);
-		baseCalculo = baseCalculo.add(valorDebito);
-		baseCalculo = baseCalculo.subtract(valorCredito);
-
-		baseCalculo = baseCalculo.setScale(2, BigDecimal.ROUND_DOWN);
-
-		if (preFaturamento) {
-			baseCalculo = new BigDecimal("0.00");
-		}
-
-		return baseCalculo;
 	}
 
 	private static BigDecimal dividiArredondando(BigDecimal dividendo, BigDecimal divisor) {

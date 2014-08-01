@@ -13,7 +13,6 @@ public class FaturamentoImovelTO implements Serializable{
 	private static final long serialVersionUID = -8120350363915598518L;
 	
 	private Imovel imovel;
-	private Boolean gerarAtividadeGrupoFaturamento;
 	private Date dataVencimentoConta;
 	private Rota rota;
 	private FaturamentoAtividadeCronogramaRota faturamentoAtivCronRota;
@@ -33,12 +32,6 @@ public class FaturamentoImovelTO implements Serializable{
 	}
 	public void setImovel(Imovel imovel) {
 		this.imovel = imovel;
-	}
-	public Boolean getGerarAtividadeGrupoFaturamento() {
-		return gerarAtividadeGrupoFaturamento;
-	}
-	public void setGerarAtividadeGrupoFaturamento(Boolean gerarAtividadeGrupoFaturamento) {
-		this.gerarAtividadeGrupoFaturamento = gerarAtividadeGrupoFaturamento;
 	}
 	public FaturamentoAtividadeCronogramaRota getFaturamentoAtivCronRota() {
 		return faturamentoAtivCronRota;
