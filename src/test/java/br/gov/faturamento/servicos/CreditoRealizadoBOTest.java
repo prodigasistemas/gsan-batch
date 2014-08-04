@@ -115,6 +115,8 @@ public class CreditoRealizadoBOTest {
 		Collection<CreditoRealizar> creditosRealizar = new ArrayList<CreditoRealizar>();
 		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
 			.andReturn(creditosRealizar);
+		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
+		.andReturn(creditosRealizar);
 		replay(creditoRealizarRepositorioMock);
 		
 		CreditoRealizadoTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, valoresAguaEsgotoTO, new BigDecimal("0.00"));
@@ -122,6 +124,6 @@ public class CreditoRealizadoBOTest {
 		assertEquals(creditoRealizadoTO.getColecaoCreditosARealizarUpdate().size(), creditoRealizadoTORetorno.getColecaoCreditosARealizarUpdate().size());
 		assertEquals(creditoRealizadoTO.getMapValoresPorTipoCredito().size(), creditoRealizadoTORetorno.getMapValoresPorTipoCredito().size());
 		assertEquals(creditoRealizadoTO.getMapCreditoRealizado().size(), creditoRealizadoTORetorno.getMapCreditoRealizado().size());
-		assertEquals(new BigDecimal("0.00"), creditoRealizadoTORetorno.getValorTotalCreditos());
+		assertEquals(0.00, creditoRealizadoTORetorno.getValorTotalCreditos().doubleValue(), 0);
 	}
 }

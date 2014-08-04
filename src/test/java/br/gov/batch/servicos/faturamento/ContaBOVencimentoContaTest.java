@@ -188,8 +188,7 @@ public class ContaBOVencimentoContaTest {
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getMaximum(Calendar.DAY_OF_MONTH));
-		
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
 	

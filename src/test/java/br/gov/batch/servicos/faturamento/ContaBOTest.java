@@ -1,41 +1,56 @@
 package br.gov.batch.servicos.faturamento;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.inject.Inject;
-
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.persistence.Cleanup;
-import org.jboss.arquillian.persistence.CleanupStrategy;
-import org.jboss.arquillian.persistence.ShouldMatchDataSet;
-import org.jboss.arquillian.persistence.TestExecutionPhase;
-import org.jboss.arquillian.persistence.UsingDataSet;
-import org.jboss.shrinkwrap.api.Archive;
+import org.easymock.EasyMockRunner;
+import org.easymock.Mock;
+import org.easymock.TestSubject;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.batch.test.ShrinkWrapBuilder;
+import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SetorComercial;
+import br.gov.model.cadastro.SistemaParametros;
+import br.gov.model.faturamento.Conta;
+import br.gov.servicos.cadastro.ClienteRepositorio;
+import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.GerarContaTO;
 
-@RunWith(Arquillian.class)
+@RunWith(EasyMockRunner.class)
 public class ContaBOTest {
 	
-	@Deployment
-    public static Archive<?> createDeployment() {
-		return ShrinkWrapBuilder.createDeployment();
-    }
-	
-	@Inject
+	@TestSubject
 	private ContaBO contaBO;
 	
+	@Mock
+	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
+	
+	@Mock
+	private ClienteRepositorio clienteRepositorio;
+
 	Imovel imovel = new Imovel();
 	
-	private void gerarContaSimples(){
+	SistemaParametros sistemaParametros;
+	
+	@Before
+	public void init(){
+		contaBO = new ContaBO();
+		
+		sistemaParametros = new SistemaParametros();
+		sistemaParametros.setNumeroMesesValidadeConta((short) 5);
+		
+		contaBO.setSistemaParametros(sistemaParametros);
+	}
+	
+	private void preparaTeste(){
 		SetorComercial setor = new SetorComercial();
 		setor.setId(1);
 		setor.setCodigo(8);
@@ -47,26 +62,45 @@ public class ContaBOTest {
 		imovel.setId(1L);
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
+		
+		expect(medicaoHistoricoRepositorio.obterPorImovelEReferencia(1L, 201405)).andReturn(null);
+		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1L)).andReturn(new Cliente());
+		
+		replay(medicaoHistoricoRepositorio);
+		replay(clienteRepositorio);		
 	}
 	
 	@Test
-	@UsingDataSet("criarContaInput.yml")
-	@ShouldMatchDataSet("criarContaOutput01.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
 	public void criarContaComValoresZerados() throws Exception{
-		gerarContaSimples();
+		preparaTeste();
 		
-		contaBO.gerarConta(toContaZerados());
+		Conta conta = contaBO.buildConta(toContaZerados());
+		Assert.assertEquals(201405, conta.getReferencia().intValue());
+		Assert.assertEquals(201405, conta.getReferenciaContabil().intValue());
+		Assert.assertEquals(0, conta.getValorAgua().intValue());
+		Assert.assertEquals(0, conta.getValorEsgoto().intValue());
+		Assert.assertEquals(0, conta.getValorCreditos().intValue());
+		Assert.assertEquals(0, conta.getValorDebitos().intValue());
+		Assert.assertEquals(0, conta.getValorImposto().intValue());
+		Assert.assertEquals(0, conta.getPercentualEsgoto().intValue());
+		Assert.assertEquals(0, conta.getPercentualColeta().intValue());
 	}
 	
 	@Test
-	@UsingDataSet("criarContaInput.yml")
-	@ShouldMatchDataSet("criarContaOutput02.yml")
-	@Cleanup(phase = TestExecutionPhase.AFTER, strategy = CleanupStrategy.USED_ROWS_ONLY)
 	public void criarContaComValoresPreenchidos() throws Exception{
-		gerarContaSimples();
+		preparaTeste();
 		
-		contaBO.gerarConta(toContaPreenchidos());
+		Conta conta = contaBO.buildConta(toContaPreenchidos());
+		
+		Assert.assertEquals(201405, conta.getReferencia().intValue());
+		Assert.assertEquals(201405, conta.getReferenciaContabil().intValue());
+		Assert.assertEquals(0, conta.getValorAgua().intValue());
+		Assert.assertEquals(0, conta.getValorEsgoto().intValue());
+		Assert.assertEquals(2.45, conta.getValorCreditos().doubleValue(), 0);
+		Assert.assertEquals(5.45, conta.getValorDebitos().doubleValue(), 0);
+		Assert.assertEquals(0.78, conta.getValorImposto().doubleValue(), 0);
+		Assert.assertEquals(5.60, conta.getPercentualEsgoto().doubleValue(), 0);
+		Assert.assertEquals(5.60, conta.getPercentualColeta().doubleValue(), 0);		
 	}
 	
 	private GerarContaTO toContaZerados(){

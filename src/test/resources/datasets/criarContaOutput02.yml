@@ -1,3 +1,35 @@
+cadastro.localidade:
+  - loca_id: 1
+
+cadastro.quadra:
+  - qdra_id: 1
+    qdra_nnquadra: 200
+
+cadastro.setor_comercial:
+  - stcm_id: 1
+    stcm_cdsetorcomercial: 8
+
+cadastro.imovel:
+  - imov_id: 1
+    stcm_id: 1
+
+cadastro.sistema_parametros:
+  - parm_id: 1
+    parm_amreferenciafaturamento: 201403
+    parm_nnmesesvalidadeconta: 4
+
+micromedicao.hidrometro_inst_hist:
+  - hidi_id: 1
+  
+atendimentopublico.ligacao_agua:
+  - lagu_id: 1
+    imov_id: 1
+    hidi_id: 1
+
+micromedicao.medicao_historico:
+  - mdhi_id: 1
+    mdhi_amleitura: 201409
+
 faturamento.conta_geral:
   - cnta_id: 1
     cntg_ichistorico: 2

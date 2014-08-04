@@ -35,18 +35,19 @@ public class CreditoRealizadoBO {
 	private CreditoRealizarRepositorio creditoRealizarRepositorio;
 	
 	private CreditoRealizadoTO creditoRealizadoTO;
+	
 	private BigDecimal valorACobrar;
 
 	public CreditoRealizadoTO gerarCreditoRealizado(Imovel imovel, Integer anoMesFaturamento,
 			FaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos) {
 
 		Collection<CreditoRealizar> colecaoCreditosRealizar = getColecaoCreditosRealizar(imovel, anoMesFaturamento);
-
+		
 		return gerarCreditoRealizado(anoMesFaturamento, colecaoCreditosRealizar);
 	}
 
 	private CreditoRealizadoTO gerarCreditoRealizado(Integer anoMesFaturamento, Collection<CreditoRealizar> colecaoCreditosRealizar) {
-
+		
 		creditoRealizadoTO = new CreditoRealizadoTO();
 		valorACobrar = BigDecimal.ONE;
 
@@ -60,11 +61,13 @@ public class CreditoRealizadoBO {
 			creditoRealizar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
 			creditoRealizar.setValorResidualConcedidoMes(creditoRealizar.getValorResidualMesAnterior());
 			
+			BigDecimal valorCreditoParcelaMes = BigDecimal.ZERO;
+			
 			if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar)) {
+				valorCreditoParcelaMes = calculaValorCorrespondenteParcelaMes(creditoRealizar);
 				creditoRealizar.setNumeroPrestacaoRealizada(new Integer(creditoRealizar.getNumeroPrestacaoRealizada().intValue() + 1).shortValue());
 			}
 
-			BigDecimal valorCreditoParcelaMes = calculaValorCorrespondenteParcelaMes(creditoRealizar);
 			
 			creditoRealizar.setValorResidualMesAnterior(calculaValorResidualMesAnterior(creditoRealizar));
 

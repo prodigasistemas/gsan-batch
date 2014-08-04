@@ -1,6 +1,5 @@
 cadastro.localidade:
   - loca_id: 1
-    loca_nmlocalidade: "Belem"
 
 cadastro.quadra:
   - qdra_id: 1

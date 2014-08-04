@@ -12,7 +12,6 @@ import javax.ejb.TransactionAttributeType;
 import br.gov.model.Status;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaGeral;
@@ -53,13 +52,27 @@ public class ContaBO {
 	@PostConstruct
 	private void init(){
 		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
-	}
-	
+	}	
+
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public Conta gerarConta(GerarContaTO to) throws Exception{
 		ContaGeral contaGeral = new ContaGeral();
 		contaGeral.setIndicadorHistorico(Status.INATIVO.getId());
 
+		Conta conta = buildConta(to);
+		
+		conta.setNumeroBoleto(sequencialGeracaoBoleto(sistemaParametros.getValorContaFichaComp(), conta));
+		
+		Long idConta = contaGeralRepositorio.salvar(contaGeral);
+		conta.setId(idConta);
+		conta.setContaGeral(contaGeral);
+		
+		contaRepositorio.salvar(conta);
+		
+		return conta;
+	}
+	
+	public Conta buildConta(GerarContaTO to){
 		Conta.Builder builder = new Conta.Builder();
 		builder.imovel(to.getImovel())
 			.referenciaFaturamento(to.getAnoMesFaturamento())
@@ -79,20 +92,10 @@ public class ContaBO {
 			.leiturasFaturamento(medicaoHistoricoRepositorio.obterPorImovelEReferencia(to.getImovel().getId(), to.getAnoMesFaturamento()))
 			.rota(to.getRota());
 		
-		
-		Conta conta = builder.build();
-		conta.setNumeroBoleto(sequencialGeracaoBoleto(sistemaParametros.getValorContaFichaComp(), conta));
-		
-		Long idConta = contaGeralRepositorio.salvar(contaGeral);
-		conta.setId(idConta);
-		conta.setContaGeral(contaGeral);
-		
-		contaRepositorio.salvar(conta);
-		
-		return conta;
+		return builder.build();
 	}
 	
-	public Integer sequencialGeracaoBoleto(BigDecimal valorContaFichaCompensacao, Conta conta) {
+	private Integer sequencialGeracaoBoleto(BigDecimal valorContaFichaCompensacao, Conta conta) {
 		Integer sequencialContaBoleto = null;
 
 		if (valorContaFichaCompensacao != null	&& conta.calculaValorTotal().compareTo(valorContaFichaCompensacao) > 0) {
@@ -118,16 +121,16 @@ public class ContaBO {
 			}
 		}
 		
-		if ((imovel.getImovelContaEnvio() == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId() || imovel.getImovelContaEnvio() == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL.getId())
+		if (imovel.responsavelRecebeConta()
 				&& !contaTO.comVencimentoAlternativo()
-				&& imovel.getIndicadorDebitoConta() == Status.INATIVO.getId()) {
+				&& !imovel.debitoEmConta()) {
 			contaTO.adicionaDiasAoVencimento(sistemaParametros.getNumeroDiasAdicionaisCorreios());
 		}
 
 		return contaTO.getDataVencimentoConta();
 	}
 	
-	public ContaTO vencimentoAlternativo(Imovel imovel, Date dataVencimentoRota){
+	private ContaTO vencimentoAlternativo(Imovel imovel, Date dataVencimentoRota){
 		ContaTO contaTO = new ContaTO();
 		contaTO.setDataVencimentoConta(dataVencimentoRota);
 		if (imovel.existeDiaVencimento() && !imovel.emissaoExtratoFaturamento()) {
@@ -148,5 +151,9 @@ public class ContaBO {
 		}
 		
 		return contaTO;
+	}
+	
+	public void setSistemaParametros(SistemaParametros sistemaParametros) {
+		this.sistemaParametros = sistemaParametros;
 	}
 }
