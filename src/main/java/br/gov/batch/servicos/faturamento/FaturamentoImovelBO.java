@@ -78,9 +78,11 @@ public class FaturamentoImovelBO {
 		if (possuiLigacaoAguaEsgotoAtivo(imovel) || possuiHidrometro(imovel)) { 
 
 			if (deveFaturar(imovel, anoMesFaturamento)) {
+				helperValoresAguaEsgoto.setAguaEsgotoZerados(false);
 				helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ONE);
 				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ONE);
 			} else {
+				helperValoresAguaEsgoto.setAguaEsgotoZerados(true);
 				helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
 				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
 			}
@@ -93,7 +95,7 @@ public class FaturamentoImovelBO {
 			}
 		}
 
-		boolean gerarConta = analisadorGeracaoConta.verificarNaoGeracaoConta(valoresAguaEsgotoZerados(helperValoresAguaEsgoto, imovel), anoMesFaturamento, imovel);
+		boolean gerarConta = analisadorGeracaoConta.verificarGeracaoConta(helperValoresAguaEsgoto.isAguaEsgotoZerados(), anoMesFaturamento, imovel);
 		
 		if (gerarConta) {
 			helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
@@ -111,7 +113,7 @@ public class FaturamentoImovelBO {
 
 			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
 														gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
-			Conta conta = contaBO.gerarConta(gerarTO);
+			//Conta conta = contaBO.gerarConta(gerarTO);
 
 //			Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
 //
@@ -141,6 +143,11 @@ public class FaturamentoImovelBO {
 //													gerarDebitoCobradoHelper, gerarCreditoRealizadoHelper, colecaoResumoFaturamento, imovel,
 //													gerarAtividadeGrupoFaturamento, faturamentoAtivCronRota, faturamentoGrupo, anoMesReferenciaResumoFaturamento, true);
 		}
+	}
+
+	private boolean valoresAguaEsgotoZerados(FaturamentoAguaEsgotoTO helperValoresAguaEsgoto) {
+		return helperValoresAguaEsgoto.getValorTotalAgua().compareTo(BigDecimal.ZERO) == 0 
+				&& helperValoresAguaEsgoto.getValorTotalEsgoto().compareTo(BigDecimal.ZERO) == 0;
 	}
 
 	private GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
@@ -205,20 +212,10 @@ public class FaturamentoImovelBO {
 		}
 	}
 	
-	private boolean valoresAguaEsgotoZerados(FaturamentoAguaEsgotoTO helperValoresAguaEsgoto, Imovel imovel) {
-		return (helperValoresAguaEsgoto.getValorTotalAgua().compareTo(BigDecimal.ZERO) == 0 
-				&& helperValoresAguaEsgoto.getValorTotalEsgoto().compareTo(BigDecimal.ZERO) == 0)
-				|| (helperValoresAguaEsgoto.getValorTotalAgua().compareTo(BigDecimal.ZERO) != 0 && 
-					helperValoresAguaEsgoto.getValorTotalEsgoto().compareTo(BigDecimal.ZERO) != 0 &&
-					!imovel.getLigacaoAguaSituacao().getId().equals(LigacaoAguaSituacao.LIGADO) &&
-					!imovel.getLigacaoEsgotoSituacao().getId().equals(LigacaoEsgotoSituacao.LIGADO) &&
-					imovel.getImovelCondominio() == null);
-	}
-
 	private boolean deveFaturar(Imovel imovel, Integer anoMesFaturamento) {
 		boolean faturar = true;
 
-		if (imovel.getFaturamentoSituacaoTipo() != null && !imovel.getFaturamentoSituacaoTipo().equals("")) {
+		if (imovel.getFaturamentoSituacaoTipo() != null) {
 
 			List<FaturamentoSituacaoHistorico> faturamentosSituacaoHistorico = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
 			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentosSituacaoHistorico.get(0);
@@ -226,9 +223,8 @@ public class FaturamentoImovelBO {
 			if ((faturamentoSituacaoHistorico != null 
 					&& anoMesFaturamento >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() 
 					&& anoMesFaturamento <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim())
-					&& (imovel.getFaturamentoSituacaoTipo() != null 
-					&& imovel.getFaturamentoSituacaoTipo().getParalisacaoFaturamento() == Status.ATIVO 
-					&& imovel.getFaturamentoSituacaoTipo().getValidoAgua() == Status.ATIVO)) {
+					&& imovel.paralisacaoFaturamento() 
+					&& imovel.faturamentoAguaValido()) {
 				faturar = false;
 			}
 		}

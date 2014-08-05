@@ -53,7 +53,7 @@ public class GerarConta implements ItemProcessor {
     	to.setAnoMesFaturamento(anoMesFaturamento);
     	to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
     	
-		//faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
+		faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
     	
         return imovel;
     }
