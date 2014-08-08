@@ -18,13 +18,13 @@ import org.junit.runner.RunWith;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
-import br.gov.servicos.to.DebitoCobradoTO;
+import br.gov.servicos.to.DebitosContaTO;
 
 @RunWith(EasyMockRunner.class)
 public class DebitoCobradoBOTest {
 	
 	@TestSubject
-	private DebitoCobradoBO business;
+	private DebitosContaBO business;
 	
 	@Mock
 	private DebitoCobrarBO debitoCobrarEJBMock;
@@ -42,7 +42,7 @@ public class DebitoCobradoBOTest {
 	@Before
 	public void setup() {
 		imovel = new Imovel();
-		business = new DebitoCobradoBO();
+		business = new DebitosContaBO();
 	}
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
@@ -69,7 +69,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
 		
 		assertEquals(7.25, to.getValorTotalDebito().doubleValue(), 0);
 	}
@@ -81,7 +81,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
 		
 		assertEquals(5.34, to.getValorTotalDebito().doubleValue(), 0);
 	}
@@ -93,7 +93,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitoCobradoTO to = business.gerarDebitoCobrado(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
 		
 		DebitoCobrado debitoCobrado = to.getDebitosCobrados().get(0);
 		

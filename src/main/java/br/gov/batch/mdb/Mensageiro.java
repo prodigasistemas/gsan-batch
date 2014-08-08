@@ -39,9 +39,9 @@ public class Mensageiro implements MessageListener {
             Properties processoParametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
             
             processoParametros.put("idProcessoIniciado", "200");
-            processoParametros.put("idRota", "619");
-            processoParametros.put("anoMesFaturamento", "201406");
-            processoParametros.put("idGrupoFaturamento", "203");
+            processoParametros.put("idRota", "949");
+            processoParametros.put("anoMesFaturamento", "201408");
+            processoParametros.put("idGrupoFaturamento", "205");
             
                         
             jo.start(processoIniciado.getProcesso().getNomeArquivoBatch(), processoParametros);

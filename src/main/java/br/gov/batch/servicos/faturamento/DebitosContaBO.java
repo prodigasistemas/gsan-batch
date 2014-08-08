@@ -14,10 +14,10 @@ import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCobrarCategoria;
 import br.gov.model.faturamento.DebitoCobrarGeral;
-import br.gov.servicos.to.DebitoCobradoTO;
+import br.gov.servicos.to.DebitosContaTO;
 
 @Stateless
-public class DebitoCobradoBO {
+public class DebitosContaBO {
 
 	@EJB
 	private DebitoCobrarBO debitoCobrarBO;
@@ -28,8 +28,8 @@ public class DebitoCobradoBO {
 	@EJB
 	private DebitoCobrarCategoriaBO debitoCobrarCategoriaBO;
 	
-	public DebitoCobradoTO gerarDebitoCobrado(Imovel imovel, int anoMesFaturamento){
-		DebitoCobradoTO to = new DebitoCobradoTO();
+	public DebitosContaTO gerarDebitosConta(Imovel imovel, int anoMesFaturamento){
+		DebitosContaTO to = new DebitosContaTO();
 		
 		Collection<DebitoCobrar> colecaoDebitosACobrar = debitoCobrarBO.debitosCobrarVigentes(imovel);
 		

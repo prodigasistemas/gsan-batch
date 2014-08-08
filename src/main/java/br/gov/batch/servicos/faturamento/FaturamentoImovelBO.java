@@ -26,8 +26,8 @@ import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ContaCategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
-import br.gov.servicos.to.CreditoRealizadoTO;
-import br.gov.servicos.to.DebitoCobradoTO;
+import br.gov.servicos.to.CreditosContaTO;
+import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 import br.gov.servicos.to.GerarContaTO;
 import br.gov.servicos.to.ImovelSubcategoriaTO;
@@ -50,10 +50,10 @@ public class FaturamentoImovelBO {
 	private LigacaoEsgotoRepositorio ligacaoEsgotoRepositorio;
 	
 	@EJB
-	private DebitoCobradoBO debitoCobradoBO;
+	private DebitosContaBO debitosContaBO;
 	
 	@EJB
-	private CreditoRealizadoBO creditoRealizadoBO;
+	private CreditosContaBO creditosContaBO;
 	
 	@EJB
 	private ImpostosContaBO impostosContaBO;
@@ -101,19 +101,18 @@ public class FaturamentoImovelBO {
 			helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
 			helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
 
-			DebitoCobradoTO gerarDebitoCobradoHelper = debitoCobradoBO.gerarDebitoCobrado(imovel, anoMesFaturamento);
+			DebitosContaTO debitosConta = debitosContaBO.gerarDebitosConta(imovel, anoMesFaturamento);
 
-			CreditoRealizadoTO gerarCreditoRealizadoHelper = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, helperValoresAguaEsgoto, 
-																				gerarDebitoCobradoHelper.getValorTotalDebito());
+			CreditosContaTO creditosConta = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
 
-
-			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
+			ImpostosDeduzidosContaTO impostosDeduzidosConta = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
 							anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
-							gerarDebitoCobradoHelper.getValorTotalDebito(), gerarCreditoRealizadoHelper.getValorTotalCreditos());
+							debitosConta.getValorTotalDebito(), creditosConta.getValorTotalCreditos());
 
-			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, gerarDebitoCobradoHelper,
-														gerarCreditoRealizadoHelper, gerarImpostosDeduzidosContaHelper);
-			//Conta conta = contaBO.gerarConta(gerarTO);
+			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, debitosConta,
+														creditosConta, impostosDeduzidosConta);
+			
+			Conta conta = contaBO.gerarConta(gerarTO);
 
 //			Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
 //
@@ -151,7 +150,7 @@ public class FaturamentoImovelBO {
 	}
 
 	private GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
-			DebitoCobradoTO gerarDebitoCobradoHelper, CreditoRealizadoTO gerarCreditoRealizadoHelper,
+			DebitosContaTO gerarDebitoCobradoHelper, CreditosContaTO gerarCreditoRealizadoHelper,
 			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
 		GerarContaTO gerarTO = new GerarContaTO();
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());

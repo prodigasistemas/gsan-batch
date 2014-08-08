@@ -19,11 +19,10 @@ import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
-import br.gov.servicos.to.CreditoRealizadoTO;
-import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
+import br.gov.servicos.to.CreditosContaTO;
 
 @Stateless
-public class CreditoRealizadoBO {
+public class CreditosContaBO {
 
 	@EJB
 	private CategoriaBO categoriaBO;
@@ -34,30 +33,19 @@ public class CreditoRealizadoBO {
 	@EJB
 	private CreditoRealizarRepositorio creditoRealizarRepositorio;
 	
-	private CreditoRealizadoTO creditoRealizadoTO;
+	private CreditosContaTO creditosConta;
 	
-	private BigDecimal valorACobrar;
+	public CreditosContaTO gerarCreditosConta(Imovel imovel, Integer anoMesFaturamento) {
 
-	public CreditoRealizadoTO gerarCreditoRealizado(Imovel imovel, Integer anoMesFaturamento,
-			FaturamentoAguaEsgotoTO valoresAguaEsgotoTO, BigDecimal valorTotalDebitos) {
-
-		Collection<CreditoRealizar> colecaoCreditosRealizar = getColecaoCreditosRealizar(imovel, anoMesFaturamento);
+		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel, anoMesFaturamento);
 		
-		return gerarCreditoRealizado(anoMesFaturamento, colecaoCreditosRealizar);
+		return gerarCreditos(anoMesFaturamento, creditosRealizar);
 	}
 
-	private CreditoRealizadoTO gerarCreditoRealizado(Integer anoMesFaturamento, Collection<CreditoRealizar> colecaoCreditosRealizar) {
-		
-		creditoRealizadoTO = new CreditoRealizadoTO();
-		valorACobrar = BigDecimal.ONE;
+	private CreditosContaTO gerarCreditos(Integer anoMesFaturamento, Collection<CreditoRealizar> creditosRealizar) {
+		creditosConta = new CreditosContaTO();
 
-		Iterator<CreditoRealizar> iteratorColecaoCreditosARealizar = colecaoCreditosRealizar.iterator();
-		CreditoRealizar creditoRealizar = null;
-
-		while (iteratorColecaoCreditosARealizar.hasNext()) {
-
-			creditoRealizar = (CreditoRealizar) iteratorColecaoCreditosARealizar.next();
-
+		for (CreditoRealizar creditoRealizar: creditosRealizar) {
 			creditoRealizar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
 			creditoRealizar.setValorResidualConcedidoMes(creditoRealizar.getValorResidualMesAnterior());
 			
@@ -67,28 +55,22 @@ public class CreditoRealizadoBO {
 				valorCreditoParcelaMes = calculaValorCorrespondenteParcelaMes(creditoRealizar);
 				creditoRealizar.setNumeroPrestacaoRealizada(new Integer(creditoRealizar.getNumeroPrestacaoRealizada().intValue() + 1).shortValue());
 			}
-
 			
-			creditoRealizar.setValorResidualMesAnterior(calculaValorResidualMesAnterior(creditoRealizar));
+			valorCreditoParcelaMes = valorCreditoParcelaMes.subtract(creditoRealizar.getValorResidualMesAnterior());
 
-			if (valorACobrarEhMenorQueZero()) {
-				valorCreditoParcelaMes = valorCreditoParcelaMes.subtract(creditoRealizar.getValorResidualMesAnterior());
-				valorACobrar = BigDecimal.ZERO;
-			}
-
-			creditoRealizadoTO.somaValorTotalCreditos(valorCreditoParcelaMes);
+			creditosConta.somaValorTotalCreditos(valorCreditoParcelaMes);
 
 			criarAtividadeGrupoFaturamento(creditoRealizar, valorCreditoParcelaMes);
 
-			if (creditoRealizadoTO.possuiCreditoTipo(creditoRealizar.getCreditoTipo())) {
+			if (creditosConta.possuiCreditoTipo(creditoRealizar.getCreditoTipo())) {
 				BigDecimal valorTotal = somaValorCreditoTipoEValorCreditoParcelaMes(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
-				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorTotal);
+				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorTotal);
 			} else {
-				creditoRealizadoTO.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
+				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
 			}
 		}
 
-		return creditoRealizadoTO;
+		return creditosConta;
 	}
 
 	private void criarAtividadeGrupoFaturamento(CreditoRealizar creditoRealizar, BigDecimal valorCreditoParcelaMes) {
@@ -97,20 +79,8 @@ public class CreditoRealizadoBO {
 		Collection<CreditoRealizadoCategoria> colecaoCreditosRealizadoCategoria = obterColecaoCreditosRealizadoCategoria(
 				creditoRealizado, creditoRealizar, valorCreditoParcelaMes);
 
-		creditoRealizadoTO.putCategoriasPorCreditoRealizado(creditoRealizado, colecaoCreditosRealizadoCategoria);
-		creditoRealizadoTO.addCreditoRealizar(creditoRealizar);
-	}
-
-	private BigDecimal calculaValorResidualMesAnterior(CreditoRealizar creditoRealizar) {
-		if (valorACobrarEhMenorQueZero()) {
-			return valorACobrar.multiply(new BigDecimal("-1"));
-		}
-		
-		return creditoRealizar.getValorResidualMesAnterior();
-	}
-
-	private boolean valorACobrarEhMenorQueZero() {
-		return valorACobrar.compareTo(BigDecimal.ZERO) == -1;
+		creditosConta.putCategoriasPorCreditoRealizado(creditoRealizado, colecaoCreditosRealizadoCategoria);
+		creditosConta.addCreditoRealizar(creditoRealizar);
 	}
 
 	private Collection<CreditoRealizadoCategoria> obterColecaoCreditosRealizadoCategoria(CreditoRealizado creditoRealizado, 
@@ -208,7 +178,7 @@ public class CreditoRealizadoBO {
 		(creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue());
 	}
 
-	private Collection<CreditoRealizar> getColecaoCreditosRealizar(Imovel imovel, Integer anoMesFaturamento) {
+	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel, Integer anoMesFaturamento) {
 		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 				imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
@@ -227,7 +197,7 @@ public class CreditoRealizadoBO {
 	}
 
 	public BigDecimal somaValorCreditoTipoEValorCreditoParcelaMes(CreditoTipo creditoTipo, BigDecimal valorCreditoParcelaMes) {
-		BigDecimal valorCreditoTipo = creditoRealizadoTO.getValorCreditoTipo(creditoTipo);
+		BigDecimal valorCreditoTipo = creditosConta.getValorCreditoTipo(creditoTipo);
 		
 		if (valorCreditoParcelaMes == null) {
 			valorCreditoParcelaMes = BigDecimal.ZERO;

@@ -15,19 +15,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.batch.servicos.faturamento.CreditoRealizadoBO;
+import br.gov.batch.servicos.faturamento.CreditosContaBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
-import br.gov.servicos.to.CreditoRealizadoTO;
+import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 
 @RunWith(EasyMockRunner.class)
 public class CreditoRealizadoBOTest {
 
 	@TestSubject
-	private CreditoRealizadoBO creditoRealizadoBO;
+	private CreditosContaBO creditoRealizadoBO;
 	
 	@Mock
 	private CreditoRealizarRepositorio creditoRealizarRepositorioMock;
@@ -35,13 +35,13 @@ public class CreditoRealizadoBOTest {
 	private Imovel imovel;
 	private int anoMesFaturamento;
 	
-	private CreditoRealizadoTO creditoRealizadoTO;
+	private CreditosContaTO creditoRealizadoTO;
 	private FaturamentoAguaEsgotoTO valoresAguaEsgotoTO;
 	private CreditoRealizar creditoRealizar;
 
 	@Before
 	public void setup(){
-		creditoRealizadoBO = new CreditoRealizadoBO();
+		creditoRealizadoBO = new CreditosContaBO();
 		
 		imovel = new Imovel();
 		imovel.setId(1L);
@@ -55,7 +55,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setNumeroPrestacaoCredito(new Short("1"));
 		creditoRealizar.setValorCredito(new BigDecimal("2.00"));
 		
-		creditoRealizadoTO = new CreditoRealizadoTO();
+		creditoRealizadoTO = new CreditosContaTO();
 		valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 	}
 	
@@ -119,7 +119,7 @@ public class CreditoRealizadoBOTest {
 		.andReturn(creditosRealizar);
 		replay(creditoRealizarRepositorioMock);
 		
-		CreditoRealizadoTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditoRealizado(imovel, anoMesFaturamento, valoresAguaEsgotoTO, new BigDecimal("0.00"));
+		CreditosContaTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditosConta(imovel, anoMesFaturamento);
 		
 		assertEquals(creditoRealizadoTO.getColecaoCreditosARealizarUpdate().size(), creditoRealizadoTORetorno.getColecaoCreditosARealizarUpdate().size());
 		assertEquals(creditoRealizadoTO.getMapValoresPorTipoCredito().size(), creditoRealizadoTORetorno.getMapValoresPorTipoCredito().size());
