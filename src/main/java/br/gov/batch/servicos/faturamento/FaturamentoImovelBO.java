@@ -144,14 +144,9 @@ public class FaturamentoImovelBO {
 		}
 	}
 
-	private boolean valoresAguaEsgotoZerados(FaturamentoAguaEsgotoTO helperValoresAguaEsgoto) {
-		return helperValoresAguaEsgoto.getValorTotalAgua().compareTo(BigDecimal.ZERO) == 0 
-				&& helperValoresAguaEsgoto.getValorTotalEsgoto().compareTo(BigDecimal.ZERO) == 0;
-	}
-
 	private GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
-			DebitosContaTO gerarDebitoCobradoHelper, CreditosContaTO gerarCreditoRealizadoHelper,
-			ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
+			DebitosContaTO gerarDebitoCobradoHelper, CreditosContaTO creditosContaTO,
+			ImpostosDeduzidosContaTO impostosDeduzidosTO) {
 		GerarContaTO gerarTO = new GerarContaTO();
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
 		gerarTO.setImovel(faturamentoTO.getImovel());
@@ -159,9 +154,9 @@ public class FaturamentoImovelBO {
 		gerarTO.setDataVencimentoRota(faturamentoTO.getDataVencimentoConta());
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
 		gerarTO.setAnoMesFaturamento(faturamentoTO.getAnoMesFaturamento());
-		gerarTO.setValorTotalCreditos(gerarCreditoRealizadoHelper.getValorTotalCreditos());
+		gerarTO.setValorTotalCreditos(creditosContaTO.getValorTotalCreditos());
 		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorTotalDebito());
-		gerarTO.setValorTotalImposto(gerarImpostosDeduzidosContaHelper.getValorTotalImposto());
+		gerarTO.setValorTotalImposto(impostosDeduzidosTO.getValorTotalImposto());
 		gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
 		gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
 		return gerarTO;

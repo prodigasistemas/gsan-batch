@@ -17,6 +17,7 @@ import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
 import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
@@ -33,11 +34,14 @@ public class CreditosContaBO {
 	@EJB
 	private CreditoRealizarRepositorio creditoRealizarRepositorio;
 	
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
+	
 	private CreditosContaTO creditosConta;
 	
 	public CreditosContaTO gerarCreditosConta(Imovel imovel, Integer anoMesFaturamento) {
 
-		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel, anoMesFaturamento);
+		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel);
 		
 		return gerarCreditos(anoMesFaturamento, creditosRealizar);
 	}
@@ -178,7 +182,9 @@ public class CreditosContaBO {
 		(creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue());
 	}
 
-	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel, Integer anoMesFaturamento) {
+	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel) {
+		Integer anoMesFaturamento = sistemaParametrosRepositorio.getSistemaParametros().getAnoMesFaturamento();
+		
 		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 				imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
