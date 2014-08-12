@@ -94,7 +94,7 @@ public class FaturamentoImovelBO {
 				helperValoresAguaEsgoto.setPercentualColetaEsgoto(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
 			}
 		}
-
+		
 		boolean gerarConta = analisadorGeracaoConta.verificarGeracaoConta(helperValoresAguaEsgoto.isAguaEsgotoZerados(), anoMesFaturamento, imovel);
 		
 		if (gerarConta) {

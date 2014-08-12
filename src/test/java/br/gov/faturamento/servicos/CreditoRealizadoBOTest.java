@@ -17,8 +17,10 @@ import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.CreditosContaBO;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
@@ -31,6 +33,9 @@ public class CreditoRealizadoBOTest {
 	
 	@Mock
 	private CreditoRealizarRepositorio creditoRealizarRepositorioMock;
+	
+	@Mock
+	private SistemaParametrosRepositorio sistemaParametrosRepositorioMock;
 
 	private Imovel imovel;
 	private int anoMesFaturamento;
@@ -112,11 +117,16 @@ public class CreditoRealizadoBOTest {
 	
 	@Test
 	public void gerarCreditoRealizadoSemCreditoRealizar(){
+		SistemaParametros parametros = new SistemaParametros();
+		parametros.setAnoMesFaturamento(201406);
 		Collection<CreditoRealizar> creditosRealizar = new ArrayList<CreditoRealizar>();
 		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
 			.andReturn(creditosRealizar);
 		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
 		.andReturn(creditosRealizar);
+		expect(sistemaParametrosRepositorioMock.getSistemaParametros())
+		.andReturn(parametros);
+		replay(sistemaParametrosRepositorioMock);
 		replay(creditoRealizarRepositorioMock);
 		
 		CreditosContaTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditosConta(imovel, anoMesFaturamento);

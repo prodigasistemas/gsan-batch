@@ -95,7 +95,6 @@ public class ContaBOVencimentoContaTest {
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
 		
 		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
@@ -156,7 +155,6 @@ public class ContaBOVencimentoContaTest {
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
-		cal.set(Calendar.DAY_OF_MONTH, 5);
 		
 		assertEquals(format.format(cal.getTime()), format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}

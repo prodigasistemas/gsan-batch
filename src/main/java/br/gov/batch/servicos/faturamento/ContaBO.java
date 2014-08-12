@@ -117,6 +117,8 @@ public class ContaBO {
 				
 				if (dataAtualMaisDiasMinimoEmissao.after(contaTO.getDataVencimentoConta())){
 					contaTO.adicionaMesAoVencimento();
+				} else{
+					contaTO.setDataVencimentoConta(dataVencimentoRota);
 				}
 			}
 		}
