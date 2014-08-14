@@ -19,8 +19,8 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 
 @Named
-public class PreGerarConta extends AbstractItemReader {
-	private Logger logger = Logger.getLogger(PreGerarConta.class);
+public class CarregarImoveisRota extends AbstractItemReader {
+	private Logger logger = Logger.getLogger(CarregarImoveisRota.class);
 	
     @EJB
     private ImovelRepositorio repositorio;
@@ -30,7 +30,7 @@ public class PreGerarConta extends AbstractItemReader {
     
     @Inject
     private BatchUtil util;
-        
+    
     @Inject
     @BatchProperty(name = "primeiroItem")
     private String primeiroItem;
@@ -57,7 +57,7 @@ public class PreGerarConta extends AbstractItemReader {
     	imoveis = new ArrayDeque<Imovel>(lista);
     	    	
     	anoMesFaturamento = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
-    	logger.info(String.format("Processando [ %s ] a partir de [ %s ].", lista.size(), firstItem));
+//    	logger.info(String.format("Rota: %s - Processando [ %s ] a partir de [ %s ].", idRota, lista.size(), firstItem));
     }
 
     public Imovel readItem() throws Exception {

@@ -15,11 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.batch.servicos.faturamento.AnalisadorGeracaoConta;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
@@ -27,8 +27,8 @@ import br.gov.model.faturamento.DebitoTipo;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
 import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
-import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
 @RunWith(EasyMockRunner.class)
 public class AnalisadorGeracaoContaTest {
@@ -45,7 +45,7 @@ public class AnalisadorGeracaoContaTest {
 	private int anoMesFaturamento;
 	
 	@Mock
-	private DebitoCobrarRepositorio debitoCobrarEJBMock;
+	private DebitoCobrarBO debitoCobrarEJBMock;
 	
 	@Mock
 	private PagamentoRepositorio pagamentoEJBMock;
@@ -55,6 +55,9 @@ public class AnalisadorGeracaoContaTest {
 	
 	@Mock
 	private DevolucaoRepositorio devolucaoEJBMock;
+	
+	@Mock
+	private SistemaParametrosRepositorio sistemaParametrosRepositorioMock;
 	
 	@Before
 	public void setup(){
@@ -134,9 +137,8 @@ public class AnalisadorGeracaoContaTest {
 	
 	@Test
 	public void geraContaComDebitoCobrar() throws Exception {
-
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(null);
-		
+		mockSistemaParametrosRepositorio();
 		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
@@ -146,6 +148,8 @@ public class AnalisadorGeracaoContaTest {
 		Collection<DebitoCobrar> debitosCobrar = buildCollectionDebitosCobrarVazio(false);
 		
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
+
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.ATIVO);
 		
@@ -159,10 +163,11 @@ public class AnalisadorGeracaoContaTest {
 		
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, false);
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
-		assertFalse(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
+		assertTrue(analisadorGeracaoConta.verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel));
 	}
 	
 	@Test
@@ -173,6 +178,7 @@ public class AnalisadorGeracaoContaTest {
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		mockPesquisarCreditoARealizar(null);
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -187,6 +193,7 @@ public class AnalisadorGeracaoContaTest {
 		mockDebitosCobrarPorImovelComPendenciaESemRevisao(debitosCobrar);
 		mockExisteDebitoSemPagamento(debitosCobrar, true);
 		mockPesquisarCreditoARealizar(null);
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -204,8 +211,8 @@ public class AnalisadorGeracaoContaTest {
 		Collection<CreditoRealizar> creditosRealizar = buildCollectionCreditosRealizar();
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
+		mockSistemaParametrosRepositorio();
 		replay(creditoRealizarEJBMock);
-		replay(devolucaoEJBMock);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -225,6 +232,7 @@ public class AnalisadorGeracaoContaTest {
 		
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
 		replay(creditoRealizarEJBMock);
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -244,6 +252,7 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, false);
 		replay(creditoRealizarEJBMock);
+		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -265,6 +274,7 @@ public class AnalisadorGeracaoContaTest {
 	private void mockExisteCreditoComDevolucao(Collection<CreditoRealizar> creditosRealizar, boolean retorno) {
 		expect(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
 			.andReturn(retorno);
+		replay(devolucaoEJBMock);
 	}
 	
 	private void mockExisteDebitoSemPagamento(Collection<DebitoCobrar> debitosCobrar, boolean retorno) {
@@ -281,9 +291,17 @@ public class AnalisadorGeracaoContaTest {
 
 
 	private void mockDebitosCobrarPorImovelComPendenciaESemRevisao(Collection<DebitoCobrar> debitosCobrar) {
-		expect(debitoCobrarEJBMock.debitosCobrarPorImovelComPendenciaESemRevisao(imovel))
+		expect(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel))
 			.andReturn(debitosCobrar);
 		replay(debitoCobrarEJBMock);
+	}
+	
+	private void mockSistemaParametrosRepositorio() {
+		SistemaParametros sistemaParametros = new SistemaParametros();
+		sistemaParametros.setAnoMesFaturamento(anoMesFaturamento);
+		expect(sistemaParametrosRepositorioMock.getSistemaParametros())
+		.andReturn(sistemaParametros);
+		replay(sistemaParametrosRepositorioMock);
 	}
 	
 	private Collection<DebitoCobrar> buildCollectionDebitosCobrarVazio(boolean vazio){
@@ -291,6 +309,9 @@ public class AnalisadorGeracaoContaTest {
 		
 		if(vazio == false){
 			DebitoCobrar debitoCobrar = new DebitoCobrar();
+			DebitoTipo debitoTipo = new DebitoTipo();
+			debitoTipo.setIndicadorGeracaoConta(Status.ATIVO);
+			debitoCobrar.setDebitoTipo(debitoTipo);
 			debitosCobrar.add(debitoCobrar);
 		}
 		

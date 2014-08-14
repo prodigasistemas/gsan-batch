@@ -7,13 +7,13 @@ import br.gov.batch.Particao;
 import br.gov.batch.util.BatchUtil;
 
 @Named
-public class ParticaoPreFaturamento extends Particao {
+public class ParticionadorRota extends Particao {
 
     @Inject
     private BatchUtil util;
 	
-    public long totalItens(){
+    public int totalItens(){
     	int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	return rotaBO.totalImoveisParaPreFaturamento(idRota);
+    	return (int) rotaBO.totalImoveisParaPreFaturamento(idRota);
     }
 }

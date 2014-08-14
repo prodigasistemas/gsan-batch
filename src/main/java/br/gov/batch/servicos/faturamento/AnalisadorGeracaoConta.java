@@ -13,7 +13,6 @@ import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.arrecadacao.DevolucaoRepositorio;
 import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
-import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 
 @Stateless
 public class AnalisadorGeracaoConta {
@@ -22,7 +21,7 @@ public class AnalisadorGeracaoConta {
 	private CreditoRealizarRepositorio creditoRealizarRepositorio;
 	
 	@EJB
-	private DebitoCobrarRepositorio debitoCobrarRepositorio;
+	private DebitoCobrarBO debitoCobrarBO;
 	
 	@EJB
 	private PagamentoRepositorio pagamentoRepositorio;
@@ -38,8 +37,8 @@ public class AnalisadorGeracaoConta {
 
 	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento, Imovel imovel) {
 		
-		Collection<DebitoCobrar> debitosACobrar = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
-		if (naoHaDebitosACobrar(debitosACobrar) || imovel.paralisacaoFaturamento() || !pagamentoRepositorio.existeDebitoSemPagamento(debitosACobrar)) {
+		Collection<DebitoCobrar> debitosACobrar = debitoCobrarBO.debitosCobrarSemPagamentos(imovel);
+		if (naoHaDebitosACobrar(debitosACobrar) || imovel.paralisacaoFaturamento()) {
 			return false;
 		}
 		

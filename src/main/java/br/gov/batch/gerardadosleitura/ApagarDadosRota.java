@@ -32,8 +32,8 @@ import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Named
-public class ApagarDadosGerados implements Batchlet{
-	private static Logger logger = Logger.getLogger(ApagarDadosGerados.class);
+public class ApagarDadosRota implements Batchlet{
+	private static Logger logger = Logger.getLogger(ApagarDadosRota.class);
 	
 	@EJB
 	private ClienteContaRepositorio clienteContaRepositorio;
@@ -88,13 +88,13 @@ public class ApagarDadosGerados implements Batchlet{
 	
     @Inject
     private BatchUtil util;
-
+    
 	public String process() throws Exception {
-		logger.info("Exclusao de dados prefaturados");
-		
     	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
     	Integer referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
     	Integer grupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
+    	
+    	logger.info("Exclusao de dados prefaturados para a rota: " + idRota);
     	
     	Rota rota = rotaRepositorio.findById(idRota);
     	

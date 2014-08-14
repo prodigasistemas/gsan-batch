@@ -17,7 +17,7 @@ import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
-public class PreFaturamentoJobListener implements JobListener{
+public class RotaJobListener implements JobListener{
 	
 	private static Logger logger = Logger.getLogger(Mensageiro.class);
 	
@@ -42,12 +42,11 @@ public class PreFaturamentoJobListener implements JobListener{
 		
         processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
         
-        logger.info(String.format("Inicio da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+        logger.info(String.format("Inicio da execução [%s] do job [%s] para a rota: %s", execId, jobCtx.getJobName(), util.parametroDoBatch("idRota")));
 	}
 
 	public void afterJob() throws Exception {
-		long execId = jobCtx.getExecutionId();
-		logger.info(String.format("Fim da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+		logger.info("Fim do processamento da rota: " + util.parametroDoBatch("idRota"));
 		controle.finalizaProcessamentoRota();
 	}
 }

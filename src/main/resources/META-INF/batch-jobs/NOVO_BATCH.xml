@@ -1,30 +1,13 @@
-<job id="gerar_dados_leitura" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="pre_faturamento" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="preFaturamentoJobListener"/>
 	</listeners>
-	<properties>
-		<property name="num_particoes" value="10" />
-	</properties>
-	
-	<step id="apagarDados" next="preFaturamentoImovel">
-		<batchlet ref="apagarDadosGerados">
-		</batchlet>
-	</step>
-	
-	<step id="preFaturamentoImovel">
-		<chunk>
-			<reader ref="preGerarConta">
-				<properties>
-					<property name="primeiroItem" value="#{partitionPlan['primeiroItem']}" />
-					<property name="numItens" value="#{partitionPlan['numItens']}" />
-				</properties>
-			</reader>
-			<processor ref="gerarConta" />
-			<writer ref="posGerarConta" />
+
+	<step id="carregarRotas">
+		<chunk item-count="1">
+			<reader ref="carregarRotas"/>
+			<processor ref="iniciaProcessamentoRota" />
+			<writer ref="dummyItemWriter" />
 		</chunk>
-		<partition>
-			<mapper ref="particaoPreFaturamento" />
-		</partition>
 	</step>
 </job>
-

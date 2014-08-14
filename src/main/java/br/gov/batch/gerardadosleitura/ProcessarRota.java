@@ -5,8 +5,6 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.faturamento.FaturamentoImovelBO;
 import br.gov.batch.servicos.faturamento.FaturamentoImovelTO;
 import br.gov.batch.util.BatchUtil;
@@ -17,9 +15,7 @@ import br.gov.servicos.faturamento.FaturamentoAtividadeCronRotaRepositorio;
 import br.gov.servicos.to.CronogramaFaturamentoRotaTO;
 
 @Named
-public class GerarConta implements ItemProcessor {
-	private static Logger logger = Logger.getLogger(GerarConta.class);
-	
+public class ProcessarRota implements ItemProcessor {
 	@EJB
 	private FaturamentoImovelBO faturamentoImovelBO;
 	
@@ -29,7 +25,7 @@ public class GerarConta implements ItemProcessor {
     @Inject
     private BatchUtil util;
     
-	public GerarConta() {
+	public ProcessarRota() {
 	}
 
     public Imovel processItem(Object param) throws Exception {

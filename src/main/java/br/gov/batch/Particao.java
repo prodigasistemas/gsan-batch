@@ -24,7 +24,7 @@ public abstract class Particao implements PartitionMapper {
     @Inject
     protected JobContext jobCtx;
     
-    public abstract long totalItens();
+    public abstract int totalItens();
 
     public PartitionPlan mapPartitions() throws Exception {
         return new PartitionPlanImpl() {
@@ -34,7 +34,7 @@ public abstract class Particao implements PartitionMapper {
         	}
 
             public int getPartitions() {
-            	return Integer.valueOf(jobCtx.getProperties().getProperty("num_particoes"));
+            	return totalItens() / Integer.valueOf(jobCtx.getProperties().getProperty("tam_particao")) + 1;
             }
 
             public Properties[] getPartitionProperties() {
@@ -64,4 +64,9 @@ public abstract class Particao implements PartitionMapper {
             }
         };
     }
+    
+    public static void main(String[] args) {
+		Integer t = 30 / 20;
+		System.out.println(t);
+	}
 }
