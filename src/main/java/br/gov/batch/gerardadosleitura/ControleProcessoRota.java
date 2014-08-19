@@ -4,17 +4,19 @@ import javax.ejb.Singleton;
 
 @Singleton
 public class ControleProcessoRota {
-    private Boolean emProcessamento = false;
+	private final Integer limiteRotas = 3;
+	
+    private Integer quantidadeRotas = 0;
     
     public synchronized void iniciaProcessamentoRota(){
-    	emProcessamento = true;
+    	quantidadeRotas++;
     }
     
     public synchronized void finalizaProcessamentoRota(){
-    	emProcessamento = false;
+    	quantidadeRotas--;
     }
     
 	public synchronized Boolean emProcessamento(){
-		return emProcessamento;
+		return quantidadeRotas == limiteRotas;
 	}
 }

@@ -28,7 +28,7 @@ public class CarregarRotas extends AbstractItemReader {
         String[]  ids =  util.parametroDoBatch("idsRota").split(",");
         
     	for (String id : ids) {
-			rotas.add(id);
+			rotas.add(id.trim());
 		}
     	    	
     	logger.info(String.format("Processando grupo [ %s ] com rotas [ %s ].", util.parametroDoBatch("idGrupoFaturamento"), util.parametroDoBatch("idsRota")));
