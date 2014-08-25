@@ -14,23 +14,32 @@ import javax.ejb.TransactionAttributeType;
 import org.jboss.logging.Logger;
 
 import br.gov.model.Status;
-import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
-import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
+import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
 import br.gov.model.faturamento.ContaCategoriaPK;
+import br.gov.model.faturamento.ContaImpostosDeduzidos;
+import br.gov.model.faturamento.DebitoCobrado;
+import br.gov.model.faturamento.DebitoCobradoCategoria;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.model.faturamento.ImpostoTipo;
 import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
+import br.gov.servicos.cadastro.ClienteContaRepositorio;
+import br.gov.servicos.cadastro.ClienteImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ContaCategoriaRepositorio;
+import br.gov.servicos.faturamento.ContaImpostosDeduzidosRepositorio;
+import br.gov.servicos.faturamento.DebitoCobradoCategoriaRepositorio;
+import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 import br.gov.servicos.to.GerarContaTO;
 import br.gov.servicos.to.ImovelSubcategoriaTO;
+import br.gov.servicos.to.ImpostoDeduzidoTO;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @Stateless
@@ -62,9 +71,24 @@ public class FaturamentoImovelBO {
 	private ContaBO contaBO;
 	
 	@EJB
+	private ClienteContaRepositorio clienteContaRepositorio;
+	
+	@EJB
+	private ClienteImovelRepositorio clienteImovelRepositorio;
+	
+	@EJB
 	private ContaCategoriaRepositorio contaCategoriaRepositorio;
 	
-	private FaturamentoAguaEsgotoTO helperValoresAguaEsgoto;
+	@EJB
+	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
+	
+	@EJB
+	private DebitoCobradoRepositorio debitoCobradoRepositorio;
+	
+	@EJB
+	private DebitoCobradoCategoriaRepositorio debitoCobradoCategoriaRepositorio;
+	
+	private FaturamentoAguaEsgotoTO faturamentoAguaEsgotoTO;
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
@@ -73,57 +97,30 @@ public class FaturamentoImovelBO {
 
 		Collection<ImovelSubcategoriaTO> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
 
-		helperValoresAguaEsgoto = new FaturamentoAguaEsgotoTO();
-
-		if (possuiLigacaoAguaEsgotoAtivo(imovel) || possuiHidrometro(imovel)) { 
-
-			if (deveFaturar(imovel, anoMesFaturamento)) {
-				helperValoresAguaEsgoto.setAguaEsgotoZerados(false);
-				helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ONE);
-				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ONE);
-			} else {
-				helperValoresAguaEsgoto.setAguaEsgotoZerados(true);
-				helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
-				helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
-			}
-
-			LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(imovel.getId());
-			
-			if (ligacaoEsgoto != null){
-				helperValoresAguaEsgoto.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, imovel));
-				helperValoresAguaEsgoto.setPercentualColetaEsgoto(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
-			}
-		}
-		boolean gerarConta = false;
+		inicializaValoresAguaEsgoto(imovel, anoMesFaturamento);
 		
-		gerarConta = analisadorGeracaoConta.verificarGeracaoConta(helperValoresAguaEsgoto.isAguaEsgotoZerados(), anoMesFaturamento, imovel);
-		
-		if (gerarConta) {
-			helperValoresAguaEsgoto.setValorTotalAgua(BigDecimal.ZERO);
-			helperValoresAguaEsgoto.setValorTotalEsgoto(BigDecimal.ZERO);
+		if (analisadorGeracaoConta.verificarGeracaoConta(faturamentoAguaEsgotoTO.isAguaEsgotoZerados(), anoMesFaturamento, imovel)) {
+			faturamentoAguaEsgotoTO.setValorTotalAgua(BigDecimal.ZERO);
+			faturamentoAguaEsgotoTO.setValorTotalEsgoto(BigDecimal.ZERO);
 
 			DebitosContaTO debitosConta = debitosContaBO.gerarDebitosConta(imovel, anoMesFaturamento);
-
 			CreditosContaTO creditosConta = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
 
 			ImpostosDeduzidosContaTO impostosDeduzidosConta = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(),
-							anoMesFaturamento, helperValoresAguaEsgoto.getValorTotalAgua(), helperValoresAguaEsgoto.getValorTotalEsgoto(),
+							anoMesFaturamento, faturamentoAguaEsgotoTO.getValorTotalAgua(), faturamentoAguaEsgotoTO.getValorTotalEsgoto(),
 							debitosConta.getValorTotalDebito(), creditosConta.getValorTotalCreditos());
 
-			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, debitosConta,
-														creditosConta, impostosDeduzidosConta);
-			
+			GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, debitosConta, creditosConta, impostosDeduzidosConta);
 			Conta conta = contaBO.gerarConta(gerarTO);
 
-//			Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
-//
-//			if (contasCategoria != null && !contasCategoria.isEmpty()) {
-//				contaCategoriaRepositorio.inserirContasCategoria(contasCategoria);
-//			}
-//
-//			this.inserirClienteConta(conta, imovel);
-//			this.inserirContaImpostosDeduzidos(conta, gerarImpostosDeduzidosContaHelper);
-//			this.inserirDebitoCobrado(gerarDebitoCobradoHelper.getMapDebitosCobrados(), conta);
+			Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
+			contaCategoriaRepositorio.inserir(contasCategoria);
+
+			List<ClienteImovel> clienteImovelAtivos = clienteImovelRepositorio.pesquisarClienteImovelAtivos(imovel);
+			clienteContaRepositorio.inserir(clienteImovelAtivos, conta);
+			
+			this.inserirContaImpostosDeduzidos(conta, impostosDeduzidosConta);
+			this.inserirDebitoCobrado(debitosConta, conta);
 //			this.atualizarDebitoACobrarFaturamento(gerarDebitoCobradoHelper.getColecaoDebitoACobrar());
 //			this.inserirCreditoRealizado(gerarCreditoRealizadoHelper.getMapCreditoRealizado(), conta);
 //			this.atualizarCreditoARealizar(gerarCreditoRealizadoHelper.getColecaoCreditoARealizar());
@@ -131,17 +128,84 @@ public class FaturamentoImovelBO {
 //			if (imovel.getIndicadorDebitoConta().equals(ConstantesSistema.SIM) && conta.getContaMotivoRevisao() == null) {
 //				this.gerarMovimentoDebitoAutomatico(imovel, conta, faturamentoGrupo);
 //			}
-
-//			Integer anoMesReferenciaResumoFaturamento = null;
-//			if (faturamentoAntecipado) {
-//				anoMesReferenciaResumoFaturamento = anoMesFaturamento;
-//    		}
+		}
+	}
+	
+	private void inserirContaImpostosDeduzidos(Conta conta, ImpostosDeduzidosContaTO gerarImpostosDeduzidosContaHelper) {
+		Collection<ImpostoDeduzidoTO> impostosDeduzidosTO = gerarImpostosDeduzidosContaHelper.getListaImpostosDeduzidos();
+		Collection<ContaImpostosDeduzidos> contasImpostosDeduzidos = new ArrayList<ContaImpostosDeduzidos>();
+		
+		for (ImpostoDeduzidoTO impostoDeduzidoTO : impostosDeduzidosTO) {
+			ContaImpostosDeduzidos contaImpostosDeduzidos = new ContaImpostosDeduzidos();
+			contaImpostosDeduzidos.setConta(conta);
 			
-			Collection<ImovelSubcategoriaTO> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(imovel.getId());
+			ImpostoTipo impostoTipo = new ImpostoTipo();
+			impostoTipo.setId(impostoDeduzidoTO.getIdImpostoTipo());
+			
+			contaImpostosDeduzidos.setImpostoTipo(impostoTipo);
+			contaImpostosDeduzidos.setValorImposto(impostoDeduzidoTO.getValor());
+			contaImpostosDeduzidos.setPercentualAliquota(impostoDeduzidoTO.getPercentualAliquota());
+			contaImpostosDeduzidos.setValorBaseCalculo(gerarImpostosDeduzidosContaHelper.getValorBaseCalculo());
+			contaImpostosDeduzidos.setUltimaAlteracao(new Date());
+			
+			contasImpostosDeduzidos.add(contaImpostosDeduzidos);
+		}
 
-//			this.gerarResumoFaturamentoSimulacao(colecaoCategorias, helperValoresAguaEsgoto.getColecaoCalcularValoresAguaEsgotoHelper(),
-//													gerarDebitoCobradoHelper, gerarCreditoRealizadoHelper, colecaoResumoFaturamento, imovel,
-//													gerarAtividadeGrupoFaturamento, faturamentoAtivCronRota, faturamentoGrupo, anoMesReferenciaResumoFaturamento, true);
+		if (contasImpostosDeduzidos != null && !contasImpostosDeduzidos.isEmpty()) {
+			contaImpostosDeduzidosRepositorio.inserir(contasImpostosDeduzidos);
+			contasImpostosDeduzidos.clear();
+			contasImpostosDeduzidos = null;
+		}
+	}
+	
+	private void inserirDebitoCobrado(DebitosContaTO debitosContaTO, Conta conta) {
+		for (DebitoCobrado debitoCobrado : debitosContaTO.getDebitosCobrados()) {
+			debitoCobrado.setConta(conta);
+			debitoCobrado.setCobradoEm(new Date());
+			debitoCobrado.setUltimaAlteracao(new Date());
+
+			Long idDebitoCobrado = debitoCobradoRepositorio.inserir(debitoCobrado);
+			
+			List<DebitoCobradoCategoria> debitoCobradoCategorias = debitosContaTO.getCategorias(debitoCobrado);
+			
+			Collection<DebitoCobradoCategoria> debitosCobradosCategoria = new ArrayList<DebitoCobradoCategoria>();
+			for (DebitoCobradoCategoria debitoCobradoCategoria : debitoCobradoCategorias) {
+				debitoCobradoCategoria.getId().setDebitoCobradoId(idDebitoCobrado);
+				debitoCobradoCategoria.setUltimaAlteracao(new Date());
+				
+				debitosCobradosCategoria.add(debitoCobradoCategoria);
+			}
+
+			debitoCobradoCategoriaRepositorio.inserir(debitosCobradosCategoria);
+
+			if (debitosCobradosCategoria != null) {
+				debitosCobradosCategoria.clear();
+				debitosCobradosCategoria = null;
+			}
+		}
+	}
+
+	private void inicializaValoresAguaEsgoto(Imovel imovel, Integer anoMesFaturamento) throws Exception {
+		faturamentoAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
+
+		if (possuiLigacaoAguaEsgotoAtivo(imovel) || possuiHidrometro(imovel)) {
+
+			if (deveFaturar(imovel, anoMesFaturamento)) {
+				faturamentoAguaEsgotoTO.setAguaEsgotoZerados(false);
+				faturamentoAguaEsgotoTO.setValorTotalAgua(BigDecimal.ONE);
+				faturamentoAguaEsgotoTO.setValorTotalEsgoto(BigDecimal.ONE);
+			} else {
+				faturamentoAguaEsgotoTO.setAguaEsgotoZerados(true);
+				faturamentoAguaEsgotoTO.setValorTotalAgua(BigDecimal.ZERO);
+				faturamentoAguaEsgotoTO.setValorTotalEsgoto(BigDecimal.ZERO);
+			}
+
+			LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(imovel.getId());
+			
+			if (ligacaoEsgoto != null){
+				faturamentoAguaEsgotoTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, imovel));
+				faturamentoAguaEsgotoTO.setPercentualColetaEsgoto(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+			}
 		}
 	}
 
@@ -158,8 +222,8 @@ public class FaturamentoImovelBO {
 		gerarTO.setValorTotalCreditos(creditosContaTO.getValorTotalCreditos());
 		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorTotalDebito());
 		gerarTO.setValorTotalImposto(impostosDeduzidosTO.getValorTotalImposto());
-		gerarTO.setPercentualEsgoto(helperValoresAguaEsgoto.getPercentualEsgoto());
-		gerarTO.setPercentualColeta(helperValoresAguaEsgoto.getPercentualColetaEsgoto());
+		gerarTO.setPercentualEsgoto(faturamentoAguaEsgotoTO.getPercentualEsgoto());
+		gerarTO.setPercentualColeta(faturamentoAguaEsgotoTO.getPercentualColetaEsgoto());
 		return gerarTO;
 	}
 	
