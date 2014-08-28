@@ -113,7 +113,7 @@ public class ApagarDadosRota implements Batchlet{
     		contaImpressaoRepositorio.apagarImpressaoDasContas(idsContas);
     		contaCategoriaConsumoFaixaRepositorio.apagarCategoriaConsumoFaixaDasContas(idsContas);
     		contaCategoriaRepositorio.apagarCategoriaDasContas(idsContas);
-    		clienteContaRepositorio.apagarClientesDasConta(idsContas);
+    		clienteContaRepositorio.apagarClientesConta(idsContas);
     		contaImpostosDeduzidosRepositorio.apagarImpostosDeduzidosDeContas(idsContas);
     		debitoAutomaticoMovimentoRepositorio.apagarMovimentosDebitoAutomaticoDasConta(idsContas);
     		

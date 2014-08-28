@@ -10,6 +10,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.Status;
+import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
@@ -17,6 +18,7 @@ import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaGeral;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 import br.gov.servicos.cadastro.ClienteRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ContaGeralRepositorio;
@@ -24,7 +26,10 @@ import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.ContaTO;
+import br.gov.servicos.to.CreditosContaTO;
+import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.GerarContaTO;
+import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @Stateless
 public class ContaBO {
@@ -47,6 +52,9 @@ public class ContaBO {
 	@EJB
 	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 	
+	@EJB
+	private LigacaoEsgotoRepositorio ligacaoEsgotoRepositorio;
+	
 	private SistemaParametros sistemaParametros;
 	
 	@PostConstruct
@@ -54,6 +62,14 @@ public class ContaBO {
 		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 	}	
 
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public Conta gerarConta(FaturamentoImovelTO faturamentoTO, DebitosContaTO debitosContaTO, CreditosContaTO creditosContaTO, 
+							ImpostosDeduzidosContaTO impostosDeduzidosContaTO) throws Exception {
+		
+		GerarContaTO gerarTO = buildGerarContaTO(faturamentoTO, debitosContaTO, creditosContaTO, impostosDeduzidosContaTO);
+		return gerarConta(gerarTO);
+	}
+	
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public Conta gerarConta(GerarContaTO to) throws Exception{
 		ContaGeral contaGeral = new ContaGeral();
@@ -70,6 +86,32 @@ public class ContaBO {
 		contaRepositorio.salvar(conta);
 		
 		return conta;
+	}
+	
+	public GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
+			DebitosContaTO gerarDebitoCobradoHelper, CreditosContaTO creditosContaTO,
+			ImpostosDeduzidosContaTO impostosDeduzidosTO) throws Exception {
+		
+		GerarContaTO gerarTO = new GerarContaTO();
+		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
+		gerarTO.setImovel(faturamentoTO.getImovel());
+		gerarTO.setRota(faturamentoTO.getRota());
+		gerarTO.setDataVencimentoRota(faturamentoTO.getDataVencimentoConta());
+		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
+		gerarTO.setAnoMesFaturamento(faturamentoTO.getAnoMesFaturamento());
+		gerarTO.setValorTotalCreditos(creditosContaTO.getValorTotalCreditos());
+		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorTotalDebito());
+		gerarTO.setValorTotalImposto(impostosDeduzidosTO.getValorTotalImposto());
+
+		LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(faturamentoTO.getImovel().getId());
+		if (ligacaoEsgoto != null){
+			gerarTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, faturamentoTO.getImovel()));
+			gerarTO.setPercentualColeta(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+		} else {
+			gerarTO.setPercentualEsgoto(BigDecimal.ZERO);
+		}
+		
+		return gerarTO;
 	}
 	
 	public Conta buildConta(GerarContaTO to){
@@ -153,6 +195,19 @@ public class ContaBO {
 		}
 		
 		return contaTO;
+	}
+	
+	private BigDecimal verificarPercentualEsgotoAlternativo(LigacaoEsgoto ligacaoEsgoto, Imovel imovel) throws Exception {
+
+		if (imovel.getLigacaoEsgotoSituacao().getSituacaoFaturamento().equals(Status.ATIVO) 
+				&& ligacaoEsgoto.getNumeroConsumoPercentualAlternativo().intValue() >= 0 
+				&& ligacaoEsgoto.getPercentualAlternativo() != null
+				&& ligacaoEsgoto.getPercentualAlternativo().compareTo(ligacaoEsgoto.getPercentual()) == -1) {
+			
+			return ligacaoEsgoto.getPercentualAlternativo();
+		} else {
+			return BigDecimal.ZERO;
+		}
 	}
 	
 	public void setSistemaParametros(SistemaParametros sistemaParametros) {

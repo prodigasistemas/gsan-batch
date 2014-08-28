@@ -2,12 +2,11 @@ package br.gov.batch.servicos.faturamento;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-
-import org.hibernate.loader.plan.exec.process.spi.ReturnReader;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
@@ -62,5 +61,9 @@ public class DebitoCobrarBO {
 			}
 		}
 		return debitos;
+	}
+	
+	public void atualizarDebitoCobrar(List<DebitoCobrar> debitosCobrar){
+		debitoCobrarRepositorio.atualizarDebitoCobrar(debitosCobrar);
 	}
 }

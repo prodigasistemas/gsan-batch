@@ -23,7 +23,6 @@ import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
-import br.gov.servicos.to.FaturamentoAguaEsgotoTO;
 
 @RunWith(EasyMockRunner.class)
 public class CreditoRealizadoBOTest {
@@ -41,7 +40,6 @@ public class CreditoRealizadoBOTest {
 	private int anoMesFaturamento;
 	
 	private CreditosContaTO creditoRealizadoTO;
-	private FaturamentoAguaEsgotoTO valoresAguaEsgotoTO;
 	private CreditoRealizar creditoRealizar;
 
 	@Before
@@ -61,7 +59,6 @@ public class CreditoRealizadoBOTest {
 		creditoRealizar.setValorCredito(new BigDecimal("2.00"));
 		
 		creditoRealizadoTO = new CreditosContaTO();
-		valoresAguaEsgotoTO = new FaturamentoAguaEsgotoTO();
 	}
 	
 	@Test
@@ -131,7 +128,7 @@ public class CreditoRealizadoBOTest {
 		
 		CreditosContaTO creditoRealizadoTORetorno = creditoRealizadoBO.gerarCreditosConta(imovel, anoMesFaturamento);
 		
-		assertEquals(creditoRealizadoTO.getColecaoCreditosARealizarUpdate().size(), creditoRealizadoTORetorno.getColecaoCreditosARealizarUpdate().size());
+		assertEquals(creditoRealizadoTO.getCreditosRealizar().size(), creditoRealizadoTORetorno.getCreditosRealizar().size());
 		assertEquals(creditoRealizadoTO.getMapValoresPorTipoCredito().size(), creditoRealizadoTORetorno.getMapValoresPorTipoCredito().size());
 		assertEquals(creditoRealizadoTO.getMapCreditoRealizado().size(), creditoRealizadoTORetorno.getMapCreditoRealizado().size());
 		assertEquals(0.00, creditoRealizadoTORetorno.getValorTotalCreditos().doubleValue(), 0);
