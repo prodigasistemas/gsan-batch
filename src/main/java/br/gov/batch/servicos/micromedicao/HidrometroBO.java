@@ -13,7 +13,6 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.HidrometroTO;
-import br.gov.servicos.to.MedicaoHistoricoTO;
 
 @Stateless
 public class HidrometroBO {
@@ -58,34 +57,13 @@ public class HidrometroBO {
 	
 	Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 	
-	String filtroPoTipoMedicao = "";
-	
 	MedicaoHistorico medicaoHistoricoAtual =  medicaoHistoricoRepositorio.obterPorImovelEReferencia(idImovel, anoMesReferencia);
 
 	if (medicaoHistoricoAtual != null) {
 		dataLeituraFaturada = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
-	} 
-//	else {
-//		Imovel imovel = new Imovel();
-//		imovel.setId(idImovel);
-//		
-//		Collection colecaoDadosMedicaoHistorico = this.obterDadosTiposMedicao(imovel, anoMesReferenciaAnterior);
-//		
-//		if (colecaoDadosMedicaoHistorico != null && !colecaoDadosMedicaoHistorico.isEmpty()){
-//			
-//			Iterator iterator = colecaoDadosMedicaoHistorico.iterator();
-//				
-//			while(iterator.hasNext()){
-//					
-//				Object[] arrayMedicaoHistorico = (Object[]) iterator.next();
-//				
-//				if (arrayMedicaoHistorico[4] != null) {
-//					dataLeituraFaturada = (Date) arrayMedicaoHistorico[4];
-//				}
-//					
-//			}
-//		}
-//	}
+	}else{
+		dataLeituraFaturada = this.obterDataMedicao(idImovel, anoMesReferenciaAnterior);
+	}
 
 	return dataLeituraFaturada;
 
@@ -100,11 +78,11 @@ public class HidrometroBO {
 			dataMedicao = dadosHidrometro.get(0).getDataInstalacao();
 		}
 		
-		MedicaoHistoricoTO medicaoHistoricoTO = medicaoHistoricoRepositorio.obterDadosMedicao(idImovel, anoMesReferencia);
+		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.obterPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
 		
 		if (medicaoHistoricoTO == null){
 			Integer mesAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
-			medicaoHistoricoTO = medicaoHistoricoRepositorio.obterDadosMedicao(idImovel, mesAnterior);
+			medicaoHistoricoTO = medicaoHistoricoRepositorio.obterPorLigacaoAguaOuPoco(idImovel, mesAnterior);
 		}
 		
 		if (medicaoHistoricoTO != null){
