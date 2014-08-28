@@ -37,7 +37,7 @@ public class ImpostosContaBO {
 	
 	private ImpostoDeduzidoTO impostoDeduzidoTO = null;
 
-	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Long idImovel, Integer anoMesReferencia, 
+	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Integer idImovel, Integer anoMesReferencia, 
 			BigDecimal valorAgua, BigDecimal valorEsgoto, BigDecimal valorDebito, BigDecimal valorCredito) {
 
 		ImpostosDeduzidosContaTO retorno = new ImpostosDeduzidosContaTO();

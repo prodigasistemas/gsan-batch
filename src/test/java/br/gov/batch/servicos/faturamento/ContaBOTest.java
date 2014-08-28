@@ -59,12 +59,12 @@ public class ContaBOTest {
 		quadra.setId(1);
 		quadra.setNumeroQuadra(200);
 		
-		imovel.setId(1L);
+		imovel.setId(1);
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
 		
-		expect(medicaoHistoricoRepositorio.obterPorImovelEReferencia(1L, 201405)).andReturn(null);
-		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1L)).andReturn(new Cliente());
+		expect(medicaoHistoricoRepositorio.obterPorImovelEReferencia(1, 201405)).andReturn(null);
+		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1)).andReturn(new Cliente());
 		
 		replay(medicaoHistoricoRepositorio);
 		replay(clienteRepositorio);		

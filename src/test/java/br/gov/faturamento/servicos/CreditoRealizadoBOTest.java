@@ -49,7 +49,7 @@ public class CreditoRealizadoBOTest {
 		creditoRealizadoBO = new CreditosContaBO();
 		
 		imovel = new Imovel();
-		imovel.setId(1L);
+		imovel.setId(1);
 		
 		anoMesFaturamento = 201406;
 		

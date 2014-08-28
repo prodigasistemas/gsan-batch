@@ -99,7 +99,7 @@ public class ApagarDadosRota implements Batchlet{
     	Rota rota = rotaRepositorio.findById(idRota);
     	
     	List<Long> idsContas  = new ArrayList<Long>();
-    	List<Long> idsImoveis = new ArrayList<Long>();
+    	List<Integer> idsImoveis = new ArrayList<Integer>();
     	
     	if (rota.isAlternativa()){
     		idsContas = contaRepositorio.idsContasDeImovelComRotaAlternativa(idRota, referencia, DebitoCreditoSituacao.PRE_FATURADA.getId(), grupoFaturamento);

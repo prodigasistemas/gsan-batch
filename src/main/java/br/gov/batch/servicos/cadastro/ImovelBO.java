@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
+import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 
 @Stateless
 public class ImovelBO {
+	
+	@EJB
+	private ImovelRepositorio imovelRepositorio;
 
 	public Collection<BigDecimal> obterValorPorCategoria(Collection<Categoria> colecaoCategorias, BigDecimal valor) {
 
@@ -72,5 +78,15 @@ public class ImovelBO {
 		}
 
 		return colecaoValoresPorCategoria;
+	}
+	
+	public FaturamentoGrupo pesquisarFaturamentoGrupo(Integer idImovel){
+		FaturamentoGrupo faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoRotaAlternativa(idImovel);
+		
+		if (faturamentoGrupo == null){
+			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupo(idImovel);
+		}
+		
+		return faturamentoGrupo;
 	}
 }

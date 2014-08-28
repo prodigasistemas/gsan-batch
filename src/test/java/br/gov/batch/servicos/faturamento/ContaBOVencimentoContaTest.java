@@ -54,7 +54,7 @@ public class ContaBOVencimentoContaTest {
 		textoDia10MesSeguinte = format.format(cal.getTime());
 		
 		imovel = new Imovel();
-		imovel.setId(1L);
+		imovel.setId(1);
 		
 		
 		contaBO = new ContaBO();
@@ -66,7 +66,7 @@ public class ContaBOVencimentoContaTest {
 	}
 	
 	private IExpectationSetters<Cliente> mountClienteRepositorioMock() {
-		return expect(clienteRepositorioMock.buscarClienteResponsavelPorImovel(1L));
+		return expect(clienteRepositorioMock.buscarClienteResponsavelPorImovel(1));
 	}
 	
 	private IExpectationSetters<Short> mountSistemaParametrosRepositorioMock() {

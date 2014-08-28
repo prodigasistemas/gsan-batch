@@ -3,7 +3,6 @@ package br.gov.batch.servicos.faturamento;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -14,9 +13,7 @@ import javax.ejb.TransactionAttributeType;
 import org.jboss.logging.Logger;
 
 import br.gov.model.Status;
-import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
-import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
@@ -235,8 +232,8 @@ public class FaturamentoImovelBO {
 		boolean hidrometro = false;
 		if ((imovel.getHidrometroInstalacaoHistorico() != null && imovel.getHidrometroInstalacaoHistorico().getId() != null)
 				|| (imovel.getLigacaoAgua() != null 
-				&& imovel.getLigacaoAgua().getHidrometroInstalacaoHistorico() != null 
-				&& imovel.getLigacaoAgua().getHidrometroInstalacaoHistorico().getId() != null)) {
+				&& imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico() != null 
+				&& imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico().size() > 0)) {
 			hidrometro = true;
 		}
 
