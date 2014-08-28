@@ -59,7 +59,7 @@ public class DebitosContaBO {
 			to.addDebitoCobrado(debitoCobrado);
 			to.addValorDebito(valorPrestacao);
 			to.addDebitoCobrarAtualizado(debitoACobrar);
-			to.setCategorias(debitoCobradoCategoriaBO.listaDebitoCobradoCategoriaPeloCobrar(dCobrarCategoria));
+			to.addCategorias(debitoCobrado, debitoCobradoCategoriaBO.listaDebitoCobradoCategoriaPeloCobrar(dCobrarCategoria));
 		}
 		return to;
 	}
