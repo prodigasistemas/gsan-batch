@@ -7,12 +7,12 @@ import java.util.Collection;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.model.cadastro.ICategoria;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
 import br.gov.model.faturamento.ContaCategoriaPK;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ContaCategoriaRepositorio;
-import br.gov.servicos.to.ImovelSubcategoriaTO;
 
 @Stateless
 public class ContaCategoriaBO {
@@ -24,18 +24,18 @@ public class ContaCategoriaBO {
 	private ContaCategoriaRepositorio contaCategoriaRepositorio;
 
 	public void inserirContasCategoriaValoresZerados(Integer idImovel, Conta conta) throws Exception {
-		Collection<ImovelSubcategoriaTO> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
+		Collection<ICategoria> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
 		Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
 		contaCategoriaRepositorio.inserir(contasCategoria);
 	}
 	
-	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Conta conta, Collection<ImovelSubcategoriaTO> colecaoCategorias) throws Exception {
+	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Conta conta, Collection<ICategoria> colecaoCategorias) throws Exception {
 		Collection<ContaCategoria> helper = new ArrayList<ContaCategoria>();
 		
 		ContaCategoria contaCategoria = null;
 		ContaCategoriaPK contaCategoriaPK = null;
 
-		for (ImovelSubcategoriaTO categoria : colecaoCategorias) {
+		for (ICategoria categoria : colecaoCategorias) {
 			
 			contaCategoria = new ContaCategoria();
 			contaCategoriaPK = new ContaCategoriaPK();
