@@ -3,6 +3,7 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
+import br.gov.model.cadastro.Subcategoria;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @RunWith(EasyMockRunner.class)
@@ -34,6 +36,7 @@ public class ArquivoTextoTipo02Test {
 	
 	private Imovel imovel;
 	private Collection<ICategoria> categorias;
+	private Collection<ICategoria> subcategorias;
 	
 	@Before
 	public void setup() {
@@ -47,27 +50,65 @@ public class ArquivoTextoTipo02Test {
 		categoria.setDescricao("CATEGORIA 1");
 		categoria.setDescricaoAbreviada("CTG 1");
 		
+		Subcategoria subcategoria = new Subcategoria();
+		subcategoria.setId(1L);
+		subcategoria.setQuantidadeEconomias(1);
+		subcategoria.setDescricao("SUBCATEGORIA 1");
+		subcategoria.setDescricaoAbreviada("SCTG 1");
+		subcategoria.setCategoria(categoria);
+		
 		categorias = new ArrayList<ICategoria>();
 		categorias.add(categoria);
+		
+		subcategorias = new ArrayList<ICategoria>();
+		subcategorias.add(subcategoria);
 		
 		arquivoTextoTipo02 = new ArquivoTextoTipo02();
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo02Categoria() {
-		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andReturn(true);
-		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andReturn(categorias);
-		replay();
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(true);
+		replay(sistemaParametrosMock);
+		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andStubReturn(categorias);
+		replay(imovelSubcategoriaRepositorioMock);
 		
 		assertNotNull(arquivoTextoTipo02.build(imovel));
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo02Subcategoria() {
-		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andReturn(true);
-		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andReturn(categorias);
-		replay();
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(false);
+		replay(sistemaParametrosMock);
+		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andStubReturn(subcategorias);
+		replay(imovelSubcategoriaRepositorioMock);
 		
 		assertNotNull(arquivoTextoTipo02.build(imovel));
+	}
+	
+	@Test
+	public void buildArquivoTextoTipo02CategoriaTamanhoLinha() {
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(true);
+		replay(sistemaParametrosMock);
+		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andStubReturn(categorias);
+		replay(imovelSubcategoriaRepositorioMock);
+		
+		String linha = arquivoTextoTipo02.build(imovel);
+		int tamanhoLinha = linha.length();
+		
+		assertTrue(tamanhoLinha >= 94);
+	}
+	
+	@Test
+	public void buildArquivoTextoTipo02SubcategoriaTamanhoLinha() {
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(false);
+		replay(sistemaParametrosMock);
+		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andStubReturn(subcategorias);
+		replay(imovelSubcategoriaRepositorioMock);
+		
+		String linha = arquivoTextoTipo02.build(imovel);
+		int tamanhoLinha = linha.length();
+		
+		assertTrue(tamanhoLinha >= 94);
 	}
 }
