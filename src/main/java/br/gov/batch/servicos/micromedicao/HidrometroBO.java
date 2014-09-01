@@ -57,7 +57,7 @@ public class HidrometroBO {
 	
 	Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 	
-	MedicaoHistorico medicaoHistoricoAtual =  medicaoHistoricoRepositorio.obterPorImovelEReferencia(idImovel, anoMesReferencia);
+	MedicaoHistorico medicaoHistoricoAtual =  medicaoHistoricoRepositorio.buscarPorImovelEReferencia(idImovel, anoMesReferencia);
 
 	if (medicaoHistoricoAtual != null) {
 		dataLeituraFaturada = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
@@ -78,11 +78,11 @@ public class HidrometroBO {
 			dataMedicao = dadosHidrometro.get(0).getDataInstalacao();
 		}
 		
-		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.obterPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
+		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
 		
 		if (medicaoHistoricoTO == null){
 			Integer mesAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
-			medicaoHistoricoTO = medicaoHistoricoRepositorio.obterPorLigacaoAguaOuPoco(idImovel, mesAnterior);
+			medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, mesAnterior);
 		}
 		
 		if (medicaoHistoricoTO != null){

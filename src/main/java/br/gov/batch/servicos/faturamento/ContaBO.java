@@ -131,7 +131,7 @@ public class ContaBO {
 			.percentualColeta(to.getPercentualColeta())
 			.debitoCreditoSituacaoAtual(DebitoCreditoSituacao.PRE_FATURADA)
 			.faturamentoGrupo(to.getFaturamentoGrupo())
-			.leiturasFaturamento(medicaoHistoricoRepositorio.obterPorImovelEReferencia(to.getImovel().getId(), to.getAnoMesFaturamento()))
+			.leiturasFaturamento(medicaoHistoricoRepositorio.buscarPorImovelEReferencia(to.getImovel().getId(), to.getAnoMesFaturamento()))
 			.rota(to.getRota());
 		
 		return builder.build();
