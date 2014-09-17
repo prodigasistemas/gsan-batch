@@ -94,8 +94,8 @@ public class ArquivoTextoTipo02 {
 	}
 
 	private String getFatorEconomias(ICategoria iCategoria) {
-		if (iCategoria.getCategoriaFatorEconomias() != null) {
-			return Utilitarios.completaTexto(2, iCategoria.getCategoriaFatorEconomias().toString());
+		if (iCategoria.getFatorEconomias() != null) {
+			return Utilitarios.completaTexto(2, iCategoria.getFatorEconomias().toString());
 		} else {
 			return Utilitarios.completaTexto(2, "");
 		}

@@ -34,7 +34,7 @@ public class ArquivoTextoTipo03 {
 
 			builder.append(TIPO_REGISTRO);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
-			builder.append(String.valueOf(consumoHistorico.getLigacaoTipo().getId()));
+			builder.append(String.valueOf(consumoHistorico.getLigacaoTipo()));
 			builder.append(String.valueOf(consumoHistorico.getReferenciaFaturamento()));
 			builder.append(getNumeroConsumoFaturadoMes(consumoHistorico));
 			builder.append(getIdLeituraAnormalidadeFaturamento(consumoHistorico));

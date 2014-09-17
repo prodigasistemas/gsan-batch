@@ -43,12 +43,12 @@ public class ArquivoTextoTipo03Test {
 		imovel = new Imovel(1);
 		
 		consumoHistorico = new ConsumoHistorico();
-		consumoHistorico.setId(1L);
-		consumoHistorico.setLigacaoTipo(LigacaoTipo.AGUA);
+		consumoHistorico.setId(1);
+		consumoHistorico.setLigacaoTipo(LigacaoTipo.AGUA.getId());
 		consumoHistorico.setReferenciaFaturamento(201408);
 		consumoHistorico.setNumeroConsumoFaturadoMes(100);
 		ConsumoAnormalidade consumoAnormalidade = new ConsumoAnormalidade();
-		consumoAnormalidade.setId(1L);
+		consumoAnormalidade.setId(1);
 		consumoHistorico.setConsumoAnormalidade(consumoAnormalidade);
 		
 		consumosHistoricos = new ArrayList<ConsumoHistorico>();
