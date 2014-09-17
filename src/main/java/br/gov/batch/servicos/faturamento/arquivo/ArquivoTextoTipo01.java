@@ -1,32 +1,28 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
-import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
-@Stateless
+//@Stateless
 public class ArquivoTextoTipo01 {
 	
 	private Imovel imovel;
 	
-	@EJB
+//	@EJB
 	private ClienteEnderecoRepositorio clienteEnderecoRepositorio; 
 	
-	@EJB
+//	@EJB
 	private DebitoAutomaticoRepositorio debitoAutomaticoRepositorio;
 	
-	@EJB
+//	@EJB
 	private HidrometroBO hidrometroBO;
 	
 	private ArquivoTextoTipo01(Builder builder) {
