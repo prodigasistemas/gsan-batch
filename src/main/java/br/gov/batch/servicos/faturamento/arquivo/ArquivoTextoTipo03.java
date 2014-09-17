@@ -12,10 +12,10 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
 public class ArquivoTextoTipo03 {
 
-	@EJB
+//	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
 	
-	@EJB
+//	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
 	
 	private StringBuilder builder;

@@ -34,7 +34,7 @@ public class DebitoCobradoBO {
 			debitoCobrado.setCobradoEm(new Date());
 			debitoCobrado.setUltimaAlteracao(new Date());
 
-			Long idDebitoCobrado = debitoCobradoRepositorio.inserir(debitoCobrado);
+			Integer idDebitoCobrado = debitoCobradoRepositorio.inserir(debitoCobrado);
 			
 			List<DebitoCobradoCategoria> debitoCobradoCategorias = debitosContaTO.getCategorias(debitoCobrado);
 			

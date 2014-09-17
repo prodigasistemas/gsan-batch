@@ -45,10 +45,26 @@ public class DebitosContaBO {
 
 			DebitoCobrarGeral debitoACobrarGeral = new DebitoCobrarGeral();
 			debitoACobrarGeral.setId(debitoACobrar.getId());
+			debitoCobrado.setId(null);
 			debitoCobrado.setDebitoCobrarGeral(debitoACobrarGeral);
+			debitoCobrado.setDebitoTipo(debitoACobrar.getDebitoTipo());
 			debitoCobrado.setUltimaAlteracao(new Date());
 			debitoCobrado.setValorPrestacao(valorPrestacao);
 			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
+			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
+			debitoCobrado.setUltimaAlteracao(new Date());
+			debitoCobrado.setLancamentoItemContabil(debitoACobrar.getLancamentoItemContabil());
+			debitoCobrado.setLocalidade(debitoACobrar.getLocalidade());
+			debitoCobrado.setQuadra(debitoACobrar.getQuadra());
+			debitoCobrado.setCodigoSetorComercial(debitoACobrar.getCodigoSetorComercial());
+			debitoCobrado.setNumeroQuadra(debitoACobrar.getNumeroQuadra());
+			debitoCobrado.setNumeroLote(debitoACobrar.getNumeroLote());
+			debitoCobrado.setNumeroSubLote(debitoACobrar.getNumeroSubLote());
+			debitoCobrado.setAnoMesReferenciaDebito(debitoACobrar.getAnoMesReferenciaDebito());
+			debitoCobrado.setAnoMesCobrancaDebito(debitoACobrar.getAnoMesCobrancaDebito());
+			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
+			debitoCobrado.setFinanciamentoTipo(debitoACobrar.getFinanciamentoTipo());
+			debitoCobrado.setNumeroParcelaBonus(debitoACobrar.getNumeroParcelaBonus() != null ? debitoACobrar.getNumeroParcelaBonus() : 0);
 			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
 			
 			List<DebitoCobrarCategoria> dCobrarCategoria   = debitoCobrarCategoriaBO.dividePrestacaoDebitoPelasEconomias(debitoACobrar.getId(), valorPrestacao);

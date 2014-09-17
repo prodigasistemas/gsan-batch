@@ -108,7 +108,7 @@ public class DebitoCobrarBOTest {
 		Parcelamento p = new Parcelamento();
 		p.setAnoMesReferenciaFaturamento(anoMesReferencia - 1);
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(28));
 		d.setNumeroPrestacaoDebito((short) 4);
 		d.setParcelamento(p);
@@ -118,7 +118,7 @@ public class DebitoCobrarBOTest {
 
 	private DebitoCobrar debitoCobrarSimples() {
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(28));
 		d.setNumeroPrestacaoDebito((short) 4);
 		return d;
@@ -128,7 +128,7 @@ public class DebitoCobrarBOTest {
 		Parcelamento p = new Parcelamento();
 		p.setAnoMesReferenciaFaturamento(anoMesReferencia + 1);
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(28));
 		d.setNumeroPrestacaoDebito((short) 4);
 		d.setParcelamento(p);
@@ -140,7 +140,7 @@ public class DebitoCobrarBOTest {
 		Parcelamento p = new Parcelamento();
 		p.setAnoMesReferenciaFaturamento(anoMesReferencia + 1);
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(28));
 		d.setNumeroPrestacaoDebito((short) 4);
 		d.setParcelamento(p);

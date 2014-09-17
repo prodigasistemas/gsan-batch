@@ -117,11 +117,11 @@ public class ApagarDadosRota implements Batchlet{
     		contaImpostosDeduzidosRepositorio.apagarImpostosDeduzidosDeContas(idsContas);
     		debitoAutomaticoMovimentoRepositorio.apagarMovimentosDebitoAutomaticoDasConta(idsContas);
     		
-    		List<Long> idsDebitosCobrados = debitoCobradoRepositorio.debitosCobradosDasContas(idsContas);
+    		List<Integer> idsDebitosCobrados = debitoCobradoRepositorio.debitosCobradosDasContas(idsContas);
     		debitoCobradoCategoriaRepositorio.apagarCategoriasdosDebitosCobrados(idsDebitosCobrados);
     		debitoCobradoRepositorio.apagarDebitosCobradosDasContas(idsContas);
     		
-    		List<Long> idsCreditosRealizados = creditoRealizadoRepositorio.creditosRealizadosDasContas(idsContas);
+    		List<Integer> idsCreditosRealizados = creditoRealizadoRepositorio.creditosRealizadosDasContas(idsContas);
     		creditoRealizadoCategoriaRepositorio.apagarCategoriasDosCreditosRealizados(idsCreditosRealizados);
     		creditoRealizadoRepositorio.apagarCreditosRealizadosDasContas(idsContas);
     		

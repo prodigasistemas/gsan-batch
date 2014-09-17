@@ -33,7 +33,7 @@ public class DebitoCobrarCategoriaBOTest {
 	}
 	
 	protected void preparaMocks(List<DebitoCobrarCategoria> categorias) {
-		expect(mock.listaPeloDebitoCobrar(1L))
+		expect(mock.listaPeloDebitoCobrar(1))
 		.andReturn(categorias);
 		replay(mock);
 	}
@@ -45,7 +45,7 @@ public class DebitoCobrarCategoriaBOTest {
 		
 		preparaMocks(categorias);
 		
-		categorias = business.dividePrestacaoDebitoPelasEconomias(1L, new BigDecimal(60));
+		categorias = business.dividePrestacaoDebitoPelasEconomias(1, new BigDecimal(60));
 		
 		assertEquals(categorias.get(0).getValorPrestacaoEconomia().doubleValue(), 60.00, 0);
 	}
@@ -58,7 +58,7 @@ public class DebitoCobrarCategoriaBOTest {
 		
 		preparaMocks(categorias);
 		
-		categorias = business.dividePrestacaoDebitoPelasEconomias(1L, new BigDecimal(60));
+		categorias = business.dividePrestacaoDebitoPelasEconomias(1, new BigDecimal(60));
 				
 		assertEquals(categorias.get(0).getValorPrestacaoEconomia().doubleValue(), 20.00, 0);
 		assertEquals(categorias.get(1).getValorPrestacaoEconomia().doubleValue(), 40.00, 0);
@@ -73,7 +73,7 @@ public class DebitoCobrarCategoriaBOTest {
 		
 		preparaMocks(categorias);
 		
-		categorias = business.dividePrestacaoDebitoPelasEconomias(1L, new BigDecimal(60));
+		categorias = business.dividePrestacaoDebitoPelasEconomias(1, new BigDecimal(60));
 		
 		assertEquals(categorias.get(0).getValorPrestacaoEconomia().doubleValue(), 10.00, 0);
 		assertEquals(categorias.get(1).getValorPrestacaoEconomia().doubleValue(), 20.00, 0);
@@ -89,7 +89,7 @@ public class DebitoCobrarCategoriaBOTest {
 		
 		preparaMocks(categorias);
 		
-		categorias = business.dividePrestacaoDebitoPelasEconomias(1L, new BigDecimal(20));
+		categorias = business.dividePrestacaoDebitoPelasEconomias(1, new BigDecimal(20));
 		
 		assertEquals(categorias.get(0).getValorPrestacaoEconomia().doubleValue(), 3.35, 0);
 		assertEquals(categorias.get(1).getValorPrestacaoEconomia().doubleValue(), 6.66, 0);

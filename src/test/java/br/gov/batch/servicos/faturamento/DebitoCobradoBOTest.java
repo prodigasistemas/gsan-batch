@@ -102,7 +102,7 @@ public class DebitoCobradoBOTest {
 
 	private DebitoCobrar debitoCobrar() {
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(29));
 		d.setNumeroPrestacaoCobradas((short) 0);
 		d.setNumeroPrestacaoDebito((short) 4);
@@ -111,7 +111,7 @@ public class DebitoCobradoBOTest {
 	
 	private DebitoCobrar debitoCobrarParceladoENaUltimaParcela() {
 		DebitoCobrar d = new DebitoCobrar();
-		d.setId(3L);
+		d.setId(3);
 		d.setValorDebito(new BigDecimal(16));
 		d.setNumeroPrestacaoCobradas((short) 2);
 		d.setNumeroPrestacaoDebito((short) 3);

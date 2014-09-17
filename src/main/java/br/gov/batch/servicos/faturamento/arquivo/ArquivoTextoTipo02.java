@@ -12,13 +12,13 @@ import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
-@Stateless
+//@Stateless
 public class ArquivoTextoTipo02 {
 	
-	@Inject
+//	@Inject
 	private SistemaParametros sistemaParametro;
 
-	@EJB
+//	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
 	private StringBuilder builder;

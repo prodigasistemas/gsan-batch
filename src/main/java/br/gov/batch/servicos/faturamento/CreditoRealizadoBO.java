@@ -30,7 +30,7 @@ public class CreditoRealizadoBO {
 		for (CreditoRealizado creditoRealizado : creditosRealizados) {
 			creditoRealizado.setConta(conta);
 			creditoRealizado.setUltimaAlteracao(new Date());
-			Long idCreditoRealizado = creditoRealizadoRepositorio.inserir(creditoRealizado);
+			Integer idCreditoRealizado = creditoRealizadoRepositorio.inserir(creditoRealizado);
 			creditoRealizado.setId(idCreditoRealizado);
 			
 			Collection<CreditoRealizadoCategoria> creditosRealizadosCategoria = creditosContaTO.getMapCreditoRealizado().get(creditoRealizado);

@@ -21,23 +21,25 @@ public class ContaImpostosDeduzidosBO {
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
 	
 	public void inserirContaImpostosDeduzidos(Conta conta, ImpostosDeduzidosContaTO impostosDeduzidosContaTO) {
-		Collection<ImpostoDeduzidoTO> impostosDeduzidosTO = impostosDeduzidosContaTO.getListaImpostosDeduzidos();
+		Collection<ImpostoDeduzidoTO> impostosDeduzidos = impostosDeduzidosContaTO.getListaImpostosDeduzidos();
 		Collection<ContaImpostosDeduzidos> contasImpostosDeduzidos = new ArrayList<ContaImpostosDeduzidos>();
 		
-		for (ImpostoDeduzidoTO impostoDeduzidoTO : impostosDeduzidosTO) {
-			ContaImpostosDeduzidos contaImpostosDeduzidos = new ContaImpostosDeduzidos();
-			contaImpostosDeduzidos.setConta(conta);
-			
-			ImpostoTipo impostoTipo = new ImpostoTipo();
-			impostoTipo.setId(impostoDeduzidoTO.getIdImpostoTipo());
-			
-			contaImpostosDeduzidos.setImpostoTipo(impostoTipo);
-			contaImpostosDeduzidos.setValorImposto(impostoDeduzidoTO.getValor());
-			contaImpostosDeduzidos.setPercentualAliquota(impostoDeduzidoTO.getPercentualAliquota());
-			contaImpostosDeduzidos.setValorBaseCalculo(impostosDeduzidosContaTO.getValorBaseCalculo());
-			contaImpostosDeduzidos.setUltimaAlteracao(new Date());
-			
-			contasImpostosDeduzidos.add(contaImpostosDeduzidos);
+		if (impostosDeduzidos != null){
+			for (ImpostoDeduzidoTO imposto : impostosDeduzidos) {
+				ContaImpostosDeduzidos contaImpostosDeduzidos = new ContaImpostosDeduzidos();
+				contaImpostosDeduzidos.setConta(conta);
+				
+				ImpostoTipo impostoTipo = new ImpostoTipo();
+				impostoTipo.setId(imposto.getIdImpostoTipo());
+				
+				contaImpostosDeduzidos.setImpostoTipo(impostoTipo);
+				contaImpostosDeduzidos.setValorImposto(imposto.getValor());
+				contaImpostosDeduzidos.setPercentualAliquota(imposto.getPercentualAliquota());
+				contaImpostosDeduzidos.setValorBaseCalculo(impostosDeduzidosContaTO.getValorBaseCalculo());
+				contaImpostosDeduzidos.setUltimaAlteracao(new Date());
+				
+				contasImpostosDeduzidos.add(contaImpostosDeduzidos);
+			}
 		}
 
 		if (contasImpostosDeduzidos != null && !contasImpostosDeduzidos.isEmpty()) {

@@ -15,7 +15,7 @@ public class DebitoCobrarCategoriaBO {
 	@EJB
 	private DebitoCobrarCategoriaRepositorio repositorio;
 	
-	public List<DebitoCobrarCategoria> dividePrestacaoDebitoPelasEconomias(Long debitoCobrarId, BigDecimal valorPrestacao){
+	public List<DebitoCobrarCategoria> dividePrestacaoDebitoPelasEconomias(Integer debitoCobrarId, BigDecimal valorPrestacao){
 		
 		List<DebitoCobrarCategoria> debitos = repositorio.listaPeloDebitoCobrar(debitoCobrarId);
 
