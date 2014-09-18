@@ -31,9 +31,8 @@ public class AnalisadorGeracaoConta {
 	
 	public AnalisadorGeracaoConta(){}
 	
-	public boolean verificarGeracaoConta(int anoMesFaturamento, Imovel imovel, boolean faturarEmSituacaoEspecialFaturamento) throws Exception {
-		return verificarSituacaoImovelParaGerarConta(anoMesFaturamento, imovel, faturarEmSituacaoEspecialFaturamento) 
-				|| verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel);
+	public boolean verificarGeracaoConta(boolean aguaEsgotoZerados, int anoMesFaturamento, Imovel imovel) throws Exception {
+		return verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel) || verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel);
 	}
 
 	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento, Imovel imovel) {
@@ -55,8 +54,8 @@ public class AnalisadorGeracaoConta {
 		return segundaCondicaoGerarConta;
 	}
 
-	public boolean verificarSituacaoImovelParaGerarConta(int anoMesFaturamento, Imovel imovel, boolean faturarEmSituacaoEspecialFaturamento) {
-		return !(!faturarEmSituacaoEspecialFaturamento || (faturarEmSituacaoEspecialFaturamento && !imovel.aguaLigada() && !imovel.esgotoLigado() && !imovel.pertenceACondominio()));
+	public boolean verificarSituacaoImovelParaGerarConta(boolean valoresAguaEsgotoZerados, Imovel imovel) {
+		return !(valoresAguaEsgotoZerados || (!valoresAguaEsgotoZerados && !imovel.aguaLigada() && !imovel.esgotoLigado() && !imovel.pertenceACondominio()));
 	}
 
 	private boolean haDebitosCobrarAtivos(Collection<DebitoCobrar> debitosACobrar) {
@@ -77,4 +76,5 @@ public class AnalisadorGeracaoConta {
 	private boolean naoHaDebitosACobrar(Collection<DebitoCobrar> debitosACobrar) {
 		return debitosACobrar == null || debitosACobrar.isEmpty();
 	}
+
 }

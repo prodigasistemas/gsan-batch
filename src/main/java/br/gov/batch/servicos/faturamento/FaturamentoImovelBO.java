@@ -72,12 +72,12 @@ public class FaturamentoImovelBO {
 		Imovel imovel = faturamentoTO.getImovel();
 		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
 		
-		boolean faturarEmSituacaoEspecialFaturamento = false;
+		boolean valoresAguaEsgotoZerados = false;
 		if (imovel.possuiLigacaoAguaAtiva() || imovel.possuiLigacaoEsgotoAtiva() || imovel.existeHidrometro()) {
-			faturarEmSituacaoEspecialFaturamento = verificarFaturarEmSituacaoEspecialFaturamento(imovel, anoMesFaturamento);
+			valoresAguaEsgotoZerados = !deveFaturar(imovel, anoMesFaturamento);
 		}
 		
-		if (analisadorGeracaoConta.verificarGeracaoConta(anoMesFaturamento, imovel, faturarEmSituacaoEspecialFaturamento)) {
+		if (analisadorGeracaoConta.verificarGeracaoConta(valoresAguaEsgotoZerados, anoMesFaturamento, imovel)) {
 			DebitosContaTO debitosContaTO = debitosContaBO.gerarDebitosConta(imovel, anoMesFaturamento);
 			CreditosContaTO creditosContaTO = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
 			ImpostosDeduzidosContaTO impostosDeduzidosContaTO = impostosContaBO.gerarImpostosDeduzidosConta(imovel, anoMesFaturamento, 
@@ -121,4 +121,25 @@ public class FaturamentoImovelBO {
 				&& anoMesFaturamento >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() 
 				&& anoMesFaturamento <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim();
 	}
+	
+	private boolean deveFaturar(Imovel imovel, Integer anoMesFaturamento) {
+		boolean faturar = true;
+
+		if (imovel.getFaturamentoSituacaoTipo() != null) {
+
+			List<FaturamentoSituacaoHistorico> faturamentosSituacaoHistorico = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
+			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentosSituacaoHistorico.get(0);
+
+			if ((faturamentoSituacaoHistorico != null 
+					&& anoMesFaturamento >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() 
+					&& anoMesFaturamento <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim())
+					&& imovel.paralisacaoFaturamento() 
+					&& imovel.faturamentoAguaValido()) {
+				faturar = false;
+			}
+		}
+
+		return faturar;
+	}
+	
 }
