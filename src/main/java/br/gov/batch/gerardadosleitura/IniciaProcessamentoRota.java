@@ -28,7 +28,7 @@ public class IniciaProcessamentoRota implements ItemProcessor {
     public Object processItem(Object param) throws Exception {
         Properties processoParametros = new Properties();
         
-        processoParametros.put("idProcessoIniciado", "200");
+        processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
         processoParametros.put("idRota", String.valueOf(param));
         processoParametros.put("anoMesFaturamento" , util.parametroDoBatch("anoMesFaturamento"));
         processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
