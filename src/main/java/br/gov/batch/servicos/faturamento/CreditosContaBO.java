@@ -46,50 +46,43 @@ public class CreditosContaBO {
 		return gerarCreditos(anoMesFaturamento, creditosRealizar);
 	}
 
-	private CreditosContaTO gerarCreditos(Integer anoMesFaturamento, Collection<CreditoRealizar> creditosRealizar) {
+	public CreditosContaTO gerarCreditos(Integer anoMesFaturamento, Collection<CreditoRealizar> creditosRealizar) {
 		creditosConta = new CreditosContaTO();
 
 		for (CreditoRealizar creditoRealizar: creditosRealizar) {
 			creditoRealizar.setAnoMesReferenciaPrestacao(anoMesFaturamento);
 			creditoRealizar.setValorResidualConcedidoMes(creditoRealizar.getValorResidualMesAnterior());
 			
-			BigDecimal valorCreditoParcelaMes = BigDecimal.ZERO;
+			BigDecimal valorCredito = creditoRealizar.calculaValorCredito();
 			
-			if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar)) {
-				valorCreditoParcelaMes = calculaValorCorrespondenteParcelaMes(creditoRealizar);
-				creditoRealizar.setNumeroPrestacaoRealizada(new Integer(creditoRealizar.getNumeroPrestacaoRealizada().intValue() + 1).shortValue());
-			}
-			
-			valorCreditoParcelaMes = valorCreditoParcelaMes.subtract(creditoRealizar.getValorResidualMesAnterior());
+			creditosConta.somaValorTotalCreditos(valorCredito);
 
-			creditosConta.somaValorTotalCreditos(valorCreditoParcelaMes);
-
-			criarAtividadeGrupoFaturamento(creditoRealizar, valorCreditoParcelaMes);
+			criarAtividadeGrupoFaturamento(creditoRealizar, valorCredito);
 
 			if (creditosConta.possuiCreditoTipo(creditoRealizar.getCreditoTipo())) {
-				BigDecimal valorTotal = somaValorCreditoTipoEValorCreditoParcelaMes(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
+				BigDecimal valorTotal = somaValorCreditoTipoEValorCreditoParcelaMes(creditoRealizar.getCreditoTipo(), valorCredito);
 				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorTotal);
 			} else {
-				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCreditoParcelaMes);
+				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCredito);
 			}
 		}
 
 		return creditosConta;
 	}
-
-	private void criarAtividadeGrupoFaturamento(CreditoRealizar creditoRealizar, BigDecimal valorCreditoParcelaMes) {
+	
+	public void criarAtividadeGrupoFaturamento(CreditoRealizar creditoRealizar, BigDecimal valorCreditoParcelaMes) {
 		CreditoRealizado creditoRealizado = criarCreditoRealizado(creditoRealizar, valorCreditoParcelaMes);
 
 		Collection<CreditoRealizadoCategoria> colecaoCreditosRealizadoCategoria = obterColecaoCreditosRealizadoCategoria(
-				creditoRealizado, creditoRealizar, valorCreditoParcelaMes);
+				creditoRealizado, creditoRealizar.getId(), valorCreditoParcelaMes);
 
 		creditosConta.putCategoriasPorCreditoRealizado(creditoRealizado, colecaoCreditosRealizadoCategoria);
 		creditosConta.addCreditoRealizar(creditoRealizar);
 	}
 
 	private Collection<CreditoRealizadoCategoria> obterColecaoCreditosRealizadoCategoria(CreditoRealizado creditoRealizado, 
-			CreditoRealizar creditoRealizar, BigDecimal valorCredito) {
-		Collection<Categoria> colecaoCategorias = obterColecaoCategorias(creditoRealizar);
+			Integer idCreditoRealizar, BigDecimal valorCredito) {
+		Collection<Categoria> colecaoCategorias = obterColecaoCategorias(idCreditoRealizar);
 		Collection<BigDecimal> colecaoCategoriasCalculadasValor = categoriaBO.obterValorPorCategoria(colecaoCategorias, valorCredito);
 
 		Iterator<BigDecimal> colecaoCategoriasCalculadasValorIterator = colecaoCategoriasCalculadasValor.iterator();
@@ -115,8 +108,8 @@ public class CreditosContaBO {
 		return colecaoCreditosRealizadoCategoria;
 	}
 
-	private Collection<Categoria> obterColecaoCategorias(CreditoRealizar creditoRealizar) {
-		Collection<CreditoRealizarCategoria> colecaoCreditoARealizarCategoria = creditoRealizarCategoriaRepositorio.buscarCreditoRealizarCategoria(creditoRealizar.getId());
+	private Collection<Categoria> obterColecaoCategorias(Integer idCreditoRealizar) {
+		Collection<CreditoRealizarCategoria> colecaoCreditoARealizarCategoria = creditoRealizarCategoriaRepositorio.buscarCreditoRealizarCategoria(idCreditoRealizar);
 
 		Iterator<CreditoRealizarCategoria> colecaoCreditoARealizarCategoriaIterator = colecaoCreditoARealizarCategoria.iterator();
 		Collection<Categoria> colecaoCategorias = new ArrayList<Categoria>();
@@ -151,35 +144,6 @@ public class CreditosContaBO {
 		creditoRealizado.setNumeroPrestacaoCredito(creditoRealizar.getNumeroPrestacaoRealizada());
 		creditoRealizado.setCreditoRealizarGeral(creditoRealizar.getCreditoRealizarGeral());
 		return creditoRealizado;
-	}
-
-	public BigDecimal calculaValorCorrespondenteParcelaMes(CreditoRealizar creditoRealizar) {
-		BigDecimal valorCorrespondenteParcelaMes = BigDecimal.ZERO;
-
-		if (numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(creditoRealizar)) {
-			valorCorrespondenteParcelaMes = creditoRealizar.getValorCredito().divide(new BigDecimal(
-					creditoRealizar.getNumeroPrestacaoCredito()), 2, BigDecimal.ROUND_DOWN);
-
-			if (ehUltimaParcela(creditoRealizar)) {
-
-				BigDecimal valorMesVezesPrestacaoCredito = valorCorrespondenteParcelaMes.multiply(
-						new BigDecimal(creditoRealizar.getNumeroPrestacaoCredito())).setScale(2);
-
-				valorCorrespondenteParcelaMes = valorCorrespondenteParcelaMes.add(creditoRealizar.getValorCredito()).subtract(valorMesVezesPrestacaoCredito);
-			}
-		}
-
-		return valorCorrespondenteParcelaMes.add(creditoRealizar.getValorResidualMesAnterior());
-	}
-
-	private boolean ehUltimaParcela(CreditoRealizar creditoRealizar) {
-		return creditoRealizar.getNumeroPrestacaoRealizada().intValue() == 
-				((creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue()) - 1);
-	}
-
-	private boolean numeroPrestacoesRealizadasMenorQueNumeroPrestacoesCredito(CreditoRealizar creditoRealizar) {
-		return creditoRealizar.getNumeroPrestacaoRealizada().intValue() <
-		(creditoRealizar.getNumeroPrestacaoCredito().intValue() - creditoRealizar.getNumeroParcelaBonus().intValue());
 	}
 
 	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel) {
