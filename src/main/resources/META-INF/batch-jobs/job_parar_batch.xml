@@ -1,0 +1,9 @@
+<job id="job_parar_batch"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step_parar_batch">
+		<chunk item-count="1">
+			<reader ref="dummyItemReader"/>
+			<processor ref="pararBatch" />
+			<writer ref="dummyItemWriter" />
+		</chunk>
+	</step>
+</job>

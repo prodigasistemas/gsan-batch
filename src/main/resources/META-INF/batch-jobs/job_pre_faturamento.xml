@@ -1,4 +1,4 @@
-<job id="pre_faturamento" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="job_pre_faturamento"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="preFaturamentoJobListener"/>
 	</listeners>

@@ -1,9 +1,6 @@
 package br.gov.batch.gerardadosleitura;
 
-import java.util.Properties;
-
 import javax.batch.api.listener.JobListener;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -11,15 +8,13 @@ import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
-import br.gov.batch.mdb.Mensageiro;
 import br.gov.batch.util.BatchUtil;
-import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
 public class PreFaturamentoJobListener implements JobListener{
 	
-	private static Logger logger = Logger.getLogger(Mensageiro.class);
+	private static Logger logger = Logger.getLogger(PreFaturamentoJobListener.class);
 	
 	@EJB
 	private ProcessoRepositorio processoEJB;
@@ -27,20 +22,16 @@ public class PreFaturamentoJobListener implements JobListener{
 	@Inject
     protected JobContext jobCtx;
 	
-	@Inject
-	private ControleProcessoRota controle;
-	
     @Inject
     private BatchUtil util;
-
+    
 	@Override
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
-    	Properties jobParams = BatchRuntime.getJobOperator().getParameters(execId);
     	
-    	Long idProcessoIniciado = Long.valueOf(jobParams.getProperty("idProcessoIniciado"));
+    	Long idProcessoIniciado = Long.valueOf(util.parametroDoBatch("idProcessoIniciado"));
 		
-        processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
+        processoEJB.iniciaExecucaoProcesso(idProcessoIniciado, execId);
         
         logger.info(String.format("Inicio da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
 	}
@@ -48,6 +39,5 @@ public class PreFaturamentoJobListener implements JobListener{
 	public void afterJob() throws Exception {
 		long execId = jobCtx.getExecutionId();
 		logger.info(String.format("Fim da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
-		controle.finalizaProcessamentoRota();
 	}
 }
