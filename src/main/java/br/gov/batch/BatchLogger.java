@@ -6,10 +6,9 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
-import javax.jms.ObjectMessage;
 import javax.jms.Queue;
+import javax.jms.TextMessage;
 
 import org.jboss.logging.Logger;
 
@@ -17,22 +16,20 @@ import org.jboss.logging.Logger;
 public class BatchLogger {
 
 	@Inject
-	@JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
 	private JMSContext contexto;
 
 	@Resource(mappedName="java:global/jms/loggerProcessos")
 	private Queue loggerProcessos;
 
 	private String mensagem;
-
 	private Logger logger;
 	
-	public BatchLogger(){}
+	public BatchLogger(){
+		getLogger(BatchLogger.class);
+	}
 	
-	public BatchLogger getLogger(Class<?> klass) {
+	private void getLogger(Class<?> klass) {
 		this.logger = Logger.getLogger(klass);
-
-		return this;
 	}
 	
 	public String getMensagem() {
@@ -52,7 +49,7 @@ public class BatchLogger {
 
 		this.mensagem = getMensagem(level, mensagem);
 		
-		enviaLog(this.mensagem);
+		enviaLog(idProcesso, this.mensagem);
 	}
 
 	private String getMensagem(Logger.Level level, String mensagem) {
@@ -70,8 +67,8 @@ public class BatchLogger {
 		return logMensagem.toString();
 	}
 	
-	private void enviaLog(String log) {
-		ObjectMessage mensagem = contexto.createObjectMessage(log);
+	private void enviaLog(String idProcesso, String log) {
+		TextMessage mensagem = contexto.createTextMessage(idProcesso + " :: " + log);
 		contexto.createProducer().send(loggerProcessos, mensagem);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Queue;
 
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -15,7 +16,9 @@ import br.gov.batch.util.ExecucaoJob;
 
 @Named
 public class CarregarRotas extends AbstractItemReader {
-	private BatchLogger logger = new BatchLogger().getLogger(CarregarRotas.class);
+	
+	@EJB
+	private BatchLogger logger;
     
     @Inject
     private BatchUtil util;

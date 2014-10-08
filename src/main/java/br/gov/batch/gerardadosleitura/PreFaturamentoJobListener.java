@@ -7,14 +7,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
-import br.gov.batch.mdb.Mensageiro;
 import br.gov.batch.util.BatchUtil;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
 public class PreFaturamentoJobListener implements JobListener{
 	
-	private static BatchLogger logger = new BatchLogger().getLogger(Mensageiro.class);
+	@EJB
+	private BatchLogger logger;
 	
 	@EJB
 	private ProcessoRepositorio processoEJB;

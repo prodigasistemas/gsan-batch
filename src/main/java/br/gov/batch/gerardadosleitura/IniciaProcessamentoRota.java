@@ -6,6 +6,7 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -14,7 +15,9 @@ import br.gov.batch.util.BatchUtil;
 
 @Named
 public class IniciaProcessamentoRota implements ItemProcessor {
-	private static BatchLogger logger = new BatchLogger().getLogger(IniciaProcessamentoRota.class);
+	
+	@EJB
+	private BatchLogger logger;
 	
     @Inject
     private BatchUtil util;

@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
-import br.gov.batch.mdb.Mensageiro;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.batch.ProcessoIniciado;
 import br.gov.model.batch.ProcessoSituacao;
@@ -19,7 +18,8 @@ import br.gov.servicos.batch.ProcessoRepositorio;
 @Named
 public class RotaJobListener implements JobListener{
 	
-	private static BatchLogger logger = new BatchLogger().getLogger(Mensageiro.class);
+	@EJB
+	private BatchLogger logger;
 	
 	@EJB
 	private ProcessoRepositorio processoEJB;
@@ -60,16 +60,28 @@ public class RotaJobListener implements JobListener{
 		Properties parametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);
 		int totalRotas = parametros.getProperty("idsRota").split(",").length;
 		int percentualProcessado = Integer.parseInt(parametros.getProperty("percentualProcessado"));
+
+		int diferenca = 0;
+		int percentualRestante = 0;
+		int percentualAtualizado = 0;
 		
-		Integer quantidadeProcessada = (percentualProcessado * totalRotas) / 100;
+		if(percentualProcessado == 1) {
+			diferenca = totalRotas - 1;
+			percentualRestante = Math.round((diferenca * 100) / totalRotas);
+			percentualAtualizado = 100 - percentualRestante;
+		} else {
+			int quantidadeProcessada = Math.round((percentualProcessado * totalRotas) / 100);
+			quantidadeProcessada++;
+			
+			diferenca = totalRotas - quantidadeProcessada;
+			percentualRestante = Math.round((diferenca * 100) / totalRotas);
+			percentualAtualizado = 100 - percentualRestante;
+		}
 		
-		quantidadeProcessada += 1;
-		
-		Integer percentualAtualizado = Math.round((quantidadeProcessada / (float) totalRotas)) * 100;
 		if (percentualAtualizado > 100) {
 			percentualAtualizado = 100;
 		}
 		
-		processoParametroEJB.atualizarParametro(processoIniciado, "percentualProcessado", percentualAtualizado.toString());
+		processoParametroEJB.atualizarParametro(processoIniciado, "percentualProcessado", String.valueOf(percentualAtualizado));
 	}
 }

@@ -34,7 +34,9 @@ import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Named
 public class ApagarDadosRota implements Batchlet{
-	private static BatchLogger logger = new BatchLogger().getLogger(ApagarDadosRota.class);
+	
+	@EJB
+	private BatchLogger logger;
 	
 	@EJB
 	private ClienteContaRepositorio clienteContaRepositorio;

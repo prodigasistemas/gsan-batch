@@ -9,6 +9,8 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
+import javax.jms.JMSDestinationDefinition;
+import javax.jms.JMSDestinationDefinitions;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -22,6 +24,12 @@ import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoParametroRepositorio;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
+@JMSDestinationDefinitions({
+	 @JMSDestinationDefinition(name = "java:global/jms/processosFila",
+	 interfaceName = "javax.jms.Queue",
+	 destinationName="processosFila",
+	 description="Fila de Processos")
+})
 @MessageDriven(
 	activationConfig = {
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:global/jms/processosFila")
