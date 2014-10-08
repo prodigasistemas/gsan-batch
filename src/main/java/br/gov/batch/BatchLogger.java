@@ -16,11 +16,11 @@ import org.jboss.logging.Logger;
 @Stateless
 public class BatchLogger {
 
-	@Inject
-	@JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
+//	@Inject
+//	@JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
 	private JMSContext contexto;
 
-	@Resource(mappedName="java:global/jms/loggerProcessos")
+//	@Resource(mappedName="java:global/jms/loggerProcessos")
 	private Queue loggerProcessos;
 
 	private String mensagem;

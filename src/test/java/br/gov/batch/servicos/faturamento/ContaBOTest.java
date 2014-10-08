@@ -100,7 +100,7 @@ public class ContaBOTest {
 		Assert.assertEquals(5.45, conta.getValorDebitos().doubleValue(), 0);
 		Assert.assertEquals(0.78, conta.getValorImposto().doubleValue(), 0);
 		Assert.assertEquals(5.60, conta.getPercentualEsgoto().doubleValue(), 0);
-		Assert.assertEquals(5.60, conta.getPercentualColeta().doubleValue(), 0);		
+		Assert.assertEquals(56, conta.getPercentualColeta().intValue());		
 	}
 	
 	private GerarContaTO toContaZerados(){
@@ -110,7 +110,7 @@ public class ContaBOTest {
 		to.setValorTotalDebitos(BigDecimal.ZERO);
 		to.setValorTotalImposto(BigDecimal.ZERO);
 		to.setValorTotalCreditos(BigDecimal.ZERO);
-		to.setPercentualColeta(BigDecimal.ZERO);
+		to.setPercentualColeta((short) 0);
 		to.setPercentualEsgoto(BigDecimal.ZERO);
 		to.setDataVencimentoRota(new Date());
 		
@@ -124,7 +124,7 @@ public class ContaBOTest {
 		to.setValorTotalDebitos(new BigDecimal("5.45"));
 		to.setValorTotalImposto(new BigDecimal("0.78"));
 		to.setValorTotalCreditos(new BigDecimal("2.45"));
-		to.setPercentualColeta(new BigDecimal("5.60"));
+		to.setPercentualColeta((short)56);
 		to.setPercentualEsgoto(new BigDecimal("5.60"));
 		to.setDataVencimentoRota(new Date());
 		

@@ -106,7 +106,7 @@ public class ContaBO {
 		LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(faturamentoTO.getImovel().getId());
 		if (ligacaoEsgoto != null){
 			gerarTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, faturamentoTO.getImovel()));
-			gerarTO.setPercentualColeta(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+			gerarTO.setPercentualColeta(ligacaoEsgoto.valorPercentualAguaConsumidaColetada());
 		} else {
 			gerarTO.setPercentualEsgoto(BigDecimal.ZERO);
 		}
