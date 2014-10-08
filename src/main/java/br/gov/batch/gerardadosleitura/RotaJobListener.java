@@ -40,7 +40,7 @@ public class RotaJobListener implements JobListener{
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
     	
-    	Long idProcessoIniciado = Long.valueOf(util.parametroDoBatch("idProcessoIniciado"));
+    	Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
 		
         processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
         
@@ -54,7 +54,7 @@ public class RotaJobListener implements JobListener{
 	}
 
 	private void updateJobProgress() {
-		Long idProcessoIniciado = Long.valueOf(util.parametroDoBatch("idProcessoIniciado"));
+		Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
 		ProcessoIniciado processoIniciado = processoEJB.buscarProcessosIniciado(idProcessoIniciado);
 		
 		Properties parametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);

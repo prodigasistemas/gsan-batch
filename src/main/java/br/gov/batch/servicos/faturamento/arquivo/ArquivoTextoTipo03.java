@@ -54,7 +54,7 @@ public class ArquivoTextoTipo03 {
 	}
 
 	private String getIdLeituraAnormalidadeFaturamento(ConsumoHistorico consumoHistorico) {
-		Long idLeituraAnormalidadeFaturamento = medicaoHistoricoRepositorio.buscarLeituraAnormalidadeFaturamento(consumoHistorico);
+		Integer idLeituraAnormalidadeFaturamento = medicaoHistoricoRepositorio.buscarLeituraAnormalidadeFaturamento(consumoHistorico);
 		if (idLeituraAnormalidadeFaturamento != null) {
 			return Utilitarios.completaComZerosEsquerda(2, idLeituraAnormalidadeFaturamento.toString());
 		} else {

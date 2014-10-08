@@ -44,14 +44,14 @@ public class ArquivoTextoTipo02Test {
 		imovel.setId(1);
 		
 		Categoria categoria = new Categoria();
-		categoria.setId(1L);
+		categoria.setId(1);
 		categoria.setQuantidadeEconomias(1);
 		categoria.setFatorEconomias((short) 1);
 		categoria.setDescricao("CATEGORIA 1");
 		categoria.setDescricaoAbreviada("CTG 1");
 		
 		Subcategoria subcategoria = new Subcategoria();
-		subcategoria.setId(1L);
+		subcategoria.setId(1);
 		subcategoria.setQuantidadeEconomias(1);
 		subcategoria.setDescricao("SUBCATEGORIA 1");
 		subcategoria.setDescricaoAbreviada("SCTG 1");

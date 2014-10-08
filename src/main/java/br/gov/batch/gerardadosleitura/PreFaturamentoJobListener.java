@@ -29,7 +29,7 @@ public class PreFaturamentoJobListener implements JobListener{
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
     	
-    	Long idProcessoIniciado = Long.valueOf(util.parametroDoBatch("idProcessoIniciado"));
+    	Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
 		
         processoEJB.iniciaExecucaoProcesso(idProcessoIniciado, execId);
         

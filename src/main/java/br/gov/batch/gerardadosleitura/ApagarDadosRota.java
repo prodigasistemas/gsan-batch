@@ -115,7 +115,7 @@ public class ApagarDadosRota implements Batchlet{
     	
     	Rota rota = rotaRepositorio.findById(idRota);
     	
-    	List<Long> idsContas  = new ArrayList<Long>();
+    	List<Integer> idsContas  = new ArrayList<Integer>();
     	List<Integer> idsImoveis = new ArrayList<Integer>();
     	
     	if (rota.isAlternativa()){

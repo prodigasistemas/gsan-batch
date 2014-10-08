@@ -79,7 +79,7 @@ public class ContaBO {
 		
 		conta.setNumeroBoleto(sequencialGeracaoBoleto(sistemaParametros.getValorContaFichaComp(), conta));
 		
-		Long idConta = contaGeralRepositorio.salvar(contaGeral);
+		Integer idConta = contaGeralRepositorio.salvar(contaGeral);
 		conta.setId(idConta);
 		conta.setContaGeral(contaGeral);
 		
@@ -106,7 +106,7 @@ public class ContaBO {
 		LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(faturamentoTO.getImovel().getId());
 		if (ligacaoEsgoto != null){
 			gerarTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, faturamentoTO.getImovel()));
-			gerarTO.setPercentualColeta(ligacaoEsgoto.getPercentualAguaConsumidaColetada());
+			gerarTO.setPercentualColeta(ligacaoEsgoto.valorPercentualAguaConsumidaColetada());
 		} else {
 			gerarTO.setPercentualEsgoto(BigDecimal.ZERO);
 		}

@@ -81,7 +81,7 @@ public class ArquivoTextoTipo03Test {
 		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(imovel)).andReturn(consumosHistoricos);
 		replay(consumoHistoricoRepositorioMock);
 		
-		expect(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).andReturn(1L);
+		expect(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).andReturn(1);
 		replay(medicaoHistoricoRepositorioMock);
 	}
 }
