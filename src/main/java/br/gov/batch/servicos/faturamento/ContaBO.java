@@ -79,7 +79,7 @@ public class ContaBO {
 		
 		conta.setNumeroBoleto(sequencialGeracaoBoleto(sistemaParametros.getValorContaFichaComp(), conta));
 		
-		Long idConta = contaGeralRepositorio.salvar(contaGeral);
+		Integer idConta = contaGeralRepositorio.salvar(contaGeral);
 		conta.setId(idConta);
 		conta.setContaGeral(contaGeral);
 		

@@ -109,7 +109,7 @@ public class Mensageiro implements MessageListener {
         				
         				jo.stop(execId);
         				
-        				processoEJB.atualizaSituacaoProcesso(Long.valueOf(idProcessoIniciado), ProcessoSituacao.CANCELADO);
+        				processoEJB.atualizaSituacaoProcesso(Integer.valueOf(idProcessoIniciado), ProcessoSituacao.CANCELADO);
         				
         				logger.info(String.format("Batch interrompido! Id da execucao: [%s] do job [%s]", execId, batchCancelar));
         			}
