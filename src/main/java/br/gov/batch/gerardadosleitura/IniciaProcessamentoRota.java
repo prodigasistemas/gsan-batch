@@ -8,13 +8,12 @@ import javax.batch.runtime.BatchRuntime;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
+import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
 
 @Named
 public class IniciaProcessamentoRota implements ItemProcessor {
-	private static Logger logger = Logger.getLogger(IniciaProcessamentoRota.class);
+	private static BatchLogger logger = new BatchLogger().getLogger(IniciaProcessamentoRota.class);
 	
     @Inject
     private BatchUtil util;
@@ -35,7 +34,7 @@ public class IniciaProcessamentoRota implements ItemProcessor {
         
         JobOperator jo = BatchRuntime.getJobOperator();
         
-        logger.info("Rota marcada para processamento: " + param);
+        logger.info(util.parametroDoBatch("idProcessoIniciado"), "Rota marcada para processamento: " + param);
             
         jo.start("ProcessarRota", processoParametros);
         

@@ -9,8 +9,7 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
+import br.gov.batch.BatchLogger;
 import br.gov.batch.mdb.Mensageiro;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.batch.ProcessoSituacao;
@@ -19,7 +18,7 @@ import br.gov.servicos.batch.ProcessoRepositorio;
 @Named
 public class PreFaturamentoJobListener implements JobListener{
 	
-	private static Logger logger = Logger.getLogger(Mensageiro.class);
+	private static BatchLogger logger = new BatchLogger().getLogger(Mensageiro.class);
 	
 	@EJB
 	private ProcessoRepositorio processoEJB;
@@ -42,12 +41,12 @@ public class PreFaturamentoJobListener implements JobListener{
 		
         processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
         
-        logger.info(String.format("Inicio da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Inicio da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
 	}
 
 	public void afterJob() throws Exception {
 		long execId = jobCtx.getExecutionId();
-		logger.info(String.format("Fim da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Fim da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
 		controle.finalizaProcessamentoRota();
 	}
 }

@@ -7,8 +7,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.arrecadacao.DebitoAutomaticoMovimentoBO;
 import br.gov.batch.servicos.cadastro.ClienteContaBO;
 import br.gov.model.Status;
@@ -22,7 +20,6 @@ import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @Stateless
 public class FaturamentoImovelBO {
-	private static Logger logger = Logger.getLogger(FaturamentoImovelBO.class);
 	
 	@EJB
 	private AnalisadorGeracaoConta analisadorGeracaoConta;

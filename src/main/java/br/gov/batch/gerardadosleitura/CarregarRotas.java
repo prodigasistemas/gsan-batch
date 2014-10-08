@@ -8,13 +8,12 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
+import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
 
 @Named
 public class CarregarRotas extends AbstractItemReader {
-	private Logger logger = Logger.getLogger(CarregarRotas.class);
+	private BatchLogger logger = new BatchLogger().getLogger(CarregarRotas.class);
     
     @Inject
     private BatchUtil util;
@@ -25,13 +24,13 @@ public class CarregarRotas extends AbstractItemReader {
     private Queue<String> rotas = new ArrayDeque<String>();
 
     public void  open(Serializable ckpt) throws Exception {
-        String[]  ids =  util.parametroDoBatch("idsRota").split(",");
+        String[]  ids =  util.parametroDoBatch("idsRota").replaceAll("\"", "").split(",");
         
     	for (String id : ids) {
 			rotas.add(id.trim());
 		}
     	    	
-    	logger.info(String.format("Processando grupo [ %s ] com rotas [ %s ].", util.parametroDoBatch("idGrupoFaturamento"), util.parametroDoBatch("idsRota")));
+    	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Processando grupo [ %s ] com rotas [ %s ].", util.parametroDoBatch("idGrupoFaturamento"), util.parametroDoBatch("idsRota")));
     }
 
     public String readItem() throws Exception {
@@ -40,7 +39,7 @@ public class CarregarRotas extends AbstractItemReader {
     	
     	if (!rotas.isEmpty()){
     		String rota = rotas.poll();
-    		logger.info("Leitura da rota: " + rota);
+    		logger.info(util.parametroDoBatch("idProcessoIniciado"), "Leitura da rota: " + rota);
     		return rota;
     	}
     	return null;

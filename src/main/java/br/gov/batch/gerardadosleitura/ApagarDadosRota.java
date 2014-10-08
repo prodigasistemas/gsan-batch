@@ -8,8 +8,7 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
+import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.micromedicao.Rota;
@@ -33,7 +32,7 @@ import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Named
 public class ApagarDadosRota implements Batchlet{
-	private static Logger logger = Logger.getLogger(ApagarDadosRota.class);
+	private static BatchLogger logger = new BatchLogger().getLogger(ApagarDadosRota.class);
 	
 	@EJB
 	private ClienteContaRepositorio clienteContaRepositorio;
@@ -94,7 +93,7 @@ public class ApagarDadosRota implements Batchlet{
     	Integer referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
     	Integer grupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
     	
-    	logger.info("Exclusao de dados prefaturados para a rota: " + idRota);
+    	logger.info(util.parametroDoBatch("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
     	
     	Rota rota = rotaRepositorio.findById(idRota);
     	
