@@ -1,4 +1,4 @@
-<job id="processar_rota" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="job_processar_rota" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="rotaJobListener"/>
 	</listeners>

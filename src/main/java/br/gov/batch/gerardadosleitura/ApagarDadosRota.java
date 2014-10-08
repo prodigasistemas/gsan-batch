@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.batch.api.Batchlet;
+import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
+import br.gov.batch.util.ExecucaoJob;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoMovimentoRepositorio;
@@ -88,10 +90,24 @@ public class ApagarDadosRota implements Batchlet{
     @Inject
     private BatchUtil util;
     
+	@Inject
+    protected JobContext jobCtx;
+	
+    @Inject
+    private ControleProcessoRota controle;
+    
 	public String process() throws Exception {
     	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
     	Integer referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
     	Integer grupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
+    	Long parentExecutionId   = Long.valueOf(util.parametroDoBatch("parentExecutionId"));
+    	
+    	ExecucaoJob execucao = new ExecucaoJob();
+    	ExecucaoJob parent = new ExecucaoJob();
+    	parent.setExecutionId(parentExecutionId);
+    	execucao.setExecutionId(jobCtx.getExecutionId());
+    	execucao.setParentJob(parent);
+    	controle.insereExecucao(execucao);
     	
     	logger.info(util.parametroDoBatch("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
     	
