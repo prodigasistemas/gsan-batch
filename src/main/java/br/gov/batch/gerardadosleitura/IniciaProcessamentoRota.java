@@ -41,7 +41,7 @@ public class IniciaProcessamentoRota implements ItemProcessor {
         ProcessoIniciado processo = processoRepositorio.buscarProcessoIniciadoPorId(Integer.valueOf(util.parametroDoBatch("idProcessoIniciado")));
         
         if (!processo.emProcessamento()){
-        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Leitura da rota %s foi CANCELADA.", param));
+        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Leitura CANCELADA da rota %s.", param));
         }else{
         	Properties processoParametros = new Properties();
         	
@@ -55,7 +55,7 @@ public class IniciaProcessamentoRota implements ItemProcessor {
         	
         	Long executionRota = jo.start("job_processar_rota", processoParametros);
         	
-        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Rota [%s] marcada para processamento com executionId [%s]. ", param, executionRota));
+        	logger.logBackgroud(String.format("[executionId: %s] - Rota [%s] marcada para processamento. ", executionRota, param));
         	
         	controle.iniciaProcessamentoRota();
         }

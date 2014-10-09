@@ -35,7 +35,7 @@ public class PreFaturamentoJobListener implements JobListener{
 		
         processoRepositorio.iniciaExecucaoProcesso(idProcessoIniciado, execId);
         
-        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Inicio da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Inicio da execução do [%s]", execId, jobCtx.getJobName()));
 	}
 
 	public void afterJob() throws Exception {
@@ -49,6 +49,6 @@ public class PreFaturamentoJobListener implements JobListener{
 		
 		long execId = jobCtx.getExecutionId();
 
-		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Fim da execução [%s] do job [%s]", execId, jobCtx.getJobName()));
+		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Fim da execução do [%s]", execId, jobCtx.getJobName()));
 	}
 }

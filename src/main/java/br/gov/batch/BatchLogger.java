@@ -44,12 +44,22 @@ public class BatchLogger {
 		log(Logger.Level.ERROR, idProcesso, mensagem);
 	}
 
+	public void logBackgroud(String mensagem){
+		log(Logger.Level.INFO, null, mensagem, false);
+	}
+	
 	public void log(Logger.Level level, String idProcesso, String mensagem) {
+		log(level, idProcesso, mensagem, true);
+	}
+	
+	public void log(Logger.Level level, String idProcesso, String mensagem, boolean enviarParaFila) {
 		logger.log(level, mensagem);
 
 		this.mensagem = getMensagem(level, mensagem);
 		
-		enviaLog(idProcesso, this.mensagem);
+		if(enviarParaFila){
+			enviaLog(idProcesso, this.mensagem);
+		}
 	}
 
 	private String getMensagem(Logger.Level level, String mensagem) {

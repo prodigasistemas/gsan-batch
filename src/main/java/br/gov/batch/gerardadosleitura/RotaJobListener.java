@@ -40,11 +40,13 @@ public class RotaJobListener implements JobListener{
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
     	
-        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Inicio da execução [%s] do job [%s] para a rota: %s", execId, jobCtx.getJobName(), util.parametroDoBatch("idRota")));
+        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Inicio do processamento da rota: %s", execId, util.parametroDoBatch("idRota")));
 	}
 
 	public void afterJob() throws Exception {
-		logger.info(util.parametroDoBatch("idProcessoIniciado"), "Fim do processamento da rota: " + util.parametroDoBatch("idRota"));
+		long execId = jobCtx.getExecutionId();
+		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Fim do processamento da rota: %s", execId, util.parametroDoBatch("idRota")));
+		
 		updateJobProgress();
 		controle.finalizaProcessamentoRota();
 	}
