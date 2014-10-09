@@ -13,6 +13,7 @@ import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.DebitosContaTO;
@@ -63,11 +64,16 @@ public class FaturamentoImovelBO {
 	@EJB
 	private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
 	
+	@EJB
+	private ImovelRepositorio imovelRepositorio;
+	
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
-		Imovel imovel = faturamentoTO.getImovel();
+		Imovel parametroImovel = faturamentoTO.getImovel();
 		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
+		
+		Imovel imovel = imovelRepositorio.buscarPeloId(parametroImovel.getId());
 		
 		boolean valoresAguaEsgotoZerados = false;
 		if (imovel.possuiLigacaoAguaAtiva() || imovel.possuiLigacaoEsgotoAtiva() || imovel.existeHidrometro()) {

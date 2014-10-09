@@ -40,10 +40,6 @@ public class RotaJobListener implements JobListener{
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
     	
-    	Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
-		
-        processoEJB.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.EM_PROCESSAMENTO);
-        
         logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Inicio da execução [%s] do job [%s] para a rota: %s", execId, jobCtx.getJobName(), util.parametroDoBatch("idRota")));
 	}
 

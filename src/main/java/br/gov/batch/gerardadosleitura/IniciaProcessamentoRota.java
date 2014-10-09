@@ -34,21 +34,19 @@ public class IniciaProcessamentoRota implements ItemProcessor {
     public Object processItem(Object param) throws Exception {
         Properties processoParametros = new Properties();
         
-        if (controle.jobAtivo(jobCtx.getExecutionId())){
-        	processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
-        	processoParametros.put("idRota", String.valueOf(param));
-        	processoParametros.put("anoMesFaturamento" , util.parametroDoBatch("anoMesFaturamento"));
-        	processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
-        	processoParametros.put("parentExecutionId", String.valueOf(jobCtx.getExecutionId()));
-        	
-        	JobOperator jo = BatchRuntime.getJobOperator();
-        	
-        	Long executionRota = jo.start("job_processar_rota", processoParametros);
-        	
-        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Rota [%s] marcada para processamento com executionId [%s]. ", param, executionRota));
-        	
-        	controle.iniciaProcessamentoRota();
-        }
+    	processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
+    	processoParametros.put("idRota", String.valueOf(param));
+    	processoParametros.put("anoMesFaturamento" , util.parametroDoBatch("anoMesFaturamento"));
+    	processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
+    	processoParametros.put("parentExecutionId", String.valueOf(jobCtx.getExecutionId()));
+    	
+    	JobOperator jo = BatchRuntime.getJobOperator();
+    	
+    	Long executionRota = jo.start("job_processar_rota", processoParametros);
+    	
+    	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Rota [%s] marcada para processamento com executionId [%s]. ", param, executionRota));
+    	
+    	controle.iniciaProcessamentoRota();
         
         return param;
     }

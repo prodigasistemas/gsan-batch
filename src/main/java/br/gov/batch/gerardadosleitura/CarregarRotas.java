@@ -13,6 +13,8 @@ import javax.inject.Named;
 import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
 import br.gov.batch.util.ExecucaoJob;
+import br.gov.model.batch.ProcessoIniciado;
+import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
 public class CarregarRotas extends AbstractItemReader {
@@ -30,6 +32,9 @@ public class CarregarRotas extends AbstractItemReader {
 
 	@Inject
     protected JobContext jobCtx;
+	
+    @Inject
+    private ProcessoRepositorio processoRepositorio;
 
     public void  open(Serializable ckpt) throws Exception {
         String[]  ids =  util.parametroDoBatch("idsRota").replaceAll("\"", "").split(",");
@@ -51,8 +56,18 @@ public class CarregarRotas extends AbstractItemReader {
     	
     	if (!rotas.isEmpty()){
     		String rota = rotas.poll();
-    		logger.info(util.parametroDoBatch("idProcessoIniciado"), "Leitura da rota: " + rota);
-    		return rota;
+    		
+            ProcessoIniciado processo = processoRepositorio.buscarProcessoIniciadoPorId(Integer.valueOf(util.parametroDoBatch("idProcessoIniciado")));
+            
+            String mensagem = String.format("Leitura da rota %s para processamento.", rota);
+            if (!processo.emProcessamento()){
+            	mensagem = String.format("Leitura da rota %s foi CANCELADA.", rota);
+            	rota = null;
+            }
+            
+            logger.info(util.parametroDoBatch("idProcessoIniciado"), mensagem);
+            
+            return rota;
     	}
     	return null;
     }

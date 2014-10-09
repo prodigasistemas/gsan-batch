@@ -11,8 +11,6 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.micromedicao.RotaBO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
@@ -20,8 +18,6 @@ import br.gov.servicos.cadastro.ImovelRepositorio;
 
 @Named
 public class CarregarImoveisRota extends AbstractItemReader {
-	private Logger logger = Logger.getLogger(CarregarImoveisRota.class);
-	
     @EJB
     private ImovelRepositorio repositorio;
     
@@ -57,7 +53,6 @@ public class CarregarImoveisRota extends AbstractItemReader {
     	imoveis = new ArrayDeque<Imovel>(lista);
     	    	
     	anoMesFaturamento = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
-//    	logger.info(String.format("Rota: %s - Processando [ %s ] a partir de [ %s ].", idRota, lista.size(), firstItem));
     }
 
     public Imovel readItem() throws Exception {
