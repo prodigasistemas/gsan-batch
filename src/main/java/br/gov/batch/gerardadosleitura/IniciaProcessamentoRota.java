@@ -12,6 +12,8 @@ import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
+import br.gov.model.batch.ProcessoIniciado;
+import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
 public class IniciaProcessamentoRota implements ItemProcessor {
@@ -28,25 +30,35 @@ public class IniciaProcessamentoRota implements ItemProcessor {
 	@Inject
     protected JobContext jobCtx;
     
+    @Inject
+    private ProcessoRepositorio processoRepositorio;
+	
 	public IniciaProcessamentoRota() {
 	}
 
     public Object processItem(Object param) throws Exception {
-        Properties processoParametros = new Properties();
+    	
+        ProcessoIniciado processo = processoRepositorio.buscarProcessoIniciadoPorId(Integer.valueOf(util.parametroDoBatch("idProcessoIniciado")));
         
-    	processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
-    	processoParametros.put("idRota", String.valueOf(param));
-    	processoParametros.put("anoMesFaturamento" , util.parametroDoBatch("anoMesFaturamento"));
-    	processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
-    	processoParametros.put("parentExecutionId", String.valueOf(jobCtx.getExecutionId()));
-    	
-    	JobOperator jo = BatchRuntime.getJobOperator();
-    	
-    	Long executionRota = jo.start("job_processar_rota", processoParametros);
-    	
-    	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Rota [%s] marcada para processamento com executionId [%s]. ", param, executionRota));
-    	
-    	controle.iniciaProcessamentoRota();
+        if (!processo.emProcessamento()){
+        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Leitura da rota %s foi CANCELADA.", param));
+        }else{
+        	Properties processoParametros = new Properties();
+        	
+        	processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
+        	processoParametros.put("idRota", String.valueOf(param));
+        	processoParametros.put("anoMesFaturamento" , util.parametroDoBatch("anoMesFaturamento"));
+        	processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
+        	processoParametros.put("parentExecutionId", String.valueOf(jobCtx.getExecutionId()));
+        	
+        	JobOperator jo = BatchRuntime.getJobOperator();
+        	
+        	Long executionRota = jo.start("job_processar_rota", processoParametros);
+        	
+        	logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Rota [%s] marcada para processamento com executionId [%s]. ", param, executionRota));
+        	
+        	controle.iniciaProcessamentoRota();
+        }
         
         return param;
     }
