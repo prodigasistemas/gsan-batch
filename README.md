@@ -3,6 +3,19 @@ gsan-batch
 
 Projeto com nova arquitetura para processamento de batchs
 
+Projetos relacionados
+
+* gsan-persistence
+* gsan-processos
+* gsan-batch-manager
+
+Tecnologias utilizadas
+
+* Java EE 7
+* Java 8
+* Rails 4
+* Ruby 2
+
 Passos de criação de um novo batch
 
 1. Criar um arquivo com o nome do batch na pasta resources/META-INF/batch-jobs/
