@@ -20,7 +20,7 @@ Tecnologias utilizadas
 
 Configuração da aplicação Java:
 
-* Instale o driver do postgres (use a lib armazenada na pasta migracoes/drivers do projeto gsan-persistence)
+* Instale o driver do postgres no Wildfly (pode usar a lib armazenada na pasta migracoes/drivers do projeto gsan-persistence)
 * Crie um datasource no arquivo standalone-full.xml com o jndi 'java:jboss/datasources/GsanDS' (o mesmo do persistence.xml)
 * Execute a aplicação com a versão full do wildfly (standalone-full.xml)
 
