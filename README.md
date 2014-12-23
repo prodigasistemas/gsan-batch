@@ -27,12 +27,8 @@ Configuração da aplicação Java:
 Passos de criação de um novo batch
 
 1. Criar um arquivo com o nome do batch na pasta resources/META-INF/batch-jobs/
-
 2. Criar um script de migração para inserir um registro na tabela batch.processo. 
-   
 Olhe um exemplo na pasta migracoes/scripts do projeto gsan-persistence
-
 Importante salientar que o conteúdo da coluna proc_nmarquivobatch deve ter o nome do arquivo de configuração do batch. Os scripts estão no projeto gsan-persistence.
-
 3. Crie uma view com o mesmo nome do batch na pasta views/templates do projeto gsan-batch-manager. Esta view contem os campos que formam os parâmetros do processo.
 
