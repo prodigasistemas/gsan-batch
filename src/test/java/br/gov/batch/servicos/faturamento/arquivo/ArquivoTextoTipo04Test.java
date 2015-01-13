@@ -4,7 +4,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoTipo;
 import br.gov.model.financeiro.FinanciamentoTipo;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
-import br.gov.servicos.faturamento.DebitoCobrarRepositorioTest;
 import br.gov.servicos.to.DebitoCobradoParcelamentoTO;
 
 @RunWith(EasyMockRunner.class)

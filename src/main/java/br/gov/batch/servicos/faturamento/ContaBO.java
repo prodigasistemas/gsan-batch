@@ -25,7 +25,7 @@ import br.gov.servicos.faturamento.ContaGeralRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
-import br.gov.servicos.to.ContaTO;
+import br.gov.servicos.to.VencimentoContaTO;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.GerarContaTO;
@@ -149,7 +149,7 @@ public class ContaBO {
 	
 	
 	public Date determinarVencimentoConta(Imovel imovel, Date dataVencimentoRota){
-		ContaTO contaTO = vencimentoAlternativo(imovel, dataVencimentoRota);
+		VencimentoContaTO contaTO = vencimentoAlternativo(imovel, dataVencimentoRota);
 		
 		if (contaTO.comVencimentoAlternativo()){
 			if (contaTO.vencimentoMesSeguinte()){
@@ -174,8 +174,8 @@ public class ContaBO {
 		return contaTO.getDataVencimentoConta();
 	}
 	
-	private ContaTO vencimentoAlternativo(Imovel imovel, Date dataVencimentoRota){
-		ContaTO contaTO = new ContaTO();
+	private VencimentoContaTO vencimentoAlternativo(Imovel imovel, Date dataVencimentoRota){
+		VencimentoContaTO contaTO = new VencimentoContaTO();
 		contaTO.setDataVencimentoConta(dataVencimentoRota);
 		if (imovel.existeDiaVencimento() && !imovel.emissaoExtratoFaturamento()) {
 			contaTO.setDiaVencimentoAlternativo(imovel.getDiaVencimento());
