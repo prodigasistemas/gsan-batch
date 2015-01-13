@@ -10,6 +10,7 @@ import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
+import br.gov.servicos.to.DebitoCobradoParcelamentoTO;
 
 public class ArquivoTextoTipo04 {
 
@@ -18,114 +19,116 @@ public class ArquivoTextoTipo04 {
 	@EJB
 	private DebitoCobradoRepositorio debitoCobradoRepositorio;
 	
+	private BigDecimal valorPrestacaoAcumulado;
+	private String anoMesAcumulado;
+	private Integer qtdAnoMesDistintos;
+	private StringBuilder builder;
+	
 	public String build(Conta conta) {
 
-		StringBuilder builder = new StringBuilder();
+		builder = new StringBuilder();
 		int quantidadeLinhas = 0;
 
 		if (conta != null) {
 
-			Collection colecaoDebitoCobradoDeParcelamento = debitoCobradoRepositorio.pesquisarDebitoCobradoParcelamento(conta);
+			Collection<DebitoCobradoParcelamentoTO> colecaoDebitoCobradoDeParcelamento = debitoCobradoRepositorio.pesquisarDebitoCobradoParcelamento(conta);
 
 			if (colecaoDebitoCobradoDeParcelamento != null && !colecaoDebitoCobradoDeParcelamento.isEmpty()) {
 
-				Iterator iterator = colecaoDebitoCobradoDeParcelamento.iterator();
-
-				while (iterator.hasNext()) {
-
-					Object[] arrayDebitoCobrado = (Object[]) iterator.next();
-
+				for (DebitoCobradoParcelamentoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
+					
 					quantidadeLinhas = quantidadeLinhas + 1;
-
+					
 					builder.append(TIPO_REGISTRO);
 					builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
-					builder.append(Utilitarios.completaComEspacosADireita(90, "PARCELAMENTO DE DEBITOS PARCELA "
-													+ Utilitarios.completaComZerosEsquerda(3, String.valueOf(arrayDebitoCobrado[0]))
-													+ "/"
-													+ Utilitarios.completaComZerosEsquerda(3, String.valueOf(arrayDebitoCobrado[1]))));
-					builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto((BigDecimal) arrayDebitoCobrado[2])));
-					builder.append(Utilitarios.completaTexto(6, (arrayDebitoCobrado[3] != null ? arrayDebitoCobrado[3] : "") + ""));
+					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
+					builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
+					builder.append(Utilitarios.completaTexto(6, (debitoParcelamento.getCodigoConstante() != null ? debitoParcelamento.getCodigoConstante() : "") + ""));
 					builder.append(System.getProperty("line.separator"));
 				}
 			}
 
-			Collection colecaoDebitoCobradoNaoParcelamento = debitoCobradoRepositorio.pesquisarDebitoCobradoNaoParcelamento(conta);
+			Collection<DebitoCobrado> colecaoDebitoCobradoNaoParcelamento = debitoCobradoRepositorio.pesquisarDebitoCobradoNaoParcelamento(conta);
 
 			if (colecaoDebitoCobradoNaoParcelamento != null && !colecaoDebitoCobradoNaoParcelamento.isEmpty()) {
 
-				Iterator iterator = colecaoDebitoCobradoNaoParcelamento.iterator();
-				
 				DebitoCobrado debitoCobradoAnterior = null;
-				DebitoCobrado debitoCobradoAtual = null;
-				BigDecimal valorPrestacaoAcumulado = BigDecimal.ZERO;
-				String anoMesAcumulado = "";
-				Integer qtdAnoMesDistintos = 0;
+				
+				valorPrestacaoAcumulado = BigDecimal.ZERO;
+				anoMesAcumulado = "";
+				qtdAnoMesDistintos = 0;
 
-				while (iterator.hasNext()) {
+				for (DebitoCobrado debitoCobradoAtual : colecaoDebitoCobradoNaoParcelamento) {
 
-					debitoCobradoAtual = (DebitoCobrado) iterator.next();
-
-					if (debitoCobradoAnterior == null) {
-
-						debitoCobradoAnterior = debitoCobradoAtual;
-
-						if (debitoCobradoAnterior.getAnoMesReferenciaDebito() != null) {
-
-							valorPrestacaoAcumulado = debitoCobradoAnterior.getValorPrestacao();
-							qtdAnoMesDistintos++;
-							anoMesAcumulado = Utilitarios.formatarAnoMesParaMesAno(debitoCobradoAnterior.getAnoMesReferenciaDebito());
-
-						} else {
-							quantidadeLinhas = quantidadeLinhas + 1;
-							builder.append(this.obterDadosServicosParcelamentosParteII(conta, debitoCobradoAnterior, 1, "", debitoCobradoAnterior.getValorPrestacao()));
-						}
-
-					} else if (debitoCobradoAnterior != null && debitoCobradoAnterior.getDebitoTipo().getId().equals(debitoCobradoAtual.getDebitoTipo().getId())) {
-
-						debitoCobradoAnterior = debitoCobradoAtual;
-
-						if (debitoCobradoAnterior.getAnoMesReferenciaDebito() != null) {
-
-							valorPrestacaoAcumulado = valorPrestacaoAcumulado.add(debitoCobradoAtual.getValorPrestacao());
-							qtdAnoMesDistintos++;
-							anoMesAcumulado = anoMesAcumulado + " " + Utilitarios.formatarAnoMesParaMesAno(debitoCobradoAtual.getAnoMesReferenciaDebito());
-
-						} else {
-							quantidadeLinhas = quantidadeLinhas + 1;
-							builder.append(this.obterDadosServicosParcelamentosParteII(conta, debitoCobradoAnterior, 1, "", debitoCobradoAnterior.getValorPrestacao()));
-						}
-
+					if (debitoTipoAnteriorIgualAtual(debitoCobradoAnterior, debitoCobradoAtual)) {
+						quantidadeLinhas = buildLinhaOuAtualizaParametros(conta, quantidadeLinhas, debitoCobradoAnterior, debitoCobradoAtual, qtdAnoMesDistintos++);
 					} else {
 						if (qtdAnoMesDistintos > 0) {
-							quantidadeLinhas = quantidadeLinhas + 1;
-							builder.append(this.obterDadosServicosParcelamentosParteII(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado));
+							quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
 						}
 
-						debitoCobradoAnterior = debitoCobradoAtual;
 						qtdAnoMesDistintos = 0;
 
-						if (debitoCobradoAnterior.getAnoMesReferenciaDebito() != null) {
-							valorPrestacaoAcumulado = debitoCobradoAnterior.getValorPrestacao();
-							qtdAnoMesDistintos = 1;
-							anoMesAcumulado = Utilitarios.formatarAnoMesParaMesAno(debitoCobradoAnterior.getAnoMesReferenciaDebito());
-						} else {
-							quantidadeLinhas = quantidadeLinhas + 1;
-							builder.append(this.obterDadosServicosParcelamentosParteII(conta, debitoCobradoAnterior, 1, "", debitoCobradoAnterior.getValorPrestacao()));
-						}
+						quantidadeLinhas = buildLinhaOuAtualizaParametros(conta, quantidadeLinhas, debitoCobradoAnterior, debitoCobradoAtual, 1);
 					}
+					
+					debitoCobradoAnterior = debitoCobradoAtual;
 				}
 
 				if (qtdAnoMesDistintos > 0) {
-					quantidadeLinhas = quantidadeLinhas + 1;
-					builder.append(this.obterDadosServicosParcelamentosParteII(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado));
+					quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
 				}
 			}
 		}
 
 		return builder.toString();
 	}
+
+	private int buildLinhaOuAtualizaParametros(Conta conta, int quantidadeLinhas, DebitoCobrado debitoCobradoAnterior, DebitoCobrado debitoCobradoAtual, int qtdAnoMesDistintos) {
+		if (debitoCobradoAtual.getAnoMesReferenciaDebito() != null) {
+			atualizaParametros(calculaValorPrestacao(debitoCobradoAnterior, debitoCobradoAtual), 
+							   calculaAnoMes(debitoCobradoAnterior, debitoCobradoAtual),
+							   qtdAnoMesDistintos);
+		} else {
+			quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, debitoCobradoAtual, 1, "", debitoCobradoAtual.getValorPrestacao());
+		}
+		
+		return quantidadeLinhas;
+	}
 	
-	public StringBuilder obterDadosServicosParcelamentosParteII(Conta conta, DebitoCobrado debitoCobrado, Integer qtdAnoMesDistintos, 
+	private BigDecimal calculaValorPrestacao(DebitoCobrado debitoCobradoAnterior, DebitoCobrado debitoCobradoAtual) {
+		if(debitoTipoAnteriorIgualAtual(debitoCobradoAnterior, debitoCobradoAtual)) {
+			return valorPrestacaoAcumulado.add(debitoCobradoAtual.getValorPrestacao()); 
+		} 
+		
+		return debitoCobradoAtual.getValorPrestacao();
+	}
+	
+	private String calculaAnoMes(DebitoCobrado debitoCobradoAnterior, DebitoCobrado debitoCobradoAtual) {
+		if(debitoTipoAnteriorIgualAtual(debitoCobradoAnterior, debitoCobradoAtual)) {
+			return anoMesAcumulado + " " + Utilitarios.formatarAnoMesParaMesAno(debitoCobradoAtual.getAnoMesReferenciaDebito()); 
+		} 
+		
+		return Utilitarios.formatarAnoMesParaMesAno(debitoCobradoAtual.getAnoMesReferenciaDebito());
+	}
+
+	private boolean debitoTipoAnteriorIgualAtual(DebitoCobrado debitoCobradoAnterior, DebitoCobrado debitoCobradoAtual) {
+		return debitoCobradoAnterior != null && debitoCobradoAnterior.getDebitoTipo().getId().equals(debitoCobradoAtual.getDebitoTipo().getId());
+	}
+
+	private void atualizaParametros(BigDecimal valorPrestacao, String anoMes, int qtdAnoMes) {
+		valorPrestacaoAcumulado = valorPrestacao;
+		qtdAnoMesDistintos = qtdAnoMes;
+		anoMesAcumulado = anoMes;
+	}
+
+	private int adicionaLinha(Conta conta, int quantidadeLinhas, DebitoCobrado debitoCobradoAtual, int qtdMeses, String anoMesAcumulado, BigDecimal valorPrestacao) {
+		quantidadeLinhas = quantidadeLinhas + 1;
+		builder.append(this.obterDadosServicosParcelamentos(conta, debitoCobradoAtual, qtdMeses, anoMesAcumulado, valorPrestacao));
+		return quantidadeLinhas;
+	}
+	
+	public StringBuilder obterDadosServicosParcelamentos(Conta conta, DebitoCobrado debitoCobrado, Integer qtdAnoMesDistintos, 
 																String anoMesAcumulado, BigDecimal valorPrestacaoAcumulado) {
 		StringBuilder builder = new StringBuilder();
 
@@ -148,7 +151,7 @@ public class ArquivoTextoTipo04 {
 								+ "/"
 								+ Utilitarios.completaComZerosEsquerda(3, String.valueOf(debitoCobrado.getNumeroPrestacao()))));
 			} else {
-				builder.append(Utilitarios.completaTexto(90, debitoCobrado.getDebitoTipo().getDescricao() + " " + anoMesAcumulado));
+				builder.append(Utilitarios.completaComEspacosADireita(90, debitoCobrado.getDebitoTipo().getDescricao() + " " + anoMesAcumulado));
 			}
 
 			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(debitoCobrado.getValorPrestacao())));
@@ -166,5 +169,16 @@ public class ArquivoTextoTipo04 {
 		} else {
 			return Utilitarios.completaTexto(6, "");
 		}
+	}
+	
+	private String getDescricaoServicoParcelamento(DebitoCobradoParcelamentoTO debito) {
+		StringBuilder descricao = new StringBuilder();
+		
+		descricao.append("PARCELAMENTO DE DEBITOS PARCELA ")
+				.append(Utilitarios.completaComZerosEsquerda(3, String.valueOf(debito.getNumeroPrestacaoDebito())))
+				.append("/")
+				.append(Utilitarios.completaComZerosEsquerda(3, String.valueOf(debito.getTotalParcela())));
+		
+		return Utilitarios.completaComEspacosADireita(90, descricao.toString());
 	}
 }
