@@ -96,7 +96,7 @@ public class ArquivoTextoTipo04Test {
 		System.out.println(linha);
 		System.out.println(tamanhoLinha);
 		
-		assertTrue(tamanhoLinha >= 122);
+		assertTrue(tamanhoLinha == 244);
 	}
 	
 	private void carregarMocks() {
