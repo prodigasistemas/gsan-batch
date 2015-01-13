@@ -210,6 +210,9 @@ public class GeradorArquivoTextoFaturamento {
 
 		return retorno;
 	}
+	*/
+	
+	/*
 	
 	public StringBuilder gerarArquivoTextoRegistroTipo01(Imovel imovel,  Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo,
 			SistemaParametro sistemaParametro, CobrancaDocumento cobrancaDocumento) throws ControladorException {
@@ -227,10 +230,7 @@ public class GeradorArquivoTextoFaturamento {
 		String idImovelPerfil = null;
 		Integer idLocalidade = null;
 		Integer idSetorComercial = null;
-		Integer numeroSequencialRota = null;
 		Integer idQuadraFace = null;
-		Short indicadorFaturamentoSituacaoAgua = null;
-		Short indicadorFaturamentoSituacaoEsgoto = null;
 		short indicadorParalisacaoFaturamentoAgua = 2;
 		short indicadorParalisacaoFaturamentoEsgoto = 2;
 
@@ -239,318 +239,16 @@ public class GeradorArquivoTextoFaturamento {
 		if (imovel.getSetorComercial() != null) {
 			idSetorComercial = imovel.getSetorComercial().getId();
 		}
-		if (imovel.getNumeroSequencialRota() != null) {
-			numeroSequencialRota = imovel.getNumeroSequencialRota();
-		}
+
 		colecaoClienteImovelOUConta = imovel.getClienteImoveis();
-		indicadorFaturamentoSituacaoAgua = imovel.getLigacaoAguaSituacao().getIndicadorFaturamentoSituacao();
-		indicadorFaturamentoSituacaoEsgoto = imovel.getLigacaoEsgotoSituacao().getIndicadorFaturamentoSituacao();
 
 		if (imovel.getQuadraFace() != null) {
 			idQuadraFace = imovel.getQuadraFace().getId();
 		}
 
-		int[] consumoMedioLigacaoAgua = this.getControladorMicromedicao().obterVolumeMedioAguaEsgoto(imovel.getId(), faturamentoGrupo.getAnoMesReferencia(),
-				LigacaoTipo.LIGACAO_AGUA, houveIntslacaoHidrometro);
-
-		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, String.valueOf(consumoMedioLigacaoAgua[0])));
-
-		arquivoTextoRegistroTipo01.append(indicadorFaturamentoSituacaoAgua.toString());
-
-		arquivoTextoRegistroTipo01.append(indicadorFaturamentoSituacaoEsgoto.toString());
-
-		Short indicadorEmissaoConta = new Short("1");
-
-		boolean naoEmitir = false;
-		if (sistemaParametro.getCodigoEmpresaFebraban().equals(SistemaParametro.CODIGO_EMPRESA_FEBRABAN_CAERN)
-				|| sistemaParametro.getCodigoEmpresaFebraban().equals(SistemaParametro.CODIGO_EMPRESA_FEBRABAN_COSANPA)) {
-			if (imovel.getImovelContaEnvio() != null && (imovel.getImovelContaEnvio().getId().equals(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL_FINAL_GRUPO))) {
-				naoEmitir = true;
-			}
-		} else {
-			if (imovel.getImovelContaEnvio() != null
-					&& (imovel.getImovelContaEnvio().getId().equals(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL)
-							|| imovel.getImovelContaEnvio().getId().equals(ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL)
-							|| imovel.getImovelContaEnvio().getId().equals(ImovelContaEnvio.ENVIAR_CONTA_BRAILLE) || imovel.getImovelContaEnvio().getId()
-							.equals(ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL))) {
-				naoEmitir = true;
-			}
-		}
-
-		if (clienteResponsavel != null && naoEmitir) {
-			indicadorEmissaoConta = new Short("2");
-		}
-
-		arquivoTextoRegistroTipo01.append(indicadorEmissaoConta.toString());
-
-		 CONSUMO_MINIMO_AGUA
-		if (imovel.getLigacaoAgua() != null && imovel.getLigacaoAgua().getNumeroConsumoMinimoAgua() != null
-				&& !imovel.getLigacaoAgua().getNumeroConsumoMinimoAgua().equals("")) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, imovel.getLigacaoAgua().getNumeroConsumoMinimoAgua().toString()));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 6));
-		}
-
-		 CONSUMO_MINIMO_ESGOTO
-		if (imovel.getLigacaoEsgoto() != null && imovel.getLigacaoEsgoto().getConsumoMinimo() != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, imovel.getLigacaoEsgoto().getConsumoMinimo().toString()));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 6));
-		}
-
-		 PERCENTUAL_ESGOTO_LIGACAO
-		if (imovel.getLigacaoEsgoto() != null && imovel.getLigacaoEsgoto().getPercentualAguaConsumidaColetada() != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6,
-					Util.formatarBigDecimalComPonto(imovel.getLigacaoEsgoto().getPercentualAguaConsumidaColetada())));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "0"));
-		}
-
-		BigDecimal percentualEsgoto = this.getControladorFaturamento().verificarPercentualEsgotoAlternativo(imovel, null);
-
-		 if (conta != null){
-		if (percentualEsgoto != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6,
-			 Util.formatarBigDecimalComPonto(conta.getPercentualEsgoto())));
-					Util.formatarBigDecimalComPonto(percentualEsgoto)));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "0"));
-		}
-
-		 TIPO_PO«O
-		if (imovel.getPocoTipo() != null) {
-			arquivoTextoRegistroTipo01.append(imovel.getPocoTipo().getId().toString());
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 1));
-		}
-
-		 CONSUMO_TARIFA
-		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(2, imovel.getConsumoTarifa().getId().toString()));
-
-		 CATEGORIA PRINCIPAL
-		Collection colecaoCategoria = null;
-
-		 ObtÈm a quantidade de economias por categoria
-		colecaoCategoria = getControladorImovel().obterQuantidadeEconomiasCategoria(imovel);
-
-		int consumoTotalReferenciaAltoConsumo = 0;
-		int consumoTotalReferenciaEstouroConsumo = 0;
-		int consumoTotalReferenciaBaixoConsumo = 0;
-		int consumoMaximoCobrancaEstouroConsumo = 0;
-		int maiorQuantidadeEconomia = 0;
-		BigDecimal vezesMediaAltoConsumo = new BigDecimal(0);
-		BigDecimal vezesMediaEstouroConsumo = new BigDecimal(0);
-		BigDecimal percentualDeterminacaoBaixoConsumo = new BigDecimal(0);
-
-		Iterator colecaoCategoriaIterator = colecaoCategoria.iterator();
-
-		while (colecaoCategoriaIterator.hasNext()) {
-
-			Categoria categoria = (Categoria) colecaoCategoriaIterator.next();
-
-			 Multiplica o consumo por economia de referencia (consumo estouro)
-			 pr n˙mero de economias do imÛvel
-			consumoTotalReferenciaAltoConsumo = consumoTotalReferenciaAltoConsumo
-					+ (categoria.getConsumoAlto().intValue() * categoria.getQuantidadeEconomiasCategoria().intValue());
-
-			 Multiplica o consumo por economia de referencia (consumo estouro)
-			 pr n˙mero de economias do imÛvel
-			consumoTotalReferenciaEstouroConsumo = consumoTotalReferenciaEstouroConsumo
-					+ (categoria.getConsumoEstouro().intValue() * categoria.getQuantidadeEconomiasCategoria().intValue());
-
-			 Multiplica o consumo por economia de referencia (consumo estouro)
-			 pr n˙mero de economias do imÛvel
-			consumoMaximoCobrancaEstouroConsumo = consumoMaximoCobrancaEstouroConsumo
-					+ (categoria.getNumeroConsumoMaximoEc().intValue() * categoria.getQuantidadeEconomiasCategoria().intValue());
-
-			consumoTotalReferenciaBaixoConsumo = consumoTotalReferenciaBaixoConsumo
-					+ (categoria.getMediaBaixoConsumo().intValue() * categoria.getQuantidadeEconomiasCategoria().intValue());
-
-			 ObtÈm a maior quantidade de economias e a vezes mÈdia de estouro
-			if (maiorQuantidadeEconomia < categoria.getQuantidadeEconomiasCategoria().intValue()) {
-
-				maiorQuantidadeEconomia = categoria.getQuantidadeEconomiasCategoria().intValue();
-
-				vezesMediaAltoConsumo = categoria.getVezesMediaAltoConsumo();
-				vezesMediaEstouroConsumo = categoria.getVezesMediaEstouro();
-				percentualDeterminacaoBaixoConsumo = categoria.getPorcentagemMediaBaixoConsumo();
-			}
-		}
-
-		 CONSUMO_REFERENCIA_ESTOURO_CONSUMO
-		if (consumoTotalReferenciaEstouroConsumo <= 999999) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, consumoTotalReferenciaEstouroConsumo + ""));
-		} else {
-			arquivoTextoRegistroTipo01.append("999999");
-		}
-
-		 CONSUMO_REFERENCIA_ALTO_CONSUMO
-		if (consumoTotalReferenciaAltoConsumo <= 999999) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, consumoTotalReferenciaAltoConsumo + ""));
-		} else {
-			arquivoTextoRegistroTipo01.append("999999");
-		}
-
-		 CONSUMO_MEDIA_BAIXO_CONSUMO
-		if (consumoTotalReferenciaBaixoConsumo <= 999999) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, consumoTotalReferenciaBaixoConsumo + ""));
-		} else {
-			arquivoTextoRegistroTipo01.append("999999");
-		}
-
-		 FATOR_MULTIPLICACAO_MEDIA_ESTOURO_CONSUMO
-		if (vezesMediaEstouroConsumo != null) {
-			arquivoTextoRegistroTipo01.append(Util.completaString(vezesMediaEstouroConsumo.toString(), 4));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 4));
-		}
-
-		 FATOR_MULTIPLICACAO_MEDIA_ALTO_CONSUMO
-		if (vezesMediaAltoConsumo != null) {
-			arquivoTextoRegistroTipo01.append(Util.completaString(vezesMediaAltoConsumo.toString(), 4));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 4));
-		}
-
-		 PERCENTUAL_DETERMINACAO_BAIXO_CONSUMO
-		if (percentualDeterminacaoBaixoConsumo != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, Util.formatarBigDecimalComPonto(percentualDeterminacaoBaixoConsumo)));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "0"));
-		}
-
-		 CONSUMO_MAXIMO_COBRANCA_ESTOURO_CONSUMO
-		if (consumoMaximoCobrancaEstouroConsumo <= 999999) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, consumoMaximoCobrancaEstouroConsumo + ""));
-		} else {
-			arquivoTextoRegistroTipo01.append("999999");
-		}
-
-		 FATURAMENTO_GRUPO
-		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(3, faturamentoGrupo.getId().toString()));
-
-		 CODIGO_ROTA
-		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(7, rota.getCodigo().toString()));
-
-		arquivoTextoRegistroTipo01.append(Util.completaString("", 9));
-
-		 N⁄MERO DA CONTA
-
-		 Tipo da calculo da tarifa
-		if (imovel.getConsumoTarifa() != null && imovel.getConsumoTarifa().getTarifaTipoCalculo() != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(2, "" + imovel.getConsumoTarifa().getTarifaTipoCalculo().getId()));
-		}
-
-		 EndereÁo Atendimento 1™ Parte
-		FiltroLocalidade filtroLocalidade = new FiltroLocalidade();
-
-		filtroLocalidade.adicionarParametro(new ParametroSimples(FiltroLocalidade.ID, idLocalidade));
-
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroCep");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroCep.cep");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroCep.logradouro");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroCep.logradouro.logradouroTipo");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroCep.logradouro.logradouroTitulo");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("enderecoReferencia");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroBairro");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroBairro.bairro");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroBairro.bairro.municipio");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("logradouroBairro.bairro.municipio.unidadeFederacao");
-		filtroLocalidade.adicionarCaminhoParaCarregamentoEntidade("enderecoReferencia");
-
-		Collection cLocalidade = (Collection) getControladorUtil().pesquisar(filtroLocalidade, Localidade.class.getName());
-
-		Localidade localidade = (Localidade) cLocalidade.iterator().next();
-
-		String descricaoAtendimento = localidade.getEnderecoFormatadoTituloAbreviado();
-
-		arquivoTextoRegistroTipo01.append(Util.completaString(descricaoAtendimento, 70));
-
-		 EndereÁo Atendimento 2™ Parte
-		String dddMunicipio = "";
-		if (localidade.getLogradouroBairro() != null && localidade.getLogradouroBairro().getBairro() != null
-				&& localidade.getLogradouroBairro().getBairro().getMunicipio() != null
-				&& localidade.getLogradouroBairro().getBairro().getMunicipio().getDdd() != null) {
-			dddMunicipio = "" + localidade.getLogradouroBairro().getBairro().getMunicipio().getDdd();
-		}
-
-		String fome = "";
-		if (localidade.getFone() != null) {
-			fome = localidade.getFone();
-		}
-
-		arquivoTextoRegistroTipo01.append(Util.completaString(dddMunicipio + fome, 11));
-
-		 Sequencial de rota
-		if (numeroSequencialRota != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(9, "" + numeroSequencialRota));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(9, ""));
-		}
-
-		 Mensagem da conta em 3 partes
-		EmitirContaHelper emitirContaHelper = new EmitirContaHelper();
-		emitirContaHelper.setAmReferencia(faturamentoGrupo.getAnoMesReferencia());
-		emitirContaHelper.setAnoMesFaturamentoGrupo(faturamentoGrupo.getAnoMesReferencia());
-		emitirContaHelper.setIdFaturamentoGrupo(faturamentoGrupo.getId());
-		emitirContaHelper.setIdGerenciaRegional(idGerenciaRegional);
-		emitirContaHelper.setIdLocalidade(idLocalidade);
-		emitirContaHelper.setIdSetorComercial(idSetorComercial);
-		emitirContaHelper.setIdImovel(imovel.getId());
-		 Caso a empresa seja a CAER
-		if (sistemaParametro.getCodigoEmpresaFebraban().equals(SistemaParametro.CODIGO_EMPRESA_FEBRABAN_CAER)) {
-			String[] mensagemContaDividida = getControladorFaturamento().obterMensagemConta(emitirContaHelper, sistemaParametro, 4, null);
-			if (mensagemContaDividida != null) {
-				 Parte 1
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[0], 60));
-				 Parte 2
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[1], 60));
-				 Parte 3
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[2], 60));
-				 Parte 4
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[3], 60));
-				 Parte 5
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[4], 60));
-
-			} else {
-				arquivoTextoRegistroTipo01.append(Util.completaString("", 300));
-			}
-		} else {
-			String[] mensagemContaDividida = getControladorFaturamento().obterMensagemConta3Partes(emitirContaHelper, sistemaParametro);
-			if (mensagemContaDividida != null) {
-				 Parte 1
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[0], 100));
-				 Parte 2
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[1], 100));
-				 Parte 3
-				arquivoTextoRegistroTipo01.append(Util.completaString(mensagemContaDividida[2], 100));
-
-			} else {
-				arquivoTextoRegistroTipo01.append(Util.completaString("", 300));
-			}
-		}
-
-		 Incluir mensagem de quitaÁ„o anual de dÈbitos
-		String msgQuitacaoDebitos = getControladorFaturamento().obterMsgQuitacaoDebitos(imovel, anoMesReferencia);
-
-		arquivoTextoRegistroTipo01.append(Util.completaString(msgQuitacaoDebitos, 120));
-
-		 Qualidade ¡gua
-		Integer anoMesReferenciaQualidadeAgua = null;
-
-		if (sistemaParametro.getNomeEmpresa() != null && sistemaParametro.getNomeEmpresa().equals(SistemaParametro.EMPRESA_COMPESA)) {
-			anoMesReferenciaQualidadeAgua = Util.subtraiAteSeisMesesAnoMesReferencia(faturamentoGrupo.getAnoMesReferencia(), 1);
-		} else {
-			anoMesReferenciaQualidadeAgua = faturamentoGrupo.getAnoMesReferencia();
-		}
-
-		arquivoTextoRegistroTipo01 = arquivoTextoRegistroTipo01.append(gerarArquivoTextoQualidadeAgua(idLocalidade, idSetorComercial,
-				anoMesReferenciaQualidadeAgua, idQuadraFace));
-
 		Integer consumoMinimoImovel = null;
 		consumoMinimoImovel = getControladorMicromedicao().obterConsumoMinimoLigacao(imovel, null);
 
-		 CONSUMO MINIMO IM”VEL
 		if (consumoMinimoImovel != null) {
 			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "" + consumoMinimoImovel));
 		} else {
@@ -558,7 +256,6 @@ public class GeradorArquivoTextoFaturamento {
 
 		}
 
-		 CONSUMO MINIMO IM”VEL N√O MEDIDO
 		int consumoMinimoNaoMedido = getControladorMicromedicao().obterConsumoNaoMedido(imovel);
 
 		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "" + consumoMinimoNaoMedido));
@@ -714,6 +411,5 @@ public class GeradorArquivoTextoFaturamento {
 
 		return arquivoTextoRegistroTipo01;
 	}		
-	
 	*/
 }

@@ -41,7 +41,7 @@ public class CreditosContaBO {
 	
 	public CreditosContaTO gerarCreditosConta(Imovel imovel, Integer anoMesFaturamento) {
 
-		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel);
+		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel, anoMesFaturamento);
 		
 		return gerarCreditos(anoMesFaturamento, creditosRealizar);
 	}
@@ -146,9 +146,7 @@ public class CreditosContaBO {
 		return creditoRealizado;
 	}
 
-	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel) {
-		Integer anoMesFaturamento = sistemaParametrosRepositorio.getSistemaParametros().getAnoMesFaturamento();
-		
+	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel, Integer anoMesFaturamento) {
 		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 				imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 

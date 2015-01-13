@@ -10,45 +10,40 @@ import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.HidrometroTO;
 
 @Stateless
 public class HidrometroBO {
-	
+
 	@EJB
 	private ImovelBO imovelBO;
 
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
-	
+
 	@EJB
 	private HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoHistoricoRepositorio;
-	
-	public boolean houveSubstituicao(Integer idImovel){
-		return false;
-	}
 
-	public boolean verificarInstalacaoSubstituicaoHidrometro(){ 
-		
-//		Date dataLeituraAnteriorFaturada = this.obterDataLeituraAnterior(idImovel, medicaoTipo);
-//		Date dataInstalacaoHidrometro = this.obterDataInstalacaoHidrometro(idImovel);
-//		
-//		if ( (dataLeituraAnteriorFaturada != null && dataInstalacaoHidrometro != null)
-//				&& (
-//					((Util.compararData(dataInstalacaoHidrometro, new Date()) < 0) && (Util.compararData(dataInstalacaoHidrometro, dataLeituraAnteriorFaturada) > 0))
-//					|| (Util.compararData(dataInstalacaoHidrometro, dataLeituraAnteriorFaturada) == 0)
-//				    )) {
-//			
-//			return true;
-//		} 
-		
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
+
+	public boolean houveSubstituicao(Integer idImovel) {
+		Date dataLeituraAnteriorFaturada = this.obterDataLeituraAnterior(idImovel);
+		Date dataInstalacaoHidrometro = this.obterDataInstalacaoHidrometro(idImovel);
+
+		if (dataLeituraAnteriorFaturada != null && dataInstalacaoHidrometro != null) {
+			if (dataInstalacaoHidrometro.before(new Date()) && !dataLeituraAnteriorFaturada.after(dataInstalacaoHidrometro)) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
 	private Date obterDataLeituraAnterior(Integer idImovel) {
-
 		Date dataLeituraFaturada = null;
 
 		FaturamentoGrupo faturamentoGrupo = imovelBO.pesquisarFaturamentoGrupo(idImovel);
@@ -66,10 +61,9 @@ public class HidrometroBO {
 		}
 
 		return dataLeituraFaturada;
-
 	}
-	
-	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
+
+	private Date obterDataInstalacaoHidrometro(Integer idImovel) {
 		List<HidrometroTO> dadosHidrometro = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
 
 		Date dataMedicao = null;
@@ -77,6 +71,12 @@ public class HidrometroBO {
 		if (dadosHidrometro.size() > 0) {
 			dataMedicao = dadosHidrometro.get(0).getDataInstalacao();
 		}
+
+		return dataMedicao;
+	}
+
+	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
+		Date dataMedicao = this.obterDataInstalacaoHidrometro(idImovel);
 
 		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
 
