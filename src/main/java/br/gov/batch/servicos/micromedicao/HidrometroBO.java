@@ -48,47 +48,47 @@ public class HidrometroBO {
 	}
 
 	private Date obterDataLeituraAnterior(Integer idImovel) {
-	
-	Date dataLeituraFaturada = null;
-	
-	FaturamentoGrupo faturamentoGrupo = imovelBO.pesquisarFaturamentoGrupo(idImovel);
-	
-	Integer anoMesReferencia = faturamentoGrupo.getAnoMesReferencia();
-	
-	Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
-	
-	MedicaoHistorico medicaoHistoricoAtual =  medicaoHistoricoRepositorio.buscarPorImovelEReferencia(idImovel, anoMesReferencia);
 
-	if (medicaoHistoricoAtual != null) {
-		dataLeituraFaturada = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
-	}else{
-		dataLeituraFaturada = this.obterDataMedicao(idImovel, anoMesReferenciaAnterior);
+		Date dataLeituraFaturada = null;
+
+		FaturamentoGrupo faturamentoGrupo = imovelBO.pesquisarFaturamentoGrupo(idImovel);
+
+		Integer anoMesReferencia = faturamentoGrupo.getAnoMesReferencia();
+
+		Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
+
+		MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorImovelEReferencia(idImovel, anoMesReferencia);
+
+		if (medicaoHistoricoAtual != null) {
+			dataLeituraFaturada = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
+		} else {
+			dataLeituraFaturada = this.obterDataMedicao(idImovel, anoMesReferenciaAnterior);
+		}
+
+		return dataLeituraFaturada;
+
 	}
-
-	return dataLeituraFaturada;
-
-}
 	
-	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia){
+	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
 		List<HidrometroTO> dadosHidrometro = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
-		
+
 		Date dataMedicao = null;
-		
-		if (dadosHidrometro.size() > 0){
+
+		if (dadosHidrometro.size() > 0) {
 			dataMedicao = dadosHidrometro.get(0).getDataInstalacao();
 		}
-		
+
 		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
-		
-		if (medicaoHistoricoTO == null){
+
+		if (medicaoHistoricoTO == null) {
 			Integer mesAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 			medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, mesAnterior);
 		}
-		
-		if (medicaoHistoricoTO != null){
+
+		if (medicaoHistoricoTO != null) {
 			dataMedicao = medicaoHistoricoTO.getDataLeituraAtualFaturamento();
 		}
-		
+
 		return dataMedicao;
 	}
 }
