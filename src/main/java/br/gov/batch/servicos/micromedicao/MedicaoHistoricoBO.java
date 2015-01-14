@@ -15,35 +15,26 @@ import br.gov.servicos.to.HidrometroTO;
 
 @Stateless
 public class MedicaoHistoricoBO {
-	
+
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
-	
+
 	@EJB
 	private HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoHistoricoRepositorio;
 
 	public List<HidrometroMedicaoHistoricoTO> obterDadosTiposMedicao(Integer idImovel, Integer anoMesReferencia) {
-		
+
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = new ArrayList<>();
-		
+
 		List<HidrometroTO> dadosHidrometroInstalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
-		
+
 		for (HidrometroTO hidrometroTO : dadosHidrometroInstalacao) {
 			HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico = new HidrometroMedicaoHistoricoTO(hidrometroTO);
-			
-			MedicaoHistorico medicaoHistorico = getMedicaoHistorico(idImovel, anoMesReferencia);
-			
-			hidrometroMedicaoHistorico.setNumeroLeituraInstalacao(medicaoHistorico.getLeituraAtualFaturamento());
-			hidrometroMedicaoHistorico.setLeituraAtualFaturamento(medicaoHistorico.getLeituraAtualFaturamento());
-			hidrometroMedicaoHistorico.setDataLeituraAtualFaturamento(medicaoHistorico.getDataLeituraAtualFaturamento());
-			hidrometroMedicaoHistorico.setLeituraSituacaoAtual(medicaoHistorico.getLeituraSituacaoAtual());
-			hidrometroMedicaoHistorico.setConsumoMedioHidrometro(medicaoHistorico.getConsumoMedioHidrometro());
-			hidrometroMedicaoHistorico.setDataLeituraAtualInformada(medicaoHistorico.getDataLeituraAtualInformada());
-			hidrometroMedicaoHistorico.setLeituraAtualInformada(medicaoHistorico.getLeituraAtualInformada());
-			
+			hidrometroMedicaoHistorico.setMedicaoHistorico(this.getMedicaoHistorico(idImovel, anoMesReferencia));
+
 			listaHidrometroMedicaoHistorico.add(hidrometroMedicaoHistorico);
 		}
-		
+
 		return listaHidrometroMedicaoHistorico;
 	}
 
