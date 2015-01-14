@@ -20,6 +20,9 @@ public class HidrometroBO {
 
 	@EJB
 	private ImovelBO imovelBO;
+	
+	@EJB
+	private MedicaoHistoricoBO medicaoHistoricoBO;
 
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
@@ -78,12 +81,7 @@ public class HidrometroBO {
 	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
 		Date dataMedicao = this.obterDataInstalacaoHidrometro(idImovel);
 
-		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);
-
-		if (medicaoHistoricoTO == null) {
-			Integer mesAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
-			medicaoHistoricoTO = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, mesAnterior);
-		}
+		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoBO.getMedicaoHistorico(idImovel, anoMesReferencia);
 
 		if (medicaoHistoricoTO != null) {
 			dataMedicao = medicaoHistoricoTO.getDataLeituraAtualFaturamento();
