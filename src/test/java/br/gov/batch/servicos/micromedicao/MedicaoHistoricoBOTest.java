@@ -101,6 +101,7 @@ public class MedicaoHistoricoBOTest {
 		to.setIdImovel(1);
 		to.setDescricaoLocalInstalacao("teste");
 		to.setRateioTipo(0);
+		to.setMedicaoTipo(1);
 		
 		List<HidrometroTO> lista = new ArrayList<HidrometroTO>();
 		lista.add(to);
