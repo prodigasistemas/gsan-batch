@@ -47,20 +47,14 @@ public class FaixaLeituraBO {
 		} else {
 			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
 
-			System.out.println("1");
 			if (isGerarFaixaNormal(imovel)) {
-				System.out.println("2");
 				return faixaLeituraEsperada;
 			} else {
-				System.out.println("3");
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
 						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
-				System.out.println("4");
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
-					System.out.println("5");
 					return faixaLeituraFalsa;
 				} else {
-					System.out.println("6");
 					return faixaLeituraEsperada;
 				}
 			}
