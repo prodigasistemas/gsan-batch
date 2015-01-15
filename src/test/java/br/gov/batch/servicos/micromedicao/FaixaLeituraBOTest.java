@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
+import br.gov.model.faturamento.FaixaLeituraEsperadaParametros;
 import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.Rota;
