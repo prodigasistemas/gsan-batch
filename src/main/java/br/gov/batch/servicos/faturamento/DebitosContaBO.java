@@ -27,7 +27,7 @@ public class DebitosContaBO {
 	
 	@EJB
 	private DebitoCobrarCategoriaBO debitoCobrarCategoriaBO;
-	
+		
 	public DebitosContaTO gerarDebitosConta(Imovel imovel, int anoMesFaturamento){
 		DebitosContaTO to = new DebitosContaTO();
 		

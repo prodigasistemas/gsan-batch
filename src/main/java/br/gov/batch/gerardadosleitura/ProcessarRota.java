@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.servicos.faturamento.FaturamentoImovelBO;
-import br.gov.batch.servicos.faturamento.FaturamentoImovelTO;
+import br.gov.batch.servicos.faturamento.to.FaturamentoImovelTO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;

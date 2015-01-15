@@ -9,6 +9,7 @@ import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.arrecadacao.DebitoAutomaticoMovimentoBO;
 import br.gov.batch.servicos.cadastro.ClienteContaBO;
+import br.gov.batch.servicos.faturamento.to.FaturamentoImovelTO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;

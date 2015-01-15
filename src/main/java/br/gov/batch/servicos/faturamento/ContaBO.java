@@ -9,6 +9,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import br.gov.batch.servicos.faturamento.to.FaturamentoImovelTO;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.cadastro.Cliente;
