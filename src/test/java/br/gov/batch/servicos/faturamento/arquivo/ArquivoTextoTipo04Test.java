@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.easymock.EasyMockRunner;
 import org.easymock.Mock;
@@ -35,8 +36,8 @@ public class ArquivoTextoTipo04Test {
 	private DebitoCobradoParcelamentoTO debitoCobradoParcelamentoTO;
 	private DebitoCobrado debitoCobrado;
 	
-	private ArrayList<DebitoCobradoParcelamentoTO> debitosCobradosParcelamentos;
-	private ArrayList<DebitoCobrado> debitosCobrados;
+	private List<DebitoCobradoParcelamentoTO> debitosCobradosParcelamentos;
+	private List<DebitoCobrado> debitosCobrados;
 	
 	@Mock
 	private DebitoCobradoRepositorio debitoCobradoRepositorioMock;
@@ -94,7 +95,7 @@ public class ArquivoTextoTipo04Test {
 		System.out.println(linha);
 		System.out.println(tamanhoLinha);
 		
-		assertTrue(tamanhoLinha >= 122);
+		assertTrue(tamanhoLinha == 244);
 	}
 	
 	private void carregarMocks() {

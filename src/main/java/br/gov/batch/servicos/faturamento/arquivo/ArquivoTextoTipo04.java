@@ -2,7 +2,6 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.ejb.EJB;
 
