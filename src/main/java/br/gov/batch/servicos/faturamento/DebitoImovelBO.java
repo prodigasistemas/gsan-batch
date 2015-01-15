@@ -15,6 +15,7 @@ import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.model.faturamento.GuiaPagamento;
 import br.gov.servicos.arrecadacao.pagamento.GuiaPagamentoRepositorio;
 import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.cobranca.ContratoParcelamentoItemRepositorio;
 import br.gov.servicos.cobranca.parcelamento.ParcelamentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
@@ -25,7 +26,7 @@ import br.gov.servicos.to.GuiaPagamentoTO;
 public class DebitoImovelBO {
 	
 	@EJB
-	private SistemaParametros sistemaParametros;
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
 	@EJB
 	private ContaRepositorio contaRepositorio;
@@ -43,6 +44,8 @@ public class DebitoImovelBO {
 	private ContratoParcelamentoItemRepositorio contratoParcelamentoItemRepositorio;
 	
 	public boolean existeDebitoImovel(ConsultaDebitoImovelTO to){
+        SistemaParametros sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+
 //		int indicadorDebito                            = 1 
 //		int indicadorPagamento                         = 1 
 //		int indicadorConta                             = 2
@@ -85,6 +88,8 @@ public class DebitoImovelBO {
 	}
 	
 	public List<ContaTO> pesquisarContasDebitoImovel(ConsultaDebitoImovelTO to){
+       SistemaParametros sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+	    
 		to.addSituacao((short) DebitoCreditoSituacao.NORMAL.getId());
 		to.addSituacao((short) DebitoCreditoSituacao.RETIFICADA.getId());
 		to.addSituacao((short) DebitoCreditoSituacao.INCLUIDA.getId());
@@ -114,12 +119,14 @@ public class DebitoImovelBO {
 				
 				contas = contasSemParcelamentos;
 			}
-		}
+		}		
 		
 		return contas;
 	}
 	
 	protected boolean imovelPossuiParcelamento(Integer idImovel) {
+        SistemaParametros sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+
 		boolean estahConfirmado = false;
 		
 		Parcelamento parcelamento = parcelamentoRepositorio.pesquisaParcelamento(idImovel, sistemaParametros.getAnoMesArrecadacao(), ParcelamentoSituacao.NORMAL);

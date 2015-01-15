@@ -1,4 +1,4 @@
-package br.gov.batch.servicos.faturamento;
+package br.gov.batch.servicos.faturamento.to;
 
 import java.io.Serializable;
 
