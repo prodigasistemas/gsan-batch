@@ -7,7 +7,7 @@ import java.util.List;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.faturamento.FaixaLeituraEsperadaParametros;
+import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
 import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.LeituraSituacao;
 import br.gov.model.micromedicao.MedicaoHistorico;
@@ -18,7 +18,7 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
-import br.gov.servicos.faturamento.FaturamentoRepositorio;
+import br.gov.servicos.micromedicao.FaixaLeituraRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
@@ -38,7 +38,7 @@ public class FaixaLeituraBO {
 	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
 
 	// @EJB
-	private FaturamentoRepositorio faturamentoRepositorio;
+	private FaixaLeituraRepositorio faixaLeituraRepositorio;
 	
 	public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
 		
@@ -72,7 +72,7 @@ public class FaixaLeituraBO {
 
 		BigDecimal mediaConsumo = new BigDecimal(media);
 		
-		List<FaixaLeituraEsperadaParametros> faixaLeituraParametros = faturamentoRepositorio.obterFaixasLeitura();
+		List<FaixaLeituraEsperadaParametros> faixaLeituraParametros = faixaLeituraRepositorio.obterFaixasLeitura();
 
 		for (FaixaLeituraEsperadaParametros faixaLeitura : faixaLeituraParametros) {
 			
