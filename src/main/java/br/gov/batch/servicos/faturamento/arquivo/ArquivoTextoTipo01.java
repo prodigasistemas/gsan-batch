@@ -7,6 +7,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.faturamento.EsgotoBO;
+import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
 import br.gov.model.cadastro.Cliente;
@@ -20,6 +21,7 @@ import br.gov.model.cadastro.endereco.ClienteEndereco;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
+import br.gov.model.faturamento.TipoConta;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
@@ -40,6 +42,8 @@ public class ArquivoTextoTipo01 {
     private Rota rota;
     
     private Integer anoMesReferencia;
+    
+    private Integer idImovelPerfil;
 
     // @EJB
     private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
@@ -61,6 +65,9 @@ public class ArquivoTextoTipo01 {
     
     @EJB
     private MensagemContaBO mensagemContaBO;
+    
+    @EJB
+    private ExtratoQuitacaoBO extratoQuitacaoBO;
 
     private String enderecoFormatado = "";
 
@@ -172,6 +179,8 @@ public class ArquivoTextoTipo01 {
         builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getNumeroSequencialRota()));
         
         escreveMensagemConta();
+        
+        builder.append(Utilitarios.completaTexto(9, extratoQuitacaoBO.obterMsgQuitacaoDebitos(imovel.getId(), anoMesReferencia)));
 
         return builder.toString();
     }
@@ -188,6 +197,8 @@ public class ArquivoTextoTipo01 {
             builder.append(Utilitarios.completaTexto(100, mensagemConta[1]));
             builder.append(Utilitarios.completaTexto(100, mensagemConta[2]));
         }else{
+            mensagemConta = mensagemContaBO.obterMensagemConta(imovel, anoMesReferencia, idImovelPerfil, TipoConta.CONTA_DEBITO_AUTOMATICO);
+            
             builder.append(Utilitarios.completaTexto(60, mensagemConta[0]));
             builder.append(Utilitarios.completaTexto(60, mensagemConta[1]));
             builder.append(Utilitarios.completaTexto(60, mensagemConta[2]));            
