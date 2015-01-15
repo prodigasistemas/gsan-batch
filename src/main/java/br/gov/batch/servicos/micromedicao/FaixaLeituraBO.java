@@ -5,11 +5,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.junit.Before;
-
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
+import br.gov.model.faturamento.FaixaLeituraEsperadaParametros;
 import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.LeituraSituacao;
 import br.gov.model.micromedicao.MedicaoHistorico;
