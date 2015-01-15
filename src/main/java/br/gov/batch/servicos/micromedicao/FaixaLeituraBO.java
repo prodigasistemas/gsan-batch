@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.junit.Before;
+
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
@@ -39,28 +41,35 @@ public class FaixaLeituraBO {
 
 	// @EJB
 	private FaturamentoRepositorio faturamentoRepositorio;
+	
 	public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
 		
 		if (hidrometro == null) {
 			return new FaixaLeituraTO(0, 0);
 		} else {
-			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, null, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
+			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
 
+			System.out.println("1");
 			if (isGerarFaixaNormal(imovel)) {
+				System.out.println("2");
 				return faixaLeituraEsperada;
 			} else {
+				System.out.println("3");
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
 						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
-
+				System.out.println("4");
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
+					System.out.println("5");
 					return faixaLeituraFalsa;
 				} else {
+					System.out.println("6");
 					return faixaLeituraEsperada;
 				}
 			}
 		}
 	}
 	
+	// TESTED
 	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media,MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
 
 		BigDecimal faixaInicial = null;
@@ -104,7 +113,7 @@ public class FaixaLeituraBO {
 	
 	private int obterLeituraAnterior(MedicaoHistorico medicaoHistorico) {
 
-		if (medicaoHistorico.getLeituraAnteriorInformada() != null && medicaoHistorico.getLeituraAtualInformada() != null) {
+		if (medicaoHistorico.possuiLeituraInformada()) {
 			if (medicaoHistorico.getLeituraAnteriorInformada().intValue() == medicaoHistorico.getLeituraAtualInformada().intValue()) {
 				return medicaoHistorico.getLeituraAnteriorInformada();
 			} else {
@@ -138,33 +147,13 @@ public class FaixaLeituraBO {
 
 		FaixaLeituraTO faixaLeitura = new FaixaLeituraTO();
 
-		Calendar dataCalendar = new GregorianCalendar();
-		int segundos = dataCalendar.get(Calendar.SECOND);
-
-		Integer somaImovelSegundo = imovel.getId() + segundos;
-
-		BigDecimal multiplicaFaxaFalsa = null;
-		BigDecimal percentualFaixaFalsaRota = imovel.getQuadra().getRota().getPercentualGeracaoFaixaFalsa();
-		BigDecimal percentualFaixaFalsaSistemaParametro = sistemaParametro.getPercentualFaixaFalsa();
-
-		if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.ROTA)) {
-			if (percentualFaixaFalsaRota != null && !percentualFaixaFalsaRota.equals(new BigDecimal(0.0))) {
-				multiplicaFaxaFalsa = percentualFaixaFalsaRota.multiply(new BigDecimal(somaImovelSegundo));
-			}
-		} else {
-			if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.SISTEMA_PARAMETRO)) {
-				if (!percentualFaixaFalsaSistemaParametro.equals(new BigDecimal(0.0))) {
-					multiplicaFaxaFalsa = percentualFaixaFalsaSistemaParametro.multiply(new BigDecimal(somaImovelSegundo));
-				}
-			}
-		}
+		BigDecimal multiplicaFaxaFalsa = obterFatorMultiplicacaoFaixaFalsa(imovel);
 
 		Integer leituraAnteriorFalsa = null;
 
 		if (multiplicaFaxaFalsa != null) {
 			hidrometroSelecionado = verificarLeituraAnteriorMedia(media, medicaoHistorico);
 
-			// se multiplicaFaxaFalsa for divisivel por 100 ou o hidrometro for selecionado
 			if ((multiplicaFaxaFalsa.doubleValue() % 100 == 0) || (hidrometroSelecionado)) {
 
 				Integer numeroMeses = new Integer(sistemaParametro.getMesesMediaConsumo());
@@ -178,7 +167,6 @@ public class FaixaLeituraBO {
 					if (leituraAnteriorFalsa.intValue() < 0) {
 						leituraAnteriorFalsa = verificarLeituraAnteriorFalsaNegativa(leituraAnteriorFalsa, hidrometro);
 					}
-
 					faixaLeitura = calcularFaixaLeituraEsperada(media, null, hidrometro, leituraAnteriorFalsa);
 				}
 			}
@@ -187,9 +175,31 @@ public class FaixaLeituraBO {
 
 		return faixaLeitura;
 	}
+
+	private BigDecimal obterFatorMultiplicacaoFaixaFalsa(Imovel imovel) {
+		BigDecimal percentualFaixaFalsaRota = imovel.getQuadra().getRota().getPercentualGeracaoFaixaFalsa();
+		BigDecimal percentualFaixaFalsaSistemaParametro = sistemaParametro.getPercentualFaixaFalsa();
+		
+		Calendar dataCalendar = new GregorianCalendar();
+		int segundos = dataCalendar.get(Calendar.SECOND);
+
+		Integer somaImovelSegundo = imovel.getId() + segundos;
+		
+		if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.ROTA)) {
+			if (imovel.getQuadra().getRota().possuiPercentualFaixaFalsa()) {
+				return percentualFaixaFalsaRota.multiply(new BigDecimal(somaImovelSegundo));
+			}
+		} else {
+			if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.SISTEMA_PARAMETRO)) {
+				if (!percentualFaixaFalsaSistemaParametro.equals(new BigDecimal(0.0))) {
+					return percentualFaixaFalsaSistemaParametro.multiply(new BigDecimal(somaImovelSegundo));
+				}
+			}
+		}
+		return null;
+	}
 	
 	public Integer pesquisarConsumoMinimoTarifa(Integer idImovel) {
-
 		ConsumoTarifaCategoriaTO consumoTarifaCategoria =  consumoTarifaRepositorio.consumoTarifaCategoriaDoImovel(idImovel);
 		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(consumoTarifaCategoria.getConsumoTarifa().getId());
 
@@ -199,16 +209,17 @@ public class FaixaLeituraBO {
 	private boolean isGerarFaixaNormal(Imovel imovel) {
 		return isIndicadorFaixaFalsaInativo() || (isIndicadorFaixaFalsaRota() && isIndicadorFaixaFalsaRotaInativo(imovel.getQuadra().getRota()));
 	}
+	
 	private boolean isIndicadorFaixaFalsaInativo() {
-		return sistemaParametro.getIndicadorFaixaFalsa() != null && sistemaParametro.getIndicadorFaixaFalsa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO);
+		return sistemaParametro.getIndicadorFaixaFalsa() != null && sistemaParametro.getIndicadorFaixaFalsa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO.getId());
 	}
 	
 	private boolean isIndicadorFaixaFalsaRota() {
-		return sistemaParametro.getIndicadorFaixaFalsa() != null && sistemaParametro.getIndicadorFaixaFalsa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_ROTA);
+		return sistemaParametro.getIndicadorFaixaFalsa() != null && sistemaParametro.getIndicadorFaixaFalsa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_ROTA.getId());
 	}
 	
 	private boolean isIndicadorFaixaFalsaRotaInativo(Rota rota) {
-		return rota.getIndicadorGerarFalsaFaixa() != null && rota.getIndicadorGerarFalsaFaixa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO);
+		return rota.getIndicadorGerarFalsaFaixa() != null && rota.getIndicadorGerarFalsaFaixa().equals(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO.getId());
 	}
 	
 	public boolean verificarLeituraAnteriorMedia(int media, MedicaoHistorico medicaoHistorico) {
