@@ -1,8 +1,10 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import br.gov.batch.servicos.micromedicao.FaixaLeituraBO;
+import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.Hidrometro;
@@ -12,12 +14,25 @@ import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
+import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
+import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
 public class ArquivoTextoTipo08 {
 
-//	@Inject
+	// @Inject
 	private SistemaParametros sistemaParametro;
 
+	
+	// @EJB
+	private FaixaLeituraBO faixaLeituraBO;
+	
+	// @EJB
+	private MedicaoHistoricoBO medicaoHistoricoBO; 
+
+	// @EJB
+	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
+	
 	private StringBuilder builder;
 	private final String TIPO_REGISTRO = "08";
 	
@@ -27,80 +42,40 @@ public class ArquivoTextoTipo08 {
 
 		int quantidadeLinhas = 0;
 
-		ArrayList<HidrometroInstalacaoHistorico> colecaoDadosMedicaoHistorico = null; // this.getControladorMicromedicao().obterDadosTiposMedicao(imovel, anoMesReferenciaAnterior);
+		List<HidrometroMedicaoHistoricoTO> colecaoHidrometroMedicaoHistorico = medicaoHistoricoBO.obterDadosTiposMedicao(imovel.getId(), referencia);
 
-		if (colecaoDadosMedicaoHistorico != null && !colecaoDadosMedicaoHistorico.isEmpty()) {
+		if (colecaoHidrometroMedicaoHistorico != null && !colecaoHidrometroMedicaoHistorico.isEmpty()) {
 
-			for (HidrometroInstalacaoHistorico hidrometroInstalacao : colecaoDadosMedicaoHistorico ) {
+			for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : colecaoHidrometroMedicaoHistorico ) {
 
-				Object[] arrayMedicaoHistorico = null; 
-
-				MedicaoHistorico medicaoHistorico = new MedicaoHistorico();
-				MedicaoTipo medicaoTipo = getMedicaoTipo((Integer)arrayMedicaoHistorico[7]);
-				Integer leituraInicialHidrometro = getLeituraInicialHidrometro((Integer)arrayMedicaoHistorico[3]);
-				Integer leituraAnteriorFaturada = (Integer) arrayMedicaoHistorico[3];
-				Date  dataLigacao = getDataLigacao(imovel, medicaoTipo);
-
-				Hidrometro hidrometro = getNumeroHidrometro((Integer)arrayMedicaoHistorico[1]);
+				MedicaoTipo medicaoTipo = getMedicaoTipo((Integer)1); // GET MEDICAO TIPO
+				Integer consumoMedio = getConsumoMedioHidrometro(imovel, medicaoTipo, referencia);
+				Hidrometro hidrometro = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
 				sistemaParametro.setAnoMesFaturamento(referencia);
 				
 				quantidadeLinhas = quantidadeLinhas + 1;
 
+				MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia);
+				MedicaoHistorico medicaoHistorico = obterMedicaoHistorico(medicaoHistoricoAtual);
+
 				builder.append(TIPO_REGISTRO);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
 				builder.append(medicaoTipo.toString());
 				builder.append(hidrometro.getNumero());
-				builder.append(getDataInstalacaoHidrometro((Date) arrayMedicaoHistorico[2]));
-				builder.append(getNumeroDigitosLeitura((Short) arrayMedicaoHistorico[1]));
-
-				// LEITURA ANTERIOR INFORMADA
-				Integer leituraAnteriorInformada = null;
-				if (arrayMedicaoHistorico[12] != null) {
-					leituraAnteriorInformada = (Integer) arrayMedicaoHistorico[12];
-				}
-				
-				Date dataLeituraAnteriorFaturamento = null;
-				Date dataLeituraAnteriorInformada = null;
-
-				ArrayList<MedicaoHistorico> colMedicaoHistoricoMenos1Mes = null; //getControladorUtil().pesquisar(filtroMedicaoHistorico, MedicaoHistorico.class.getName());
-				MedicaoHistorico medicaoHistoricoAtual = (MedicaoHistorico) colMedicaoHistoricoMenos1Mes.get(0);
-
-				if (medicaoHistoricoAtual != null && !medicaoHistoricoAtual.equals("")) {
-					leituraAnteriorFaturada = medicaoHistoricoAtual.getLeituraAnteriorFaturamento();
-					leituraAnteriorInformada = medicaoHistoricoAtual.getLeituraAnteriorInformada();
-					dataLeituraAnteriorFaturamento = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
-					dataLeituraAnteriorInformada = medicaoHistoricoAtual.getDataLeituraAtualInformada();
-				}
-
-				medicaoHistorico.setLeituraAnteriorFaturamento(leituraAnteriorFaturada);
-
-				if (leituraAnteriorInformada != null) {
-					medicaoHistorico.setLeituraAnteriorInformada(leituraAnteriorInformada);
-				}
-
-				builder.append(Utilitarios.completaComZerosEsquerda(7,leituraAnteriorFaturada.toString()));
-				builder.append(getDataLeituraAnteriorFaturada(medicaoHistoricoAtual, (Date)arrayMedicaoHistorico[4]));
-				
-				// LEITURA SITUACAO ANTERIOR
-				if (arrayMedicaoHistorico[5] != null) {
-					LeituraSituacao leituraSituacao = new LeituraSituacao();
-					leituraSituacao.setId((Integer) arrayMedicaoHistorico[5]);
-					medicaoHistorico.setLeituraSituacaoAtual(leituraSituacao);
-
-					builder.append(leituraSituacao.getId().toString());
-				} else {
-					builder.append(Utilitarios.completaTexto(1, ""));
-				}
-
-				buildFaixaLeitura();
-				builder.append(getConsumoMedioHidrometro(imovel, medicaoTipo, referencia));
-				builder.append(getLocalInstalacaoHidrometro((String)arrayMedicaoHistorico[9]));
+				builder.append(getDataInstalacaoHidrometro(hidrometroMedicaoHistorico.getDataInstalacao()));
+				builder.append(getNumeroDigitosLeitura(hidrometroMedicaoHistorico.getNumeroDigitosLeitura()));
+				builder.append(Utilitarios.completaComZerosEsquerda(7,medicaoHistoricoAtual.getLeituraAnteriorFaturamento().toString()));
+				builder.append(getDataLeituraAnteriorFaturada(medicaoHistoricoAtual, hidrometroMedicaoHistorico.getDataInstalacao()));
+				builder.append(getSituacaoLeituraAtual(hidrometroMedicaoHistorico, medicaoHistorico));
+				buildFaixaLeitura(imovel, hidrometro, consumoMedio, medicaoHistorico);
+				builder.append(Utilitarios.completaComZerosEsquerda(6,consumoMedio));
+				builder.append(getLocalInstalacaoHidrometro(hidrometroMedicaoHistorico.getDescricaoLocalInstalacao()));
 				builder.append(getLeituraAnteriorInformada(medicaoHistoricoAtual));
-				builder.append(getDataLeituraAnteiorInformada(medicaoHistoricoAtual.getDataLeituraAtualInformada(), (Date)arrayMedicaoHistorico[10]));
-				builder.append(Utilitarios.formataData(dataLigacao, FormatoData.ANO_MES_DIA));
-				builder.append(getTipoRateio((Integer)arrayMedicaoHistorico[11]));
-				builder.append(leituraInicialHidrometro);
+				builder.append(getDataLeituraAnteiorInformada(medicaoHistoricoAtual.getDataLeituraAtualInformada(), hidrometroMedicaoHistorico.getDataLeituraAtualInformada()));
+				builder.append(Utilitarios.formataData(getDataLigacao(imovel, medicaoTipo), FormatoData.ANO_MES_DIA));
+				builder.append(getTipoRateio(hidrometroMedicaoHistorico.getRateioTipo()));
+				builder.append(getLeituraInstalacaoHidrometro(hidrometroMedicaoHistorico.getNumeroLeituraInstalacao()));
 				builder.append(System.getProperty("line.separator"));
 			}
 		}
@@ -108,101 +83,102 @@ public class ArquivoTextoTipo08 {
 		return builder.toString();
 	}
 
-	private String getDataLeituraAnteiorInformada(Date dataLeituraAnteriorInformada, Date data2) {
-		if (dataLeituraAnteriorInformada != null && !dataLeituraAnteriorInformada.equals("")) {
+	private MedicaoHistorico obterMedicaoHistorico(MedicaoHistorico medicaoHistoricoAtual) {
+		MedicaoHistorico medicaoHistorico = new MedicaoHistorico();
+		medicaoHistorico.setLeituraAnteriorFaturamento(medicaoHistoricoAtual.getLeituraAnteriorFaturamento());
+
+		if (medicaoHistoricoAtual.getLeituraAnteriorInformada() != null) {
+			medicaoHistorico.setLeituraAnteriorInformada(medicaoHistoricoAtual.getLeituraAnteriorInformada());
+		}
+		
+		return medicaoHistorico;
+	}
+
+	private String getSituacaoLeituraAtual(HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico, MedicaoHistorico medicaoHistorico) {
+		if (hidrometroMedicaoHistorico.getLeituraSituacaoAtual() != null) {
+			medicaoHistorico.setLeituraSituacaoAtual(hidrometroMedicaoHistorico.getLeituraSituacaoAtual());
+			return hidrometroMedicaoHistorico.getLeituraSituacaoAtual().toString();
+		} else {
+			return Utilitarios.completaTexto(1, "");
+		}
+	}
+
+	private Integer obterLeituraAnteriorInformada(HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico) {
+		Integer leituraAnteriorInformada = null;
+		if (hidrometroMedicaoHistorico.getLeituraAtualInformada() != null) {
+			leituraAnteriorInformada = hidrometroMedicaoHistorico.getLeituraAtualInformada();
+		}
+		return leituraAnteriorInformada;
+	}
+
+	private String getDataLeituraAnteiorInformada(Date dataLeituraAnteriorInformada, Date dataLeituraAnteriorInformadaHidrometro) {
+		if (possuiDataLeituraAnteriorInformada(dataLeituraAnteriorInformada)) {
 			return Utilitarios.formataData(dataLeituraAnteriorInformada, FormatoData.ANO_MES_DIA);
 		} else {
-			if (data2 != null) {
-				return Utilitarios.formataData(data2, FormatoData.ANO_MES_DIA);
-			} else {
-				return Utilitarios.completaTexto(8, " "); 
-			}
+			return dataLeituraAnteriorInformadaHidrometro != null ? 
+					Utilitarios.formataData(dataLeituraAnteriorInformadaHidrometro, FormatoData.ANO_MES_DIA) : Utilitarios.completaTexto(8, " ");
 		}
+	}
+
+	private boolean possuiDataLeituraAnteriorInformada(Date dataLeituraAnteriorInformada) {
+		return dataLeituraAnteriorInformada != null && !dataLeituraAnteriorInformada.equals("");
 	}
 
 	private String getLocalInstalacaoHidrometro(String local) {
-		if (local != null) {
-			return Utilitarios.completaTexto(20, "" + local);
-		} else {
-			return Utilitarios.completaTexto(20, " ");
-		}
+		return local != null ? Utilitarios.completaTexto(20, "" + local) : Utilitarios.completaTexto(20, " ");
 	}
 
-	private String  getConsumoMedioHidrometro(Imovel imovel, MedicaoTipo medicaoTipo, Integer referencia) {
+	private int  getConsumoMedioHidrometro(Imovel imovel, MedicaoTipo medicaoTipo, Integer referencia) {
 		boolean houveIntslacaoHidrometro = false; //this.getControladorMicromedicao().verificarInstalacaoSubstituicaoHidrometro(imovel.getId(), medicaoTipo);
 		int[] consumoMedioHidrometro = null; //this.getControladorMicromedicao().obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo.getId(), houveIntslacaoHidrometro);
-		return Utilitarios.completaComZerosEsquerda(6,String.valueOf(consumoMedioHidrometro[0]));
+		return consumoMedioHidrometro[0];
 	}
 
-	private void buildFaixaLeitura() {
-		Integer[] faixaLeitura = null; //this.obterDadosLimiteLeituraEsperada(imovel, hidrometro, consumoMedioHidrometro[0], medicaoHistorico, sistemaParametro);
+	private void buildFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedio, MedicaoHistorico medicaoHistorico) {
+		FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, consumoMedio, medicaoHistorico);
 
-		builder.append(Utilitarios.completaComZerosEsquerda(7, faixaLeitura[0].toString()));
-		builder.append(Utilitarios.completaComZerosEsquerda(7, faixaLeitura[1].toString()));
+		builder.append(Utilitarios.completaComZerosEsquerda(7, faixaLeitura.getFaixaInferior().toString()));
+		builder.append(Utilitarios.completaComZerosEsquerda(7, faixaLeitura.getFaixaSuperior().toString()));
 	}
 
-	private String getLeituraAnteriorInformada(MedicaoHistorico medicaoHistoricoAtual) {
-		if (medicaoHistoricoAtual.getLeituraAnteriorInformada() != null) {
-			return Utilitarios.completaComZerosEsquerda(7,medicaoHistoricoAtual.getLeituraAnteriorInformada().toString());
-		} else {
-			return Utilitarios.completaTexto(7, " ");
-		}
+	private String getLeituraAnteriorInformada(MedicaoHistorico medicaoHistorico) {
+		return medicaoHistorico.getLeituraAnteriorInformada() != null ? 
+				Utilitarios.completaComZerosEsquerda(7,medicaoHistorico.getLeituraAnteriorInformada().toString()) : Utilitarios.completaTexto(7, " ");
 	}
 
-	private String  getDataLeituraAnteriorFaturada(MedicaoHistorico medicaoHistorico, Date data2) {
-		if (medicaoHistorico.getDataLeituraAnteriorFaturamento() != null && !medicaoHistorico.getDataLeituraAnteriorFaturamento().equals("")) {
+	private String  getDataLeituraAnteriorFaturada(MedicaoHistorico medicaoHistorico, Date dataInstalacaoHidrometro) {
+		if (possuiLeituraAnteriorFaturada(medicaoHistorico)) {
 			return Utilitarios.formataData(medicaoHistorico.getDataLeituraAnteriorFaturamento(), FormatoData.ANO_MES_DIA);
 		} else {
-			if (data2 != null) {
-				return Utilitarios.formataData(data2, FormatoData.ANO_MES_DIA);
-			} else {
-				return Utilitarios.completaTexto(8, " ");
-			}
+			return dataInstalacaoHidrometro != null ? Utilitarios.formataData(dataInstalacaoHidrometro, FormatoData.ANO_MES_DIA) : Utilitarios.completaTexto(8, " ");
 		}
 	}
 
-	private Integer getLeituraInicialHidrometro(Integer leituraInstalacao) {
-		if (!leituraInstalacao.equals(null)) {
-			return leituraInstalacao;
-		} else {
-			return 0;
-		}
+	private boolean possuiLeituraAnteriorFaturada(MedicaoHistorico medicaoHistorico) {
+		return medicaoHistorico.getDataLeituraAnteriorFaturamento() != null && !medicaoHistorico.getDataLeituraAnteriorFaturamento().equals("");
 	}
 
+	private String getLeituraInstalacaoHidrometro(Integer leituraInstalacao) {
+		return leituraInstalacao != null ? Utilitarios.completaComZerosEsquerda(7,leituraInstalacao) : Utilitarios.completaTexto(7, " ");
+	}
+	
 	private Date getDataLigacao(Imovel imovel, MedicaoTipo medicaoTipo) {
-		Date dataLigacao;
-		if (medicaoTipo  == MedicaoTipo.LIGACAO_AGUA ) {
-			dataLigacao = imovel.getLigacaoAgua().getDataLigacao();
-		//	filtroPoTipoMedicao = FiltroMedicaoHistorico.LIGACAO_AGUA_ID;
-		} else {
-			dataLigacao = imovel.getLigacaoEsgoto().getDataLigacao();
-		//	filtroPoTipoMedicao = FiltroMedicaoHistorico.IMOVEL_ID;
-		}
-		return dataLigacao;
-		
+		return medicaoTipo  == MedicaoTipo.LIGACAO_AGUA ? imovel.getLigacaoAgua().getDataLigacao() : imovel.getLigacaoEsgoto().getDataLigacao();
 	}
 
 	private String getNumeroDigitosLeitura(Short numeroDigitosLeitura) {
-		if (numeroDigitosLeitura != null) {
-			return numeroDigitosLeitura.toString();
-		} else {
-			return Utilitarios.completaTexto(1, " ");
-		}
+		return numeroDigitosLeitura != null ? numeroDigitosLeitura.toString() : Utilitarios.completaTexto(1, " ");
 	}
 
 	private String getDataInstalacaoHidrometro(Date dataInstalacao) {
-		if (dataInstalacao != null) {
-			return Utilitarios.formataData(dataInstalacao, FormatoData.ANO_MES_DIA);
-		} else {
-			return Utilitarios.completaTexto(8, " ");
-		}
+		return dataInstalacao != null ? Utilitarios.formataData(dataInstalacao, FormatoData.ANO_MES_DIA) : Utilitarios.completaTexto(8, " ");
 	}
 
-	private Hidrometro getNumeroHidrometro(Integer numeroHidrometro) {
+	private Hidrometro getNumeroHidrometro(String numeroHidrometro) {
 		Hidrometro hidrometro = null;
 		if (numeroHidrometro != null) {
 			hidrometro = new Hidrometro();
-			hidrometro.setNumero(String.valueOf(numeroHidrometro));
+			hidrometro.setNumero(numeroHidrometro);
 
 			builder.append(Utilitarios.completaTexto(11, hidrometro.getNumero()));
 		} else {
@@ -213,26 +189,10 @@ public class ArquivoTextoTipo08 {
 	}
 
 	private MedicaoTipo getMedicaoTipo(Integer medicaoTipo) {
-		if (medicaoTipo != null && !((Integer) medicaoTipo).equals(0)) {
-			return MedicaoTipo.LIGACAO_AGUA;
-		} else {
-			return MedicaoTipo.POCO;
-		}
+		return (medicaoTipo != null && !((Integer) medicaoTipo).equals(0)) ? MedicaoTipo.LIGACAO_AGUA : MedicaoTipo.POCO;
 	}
 
 	private String getTipoRateio(Integer tipo) {
-		if (tipo != null) {
-			return (tipo).toString();
-		} else {
-			return " ";
-		}
-	}
-
-	private String getLeituraInstalacaoHidrometro(HidrometroInstalacaoHistorico hidrometroInstalacao) {
-		if (hidrometroInstalacao.getNumeroLeituraInstalacao() != null) {
-			return Utilitarios.completaComZerosEsquerda(7,hidrometroInstalacao.getNumeroLeituraInstalacao());
-		} else {
-			return Utilitarios.completaTexto(7, " ");
-		}
+		return tipo != null ? (tipo).toString() : " ";
 	}
 }
