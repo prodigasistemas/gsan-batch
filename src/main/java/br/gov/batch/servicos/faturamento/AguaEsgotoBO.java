@@ -1,16 +1,25 @@
 package br.gov.batch.servicos.faturamento;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
+import br.gov.batch.servicos.micromedicao.ConsumoBO;
+import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
+import br.gov.model.cadastro.ICategoria;
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
+import br.gov.model.faturamento.ConsumoTarifa;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
+import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
+import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 
 @Stateless
@@ -21,6 +30,21 @@ public class AguaEsgotoBO {
 	
 	@EJB
 	private SistemaParametrosRepositorio sistemaParametrosRepositorio; 
+	
+	@EJB
+	private ImovelRepositorio imovelRepositorio; 
+	
+	@EJB
+	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
+
+	@EJB
+	private ConsumoHistoricoBO consumoHistoricoBO; 
+	
+	@EJB
+	private ConsumoBO consumoBO; 
+	
+	@EJB
+	private ConsumoTarifaRepositorio consumoTarifaRepositorio;
 	
 	public VolumeMedioAguaEsgotoTO obterVolumeMedioAguaEsgoto(Integer idImovel,
 			Integer anoMesReferencia, LigacaoTipo ligacaoTipo, boolean houveInstalacaoHidrometro){
@@ -37,7 +61,7 @@ public class AguaEsgotoBO {
 		if(dadosConsumo!=null && !dadosConsumo.isEmpty()){
 			return gerarVolumeMedioComConsumoHistorico(sistemaParametros, dadosConsumo, dataInicio, dataFim);
 		}else{
-			return gerarVolumeMedioSemConsumoHistorico();
+			return gerarVolumeMedioSemConsumoHistorico(idImovel);
 		}
 	}
 
@@ -72,17 +96,30 @@ public class AguaEsgotoBO {
 				quantidadeDeMesesRetroagidos++;
 			}
 		}
-		
 		if (quantidadeDeMesesConsiderados > 0) {
 			mediaConsumo = (consumo/quantidadeDeMesesConsiderados);
 		}
-		
 		return new VolumeMedioAguaEsgotoTO(mediaConsumo, quantidadeDeMesesConsiderados);
 	}
 
-	private VolumeMedioAguaEsgotoTO gerarVolumeMedioSemConsumoHistorico() {
-		// TODO Auto-generated method stub
-		return null;
+	private VolumeMedioAguaEsgotoTO gerarVolumeMedioSemConsumoHistorico(Integer idImovel) {
+		Imovel imovel = this.imovelRepositorio.buscarPeloId(idImovel);
+
+		imovel.setConsumoTarifa(new ConsumoTarifa());
+		imovel.getConsumoTarifa().setId(imovel.getId());
+
+		Collection<ICategoria> categoria;
+		
+		SistemaParametros sistemaParametros = this.sistemaParametrosRepositorio.getSistemaParametros();
+
+		if (sistemaParametros.getIndicadorTarifaCategoria().equals(
+				SistemaParametros.INDICADOR_TARIFA_CATEGORIA)) {
+			categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(imovel.getId());
+		} else {
+			categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(imovel.getId());
+		}
+		return new VolumeMedioAguaEsgotoTO(consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel, 
+				consumoTarifaRepositorio.consumoTarifaDoImovel(imovel.getId()), categoria),1);
 	}
 }
 
