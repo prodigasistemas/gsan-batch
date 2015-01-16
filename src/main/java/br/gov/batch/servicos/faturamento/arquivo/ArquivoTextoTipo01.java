@@ -154,10 +154,10 @@ public class ArquivoTextoTipo01 {
 
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId()));
 
-        boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
+        boolean houveInstalacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
         
         VolumeMedioAguaEsgotoTO consumoMedioLigacaoAgua = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), 
-        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA, houveIntslacaoHidrometro);
+        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 
         // INDICADOR_FATURAMENTO_ESGOTO

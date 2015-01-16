@@ -10,7 +10,6 @@ import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.util.Utilitarios;
-import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.HidrometroTO;
@@ -29,9 +28,6 @@ public class HidrometroBO {
 
 	@EJB
 	private HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoHistoricoRepositorio;
-
-	@EJB
-	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
 	public boolean houveInstalacaoOuSubstituicao(Integer idImovel) {
 		Date dataLeituraAnteriorFaturada = this.obterDataLeituraAnterior(idImovel);
