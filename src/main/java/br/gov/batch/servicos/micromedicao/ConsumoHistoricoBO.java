@@ -1,47 +1,41 @@
 package br.gov.batch.servicos.micromedicao;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
-import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
-import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
-import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
-import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
-import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
-import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 @Stateless
 public class ConsumoHistoricoBO {
 	
-	@Inject
-	private SistemaParametros sistemaParametro;
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 	
 	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
 	
 	@EJB
-	private ConsumoTarifaRepositorio consumoTarifaRepositorio;
+	private ConsumoBO consumoBO;
 	
-	@EJB
-	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
+	SistemaParametros sistemaParametro;
 	
-	@EJB
-	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
-	
-	@EJB
-	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
+	@PostConstruct
+	public void init(){
+	    sistemaParametro = sistemaParametrosRepositorio.getSistemaParametros();
+	}
 	
 	public Integer obterVolumeMedioAguaEsgoto(Integer idImovel, Integer anoMesReferencia, LigacaoTipo ligacaoTipo) {
+	    
+
 		Integer amReferenciaFinal   = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 		Integer amReferenciaInicial = Utilitarios.reduzirMeses(amReferenciaFinal, sistemaParametro.getMesesMediaConsumo());
 
@@ -51,7 +45,7 @@ public class ConsumoHistoricoBO {
 		List<ConsumoHistorico> medias = consumoHistoricoRepositorio.obterConsumoMedio(idImovel, amReferenciaInicialMaximo, amReferenciaFinal, ligacaoTipo.getId());
 		Integer mediaConsumo = 0;
 		if (medias.isEmpty()){
-			mediaConsumo = consumoMinimoLigacao(idImovel);
+			mediaConsumo = consumoBO.consumoMinimoLigacao(idImovel);
 		}else{
 			mediaConsumo = calcularMediaConsumo(medias, anoMesReferencia);
 		}
@@ -59,19 +53,9 @@ public class ConsumoHistoricoBO {
 		return mediaConsumo;
 	}
 	
-	private Integer consumoMinimoLigacao(Integer idImovel) {
-		Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
-		
-		Collection<ICategoria> economias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
-		
-		Integer consumoMinimoLigacao = this.obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, economias);
-
-		return consumoMinimoLigacao;
-	}
-
 	public Integer calcularMediaConsumo(List<ConsumoHistorico> consumos, Integer anoMesReferencia){
 		Collections.sort(consumos);
-		
+
 		int mesesParaMedia = sistemaParametro.getMesesMediaConsumo();
 		int maximoMesesCalculoMedia = sistemaParametro.getNumeroMesesMaximoCalculoMedia();
 		
@@ -96,25 +80,5 @@ public class ConsumoHistoricoBO {
 		}
 		
 		return mesesConsumo > 0 ? somaConsumo / mesesConsumo : 0;
-	}
-
-	public int obterConsumoMinimoLigacaoPorCategoria(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias){
-		
-		int consumoMinimoLigacao = 0;
-		
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
-		
-		for (ICategoria economia : categorias) {
-			Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(economia, consumoTarifaVigencia.getIdVigencia());
-			
-			if (economia.getFatorEconomias() != null) {
-				consumoMinimoLigacao += consumoMinimoTarifa * economia.getFatorEconomias().intValue();
-			} else {
-				consumoMinimoLigacao += consumoMinimoTarifa * economia.getQuantidadeEconomias();
-			}
-
-		}
-		
-		return consumoMinimoLigacao;
 	}
 }
