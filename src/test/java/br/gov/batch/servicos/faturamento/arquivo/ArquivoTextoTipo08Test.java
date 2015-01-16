@@ -119,7 +119,7 @@ public class ArquivoTextoTipo08Test {
 	
 	private void carregarMocks() {
 		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(1);
-		expect(hidrometroBOMock.houveSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(1);
+		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(1);
 		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia)).andReturn(medicaoHistorico).times(1);
 		
 		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250));

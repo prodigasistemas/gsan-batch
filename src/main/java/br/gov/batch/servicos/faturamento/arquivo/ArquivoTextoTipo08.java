@@ -58,9 +58,7 @@ public class ArquivoTextoTipo08 {
 
 		for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : listaHidrometroMedicaoHistorico) {
 
-			LigacaoTipo ligacaoTipo = obterLigacaoTipo(hidrometroMedicaoHistorico.getMedicaoTipo());
-			
-			consumoMedio = getConsumoMedioHidrometro(ligacaoTipo, referencia);
+			consumoMedio = getConsumoMedioHidrometro(hidrometroMedicaoHistorico.getMedicaoTipo().intValue(), referencia);
 			hidrometro = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
 			quantidadeLinhas = quantidadeLinhas + 1;
@@ -137,16 +135,12 @@ public class ArquivoTextoTipo08 {
 		return local != null ? Utilitarios.completaTexto(20, "" + local) : Utilitarios.completaTexto(20, " ");
 	}
 
-	private int getConsumoMedioHidrometro(LigacaoTipo ligacaoTipo, Integer referencia) {
-		boolean houveIntslacaoHidrometro = hidrometroBO.houveSubstituicao(imovel.getId());
-		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, ligacaoTipo, houveIntslacaoHidrometro);
+	private int getConsumoMedioHidrometro(Integer medicaoTipo, Integer referencia) {
+		boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
+		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo, houveIntslacaoHidrometro);
 		return volumeMedioAguaEsgotoTO.getConsumoMedio();
 	}
 	
-	private LigacaoTipo obterLigacaoTipo(Integer medicaoTipo) {
-		return medicaoTipo.equals(MedicaoTipo.LIGACAO_AGUA.getId()) ? LigacaoTipo.AGUA :  LigacaoTipo.ESGOTO;
-	}
-
 	private void buildFaixaLeitura() {
 		FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, consumoMedio, medicaoHistorico);
 

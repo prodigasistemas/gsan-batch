@@ -19,14 +19,14 @@ import org.junit.runner.RunWith;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.faturamento.FaixaLeituraEsperadaParametros;
+import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
 import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.LeituraSituacao;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.StatusFaixaFalsa;
 import br.gov.model.micromedicao.StatusUsoFaixaFalsa;
-import br.gov.servicos.faturamento.FaturamentoRepositorio;
+import br.gov.servicos.micromedicao.FaixaLeituraRepositorio;
 
 @RunWith(EasyMockRunner.class)
 public class FaixaLeituraBOTest {
@@ -35,7 +35,7 @@ public class FaixaLeituraBOTest {
 	private FaixaLeituraBO faixaLeituraBO;
 	
 	@Mock
-	private FaturamentoRepositorio faturamentoRepositorioMock;
+	private FaixaLeituraRepositorio faixaLeituraRepositorioMock;
 	
 	@Mock
 	private SistemaParametros sistemaParametrosMock;
@@ -210,8 +210,8 @@ public class FaixaLeituraBOTest {
 	}
 	
 	private void carregarMocks() {
-		expect(faturamentoRepositorioMock.obterFaixasLeitura()).andReturn(faixaLeituraParametros).times(2);
-		replay(faturamentoRepositorioMock);
+		expect(faixaLeituraRepositorioMock.obterFaixasLeitura()).andReturn(faixaLeituraParametros).times(2);
+		replay(faixaLeituraRepositorioMock);
 	}
 	
 	private void carregarSistemaParametrosMocks() {

@@ -6,9 +6,12 @@ import java.util.Collection;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
+import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
+import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
@@ -22,6 +25,7 @@ import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.faturamento.TipoConta;
+import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
@@ -59,6 +63,9 @@ public class ArquivoTextoTipo01 {
     
     @EJB
     private EsgotoBO esgotoBO;
+    
+    @EJB
+    private AguaEsgotoBO aguaEsgotoBO;
 
     @EJB
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
@@ -72,6 +79,9 @@ public class ArquivoTextoTipo01 {
     private String enderecoFormatado = "";
 
     private StringBuilder builder = new StringBuilder();
+    
+    @EJB
+    private ConsumoBO consumoBO;
 
     public ArquivoTextoTipo01() {
         builder = new StringBuilder();
@@ -144,7 +154,11 @@ public class ArquivoTextoTipo01 {
 
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId()));
 
-        boolean houveIntslacaoHidrometro = hidrometroBO.houveSubstituicao(imovel.getId());
+        boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
+        
+        VolumeMedioAguaEsgotoTO consumoMedioLigacaoAgua = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), 
+        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA, houveIntslacaoHidrometro);
+        builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 
         // INDICADOR_FATURAMENTO_ESGOTO
         escreveIndicadorFaturamentoSituacao();
@@ -180,12 +194,48 @@ public class ArquivoTextoTipo01 {
         
         escreveMensagemConta();
         
+        escreverQualidadeDaAgua();
+        
         builder.append(Utilitarios.completaTexto(9, extratoQuitacaoBO.obterMsgQuitacaoDebitos(imovel.getId(), anoMesReferencia)));
+        
+        builder.append(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoMinimoLigacao(imovel.getId())));
+        
+        builder.append(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoNaoMedido(imovel.getId(), anoMesReferencia)));
 
         return builder.toString();
     }
 
-    private void escreveMensagemConta() {
+    private void escreverQualidadeDaAgua() {
+//    	Integer anoMesReferenciaQualidadeAgua = null;
+    	
+//		if (.getNomeEmpresa() != null
+//				&& sistemaParametro.getNomeEmpresa().equals(
+//						SistemaParametro.EMPRESA_COMPESA)) {
+//			anoMesReferenciaQualidadeAgua = Util
+//					.subtraiAteSeisMesesAnoMesReferencia(
+//							faturamentoGrupo.getAnoMesReferencia(), 1);
+//		} else {
+//			anoMesReferenciaQualidadeAgua = faturamentoGrupo
+//					.getAnoMesReferencia();
+//		}
+//		/**
+//		 * autor: Adriana Muniz Data: 04/05/2011 Como o crit�rio de
+//		 * preenchimento da qualidade da agua da cosanpa n�o � usa os campos
+//		 * usados como filtros na consulta da qualidade da agua, foi necess�rio
+//		 * acrescentar mais um parametro na assinatura no m�todo, idQuadraFace,
+//		 * que ser� usado na primeira op��o de busca pela qualidade da �gua
+//		 * 
+//		 * Foi necess�rio acrescentar um parametro a mais na assinatura do
+//		 * m�todo, o sistema de parametro para que a rotina de consulta da
+//		 * qualidade da agua seja diferente.
+//		 * */
+//		arquivoTextoRegistroTipo01 = arquivoTextoRegistroTipo01
+//				.append(gerarArquivoTextoQualidadeAgua(idLocalidade,
+//						idSetorComercial, anoMesReferenciaQualidadeAgua,
+//						idQuadraFace));
+	}
+
+	private void escreveMensagemConta() {
         boolean mensagemEmTresPartes = Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES));
         
         String[] mensagemConta = null;
