@@ -6,6 +6,8 @@ import java.util.Collection;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.arrecadacao.PagamentoBO;
+import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
@@ -21,10 +23,13 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.Localidade;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
+import br.gov.model.cobranca.CobrancaDocumento;
+import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.faturamento.TipoConta;
+import br.gov.model.faturamento.TipoPagamento;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.FormatoData;
@@ -48,6 +53,8 @@ public class ArquivoTextoTipo01 {
     private Integer anoMesReferencia;
     
     private Integer idImovelPerfil;
+    
+    private CobrancaDocumento cobrancaDocumento;
 
     // @EJB
     private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
@@ -75,6 +82,9 @@ public class ArquivoTextoTipo01 {
     
     @EJB
     private ExtratoQuitacaoBO extratoQuitacaoBO;
+    
+    @EJB
+    private PagamentoBO pagamentoBO;
 
     private String enderecoFormatado = "";
 
@@ -201,8 +211,27 @@ public class ArquivoTextoTipo01 {
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoMinimoLigacao(imovel.getId())));
         
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoNaoMedido(imovel.getId(), anoMesReferencia)));
+        
+        escreverDadosCobranca();
 
         return builder.toString();
+    }
+
+    private void escreverDadosCobranca() {
+        if (cobrancaDocumento != null){
+            builder.append(Utilitarios.completaTexto(9, cobrancaDocumento.getId()));
+            
+            ConsultaCodigoBarrasTO to = new ConsultaCodigoBarrasTO();
+            to.setTipoPagamento(TipoPagamento.DOCUMENTO_COBRANCA_IMOVEL);
+            to.setValorCodigoBarra(cobrancaDocumento.getValorDocumento());
+            to.setIdLocalidade(cobrancaDocumento.getLocalidade().getId());
+            to.setMatriculaImovel(cobrancaDocumento.getImovel().getId());
+            to.setSequencialDocumentoCobranca(String.valueOf(cobrancaDocumento.getNumeroSequenciaDocumento()));
+            to.setTipoDocumento(DocumentoTipo.parse(cobrancaDocumento.getDocumentoTipo()));
+            builder.append(pagamentoBO.obterCodigoBarra(to));
+        }else{
+            builder.append(Utilitarios.completaTexto(57, ""));
+        }
     }
 
     private void escreverQualidadeDaAgua() {
