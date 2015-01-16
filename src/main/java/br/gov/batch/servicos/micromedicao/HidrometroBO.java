@@ -33,7 +33,7 @@ public class HidrometroBO {
 	@EJB
 	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
-	public boolean houveSubstituicao(Integer idImovel) {
+	public boolean houveInstalacaoOuSubstituicao(Integer idImovel) {
 		Date dataLeituraAnteriorFaturada = this.obterDataLeituraAnterior(idImovel);
 		Date dataInstalacaoHidrometro = this.obterDataInstalacaoHidrometro(idImovel);
 
@@ -69,13 +69,13 @@ public class HidrometroBO {
 	private Date obterDataInstalacaoHidrometro(Integer idImovel) {
 		List<HidrometroTO> dadosHidrometro = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
 
-		Date dataMedicao = null;
+		Date dataInstalacao = null;
 
 		if (dadosHidrometro.size() > 0) {
-			dataMedicao = dadosHidrometro.get(0).getDataInstalacao();
+			dataInstalacao = dadosHidrometro.get(0).getDataInstalacao();
 		}
 
-		return dataMedicao;
+		return dataInstalacao;
 	}
 
 	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {

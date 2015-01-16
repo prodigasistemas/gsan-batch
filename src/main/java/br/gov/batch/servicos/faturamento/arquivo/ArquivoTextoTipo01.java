@@ -144,7 +144,7 @@ public class ArquivoTextoTipo01 {
 
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId()));
 
-        boolean houveIntslacaoHidrometro = hidrometroBO.houveSubstituicao(imovel.getId());
+        boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
 
         // INDICADOR_FATURAMENTO_ESGOTO
         escreveIndicadorFaturamentoSituacao();
