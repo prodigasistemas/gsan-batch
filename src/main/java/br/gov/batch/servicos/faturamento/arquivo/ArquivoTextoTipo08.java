@@ -12,7 +12,6 @@ import br.gov.batch.servicos.micromedicao.HidrometroBO;
 import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.Hidrometro;
-import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.util.FormatoData;
@@ -58,7 +57,7 @@ public class ArquivoTextoTipo08 {
 
 		for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : listaHidrometroMedicaoHistorico) {
 
-			consumoMedio = getConsumoMedioHidrometro(hidrometroMedicaoHistorico.getMedicaoTipo().intValue(), referencia);
+			consumoMedio = getConsumoMedioHidrometro(hidrometroMedicaoHistorico.getMedicaoTipo(), referencia);
 			hidrometro = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
 			quantidadeLinhas = quantidadeLinhas + 1;
@@ -108,14 +107,6 @@ public class ArquivoTextoTipo08 {
 		} else {
 			return Utilitarios.completaTexto(1, "");
 		}
-	}
-
-	private Integer obterLeituraAnteriorInformada(HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico) {
-		Integer leituraAnteriorInformada = null;
-		if (hidrometroMedicaoHistorico.getLeituraAtualInformada() != null) {
-			leituraAnteriorInformada = hidrometroMedicaoHistorico.getLeituraAtualInformada();
-		}
-		return leituraAnteriorInformada;
 	}
 
 	private String getDataLeituraAnteiorInformada(Date dataLeituraAnteriorInformada, Date dataLeituraAnteriorInformadaHidrometro) {
