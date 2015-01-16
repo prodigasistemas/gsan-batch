@@ -21,6 +21,7 @@ import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
 import br.gov.model.micromedicao.Hidrometro;
+import br.gov.model.micromedicao.LeituraSituacao;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.StatusFaixaFalsa;
@@ -130,13 +131,14 @@ public class FaixaLeituraBOTest {
 	}
 	
 	@Test
-	public void obterDadosFaixaLeituraFaixaFalsaComHidrometroSelecionado() {
+	public void obterDadosFaixaLeituraFaixaFalsa() {
 		carregarMocks();
 		carregarSistemaParametrosFaixaFalsaMocks();
 		
 		Hidrometro hidrometro = new Hidrometro();
 		
 		Rota rota = new Rota();
+		rota.setPercentualGeracaoFaixaFalsa(new BigDecimal(10.50));
 		Quadra quadra = new Quadra();
 		quadra.setRota(rota);
 		
@@ -145,12 +147,12 @@ public class FaixaLeituraBOTest {
 		
 		medicaoHistorico = new MedicaoHistorico();
 		medicaoHistorico.setLeituraAnteriorFaturamento(7102);
+		medicaoHistorico.setLeituraSituacaoAtual(LeituraSituacao.NAO_REALIZADA.getId());
 		
 		int media = 45;
-		assertNotEquals(new Integer(0), faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, media, medicaoHistorico).getFaixaInferior());
-		assertNotEquals(new Integer(0), faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, media, medicaoHistorico).getFaixaSuperior());
+		assertEquals(new Integer(7125), faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, media, medicaoHistorico).getFaixaInferior());
+		assertEquals(new Integer(7170), faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, media, medicaoHistorico).getFaixaSuperior());
 	}
-	
 	
 	private FaixaLeituraEsperadaParametros buildFaixa10() {
 		FaixaLeituraEsperadaParametros faixa = new FaixaLeituraEsperadaParametros();
@@ -221,6 +223,8 @@ public class FaixaLeituraBOTest {
 		expect(sistemaParametrosMock.getIndicadorFaixaFalsa()).andReturn(StatusFaixaFalsa.GERAR_FAIXA_FALSA_ROTA.getId()).times(10);
 		expect(sistemaParametrosMock.getIndicadorUsoFaixaFalsa()).andReturn(StatusUsoFaixaFalsa.ROTA.getId()).times(10);
 		expect(sistemaParametrosMock.getPercentualFaixaFalsa()).andReturn(new BigDecimal(2.50)).times(10);
+		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(new Short("6")).times(10);
 		replay(sistemaParametrosMock);
+		
 	}
 }

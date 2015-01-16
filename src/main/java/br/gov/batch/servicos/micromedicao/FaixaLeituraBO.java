@@ -52,6 +52,8 @@ public class FaixaLeituraBO {
 			} else {
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
 						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
+				
+				System.out.println(faixaLeituraFalsa.isHidrometroSelecionado());
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
 					return faixaLeituraFalsa;
 				} else {
@@ -140,10 +142,11 @@ public class FaixaLeituraBO {
 		FaixaLeituraTO faixaLeitura = new FaixaLeituraTO();
 
 		BigDecimal multiplicaFaxaFalsa = obterFatorMultiplicacaoFaixaFalsa(imovel);
-
+System.out.println(multiplicaFaxaFalsa); 
 		Integer leituraAnteriorFalsa = null;
 
 		if (multiplicaFaxaFalsa != null) {
+
 			hidrometroSelecionado = verificarLeituraAnteriorMedia(media, medicaoHistorico);
 
 			if ((multiplicaFaxaFalsa.doubleValue() % 100 == 0) || (hidrometroSelecionado)) {
@@ -171,18 +174,18 @@ public class FaixaLeituraBO {
 	private BigDecimal obterFatorMultiplicacaoFaixaFalsa(Imovel imovel) {
 		BigDecimal percentualFaixaFalsaRota = imovel.getQuadra().getRota().getPercentualGeracaoFaixaFalsa();
 		BigDecimal percentualFaixaFalsaSistemaParametro = sistemaParametro.getPercentualFaixaFalsa();
-		
+
 		Calendar dataCalendar = new GregorianCalendar();
 		int segundos = dataCalendar.get(Calendar.SECOND);
 
 		Integer somaImovelSegundo = imovel.getId() + segundos;
-		
-		if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.ROTA)) {
+
+		if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.ROTA.getId())) {
 			if (imovel.getQuadra().getRota().possuiPercentualFaixaFalsa()) {
 				return percentualFaixaFalsaRota.multiply(new BigDecimal(somaImovelSegundo));
 			}
 		} else {
-			if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.SISTEMA_PARAMETRO)) {
+			if (sistemaParametro.getIndicadorUsoFaixaFalsa().equals(StatusUsoFaixaFalsa.SISTEMA_PARAMETRO.getId())) {
 				if (!percentualFaixaFalsaSistemaParametro.equals(new BigDecimal(0.0))) {
 					return percentualFaixaFalsaSistemaParametro.multiply(new BigDecimal(somaImovelSegundo));
 				}
