@@ -36,8 +36,6 @@ import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 @RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo08Test {
 
-
-
 	@TestSubject
 	private ArquivoTextoTipo08 arquivoTextoTipo08;
 	
@@ -124,7 +122,7 @@ public class ArquivoTextoTipo08Test {
 		
 		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250));
 		
-		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo, houveInstalacaoOuSubstituicaoHidrometro))
+		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId(), houveInstalacaoOuSubstituicaoHidrometro))
 		.andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(1);
 		
 		replay(medicaoHistoricoBOMock);
@@ -133,5 +131,4 @@ public class ArquivoTextoTipo08Test {
 		replay(medicaoHistoricoMock);
 		replay(faixaLeituraBOMock);
 	}
-
 }

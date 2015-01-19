@@ -112,11 +112,8 @@ public class AguaEsgotoBO {
 
 		Collection<ICategoria> categoria;
 
-		if (sistemaParametros.getIndicadorTarifaCategoria().equals(SistemaParametros.INDICADOR_TARIFA_CATEGORIA)) {
-			categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(imovel.getId());
-		} else {
-			categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(imovel.getId());
-		}
+		categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
+		
 		return new VolumeMedioAguaEsgotoTO(consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel,
 				consumoTarifaRepositorio.consumoTarifaDoImovel(imovel.getId()), categoria), 1);
 	}
