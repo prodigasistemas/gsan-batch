@@ -2,6 +2,7 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -22,12 +23,16 @@ import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.Localidade;
+import br.gov.model.cadastro.QuadraFace;
+import br.gov.model.cadastro.SetorComercial;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
+import br.gov.model.faturamento.QualidadeAgua;
+import br.gov.model.faturamento.QualidadeAguaPadrao;
 import br.gov.model.faturamento.TipoConta;
 import br.gov.model.faturamento.TipoPagamento;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -38,6 +43,9 @@ import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
+import br.gov.servicos.faturamento.QuadraFaceRepositorio;
+import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
+import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
 @Stateless
@@ -62,9 +70,13 @@ public class ArquivoTextoTipo01 {
     // @EJB
     private DebitoAutomaticoRepositorio debitoAutomaticoRepositorio;
 
-    @EJB
+//    @EJB
     private FaturamentoParametroRepositorio repositorioParametros;
+ 
+    private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
+    private QualidadeAguaRepositorio qualidadeAguaRepositorio;
+    
     @EJB
     private HidrometroBO hidrometroBO;
     
@@ -214,6 +226,9 @@ public class ArquivoTextoTipo01 {
         
         escreverDadosCobranca();
 
+        
+        escreveCpfCnpjDoClienteUsuario(clienteUsuario);
+        
         return builder.toString();
     }
 
@@ -235,33 +250,78 @@ public class ArquivoTextoTipo01 {
     }
 
     private void escreverQualidadeDaAgua() {
-//    	Integer anoMesReferenciaQualidadeAgua = null;
+    	Integer anoMesReferenciaQualidadeAgua = null;
     	
-//		if (.getNomeEmpresa() != null
-//				&& sistemaParametro.getNomeEmpresa().equals(
-//						SistemaParametro.EMPRESA_COMPESA)) {
-//			anoMesReferenciaQualidadeAgua = Util
-//					.subtraiAteSeisMesesAnoMesReferencia(
-//							faturamentoGrupo.getAnoMesReferencia(), 1);
-//		} else {
-//			anoMesReferenciaQualidadeAgua = faturamentoGrupo
-//					.getAnoMesReferencia();
-//		}
-//		/**
-//		 * autor: Adriana Muniz Data: 04/05/2011 Como o crit�rio de
-//		 * preenchimento da qualidade da agua da cosanpa n�o � usa os campos
-//		 * usados como filtros na consulta da qualidade da agua, foi necess�rio
-//		 * acrescentar mais um parametro na assinatura no m�todo, idQuadraFace,
-//		 * que ser� usado na primeira op��o de busca pela qualidade da �gua
-//		 * 
-//		 * Foi necess�rio acrescentar um parametro a mais na assinatura do
-//		 * m�todo, o sistema de parametro para que a rotina de consulta da
-//		 * qualidade da agua seja diferente.
-//		 * */
-//		arquivoTextoRegistroTipo01 = arquivoTextoRegistroTipo01
-//				.append(gerarArquivoTextoQualidadeAgua(idLocalidade,
-//						idSetorComercial, anoMesReferenciaQualidadeAgua,
-//						idQuadraFace));
+		if (!Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA))) {
+			anoMesReferenciaQualidadeAgua = Utilitarios.reduzirMeses(faturamentoGrupo.getAnoMesReferencia(), 1);
+		} else {
+			anoMesReferenciaQualidadeAgua = faturamentoGrupo.getAnoMesReferencia();
+		}
+
+		gerarTextoQualidadeAgua(imovel.getLocalidade().getId(),
+						imovel.getSetorComercial().getId(), 
+						anoMesReferenciaQualidadeAgua,
+						imovel.getQuadraFace().getId());
+	}
+
+	private void gerarTextoQualidadeAgua(Integer idLocalidade, Integer idSetorComercial,
+			Integer anoMesReferenciaQualidadeAgua, Integer idQuadraFace) {
+		preencherQualidadeAguaPadrao();
+		preencherQualidadeAgua();
+	}
+
+	private void preencherQualidadeAgua() {
+		QualidadeAgua qualidadeAgua = qualidadeAguaRepositorio.obterLista().iterator().next();
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getAnoMesReferencia()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroCloroResidual()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceTurbidez()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndicePh()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceCor()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceFluor()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceFerro()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceColiformesTotais()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceColiformesFecais()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroNitrato()));
+		builder.append(Utilitarios.completaTexto(5, qualidadeAgua.getNumeroIndiceColiformesTermotolerantes()));
+		builder.append(Utilitarios.completaTexto(30, qualidadeAgua.getFonteCaptacao().getDescricao()));
+		
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeTurbidezExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCorExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCloroExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeFluorExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTotaisExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesFecaisExigidas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTermotolerantesExigidas()));
+		
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeTurbidezAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCorAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCloroAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeFluorAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTotaisAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesFecaisAnalisadas()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTermotolerantesAnalisadas()));
+		
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeTurbidezConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCorConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeCloroConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeFluorConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTotaisConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesFecaisConforme()));
+		builder.append(Utilitarios.completaTexto(6, qualidadeAgua.getQuantidadeColiformesTermotolerantesConforme()));
+	}
+	
+	private void preencherQualidadeAguaPadrao() {
+		QualidadeAguaPadrao qualidadeAguaPadrao = qualidadeAguaPadraoRepositorio.obterLista().iterator().next();
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoTurbidez()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoPh()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoCor()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoCloro()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoFluor()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoFerro()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoColiformesTotais()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoColiformesFecais()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoNitrato()));
+		builder.append(Utilitarios.completaTexto(20, qualidadeAguaPadrao.getDescricaoPadraoColiformesTermotolerantes()));
 	}
 
 	private void escreveMensagemConta() {
@@ -451,6 +511,13 @@ public class ArquivoTextoTipo01 {
         }
     }
 
+    private void escreveCpfCnpjDoClienteUsuario(Cliente clienteUsuario) {
+		if (clienteUsuario != null && !clienteUsuario.equals("")) {
+			builder.append(Utilitarios.completaTexto(18, clienteUsuario.getCpfOuCnpj()));
+		}
+		builder.append(Utilitarios.completaTexto(18, ""));
+    }
+    
     public boolean naoEmitirConta(Integer envioConta) {
         boolean naoEmitir = false;
 
