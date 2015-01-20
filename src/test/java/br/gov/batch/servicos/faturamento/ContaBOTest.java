@@ -63,7 +63,7 @@ public class ContaBOTest {
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
 		
-		expect(medicaoHistoricoRepositorio.buscarPorImovelEReferencia(1, 201405)).andReturn(null);
+		expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201405)).andReturn(null);
 		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1)).andReturn(new Cliente());
 		
 		replay(medicaoHistoricoRepositorio);
