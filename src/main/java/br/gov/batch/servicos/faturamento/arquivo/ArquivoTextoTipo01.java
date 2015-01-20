@@ -11,6 +11,7 @@ import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
+import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
@@ -41,6 +42,7 @@ import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
@@ -67,12 +69,15 @@ public class ArquivoTextoTipo01 {
     // @EJB
     private DebitoAutomaticoRepositorio debitoAutomaticoRepositorio;
 
-//    @EJB
+    // @EJB
     private FaturamentoParametroRepositorio repositorioParametros;
  
     private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
     private QualidadeAguaRepositorio qualidadeAguaRepositorio;
+    
+    // @EJB
+    private FaturamentoSituacaoBO faturamentoSituacaoBO;
     
     @EJB
     private HidrometroBO hidrometroBO;
@@ -85,6 +90,9 @@ public class ArquivoTextoTipo01 {
 
     @EJB
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
+    
+    @EJB
+    private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
     
     @EJB
     private MensagemContaBO mensagemContaBO;
@@ -228,7 +236,8 @@ public class ArquivoTextoTipo01 {
         
         builder.append(isImovelSazonal());
         
-        //TODO INDICADORES PARALISACAO FATURAMENTO 
+        builder.append(faturamentoSituacaoBO.verificarParalisacaoFaturamentoAgua(imovel, anoMesReferencia));
+        builder.append(faturamentoSituacaoBO.verificarParalisacaoFaturamentoEsgoto(imovel, anoMesReferencia));
         
         escreverCodigoDebitoAutomatico();
         
