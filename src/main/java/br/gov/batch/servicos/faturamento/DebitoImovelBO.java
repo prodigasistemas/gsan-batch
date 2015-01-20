@@ -90,10 +90,10 @@ public class DebitoImovelBO {
 	public List<ContaTO> pesquisarContasDebitoImovel(ConsultaDebitoImovelTO to){
        SistemaParametros sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 	    
-		to.addSituacao((short) DebitoCreditoSituacao.NORMAL.getId());
-		to.addSituacao((short) DebitoCreditoSituacao.RETIFICADA.getId());
-		to.addSituacao((short) DebitoCreditoSituacao.INCLUIDA.getId());
-		to.addSituacao((short) DebitoCreditoSituacao.PARCELADA.getId());
+		to.addSituacao(DebitoCreditoSituacao.NORMAL.getId());
+		to.addSituacao(DebitoCreditoSituacao.RETIFICADA.getId());
+		to.addSituacao(DebitoCreditoSituacao.INCLUIDA.getId());
+		to.addSituacao(DebitoCreditoSituacao.PARCELADA.getId());
 		
 		List<ContaTO> contas = contaRepositorio.pesquisarContasImovel(to);
 		
