@@ -127,7 +127,7 @@ public class ContaBOTest {
 		to.setPercentualColeta((short)56);
 		to.setPercentualEsgoto(new BigDecimal("5.60"));
 		to.setDataVencimentoRota(new Date());
-		
+
 		return to;
 	}
 }

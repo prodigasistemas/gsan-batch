@@ -134,7 +134,7 @@ public class ContaBO {
 			.faturamentoGrupo(to.getFaturamentoGrupo())
 			.leiturasFaturamento(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(to.getImovel().getId(), to.getAnoMesFaturamento()))
 			.rota(to.getRota());
-		
+
 		return builder.build();
 	}
 	
