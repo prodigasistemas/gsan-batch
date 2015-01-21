@@ -8,7 +8,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cobranca.parcelamento.ParcelamentoImovelBO;
-import br.gov.model.Status;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.arrecadacao.pagamento.GuiaPagamentoRepositorio;
@@ -44,21 +43,11 @@ public class DebitoImovelBO {
 	public boolean existeDebitoImovel(ConsultaDebitoImovelTO to){
         SistemaParametros sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 
-//		int indicadorDebito                            = 1 
-//		int indicadorPagamento                         = 1 
-//		int indicadorConta                             = 2
-//		int indicadorDebitoACobrar                     = 2
-//		int indicadorCreditoARealizar                  = 2
-//		int indicadorNotasPromissorias                 = 2
-//		int indicadorGuiasPagamento                    = 1
-//		int indicadorCalcularAcrescimoImpontualidade   = 2
-//		indicadorDividaAtiva                           = 3
-		
 		Collection<ContaTO> contas = this.pesquisarContasDebitoImovel(to);
 
 		Collection<ContaTO> contasSemParcelamento = new ArrayList<ContaTO>();
 
-		if (sistemaParametros.getIndicadorBloqueioContasContratoParcelDebitos() == Status.ATIVO.getId()) {
+		if (sistemaParametros.parametroAtivo(sistemaParametros.getIndicadorBloqueioContasContratoParcelDebitos())) {
 			for (ContaTO conta : contas) {
 				if (!contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaConta(conta.getIdConta())){
 					contasSemParcelamento.add(conta);
@@ -72,7 +61,7 @@ public class DebitoImovelBO {
 		
 		List<GuiaPagamentoTO> guiasSemParcelamento = new ArrayList<GuiaPagamentoTO>(); 
 
-		if (sistemaParametros.getIndicadorBloqueioGuiasOuAcresContratoParcelDebito() == Status.ATIVO.getId()) {
+		if (sistemaParametros.parametroAtivo(sistemaParametros.getIndicadorBloqueioGuiasOuAcresContratoParcelDebito())) {
 			for (GuiaPagamentoTO guia : guias) {
 				if (!contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaGuia(guia.getIdGuia())) {
 					guiasSemParcelamento.add(guia);
