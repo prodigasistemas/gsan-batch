@@ -30,6 +30,8 @@ import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
+import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.model.faturamento.QualidadeAgua;
 import br.gov.model.faturamento.QualidadeAguaPadrao;
 import br.gov.model.faturamento.TipoConta;
@@ -43,6 +45,7 @@ import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoTipoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
@@ -71,11 +74,15 @@ public class ArquivoTextoTipo01 {
 
     // @EJB
     private FaturamentoParametroRepositorio repositorioParametros;
- 
+    
+    // @EJB
     private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
+    // @EJB
     private QualidadeAguaRepositorio qualidadeAguaRepositorio;
     
+    // @EJB
+    private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
     // @EJB
     private FaturamentoSituacaoBO faturamentoSituacaoBO;
     
@@ -228,8 +235,8 @@ public class ArquivoTextoTipo01 {
 
         escreverCpfCnpjDoClienteUsuario(clienteUsuario);
         
-        //TODO SITUAÇÃO ESPECIAL DE FATURAMENTO
-        
+        escreverSituacaoEspecialFaturamento(imovel, faturamentoGrupo);
+
         //TODO DATA LEITURA ANTERIOR FATURAMENTO
         
         escreverIndidacorAbastecimento();
@@ -635,4 +642,36 @@ public class ArquivoTextoTipo01 {
                         || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE.getId() || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL
                         .getId());
     }
+    
+    private void escreverSituacaoEspecialFaturamento(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
+
+		if (imovel.possuiFaturamentoSituacaoTipo()) {
+
+			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentoSituacaoBO.obterFaturamentoSituacaoVigente(imovel, anoMesReferencia);
+			
+			if (faturamentoSituacaoHistorico != null) {
+
+				FaturamentoSituacaoTipo faturamentoSituacaoTipo = faturamentoSituacaoTipoRepositorio.situacaoTipoDoImovel(imovel.getId());
+
+				builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getFaturamentoSituacaoTipo().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeConsumoSemLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeConsumoComLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeLeituraSemLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeLeituraComLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getConsumoAguaMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getConsumoAguaNaoMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getVolumeEsgotoMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getVolumeEsgotoNaoMedido()));
+				builder.append(Utilitarios.completaTexto(1, imovel.getFaturamentoSituacaoTipo().getValidoAgua()));
+				builder.append(Utilitarios.completaTexto(1, imovel.getFaturamentoSituacaoTipo().getValidoEsgoto()));
+
+			} else {
+				builder.append(Utilitarios.completaTexto(36, ""));
+			}
+		} else {
+			builder.append(Utilitarios.completaTexto(36, ""));
+		}
+    }
+    
+    
 }
