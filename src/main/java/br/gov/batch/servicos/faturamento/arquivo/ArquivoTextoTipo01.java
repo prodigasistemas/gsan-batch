@@ -1,13 +1,7 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import gcom.faturamento.FaturamentoAtividade;
-import gcom.util.ControladorException;
-import gcom.util.ErroRepositorioException;
-import gcom.util.Util;
-
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
