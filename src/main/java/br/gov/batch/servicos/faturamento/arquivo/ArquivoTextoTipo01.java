@@ -11,10 +11,12 @@ import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
+import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
+import br.gov.model.Status;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
@@ -29,6 +31,8 @@ import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
+import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.model.faturamento.QualidadeAgua;
 import br.gov.model.faturamento.QualidadeAguaPadrao;
 import br.gov.model.faturamento.TipoConta;
@@ -41,6 +45,8 @@ import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoTipoRepositorio;
 import br.gov.servicos.faturamento.QuadraFaceRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
@@ -68,14 +74,21 @@ public class ArquivoTextoTipo01 {
     // @EJB
     private DebitoAutomaticoRepositorio debitoAutomaticoRepositorio;
 
-//    @EJB
+    // @EJB
     private FaturamentoParametroRepositorio repositorioParametros;
- 
+    
+    // @EJB
     private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
+    // @EJB
     private QualidadeAguaRepositorio qualidadeAguaRepositorio;
     
     private QuadraFaceRepositorio quadraFaceRepositorio;
+
+    // @EJB
+    private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
+    // @EJB
+    private FaturamentoSituacaoBO faturamentoSituacaoBO;
     
     @EJB
     private HidrometroBO hidrometroBO;
@@ -88,6 +101,9 @@ public class ArquivoTextoTipo01 {
 
     @EJB
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
+    
+    @EJB
+    private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
     
     @EJB
     private MensagemContaBO mensagemContaBO;
@@ -136,13 +152,13 @@ public class ArquivoTextoTipo01 {
 
         builder.append(Utilitarios.completaTexto(30, clienteUsuario.getNome()));
 
-        escreveVencimentoConta();
+        escreverVencimentoConta();
 
         builder.append(Utilitarios.completaTexto(17, imovel.getInscricaoFormatadaSemPonto()));
 
         builder.append(Utilitarios.completaTexto(70, enderecoFormatado == null ? "" : enderecoFormatado));
 
-        escreveReferenciaConta();
+        escreverReferenciaConta();
 
         if (clienteResponsavel != null) {
             if (clienteNomeConta != null) {
@@ -166,13 +182,11 @@ public class ArquivoTextoTipo01 {
             builder.append(Utilitarios.completaTexto(109, ""));
         }
 
-        escreveSituacaoAguaEsgoto();
+        escreverSituacaoAguaEsgoto();
 
-        escreveDadosBancarios();
+        escreverDadosBancarios();
 
-        escreveDadosCondominio();
-
-        builder.append(imovel.getIndicadorImovelCondominio().toString());
+        escreverDadosCondominio();
 
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId()));
 
@@ -182,43 +196,40 @@ public class ArquivoTextoTipo01 {
         		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 
-        // INDICADOR_FATURAMENTO_ESGOTO
-        escreveIndicadorFaturamentoSituacao();
+        escreverIndicadorFaturamentoSituacao();
 
-        escreveIndicadorEmissaoConta(clienteResponsavel);
+        escreverIndicadorEmissaoConta(clienteResponsavel);
 
-        escreveConsumoMinimoAgua();
+        escreverConsumoMinimoAgua();
         
-        escreveConsumoMinimoEsgoto();
+        escreverConsumoMinimoEsgoto();
         
-        escrevePercentualAguaConsumidaColetada();
+        escreverPercentualAguaConsumidaColetada();
         
-        escrevePercentualEsgoto();
+        escreverPercentualEsgoto();
         
         builder.append(Utilitarios.completaTexto(1, imovel.getPocoTipo()));
         
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getConsumoTarifa().getId()));
         
-        escreveDadosConsumoCategoria();
+        escreverDadosConsumoCategoria();
         
         builder.append(Utilitarios.completaComZerosEsquerda(3, faturamentoGrupo.getId()));
         builder.append(Utilitarios.completaComZerosEsquerda(7, rota.getCodigo()));
-        builder.append(Utilitarios.completaTexto(9, ""));
-        builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.tarifaTipoCalculo()));
         
-        escreveCodigoConta();
+        escreverCodigoConta();
         
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.tarifaTipoCalculo()));
         
-        escreveDadosLocalidade();
+        escreverDadosLocalidade();
         
         builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getNumeroSequencialRota()));
         
-        escreveMensagemConta();
-        
-        escreverQualidadeDaAgua();
+        escreverMensagemConta();
         
         builder.append(Utilitarios.completaTexto(9, extratoQuitacaoBO.obterMsgQuitacaoDebitos(imovel.getId(), anoMesReferencia)));
+        
+        escreverQualidadeDaAgua();
         
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoMinimoLigacao(imovel.getId())));
         
@@ -226,12 +237,85 @@ public class ArquivoTextoTipo01 {
         
         escreverDadosCobranca();
 
+        escreverCpfCnpjDoClienteUsuario(clienteUsuario);
         
-        escreveCpfCnpjDoClienteUsuario(clienteUsuario);
+        escreverSituacaoEspecialFaturamento(imovel, faturamentoGrupo);
+
+        //TODO DATA LEITURA ANTERIOR FATURAMENTO
+        
+        escreverIndidacorAbastecimento();
+        
+        builder.append(isImovelSazonal());
+        
+        builder.append(faturamentoSituacaoBO.verificarParalisacaoFaturamentoAgua(imovel, anoMesReferencia));
+        builder.append(faturamentoSituacaoBO.verificarParalisacaoFaturamentoEsgoto(imovel, anoMesReferencia));
+        
+        escreverCodigoDebitoAutomatico();
+        
+        escreverEsgotoAlternativo();
+        
+        escreverDataEmissaoDocumentoCobranca();
+        
+        builder.append(System.getProperty("line.separator"));
         
         return builder.toString();
     }
 
+	private void escreverIndidacorAbastecimento() {
+		if (imovel.getLigacaoAguaSituacao() != null && imovel.getLigacaoAguaSituacao().getIndicadorAbastecimento() != null) {
+        	builder.append(Utilitarios.completaTexto(1, imovel.getLigacaoAguaSituacao().getIndicadorAbastecimento()));
+		} else {
+			builder.append(Utilitarios.completaTexto(1, ""));
+		}
+	}
+	
+	private Short isImovelSazonal() {
+		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(imovel.getId());
+
+		for(ICategoria subcategoria : subcategorias) {
+			if (subcategoria.getIndicadorSazonalidade() != null && subcategoria.getIndicadorSazonalidade() == Status.ATIVO.getId()) {
+				return Status.ATIVO.getId();
+			}
+		}
+		return Status.INATIVO.getId();
+	}
+
+	private void escreverCodigoDebitoAutomatico() {
+		if (imovel.getCodigoDebitoAutomatico() != null) {
+			builder.append(Utilitarios.completaTexto(9, imovel.getCodigoDebitoAutomatico()));
+		} else {
+			builder.append(Utilitarios.completaTexto(9, ""));
+		}
+	}
+	
+	private void escreverEsgotoAlternativo() {
+		escreverPercentualAlternativoEsgoto();
+		escreverConsumoPercentualAlternativoEsgoto();
+	}
+	private void escreverPercentualAlternativoEsgoto() {
+		if (imovel.possuiEsgoto() && imovel.getLigacaoEsgoto().possuiPercentualAlternativo()) {
+			builder.append(Utilitarios.completaComZerosEsquerda(6, Utilitarios.formatarBigDecimalComPonto(imovel.getLigacaoEsgoto().getPercentualAlternativo())));
+		} else {
+			builder.append(Utilitarios.completaTexto(6, ""));
+		}
+	}
+	
+	private void escreverConsumoPercentualAlternativoEsgoto() {
+		if (imovel.possuiEsgoto() && imovel.getLigacaoEsgoto().possuiNumeroConsumoPercentualAlternativo()) {
+			builder.append(Utilitarios.completaComZerosEsquerda(6, imovel.getLigacaoEsgoto().getNumeroConsumoPercentualAlternativo()));
+		} else {
+			builder.append(Utilitarios.completaTexto(6, ""));
+		}
+	}
+	
+	private void escreverDataEmissaoDocumentoCobranca() {
+		if (cobrancaDocumento != null){
+			builder.append(Utilitarios.formataData(cobrancaDocumento.getEmissao(), FormatoData.DIA_MES_ANO));
+		} else {
+			builder.append(Utilitarios.completaTexto(8, ""));
+		}
+	}
+	
     private void escreverDadosCobranca() {
         if (cobrancaDocumento != null){
             builder.append(Utilitarios.completaTexto(9, cobrancaDocumento.getId()));
@@ -243,6 +327,7 @@ public class ArquivoTextoTipo01 {
             to.setMatriculaImovel(cobrancaDocumento.getImovel().getId());
             to.setSequencialDocumentoCobranca(String.valueOf(cobrancaDocumento.getNumeroSequenciaDocumento()));
             to.setTipoDocumento(DocumentoTipo.parse(cobrancaDocumento.getDocumentoTipo()));
+            
             builder.append(pagamentoBO.obterCodigoBarra(to));
         }else{
             builder.append(Utilitarios.completaTexto(57, ""));
@@ -344,7 +429,7 @@ public class ArquivoTextoTipo01 {
 		}
 	}
 
-	private void escreveMensagemConta() {
+	private void escreverMensagemConta() {
         boolean mensagemEmTresPartes = Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES));
         
         String[] mensagemConta = null;
@@ -366,7 +451,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveDadosLocalidade() {
+    private void escreverDadosLocalidade() {
         Localidade localidade = imovel.getLocalidade();
         StringBuilder descricaoAtendimento = localidade.getEnderecoFormatadoTituloAbreviado();
         builder.append(Utilitarios.completaTexto(70, descricaoAtendimento));
@@ -381,7 +466,7 @@ public class ArquivoTextoTipo01 {
         builder.append(Utilitarios.completaTexto(11, dddMunicipio + fone));
     }
 
-    private void escreveCodigoConta() {
+    private void escreverCodigoConta() {
         if (conta != null) {
             builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getId()));
         } else {
@@ -389,7 +474,7 @@ public class ArquivoTextoTipo01 {
         }        
     }
 
-    private void escreveDadosConsumoCategoria() {
+    private void escreverDadosConsumoCategoria() {
         Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(imovel.getId());
         
         int consumoTotalReferenciaAltoConsumo = 0;
@@ -429,13 +514,13 @@ public class ArquivoTextoTipo01 {
         builder.append(Utilitarios.completaComZerosEsquerda(6, Math.min(consumoMaximoCobrancaEstouroConsumo, 999999)));        
     }
 
-    private void escrevePercentualEsgoto() {
+    private void escreverPercentualEsgoto() {
         BigDecimal percentual = esgotoBO.percentualEsgotoAlternativo(imovel);
         
         builder.append(Utilitarios.completaComZerosEsquerda(6, Utilitarios.formatarBigDecimalComPonto(percentual)));
     }
 
-    private void escrevePercentualAguaConsumidaColetada() {
+    private void escreverPercentualAguaConsumidaColetada() {
         if (imovel.getLigacaoEsgoto() != null) {
             String numero = Utilitarios.formatarBigDecimalComPonto(imovel.getLigacaoEsgoto().getPercentualAguaConsumidaColetada());
             builder.append(Utilitarios.completaComZerosEsquerda(6, numero));
@@ -444,7 +529,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveConsumoMinimoEsgoto() {
+    private void escreverConsumoMinimoEsgoto() {
         if (imovel.getLigacaoEsgoto() != null) {
             builder.append(Utilitarios.completaComZerosEsquerda(6, imovel.getLigacaoEsgoto().getConsumoMinimo()));
         } else {
@@ -452,7 +537,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveConsumoMinimoAgua() {
+    private void escreverConsumoMinimoAgua() {
         if (imovel.getLigacaoAgua() != null) {
             builder.append(Utilitarios.completaComZerosEsquerda(6, imovel.getLigacaoAgua().getConsumoMinimoAgua()));
         } else {
@@ -461,7 +546,7 @@ public class ArquivoTextoTipo01 {
 
     }
 
-    private void escreveIndicadorEmissaoConta(Cliente clienteResponsavel) {
+    private void escreverIndicadorEmissaoConta(Cliente clienteResponsavel) {
         Short indicadorEmissaoConta = new Short("1");
 
         boolean emitir = emitirConta(imovel.getImovelContaEnvio());
@@ -474,7 +559,7 @@ public class ArquivoTextoTipo01 {
 
     }
 
-    private void escreveIndicadorFaturamentoSituacao() {
+    private void escreverIndicadorFaturamentoSituacao() {
         if (conta != null) {
             builder.append(conta.getLigacaoAguaSituacao().getSituacaoFaturamento());
             builder.append(conta.getLigacaoEsgotoSituacao().getSituacaoFaturamento());
@@ -484,7 +569,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveSituacaoAguaEsgoto() {
+    private void escreverSituacaoAguaEsgoto() {
         if (conta != null) {
             builder.append(conta.getLigacaoAguaSituacao().getId());
             builder.append(conta.getLigacaoEsgotoSituacao().getId());
@@ -494,7 +579,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveReferenciaConta() {
+    private void escreverReferenciaConta() {
         if (conta != null) {
             builder.append(conta.getReferencia());
             builder.append(conta.getDigitoVerificadorConta());
@@ -503,7 +588,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveVencimentoConta() {
+    private void escreverVencimentoConta() {
         if (conta != null) {
             builder.append(Utilitarios.formataData(conta.getDataVencimentoConta(), FormatoData.ANO_MES_DIA));
             builder.append(Utilitarios.formataData(conta.getDataValidadeConta(), FormatoData.ANO_MES_DIA));
@@ -512,15 +597,17 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveDadosCondominio() {
+    private void escreverDadosCondominio() {
         if (imovel.getImovelCondominio() != null) {
             builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getImovelCondominio().getId()));
         } else {
             builder.append(Utilitarios.completaTexto(9, ""));
         }
+        
+        builder.append(imovel.getIndicadorImovelCondominio().toString());
     }
 
-    private void escreveDadosBancarios() {
+    private void escreverDadosBancarios() {
         DadosBancariosTO dadosBancarios = debitoAutomaticoRepositorio.dadosBancarios(imovel.getId());
 
         if (dadosBancarios != null) {
@@ -531,7 +618,7 @@ public class ArquivoTextoTipo01 {
         }
     }
 
-    private void escreveCpfCnpjDoClienteUsuario(Cliente clienteUsuario) {
+    private void escreverCpfCnpjDoClienteUsuario(Cliente clienteUsuario) {
 		if (clienteUsuario != null && !clienteUsuario.equals("")) {
 			builder.append(Utilitarios.completaTexto(18, clienteUsuario.getCpfOuCnpj()));
 		}
@@ -579,4 +666,36 @@ public class ArquivoTextoTipo01 {
                         || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE.getId() || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL
                         .getId());
     }
+    
+    private void escreverSituacaoEspecialFaturamento(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
+
+		if (imovel.possuiFaturamentoSituacaoTipo()) {
+
+			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentoSituacaoBO.obterFaturamentoSituacaoVigente(imovel, anoMesReferencia);
+			
+			if (faturamentoSituacaoHistorico != null) {
+
+				FaturamentoSituacaoTipo faturamentoSituacaoTipo = faturamentoSituacaoTipoRepositorio.situacaoTipoDoImovel(imovel.getId());
+
+				builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getFaturamentoSituacaoTipo().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeConsumoSemLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeConsumoComLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeLeituraSemLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoSituacaoTipo.getLeituraAnormalidadeLeituraComLeitura().getId()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getConsumoAguaMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getConsumoAguaNaoMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getVolumeEsgotoMedido()));
+				builder.append(Utilitarios.completaComZerosEsquerda(6, faturamentoSituacaoHistorico.getVolumeEsgotoNaoMedido()));
+				builder.append(Utilitarios.completaTexto(1, imovel.getFaturamentoSituacaoTipo().getValidoAgua()));
+				builder.append(Utilitarios.completaTexto(1, imovel.getFaturamentoSituacaoTipo().getValidoEsgoto()));
+
+			} else {
+				builder.append(Utilitarios.completaTexto(36, ""));
+			}
+		} else {
+			builder.append(Utilitarios.completaTexto(36, ""));
+		}
+    }
+    
+    
 }

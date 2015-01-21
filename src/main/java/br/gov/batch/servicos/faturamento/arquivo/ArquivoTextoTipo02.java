@@ -12,13 +12,13 @@ import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
-//@Stateless
+@Stateless
 public class ArquivoTextoTipo02 {
 	
-//	@Inject
+	@Inject
 	private SistemaParametros sistemaParametro;
 
-//	@EJB
+	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
 	private StringBuilder builder;
@@ -65,15 +65,15 @@ public class ArquivoTextoTipo02 {
 		if (sistemaParametro.indicadorTarifaCategoria()) {
 			return Utilitarios.completaTexto(50, "");
 		} else {
-			return Utilitarios.completaTexto(50, iCategoria.getDescricao());
+			return Utilitarios.completaTexto(50, iCategoria.getSubcategoriaDescricao());
 		}
 	}
 	
 	private String getSubcategoriaDescricaoAbreviada(ICategoria iCategoria) {
 		if (sistemaParametro.indicadorTarifaCategoria()) {
-			return Utilitarios.completaTexto(3, iCategoria.getDescricaoAbreviada());
+			return Utilitarios.completaTexto(3, iCategoria.getSubcategoriaDescricaoAbreviada());
 		} else {
-			return Utilitarios.completaTexto(3, iCategoria.getCategoria().getDescricaoAbreviada());
+			return Utilitarios.completaTexto(3, iCategoria.getCategoria().getCategoriaDescricaoAbreviada());
 		}
 	}
 
