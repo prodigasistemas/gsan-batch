@@ -11,6 +11,7 @@ import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
+import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
@@ -28,6 +29,7 @@ import br.gov.model.cadastro.endereco.ClienteEndereco;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.Conta;
+import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
@@ -66,24 +68,28 @@ public class ArquivoTextoTipo01 {
     
     private CobrancaDocumento cobrancaDocumento;
 
-    // @EJB
+    @EJB
     private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
 
-    // @EJB
+    @EJB
     private DebitoAutomaticoRepositorio debitoAutomaticoRepositorio;
 
-    // @EJB
+    @EJB
     private FaturamentoParametroRepositorio repositorioParametros;
     
-    // @EJB
+    @EJB
     private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
-    // @EJB
+    @EJB
     private QualidadeAguaRepositorio qualidadeAguaRepositorio;
     
-    // @EJB
+    @EJB
     private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
-    // @EJB
+    
+    @EJB
+    private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
+    
+    @EJB
     private FaturamentoSituacaoBO faturamentoSituacaoBO;
     
     @EJB
@@ -237,7 +243,7 @@ public class ArquivoTextoTipo01 {
         
         escreverSituacaoEspecialFaturamento(imovel, faturamentoGrupo);
 
-        //TODO DATA LEITURA ANTERIOR FATURAMENTO
+        builder.append(faturamentoAtividadeCronogramaBO.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA));
         
         escreverIndidacorAbastecimento();
         
@@ -672,6 +678,4 @@ public class ArquivoTextoTipo01 {
 			builder.append(Utilitarios.completaTexto(36, ""));
 		}
     }
-    
-    
 }
