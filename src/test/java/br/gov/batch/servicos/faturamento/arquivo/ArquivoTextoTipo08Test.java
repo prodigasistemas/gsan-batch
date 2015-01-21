@@ -122,7 +122,7 @@ public class ArquivoTextoTipo08Test {
 		
 		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250));
 		
-		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId(), houveInstalacaoOuSubstituicaoHidrometro))
+		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId()))
 		.andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(1);
 		
 		replay(medicaoHistoricoBOMock);

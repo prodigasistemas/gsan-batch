@@ -182,7 +182,7 @@ public class ArquivoTextoTipo01 {
         boolean houveInstalacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
         
         VolumeMedioAguaEsgotoTO consumoMedioLigacaoAgua = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), 
-        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
+        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId());
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 
         escreverIndicadorFaturamentoSituacao();
