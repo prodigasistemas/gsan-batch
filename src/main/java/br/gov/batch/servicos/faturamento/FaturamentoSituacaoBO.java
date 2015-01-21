@@ -29,23 +29,29 @@ public class FaturamentoSituacaoBO {
     	Status paralisar = Status.INATIVO;
     	
     	if (imovel.getFaturamentoSituacaoTipo() != null) {
-    		List<FaturamentoSituacaoHistorico> faturamentoSituacoes = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
-    		
-    		FaturamentoSituacaoHistorico faturamentoSituacao = faturamentoSituacoes.get(0);
-
-			if (isSituacaoEmVigencia(anoMesReferencia, faturamentoSituacao) && statusParalisacaoFaturamento) {
-				paralisar = Status.ATIVO;
-			} 		
+    		if (obterFaturamentoSituacaoVigente(imovel, anoMesReferencia) != null && statusParalisacaoFaturamento) {
+    			paralisar = Status.ATIVO;
+    		}
 		}
     	
     	return paralisar;
     }
 	
-	private boolean isSituacaoEmVigencia(Integer referencia, FaturamentoSituacaoHistorico situacao) {
+	public boolean isSituacaoEmVigencia(Integer referencia, FaturamentoSituacaoHistorico situacao) {
 		if (referencia >= situacao.getAnoMesFaturamentoSituacaoInicio() && referencia <= situacao.getAnoMesFaturamentoSituacaoFim()) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public FaturamentoSituacaoHistorico obterFaturamentoSituacaoVigente(Imovel imovel, Integer anoMesReferencia) {
+		List<FaturamentoSituacaoHistorico> situacoes = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
+		
+		for (FaturamentoSituacaoHistorico situacao : situacoes) {
+			if (isSituacaoEmVigencia(anoMesReferencia, situacao))
+				return situacao;
+		}
+		return null;
 	}
 }
