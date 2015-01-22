@@ -442,7 +442,7 @@ public class ArquivoTextoTipo01 {
         String[] mensagemConta = null;
         
         if (mensagemEmTresPartes){
-            mensagemConta = mensagemContaBO.obterMensagemConta3Partes(imovel, anoMesReferencia);
+            mensagemConta = mensagemContaBO.obterMensagemConta3Partes(imovel, anoMesReferencia, faturamentoGrupo.getId());
 
             builder.append(Utilitarios.completaTexto(100, mensagemConta[0]));
             builder.append(Utilitarios.completaTexto(100, mensagemConta[1]));
