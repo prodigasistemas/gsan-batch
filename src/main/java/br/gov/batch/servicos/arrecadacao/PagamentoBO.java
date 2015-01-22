@@ -25,61 +25,61 @@ public class PagamentoBO {
     
     static String IDENTIFICACAO_SEGMENTO = "2";
     
-    static String IDENTIFICACAO_VALOR_REAL_OU_REFERENCIA = "6";
-    
     @EJB
     private SistemaParametrosRepositorio sistemaParametrosRepositorio;
     
     SistemaParametros sistemaParametros;
 
-    
     @PostConstruct
     public void init(){
         sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
     }
     
-    public String obterCodigoBarra(ConsultaCodigoBarrasTO to){
-        
-        validaTipoPagamento(to);
-        
-        StringBuilder codigoBarra = new StringBuilder();
-        
-        codigoBarra.append(IDENTIFICACAO_PRODUTO);
-        codigoBarra.append(IDENTIFICACAO_SEGMENTO);
+	public String obterCodigoBarra(ConsultaCodigoBarrasTO to) {
 
-        Short moduloVerificador = ConstantesSistema.MODULO_VERIFICADOR_10;
-        String identificacaoValorRealOuReferencia = "6";
-        
-        if(sistemaParametros.moduloVerificador11()){
-            moduloVerificador = ConstantesSistema.MODULO_VERIFICADOR_11;
-            identificacaoValorRealOuReferencia = "8";
-        }
-        
-        codigoBarra.append(identificacaoValorRealOuReferencia);
-        
-        String valorCodigoBarra = valorCodigoBarra(to.getValorCodigoBarra());
-        codigoBarra.append(valorCodigoBarra);
-        
-        codigoBarra.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));
-        
-        codigoBarra.append(identificacaoPagamento(to)).append(to.getTipoPagamento());
-        
-        codigoBarra = new StringBuilder(codigoBarra.toString().replace(".", "").replace("-", ""));
-        
-        Integer digitoVerificadorGeral = obterDigitoVerificador(codigoBarra.toString(), moduloVerificador);
+		validaTipoPagamento(to);
 
-        codigoBarra = new StringBuilder();
-        codigoBarra.append(IDENTIFICACAO_PRODUTO)
-        .append(IDENTIFICACAO_SEGMENTO)
-        .append(identificacaoValorRealOuReferencia)
-        .append(digitoVerificadorGeral)
-        .append(valorCodigoBarra)
-        .append(sistemaParametros.getCodigoEmpresaFebraban())
-        .append(identificacaoPagamento(to)).append(to.getTipoPagamento())
-        .append(to.getTipoPagamento());
-        
-        return agrupaCodigoBarras(codigoBarra, moduloVerificador);
-    }
+		StringBuilder codigoBarra = new StringBuilder();
+
+		codigoBarra.append(IDENTIFICACAO_PRODUTO);
+		codigoBarra.append(IDENTIFICACAO_SEGMENTO);
+
+		Short moduloVerificador = ConstantesSistema.MODULO_VERIFICADOR_10;
+		String identificacaoValorRealOuReferencia = "6";
+
+		if (sistemaParametros.moduloVerificador11()) {
+			moduloVerificador = ConstantesSistema.MODULO_VERIFICADOR_11;
+			identificacaoValorRealOuReferencia = "8";
+		}
+
+		codigoBarra.append(identificacaoValorRealOuReferencia);
+
+		String valorCodigoBarra = valorCodigoBarra(to.getValorCodigoBarra());
+		codigoBarra.append(valorCodigoBarra);
+
+		codigoBarra.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));
+
+		codigoBarra.append(identificacaoPagamento(to));
+		
+		codigoBarra.append(to.getTipoPagamento().getId());
+
+		codigoBarra = new StringBuilder(codigoBarra.toString().replace(".", "").replace("-", ""));
+
+		Integer digitoVerificadorGeral = obterDigitoVerificador(codigoBarra.toString(), moduloVerificador);
+
+		codigoBarra = new StringBuilder();
+		codigoBarra.append(IDENTIFICACAO_PRODUTO)
+				   .append(IDENTIFICACAO_SEGMENTO)
+				   .append(identificacaoValorRealOuReferencia)
+				   .append(digitoVerificadorGeral)
+				   .append(valorCodigoBarra)
+				   .append(sistemaParametros.getCodigoEmpresaFebraban())
+				   .append(identificacaoPagamento(to))
+				   .append(to.getTipoPagamento())
+				   .append(to.getTipoPagamento());
+
+		return agrupaCodigoBarras(codigoBarra, moduloVerificador);
+	}
 
     private String agrupaCodigoBarras(StringBuilder codigoBarra, Short moduloVerificador) {
         String primeiroBloco = codigoBarra.substring(0, 11);
@@ -175,13 +175,13 @@ public class PagamentoBO {
         }
     }
     
+    // Verificar se todos estão implementados
     public String identificacaoPagamento(ConsultaCodigoBarrasTO to) {
         StringBuilder identificacaoPagamento = new StringBuilder();
         
         identificacaoPagamento.append(identificacaoPagamentoDocumentoUM(to));
         identificacaoPagamento.append(identificacaoPagamentoConta(to));
         identificacaoPagamento.append(identificacaoPagamentoGuiaImovel(to));
-        identificacaoPagamento.append(identificacaoPagamentoDocumentoCobrancaImovel(to));
         identificacaoPagamento.append(identificacaoPagamentoDocumentoCobrancaImovel(to));
         identificacaoPagamento.append(identificacaoPagamentoGuiaCliente(to));
         identificacaoPagamento.append(identificacaoPagamentoFaturaClienteResponsavel(to));
@@ -197,10 +197,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.UM) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-            .append(completaComZerosEsquerda(9, to.getIdGuiaPagamento()))
-            .append("00")
-            .append("1");
+			             .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+			             .append(completaComZerosEsquerda(9, to.getIdGuiaPagamento()))
+			             .append("00")
+			             .append("1");
         }
         
         return identificacao.toString();        
@@ -211,10 +211,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.NOVE) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(9, to.getIdCliente()))
-            .append(completaComZerosEsquerda(9, to.getIdGuiaPagamento()))
-            .append("00")
-            .append("1");
+			             .append(completaComZerosEsquerda(9, to.getIdCliente()))
+			             .append(completaComZerosEsquerda(9, to.getIdGuiaPagamento()))
+			             .append("00")
+			             .append("1");
         }
         
         return identificacao.toString();        
@@ -225,10 +225,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.DOCUMENTO_COBRANCA_IMOVEL) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-            .append(completaComZerosEsquerda(9, to.getSequencialDocumentoCobranca()))
-            .append(completaComZerosEsquerda(2, to.getTipoDocumento()))
-            .append("1");
+					     .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+					     .append(completaComZerosEsquerda(9, to.getSequencialDocumentoCobranca()))
+					     .append(completaComZerosEsquerda(2, to.getTipoDocumento().getId()))
+					     .append("1");
         }
         
         return identificacao.toString();        
@@ -239,10 +239,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.DOCUMENTO_COBRANCA_CLIENTE) {
             identificacao.append("000")
-            .append(completaComZerosEsquerda(8, to.getIdCliente()))
-            .append(completaComZerosEsquerda(9, to.getSequencialDocumentoCobranca()))
-            .append(completaComZerosEsquerda(2, to.getTipoDocumento()))
-            .append("00");
+			             .append(completaComZerosEsquerda(8, to.getIdCliente()))
+			             .append(completaComZerosEsquerda(9, to.getSequencialDocumentoCobranca()))
+			             .append(completaComZerosEsquerda(2, to.getTipoDocumento().getId()))
+			             .append("00");
         }
         
         return identificacao.toString();        
@@ -253,10 +253,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.FATURA_CLIENTE_RESPONSAVEL) {
             identificacao.append(completaComZerosEsquerda(9, to.getIdCliente()))
-            .append("00")
-            .append(converteParaTexto(to.getMesAnoReferenciaConta()))
-            .append(converteParaTexto(to.getDigitoVerificadorRefContaModulo10()))
-            .append(completaComZerosEsquerda(6, to.getSeqFaturaClienteResponsavel()));
+		                 .append("00")
+		                 .append(converteParaTexto(to.getMesAnoReferenciaConta()))
+		                 .append(converteParaTexto(to.getDigitoVerificadorRefContaModulo10()))
+		                 .append(completaComZerosEsquerda(6, to.getSeqFaturaClienteResponsavel()));
         }
         
         return identificacao.toString();        
@@ -267,11 +267,11 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.GUIA_CLIENTE) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(8, to.getIdCliente()))
-            .append("000")
-            .append(completaComZerosEsquerda(3, to.getIdTipoDebito()))
-            .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
-            .append("000");
+			             .append(completaComZerosEsquerda(8, to.getIdCliente()))
+			             .append("000")
+			             .append(completaComZerosEsquerda(3, to.getIdTipoDebito()))
+			             .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
+			             .append("000");
         }
         
         return identificacao.toString();        
@@ -282,12 +282,12 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.GUIA_IMOVEL) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-            .append("0")
-            .append("1")
-            .append(converteParaTexto(to.getIdTipoDebito()))
-            .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
-            .append("000");
+            			 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+            			 .append("0")
+            			 .append("1")
+            			 .append(converteParaTexto(to.getIdTipoDebito()))
+            			 .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
+            			 .append("000");
         }
         
         return identificacao.toString();
@@ -298,12 +298,12 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.CONTA) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-            .append("0")
-            .append("1")
-            .append(converteParaTexto(to.getMesAnoReferenciaConta()))
-            .append(converteParaTexto(to.getDigitoVerificadorRefContaModulo10()))
-            .append("000");
+						 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+						 .append("0")
+						 .append("1")
+						 .append(converteParaTexto(to.getMesAnoReferenciaConta()))
+						 .append(converteParaTexto(to.getDigitoVerificadorRefContaModulo10()))
+						 .append("000");
         }
         
         return identificacao.toString();
