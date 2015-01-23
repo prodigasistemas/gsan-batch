@@ -40,7 +40,7 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	
     	rota = new Rota();
     	rota.setFaturamentoGrupo(grupo);
-    	rota.setCodigo(Short.valueOf("99"));
+    	rota.setCodigo(Short.valueOf("1"));
     	
     	Localidade localidade = new Localidade(1);
     	localidade.setGerenciaRegional(gerencia);

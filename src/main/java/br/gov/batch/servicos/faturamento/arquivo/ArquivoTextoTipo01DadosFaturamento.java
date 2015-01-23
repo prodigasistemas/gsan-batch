@@ -65,7 +65,7 @@ public class ArquivoTextoTipo01DadosFaturamento {
 	    escreverIndidacorAbastecimento();
 		
 	    dadosFaturamento.put(11, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId())));
-	    dadosFaturamento.put(20, new StringBuilder(Utilitarios.completaComEspacosADireita(1, imovel.getPocoTipo())));
+	    dadosFaturamento.put(19, new StringBuilder(Utilitarios.completaComEspacosADireita(1, imovel.getPocoTipo())));
 	    dadosFaturamento.put(37, new StringBuilder(Utilitarios.formataData(
 	    		faturamentoAtividadeCronogramaBO.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA), 
 	    		FormatoData.ANO_MES_DIA)));
@@ -102,7 +102,7 @@ public class ArquivoTextoTipo01DadosFaturamento {
             builder.append(imovel.getLigacaoEsgotoSituacao().getId());
         }
 
-        dadosFaturamento.put(14, builder);
+        dadosFaturamento.put(13, builder);
     }
 	
 	private void escreverSituacaoEspecialFaturamento(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {

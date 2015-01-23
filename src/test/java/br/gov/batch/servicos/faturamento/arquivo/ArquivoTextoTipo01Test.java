@@ -321,7 +321,7 @@ public class ArquivoTextoTipo01Test {
     	String linha01 = arquivoTextoTipo01.build();
     	
     	assertNotNull(linha01);
-    	assertEquals(linha01, getLinhaValida());
+    	assertEquals(getLinhaValida(), linha01);
     }
     
 //    @Test
@@ -385,7 +385,7 @@ public class ArquivoTextoTipo01Test {
     public static void main (String [] args) {
     	int tamanhoLinha = 90;
     	
-    	String linhaCompleta = "01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501222015012200100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              2015011                                                                                                             31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.0 2.0 050.00000500001000000199999999900AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 000000000MENSAGEM EM CONTA - 1                                                                               MENSAGEM EM CONTA - 2                                                                               MENSAGEM EM CONTA - 3                                                                               MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  000010000010         33333333333333333333333333333333333333333333333311111111111                                           201501221212888888888            20150122";
+    	String linhaCompleta = "01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501222015012200100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              2015011                                                                                                             31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.0 2.0 050.00000500001000000199999999900           AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 000000000MENSAGEM EM CONTA - 1                                                                               MENSAGEM EM CONTA - 2                                                                               MENSAGEM EM CONTA - 3                                                                               MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  000010000010         33333333333333333333333333333333333333333333333311111111111                                           201501221212888888888            20150122";
     	String linha1 = linhaCompleta.substring(0, 100);
     	String linha2 = linhaCompleta.substring(100, 200);
     	String linha3 = linhaCompleta.substring(200, 300);
@@ -443,20 +443,20 @@ public class ArquivoTextoTipo01Test {
     private Map<Integer, StringBuilder> getMapConsumo() {
     	Map<Integer, StringBuilder> mapConsumo = new HashMap<Integer, StringBuilder>();
     	
-    	mapConsumo.put(13, new StringBuilder("000020"));
+    	mapConsumo.put(12, new StringBuilder("000020"));
+    	mapConsumo.put(15, new StringBuilder("000010"));
     	mapConsumo.put(16, new StringBuilder("      "));
-    	mapConsumo.put(17, new StringBuilder("      "));
-    	mapConsumo.put(18, new StringBuilder("000000"));
+    	mapConsumo.put(17, new StringBuilder("000000"));
     	
-    	mapConsumo.put(19, new StringBuilder("030.00"));
-    	mapConsumo.put(21, new StringBuilder("01"));
-    	mapConsumo.put(22, new StringBuilder("0000500000500000303.0 2.0 050.00000500"));
+    	mapConsumo.put(18, new StringBuilder("030.00"));
+    	mapConsumo.put(20, new StringBuilder("01"));
+    	mapConsumo.put(21, new StringBuilder("0000500000500000303.0 2.0 050.00000500"));
     	mapConsumo.put(43, new StringBuilder("      "));
     	
     	mapConsumo.put(44, new StringBuilder("      "));
     	mapConsumo.put(32, new StringBuilder("000010"));
     	mapConsumo.put(33, new StringBuilder("000010"));
-    	mapConsumo.put(26, new StringBuilder("00"));
+    	mapConsumo.put(25, new StringBuilder("00"));
     	
     	return mapConsumo;
     }
@@ -464,14 +464,15 @@ public class ArquivoTextoTipo01Test {
     private Map<Integer, StringBuilder> getMapConta() {
     	Map<Integer, StringBuilder> mapConta = new HashMap<Integer, StringBuilder>();
     	
-    	mapConta.put(13, new StringBuilder("2015012320150123"));
-    	mapConta.put(16, new StringBuilder("2015011"));
-    	mapConta.put(17, new StringBuilder("999999999"));
-    	mapConta.put(18, getMensagemConta());
+    	mapConta.put(3, new StringBuilder("2015012320150123"));
+    	mapConta.put(6, new StringBuilder("2015011"));
+    	mapConta.put(24, new StringBuilder("999999999"));
+    	mapConta.put(28, getMensagemConta());
     	
-    	mapConta.put(19, new StringBuilder("                                                                                                                                                                                                                    "));
-    	mapConta.put(21, new StringBuilder("                                                                                                                                                                                                        "));
-    	mapConta.put(22, new StringBuilder("MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                      "));
+    	mapConta.put(14, new StringBuilder("1"));
+    	mapConta.put(30, new StringBuilder("                                                                                                                                                                                                                    "));
+    	mapConta.put(31, new StringBuilder("                                                                                                                                                                                                        "));
+    	mapConta.put(29, new StringBuilder("MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                      "));
     	
     	return mapConta;
     }
@@ -481,12 +482,12 @@ public class ArquivoTextoTipo01Test {
     	
     	mapFatuamento.put(8, new StringBuilder("31"));
     	mapFatuamento.put(10, new StringBuilder("         2"));
-    	mapFatuamento.put(14, new StringBuilder("12"));
+    	mapFatuamento.put(13, new StringBuilder("12"));
     	mapFatuamento.put(36, new StringBuilder("                                    "));
     	
     	mapFatuamento.put(38, new StringBuilder("1"));
     	mapFatuamento.put(11, new StringBuilder("01"));
-    	mapFatuamento.put(20, new StringBuilder(" "));
+    	mapFatuamento.put(19, new StringBuilder(" "));
     	mapFatuamento.put(37, new StringBuilder("20150123"));
     	
     	mapFatuamento.put(39, new StringBuilder(""));
@@ -501,13 +502,13 @@ public class ArquivoTextoTipo01Test {
     	
     	mapLocalizacao.put(0, new StringBuilder("BELEM                    "));
     	mapLocalizacao.put(1, new StringBuilder("DESCRICAO DA LOCALIDADE  "));
-    	mapLocalizacao.put(23, new StringBuilder("001"));
-    	mapLocalizacao.put(24, new StringBuilder("0000099"));
+    	mapLocalizacao.put(22, new StringBuilder("001"));
+    	mapLocalizacao.put(23, new StringBuilder("0000001"));
     	
-    	mapLocalizacao.put(28, new StringBuilder("000000000"));
-    	mapLocalizacao.put(4, new StringBuilder("00100112340000000"));
-    	mapLocalizacao.put(5, new StringBuilder("                                                                      "));
-    	
+    	mapLocalizacao.put(27, new StringBuilder("000000000"));
+    	mapLocalizacao.put(4, new StringBuilder("00100112341234123"));
+    	mapLocalizacao.put(5, new StringBuilder("AV ALM BARROSO25 - MARCO BELEM 66093-906                              "));
+    	mapLocalizacao.put(26, new StringBuilder("           "));
     	return mapLocalizacao;
     }
     

@@ -122,9 +122,9 @@ public class ArquivoTextoTipo01DadosCliente {
             indicadorEmissaoConta = new Short("2");
         }
 
-        builder.append(indicadorEmissaoConta);
+        builder.append(indicadorEmissaoConta.toString());
         
-        dadosCliente.put(15, builder);
+        dadosCliente.put(14, builder);
     }
 	
 	public boolean emitirConta(Integer envioConta) {

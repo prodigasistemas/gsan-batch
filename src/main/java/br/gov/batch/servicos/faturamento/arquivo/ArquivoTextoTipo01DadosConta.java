@@ -108,7 +108,7 @@ public class ArquivoTextoTipo01DadosConta {
             builder.append(Utilitarios.completaComEspacosADireita(9, ""));
         }
         
-        dadosConta.put(25, builder);
+        dadosConta.put(24, builder);
     }
 	
 	private void escreverMensagemConta() {

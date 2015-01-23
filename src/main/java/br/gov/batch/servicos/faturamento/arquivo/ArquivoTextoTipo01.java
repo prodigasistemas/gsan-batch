@@ -1,5 +1,6 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -129,9 +130,21 @@ public class ArquivoTextoTipo01 {
 	    mapDados.putAll(dadosConta.build());
 	    mapDados.putAll(dadosFaturamento.build());
 	    
+	    Iterator<Integer> itKeys = mapDados.keySet().iterator();
+	    		
+	    while (itKeys.hasNext()) {
+	    	System.out.println(itKeys.next());
+	    }
+	    		
+	    Iterator<StringBuilder> it = mapDados.values().iterator();
+	    
+	    while (it.hasNext()) {
+	    	builder.append(it.next());
+	    }
+	    
 	    builder.append(System.getProperty("line.separator"));
 	    
-	    return builder.toString();
+ 	    return builder.toString();
 	
 	}
 

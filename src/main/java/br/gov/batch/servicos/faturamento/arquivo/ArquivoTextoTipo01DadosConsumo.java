@@ -60,7 +60,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 	    
 	    escreverPercentualEsgoto();
 	    
-	    dadosConsumo.put(21, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.getConsumoTarifa().getId())));
+	    dadosConsumo.put(20, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.getConsumoTarifa().getId())));
 	    
 	    escreverDadosConsumoCategoria();
 
@@ -69,7 +69,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 	    dadosConsumo.put(32, new StringBuilder(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoMinimoLigacao(imovel.getId()))));
 	    
 	    dadosConsumo.put(33, new StringBuilder(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoNaoMedido(imovel.getId(), faturamentoGrupo.getAnoMesReferencia()))));
-	    dadosConsumo.put(26, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.tarifaTipoCalculo())));
+	    dadosConsumo.put(25, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.tarifaTipoCalculo())));
 	
 	    return dadosConsumo;
 	}
@@ -83,7 +83,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 	    		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
 	    builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 	
-	    dadosConsumo.put(13, builder);
+	    dadosConsumo.put(12, builder);
 	}
 	
 	private void escreverConsumoMinimoAgua() {
@@ -95,7 +95,7 @@ public class ArquivoTextoTipo01DadosConsumo {
             builder.append(Utilitarios.completaComEspacosADireita(6, ""));
         }
 
-		dadosConsumo.put(16, builder);
+		dadosConsumo.put(15, builder);
     }
 	
 	private void escreverConsumoMinimoEsgoto() {
@@ -107,7 +107,7 @@ public class ArquivoTextoTipo01DadosConsumo {
             builder.append(Utilitarios.completaComEspacosADireita(6, ""));
         }
         
-        dadosConsumo.put(17, builder);
+        dadosConsumo.put(16, builder);
     }
 	
 	private void escreverPercentualAguaConsumidaColetada() {
@@ -120,7 +120,7 @@ public class ArquivoTextoTipo01DadosConsumo {
             builder.append(Utilitarios.completaComZerosEsquerda(6, ""));
         }
         
-        dadosConsumo.put(18, builder);
+        dadosConsumo.put(17, builder);
     }
 	
 	private void escreverPercentualEsgoto() {
@@ -130,7 +130,7 @@ public class ArquivoTextoTipo01DadosConsumo {
         
         builder.append(Utilitarios.completaComZerosEsquerda(6, Utilitarios.formatarBigDecimalComPonto(percentual)));
         
-        dadosConsumo.put(19, builder);
+        dadosConsumo.put(18, builder);
     }
 	
 	private void escreverDadosConsumoCategoria() {
@@ -174,7 +174,7 @@ public class ArquivoTextoTipo01DadosConsumo {
         builder.append(Utilitarios.completaComZerosEsquerda(6, Utilitarios.formatarBigDecimalComPonto(percentualDeterminacaoBaixoConsumo)));
         builder.append(Utilitarios.completaComZerosEsquerda(6, Math.min(consumoMaximoCobrancaEstouroConsumo, 999999))); 
        
-        dadosConsumo.put(22, builder);
+        dadosConsumo.put(21, builder);
     }
 	
 	private void escreverEsgotoAlternativo() {

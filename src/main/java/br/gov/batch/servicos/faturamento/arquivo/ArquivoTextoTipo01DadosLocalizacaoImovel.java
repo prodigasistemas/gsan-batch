@@ -29,9 +29,9 @@ public class ArquivoTextoTipo01DadosLocalizacaoImovel {
 		
 		dadosLocalizacaoImovel.put(0, new StringBuilder(Utilitarios.completaComEspacosADireita(25, imovel.getLocalidade().getGerenciaRegional().getNome())));
 		dadosLocalizacaoImovel.put(1, new StringBuilder(Utilitarios.completaComEspacosADireita(25, imovel.getLocalidade().getDescricao())));
-		dadosLocalizacaoImovel.put(23, new StringBuilder(Utilitarios.completaComZerosEsquerda(3, rota.getFaturamentoGrupo().getId())));
-		dadosLocalizacaoImovel.put(24, new StringBuilder(Utilitarios.completaComZerosEsquerda(7, rota.getCodigo())));
-		dadosLocalizacaoImovel.put(28, new StringBuilder(Utilitarios.completaComZerosEsquerda(9, imovel.getNumeroSequencialRota())));
+		dadosLocalizacaoImovel.put(22, new StringBuilder(Utilitarios.completaComZerosEsquerda(3, rota.getFaturamentoGrupo().getId())));
+		dadosLocalizacaoImovel.put(23, new StringBuilder(Utilitarios.completaComZerosEsquerda(7, rota.getCodigo())));
+		dadosLocalizacaoImovel.put(27, new StringBuilder(Utilitarios.completaComZerosEsquerda(9, imovel.getNumeroSequencialRota())));
 		dadosLocalizacaoImovel.put(4, new StringBuilder(Utilitarios.completaComEspacosADireita(17, imovel.getInscricaoFormatadaSemPonto())));
 		dadosLocalizacaoImovel.put(5, new StringBuilder(Utilitarios.completaComEspacosADireita(70, imovel.getEnderecoFormatadoAbreviado())));
 		
@@ -56,6 +56,6 @@ public class ArquivoTextoTipo01DadosLocalizacaoImovel {
 
         builder.append(Utilitarios.completaComEspacosADireita(11, dddMunicipio + fone));
         
-        dadosLocalizacaoImovel.put(27, builder);
+        dadosLocalizacaoImovel.put(26, builder);
     }
 }
