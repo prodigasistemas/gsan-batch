@@ -510,7 +510,7 @@ public class ArquivoTextoTipo01Test {
     	
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true");
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false");
-    	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA)).andReturn("false");
+    	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).andReturn("false");
     	replay(repositorioParametros);
     	
     	expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, null, faturamentoGrupo.getId())).andReturn(mensagemConta);

@@ -342,7 +342,7 @@ public class ArquivoTextoTipo01 {
     private void escreverQualidadeDaAgua() {
     	Integer anoMesReferenciaQualidadeAgua = null;
     	
-		if (!Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA))) {
+		if (!Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA))) {
 			anoMesReferenciaQualidadeAgua = Utilitarios.reduzirMeses(faturamentoGrupo.getAnoMesReferencia(), 1);
 		} else {
 			anoMesReferenciaQualidadeAgua = faturamentoGrupo.getAnoMesReferencia();
