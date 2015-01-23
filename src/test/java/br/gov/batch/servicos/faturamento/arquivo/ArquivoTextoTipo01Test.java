@@ -497,7 +497,7 @@ public class ArquivoTextoTipo01Test {
     	expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(instalacaoOuSubstituicaoHidrometro);
     	replay(hidrometroBOMock);
     	
-    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), instalacaoOuSubstituicaoHidrometro))
+    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId()))
     		.andReturn(volumeMedioTO);
     	replay(aguaEsgotoBOMock);
     	
@@ -510,10 +510,10 @@ public class ArquivoTextoTipo01Test {
     	
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true");
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false");
-    	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA)).andReturn("false");
+    	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).andReturn("false");
     	replay(repositorioParametros);
     	
-    	expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, null, null)).andReturn(mensagemConta);
+    	expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, null, faturamentoGrupo.getId())).andReturn(mensagemConta);
     	replay(mensagemContaBOMock);
     	
     	expect(extratoQuitacaoBOMock.obterMsgQuitacaoDebitos(imovel.getId(), null)).andReturn("MENSAGEM QUITACAO ANUAL DE DEBITOS");
