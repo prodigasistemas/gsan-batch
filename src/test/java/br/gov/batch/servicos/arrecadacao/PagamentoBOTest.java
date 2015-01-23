@@ -27,35 +27,55 @@ public class PagamentoBOTest {
 	@Mock
 	private SistemaParametros sistemaParametrosMock;
 	
-	private ConsultaCodigoBarrasTO to;
-	
 	@Before
 	public void setup() {
 		pagamentoBO = new PagamentoBO();
+	}
+
+	@Test
+	public void codigoDeBarraValidoParaConta() {
+		mockParametros();
 		
-		to = new ConsultaCodigoBarrasTO();
-		to.setTipoPagamento(TipoPagamento.CONTA);
-        to.setValorCodigoBarra(BigDecimal.valueOf(14.00));
-        to.setMesAnoReferenciaConta("072014");
-        to.setDigitoVerificadorRefContaModulo10(10);
-        to.setIdLocalidade(17);
-        to.setMatriculaImovel(1101625);
-        to.setTipoDocumento(DocumentoTipo.parse(1));
+		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaConta());
+		assertEquals("826400000004474000220027006858686014012015400034", codigoDeBarra);
 	}
 	
 	@Test
-	public void codigoDeBarraValido() {
+	public void codigoDeBarraValidoParaDocumentoCobrancaImovel() {
 		mockParametros();
 		
-		String codigoDeBarra = pagamentoBO.obterCodigoBarra(to);
-		
-		assertEquals("826600000000140000220172001101625018072014400039", codigoDeBarra);
+		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaDocumentoCobrancaImovel());
+		assertEquals("826500000003958000220185004929756007696727601150", codigoDeBarra);
 	}
 	
 	private void mockParametros() {
-		expect(sistemaParametrosMock.getNumeroModuloDigitoVerificador()).andReturn(Short.valueOf("10"));
-		expect(sistemaParametrosMock.getCodigoEmpresaFebraban()).andReturn(Short.valueOf("22")).times(2);
 		expect(sistemaParametrosMock.moduloVerificador11()).andReturn(false);
+		expect(sistemaParametrosMock.getCodigoEmpresaFebraban()).andReturn(Short.valueOf("22"));
 		replay(sistemaParametrosMock);
+	}
+	
+	private ConsultaCodigoBarrasTO getDadosParaConta() {
+		ConsultaCodigoBarrasTO to = new ConsultaCodigoBarrasTO();
+		to.setTipoPagamento(TipoPagamento.CONTA);
+        to.setValorCodigoBarra(BigDecimal.valueOf(47.40));
+        to.setMesAnoReferenciaConta("012015");
+        to.setDigitoVerificadorRefContaModulo10(4);
+        to.setIdLocalidade(2);
+        to.setMatriculaImovel(6858686);
+        to.setTipoDocumento(DocumentoTipo.parse(DocumentoTipo.CONTA.getId()));
+        
+        return to;
+	}
+	
+	private ConsultaCodigoBarrasTO getDadosParaDocumentoCobrancaImovel() {
+		ConsultaCodigoBarrasTO to = new ConsultaCodigoBarrasTO();
+		to.setTipoPagamento(TipoPagamento.DOCUMENTO_COBRANCA_IMOVEL);
+        to.setValorCodigoBarra(BigDecimal.valueOf(95.80));
+        to.setIdLocalidade(18);
+        to.setMatriculaImovel(4929756);
+        to.setSequencialDocumentoCobranca("6967276");
+        to.setTipoDocumento(DocumentoTipo.parse(DocumentoTipo.CONTA.getId()));
+        
+        return to;
 	}
 }

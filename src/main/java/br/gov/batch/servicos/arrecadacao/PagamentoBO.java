@@ -57,9 +57,11 @@ public class PagamentoBO {
 		String valorCodigoBarra = valorCodigoBarra(to.getValorCodigoBarra());
 		codigoBarra.append(valorCodigoBarra);
 
-		codigoBarra.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));
+		String identificacaoEmpresa = Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban());
+		codigoBarra.append(identificacaoEmpresa);
 
-		codigoBarra.append(identificacaoPagamento(to));
+		String identificacaoPagamento = identificacaoPagamento(to);
+		codigoBarra.append(identificacaoPagamento);
 		
 		codigoBarra.append(to.getTipoPagamento().getId());
 
@@ -73,14 +75,13 @@ public class PagamentoBO {
 				   .append(identificacaoValorRealOuReferencia)
 				   .append(digitoVerificadorGeral)
 				   .append(valorCodigoBarra)
-				   .append(sistemaParametros.getCodigoEmpresaFebraban())
-				   .append(identificacaoPagamento(to))
-				   .append(to.getTipoPagamento())
-				   .append(to.getTipoPagamento());
+				   .append(identificacaoEmpresa)
+				   .append(identificacaoPagamento)
+				   .append(to.getTipoPagamento().getId());
 
 		return agrupaCodigoBarras(codigoBarra, moduloVerificador);
 	}
-
+	
     private String agrupaCodigoBarras(StringBuilder codigoBarra, Short moduloVerificador) {
         String primeiroBloco = codigoBarra.substring(0, 11);
         Integer digitoPrimeiroBloco = obterDigitoVerificador(primeiroBloco, moduloVerificador);
@@ -88,15 +89,15 @@ public class PagamentoBO {
         Integer digitoSegundoBloco = obterDigitoVerificador(segundoBloco, moduloVerificador);
         String terceiroBloco = codigoBarra.substring(22, 33);
         Integer digitoTerceiroBloco = obterDigitoVerificador(terceiroBloco, moduloVerificador);
-        String quartoBloco = codigoBarra.substring(0, 11);
+        String quartoBloco = codigoBarra.substring(33, 44);
         Integer digitoQuartoBloco = obterDigitoVerificador(quartoBloco, moduloVerificador);
         
 
         return new StringBuilder()
-        .append(primeiroBloco).append(digitoPrimeiroBloco)
-        .append(segundoBloco) .append(digitoSegundoBloco)
-        .append(terceiroBloco).append(digitoTerceiroBloco)
-        .append(quartoBloco)  .append(digitoQuartoBloco).toString();
+        		.append(primeiroBloco).append(digitoPrimeiroBloco)
+        		.append(segundoBloco).append(digitoSegundoBloco)
+        		.append(terceiroBloco).append(digitoTerceiroBloco)
+        		.append(quartoBloco).append(digitoQuartoBloco).toString();
     }
 
     private String valorCodigoBarra(BigDecimal valorCodigoBarra) {
@@ -186,7 +187,7 @@ public class PagamentoBO {
         identificacaoPagamento.append(identificacaoPagamentoGuiaCliente(to));
         identificacaoPagamento.append(identificacaoPagamentoFaturaClienteResponsavel(to));
         identificacaoPagamento.append(identificacaoPagamentoDocumentoCobrancaCliente(to));
-        identificacaoPagamento.append(identificacaoPagamentoDocumento(to));
+        identificacaoPagamento.append(identificacaoPagamentoDocumentoNOVE(to));
 
 
         return identificacaoPagamento.toString();
@@ -206,7 +207,7 @@ public class PagamentoBO {
         return identificacao.toString();        
     }
 
-    private String identificacaoPagamentoDocumento(ConsultaCodigoBarrasTO to) {
+    private String identificacaoPagamentoDocumentoNOVE(ConsultaCodigoBarrasTO to) {
         StringBuilder identificacao = new StringBuilder();
         
         if (to.getTipoPagamento() == TipoPagamento.NOVE) {
@@ -285,7 +286,7 @@ public class PagamentoBO {
             			 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
             			 .append("0")
             			 .append("1")
-            			 .append(converteParaTexto(to.getIdTipoDebito()))
+            			 .append(completaComZerosEsquerda(3, to.getIdTipoDebito()))
             			 .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
             			 .append("000");
         }
@@ -298,7 +299,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.CONTA) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
+            			 // TODO - Completar com 8
 						 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+						 // TODO - Adicionar 000
+//						 .append("000")
 						 .append("0")
 						 .append("1")
 						 .append(converteParaTexto(to.getMesAnoReferenciaConta()))
