@@ -2,6 +2,7 @@ package br.gov.batch.servicos.faturamento;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -11,9 +12,7 @@ import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
 import br.gov.model.cadastro.ICategoria;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.faturamento.ConsumoTarifa;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelRepositorio;
@@ -54,7 +53,7 @@ public class AguaEsgotoBO {
 	}
 	
 	public VolumeMedioAguaEsgotoTO obterVolumeMedioAguaEsgoto(Integer idImovel, Integer anoMesReferencia,
-			int idLigacaoTipo, boolean houveInstalacaoHidrometro) {
+			int idLigacaoTipo) {
 
 		Integer dataFim = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 		Integer dataInicio = Utilitarios.reduzirMeses(dataFim, sistemaParametros.getMesesMediaConsumo());
@@ -71,29 +70,35 @@ public class AguaEsgotoBO {
 	private VolumeMedioAguaEsgotoTO gerarVolumeMedioComConsumoHistorico(List<ConsumoHistorico> listaConsumoHistorico,
 			Integer dataInicio, Integer dataFim) {
 		
-		ConsumoHistorico consumoHistorico = listaConsumoHistorico.iterator().next();
-		Integer referencia = consumoHistorico.getReferenciaFaturamento();
-		Integer maximoDeMesesParaCalcularMedia = sistemaParametros.getNumeroMesesMaximoCalculoMedia().intValue();
-		Integer novaDataInicio = Utilitarios.reduzirMeses(dataInicio, maximoDeMesesParaCalcularMedia);
-		Integer quantidadeDeMeses = Utilitarios.obterQuantidadeMeses(dataFim, novaDataInicio);
+		ListIterator<ConsumoHistorico> iterator = listaConsumoHistorico.listIterator();
+		ConsumoHistorico consumoHistorico = iterator.next();
+		int referencia = consumoHistorico.getReferenciaFaturamento();
+		int maximoDeMesesParaCalcularMedia = sistemaParametros.getNumeroMesesMaximoCalculoMedia().intValue();
+		int novaDataInicio = Utilitarios.reduzirMeses(dataInicio, maximoDeMesesParaCalcularMedia);
+		int quantidadeDeMeses = Utilitarios.obterQuantidadeMeses(dataFim, novaDataInicio);
 
-		Integer quantidadeDeMesesConsiderados = 0;
-		Integer quantidadeDeMesesRetroagidos = 0;
-		Integer consumo = 0;
-		Integer mediaConsumo = 0;
+		int quantidadeDeMesesConsiderados = 0;
+		int quantidadeDeMesesRetroagidos = 0;
+		int consumo = 0;
+		int mediaConsumo = 0;
+		
 		while (quantidadeDeMesesRetroagidos <= maximoDeMesesParaCalcularMedia && quantidadeDeMesesConsiderados < quantidadeDeMeses) {
 			if (dataFim.equals(referencia)) {
 				consumo += consumoHistorico.getNumeroConsumoCalculoMedia();
 				quantidadeDeMesesConsiderados++;
 
-				consumoHistorico = listaConsumoHistorico.iterator().next();
-				if (consumoHistorico == null)
+				if (iterator.hasNext()) {
+					consumoHistorico = iterator.next();
+					referencia = consumoHistorico.getReferenciaFaturamento();
+				} else {
 					break;
-
-				referencia = consumoHistorico.getNumeroConsumoCalculoMedia();
-				dataFim = Utilitarios.reduzirMeses(dataFim, 1);
+				}
 			} else {
 				quantidadeDeMesesRetroagidos++;
+			}
+			
+			if (quantidadeDeMesesRetroagidos < maximoDeMesesParaCalcularMedia) {
+				dataFim = Utilitarios.reduzirMeses(dataFim, 1);
 			}
 		}
 		
@@ -105,13 +110,10 @@ public class AguaEsgotoBO {
 	}
 
 	private VolumeMedioAguaEsgotoTO gerarVolumeMedioSemConsumoHistorico(Integer idImovel) {
-		Imovel imovel = imovelRepositorio.buscarPeloId(idImovel);
-		imovel.setConsumoTarifa(new ConsumoTarifa());
-		imovel.getConsumoTarifa().setId(imovel.getId());
-
-		Collection<ICategoria> categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
+		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
+		int idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
+		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, categorias);
 		
-		return new VolumeMedioAguaEsgotoTO(consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel,
-				consumoTarifaRepositorio.consumoTarifaDoImovel(imovel.getId()), categoria), 1);
+		return new VolumeMedioAguaEsgotoTO(consumoMinimo, 1);
 	}
 }

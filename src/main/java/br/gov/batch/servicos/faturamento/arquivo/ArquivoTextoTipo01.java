@@ -195,10 +195,8 @@ public class ArquivoTextoTipo01 {
 
         builder.append(Utilitarios.completaComZerosEsquerda(2, imovel.getImovelPerfil().getId()));
 
-        boolean houveInstalacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
-        
         VolumeMedioAguaEsgotoTO consumoMedioLigacaoAgua = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), 
-        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
+        		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId());
         builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 
         escreverIndicadorFaturamentoSituacao();
@@ -796,10 +794,8 @@ public class ArquivoTextoTipo01 {
 	}
 	
 	private void buildInformacoesConsumo() {
-		boolean houveInstalacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
-	    
 	    VolumeMedioAguaEsgotoTO consumoMedioLigacaoAgua = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), 
-	    		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), houveInstalacaoHidrometro);
+	    		faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId());
 	    builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedioLigacaoAgua.getConsumoMedio()));
 	
 	    escreverConsumoMinimoAgua();

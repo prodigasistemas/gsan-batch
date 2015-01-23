@@ -128,7 +128,7 @@ public class ArquivoTextoTipo08 {
 
 	private int getConsumoMedioHidrometro(Integer medicaoTipo, Integer referencia) {
 		boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
-		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo, houveIntslacaoHidrometro);
+		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo);
 		return volumeMedioAguaEsgotoTO.getConsumoMedio();
 	}
 	
