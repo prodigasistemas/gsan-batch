@@ -513,7 +513,7 @@ public class ArquivoTextoTipo01Test {
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA)).andReturn("false");
     	replay(repositorioParametros);
     	
-    	expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, null)).andReturn(mensagemConta);
+    	expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, null, null)).andReturn(mensagemConta);
     	replay(mensagemContaBOMock);
     	
     	expect(extratoQuitacaoBOMock.obterMsgQuitacaoDebitos(imovel.getId(), null)).andReturn("MENSAGEM QUITACAO ANUAL DE DEBITOS");
