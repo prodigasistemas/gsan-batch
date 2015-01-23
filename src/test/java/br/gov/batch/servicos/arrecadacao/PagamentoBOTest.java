@@ -3,6 +3,7 @@ package br.gov.batch.servicos.arrecadacao;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
@@ -33,11 +34,20 @@ public class PagamentoBOTest {
 	}
 
 	@Test
+	public void codigoDeBarraQuantidadeDeDigitos() {
+		mockParametros();
+		
+		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaConta());
+		assertTrue(codigoDeBarra.length() == 48);
+	}
+	
+	@Test
 	public void codigoDeBarraValidoParaConta() {
 		mockParametros();
 		
 		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaConta());
-		assertEquals("826400000004474000220027006858686014012015400034", codigoDeBarra);
+		System.out.println(codigoDeBarra);
+		assertEquals("826500000003474000220027068586860006012015400034", codigoDeBarra);
 	}
 	
 	@Test
@@ -45,7 +55,8 @@ public class PagamentoBOTest {
 		mockParametros();
 		
 		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaDocumentoCobrancaImovel());
-		assertEquals("826500000003958000220185004929756007696727601150", codigoDeBarra);
+		System.out.println(codigoDeBarra);
+		assertEquals("826900000009958000220185049297560069967276010055", codigoDeBarra);
 	}
 	
 	private void mockParametros() {
