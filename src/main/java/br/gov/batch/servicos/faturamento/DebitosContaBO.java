@@ -63,7 +63,7 @@ public class DebitosContaBO {
 			debitoCobrado.setAnoMesReferenciaDebito(debitoACobrar.getAnoMesReferenciaDebito());
 			debitoCobrado.setAnoMesCobrancaDebito(debitoACobrar.getAnoMesCobrancaDebito());
 			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
-			debitoCobrado.setFinanciamentoTipo(debitoACobrar.getFinanciamentoTipo());
+			debitoCobrado.setTipoFinanciamento(debitoACobrar.getTipoFinanciamento());
 			debitoCobrado.setNumeroParcelaBonus(debitoACobrar.getNumeroParcelaBonus() != null ? debitoACobrar.getNumeroParcelaBonus() : 0);
 			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
 			
