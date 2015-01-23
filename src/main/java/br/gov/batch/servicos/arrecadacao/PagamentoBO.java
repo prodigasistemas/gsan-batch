@@ -226,10 +226,10 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.DOCUMENTO_COBRANCA_IMOVEL) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-					     .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
+					     .append(completaComZerosEsquerda(8, to.getMatriculaImovel()))
 					     .append(completaComZerosEsquerda(9, to.getSequencialDocumentoCobranca()))
 					     .append(completaComZerosEsquerda(2, to.getTipoDocumento().getId()))
-					     .append("1");
+					     .append("00");
         }
         
         return identificacao.toString();        
@@ -283,9 +283,8 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.GUIA_IMOVEL) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            			 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-            			 .append("0")
-            			 .append("1")
+            			 .append(completaComZerosEsquerda(8, to.getMatriculaImovel()))
+            			 .append("000")
             			 .append(completaComZerosEsquerda(3, to.getIdTipoDebito()))
             			 .append(converteParaTexto(to.getAnoEmissaoGuiaPagamento()))
             			 .append("000");
@@ -299,12 +298,8 @@ public class PagamentoBO {
         
         if (to.getTipoPagamento() == TipoPagamento.CONTA) {
             identificacao.append(completaComZerosEsquerda(3, to.getIdLocalidade()))
-            			 // TODO - Completar com 8
-						 .append(completaComZerosEsquerda(9, to.getMatriculaImovel()))
-						 // TODO - Adicionar 000
-//						 .append("000")
-						 .append("0")
-						 .append("1")
+						 .append(completaComZerosEsquerda(8, to.getMatriculaImovel()))
+						 .append("000")
 						 .append(converteParaTexto(to.getMesAnoReferenciaConta()))
 						 .append(converteParaTexto(to.getDigitoVerificadorRefContaModulo10()))
 						 .append("000");
