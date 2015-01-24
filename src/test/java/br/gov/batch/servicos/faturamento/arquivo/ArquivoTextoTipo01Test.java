@@ -432,7 +432,7 @@ public class ArquivoTextoTipo01Test {
     	mapCobranca.put(9, new StringBuilder("BANCO DO BRASIL00000"));
     	mapCobranca.put(34, new StringBuilder("         333333333333333333333333333333333333333333333333"));
     	mapCobranca.put(42, new StringBuilder("888888888"));
-    	//mapCobranca.put(45, new StringBuilder("20150122"));
+    	mapCobranca.put(45, new StringBuilder("20150122"));
     	
     	return mapCobranca;
     }
@@ -505,7 +505,7 @@ public class ArquivoTextoTipo01Test {
     	mapLocalizacao.put(27, new StringBuilder("000000000"));
     	mapLocalizacao.put(4, new StringBuilder("00100112341234123"));
     	mapLocalizacao.put(5, new StringBuilder("AV ALM BARROSO25 - MARCO BELEM 66093-906                              "));
-    	mapLocalizacao.put(26, new StringBuilder("           "));
+    	mapLocalizacao.put(26, new StringBuilder("AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 "));
     	return mapLocalizacao;
     }
     
