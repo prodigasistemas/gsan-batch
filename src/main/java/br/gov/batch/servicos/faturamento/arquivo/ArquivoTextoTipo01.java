@@ -109,16 +109,8 @@ public class ArquivoTextoTipo01 {
         builder = new StringBuilder();
     }
 
-    public static void main (String [] args) {
-    	String linhaCompleta = "01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501222015012200100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              2015011                                                                                                             31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.0 2.0 050.00000500001000000199999999900AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 000000000MENSAGEM EM CONTA - 1                                                                               MENSAGEM EM CONTA - 2                                                                               MENSAGEM EM CONTA - 3                                                                               MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  000010000010         33333333333333333333333333333333333333333333333311111111111                                           201501221212888888888            20150122";
-    	String linha1 = linhaCompleta.substring(0, 90);
-    	
-    	System.out.println(linha1);
-    	//return null;
-    }
     public String build() {
-		
-    	mapDados = new TreeMap<Integer, StringBuilder>();
+        mapDados = new TreeMap<Integer, StringBuilder>();
     	
 	    builder.append("01");
 	    builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(imovel.getId())));
@@ -145,8 +137,8 @@ public class ArquivoTextoTipo01 {
 	    builder.append(System.getProperty("line.separator"));
 	    
  	    return builder.toString();
-	
-	}
+ 	    
+    }
 
 	public Imovel getImovel() {
 		return imovel;
@@ -191,7 +183,7 @@ public class ArquivoTextoTipo01 {
 	public ArquivoTextoTipo01DadosCobranca getDadosCobranca() {
 		return dadosCobranca;
 	}
-
+	
 	public void setDadosCobranca(ArquivoTextoTipo01DadosCobranca dadosCobranca) {
 		this.dadosCobranca = dadosCobranca;
 	}

@@ -159,7 +159,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(instalacaoOuSubstituicaoHidrometro);
     	replay(hidrometroBOMock);
     	
-    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId(), instalacaoOuSubstituicaoHidrometro))
+    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId()))
     		.andReturn(volumeMedioTO);
     	replay(aguaEsgotoBOMock);
     	

@@ -203,7 +203,6 @@ public class ArquivoTextoTipo01Test {
     }
     
     private StringBuilder getMensagemConta() {
-    	
     	StringBuilder mensagem = new StringBuilder();
     	
     	mensagem.append("MENSAGEM EM CONTA - 1                                                                               ")

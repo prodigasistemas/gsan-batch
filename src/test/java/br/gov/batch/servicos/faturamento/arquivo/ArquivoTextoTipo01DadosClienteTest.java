@@ -112,7 +112,7 @@ public class ArquivoTextoTipo01DadosClienteTest {
     private void carregarMocks() {
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true").times(2);
     	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false").times(2);
-    	expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA)).andReturn("false").times(2);
+    	//expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_COMPESA)).andReturn("false").times(2);
     	replay(repositorioParametros);
     }
 }
