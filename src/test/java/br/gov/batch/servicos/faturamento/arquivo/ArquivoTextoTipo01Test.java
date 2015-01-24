@@ -375,7 +375,8 @@ public class ArquivoTextoTipo01Test {
     		.append("                                                                                                    ")
     		.append("                                                                                                    ")
     		.append("                                                             000010000010         333333333333333333")
-    		.append("33333333333333333333333333333311111111111                                           201501221212888888888            20150122");
+    		//.append("33333333333333333333333333333311111111111                                           201501221212888888888            20150122");
+    		.append("33333333333333333333333333333311111111111                                           201501221212888888888            ");
     	
     	return linha.toString();
     }
@@ -431,7 +432,7 @@ public class ArquivoTextoTipo01Test {
     	mapCobranca.put(9, new StringBuilder("BANCO DO BRASIL00000"));
     	mapCobranca.put(34, new StringBuilder("         333333333333333333333333333333333333333333333333"));
     	mapCobranca.put(42, new StringBuilder("888888888"));
-    	mapCobranca.put(45, new StringBuilder("20150122"));
+    	//mapCobranca.put(45, new StringBuilder("20150122"));
     	
     	return mapCobranca;
     }
