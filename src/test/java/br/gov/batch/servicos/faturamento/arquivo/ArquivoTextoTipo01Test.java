@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -324,18 +325,18 @@ public class ArquivoTextoTipo01Test {
     	assertEquals(getLinhaValida(), linha01);
     }
     
-//    @Test
-//	public void buildArquivoTextoTipo01TamanhoLinha() {
-//		carregarMocks();
-//		
-//		String linha = arquivoTextoTipo01.build();
-//		int tamanhoLinha = linha.length();
-//		
-//		System.out.println(linha);
-//		System.out.println(tamanhoLinha);
-//		
-//		 assertTrue(tamanhoLinha == 1526);
-//	}
+    @Test
+	public void buildArquivoTextoTipo01TamanhoLinha() {
+		carregarMocks();
+		
+		String linha = arquivoTextoTipo01.build();
+		int tamanhoLinha = linha.length();
+		
+		System.out.println(linha);
+		System.out.println(tamanhoLinha);
+		
+		 assertTrue(tamanhoLinha == 1526);
+	}
     
     public void carregarMocks() {
     	expect(dadosClienteMock.build()).andReturn(getMapCliente());
@@ -361,58 +362,9 @@ public class ArquivoTextoTipo01Test {
     private String getLinhaValida() {
     	StringBuilder linha = new StringBuilder();
     	
-    	linha.append("01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501222")
-    		.append("015012200100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              201501")
-    		.append("1                                                                                                   ")
-    		.append("          31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.")
-    		.append("0 2.0 050.00000500001000000199999999900           000000000")
-    		.append("MENSAGEM EM CONTA - 1                                                  ")
-    		.append("                             MENSAGEM EM CONTA - 2                                                  ")
-    		.append("                             MENSAGEM EM CONTA - 3                                                  ")
-    		.append("                             MENSAGEM QUITACAO ANUAL DE DEBITOS                                     ")
-    		.append("                                                                                                    ")
-    		.append("                                                                                                    ")
-    		.append("                                                                                                    ")
-    		.append("                                                                                                    ")
-    		.append("                                                             000010000010         333333333333333333")
-    		//.append("33333333333333333333333333333311111111111                                           201501221212888888888            20150122");
-    		.append("33333333333333333333333333333311111111111                                           201501221212888888888            ");
-    	
+    	linha.append("01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501222015012200100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              2015011                                                                                                             31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.0 2.0 050.00000500001000000199999999900AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 000000000MENSAGEM EM CONTA - 1                                                                               MENSAGEM EM CONTA - 2                                                                               MENSAGEM EM CONTA - 3                                                                               MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  000010000010         33333333333333333333333333333333333333333333333311111111111                                           201501221212888888888            20150122");
+    	linha.append(System.getProperty("line.separator"));
     	return linha.toString();
-    }
-    
-    public static void main (String [] args) {
-    	String linhaCompleta = "01001234567BELEM                    DESCRICAO DA LOCALIDADE  MARIA JOSÉ DA SILVA           201501232015012300100112341234123AV ALM BARROSO25 - MARCO BELEM 66093-906                              2015011                                                                                                             31BANCO DO BRASIL00000         201000020121000010      000000030.00 010000500000500000303.0 2.0 050.00000500001000000199999999900AVENIDAALMBARROSO10 - MARCO BELEM 66093-906                           9133224455 000000000MENSAGEM EM CONTA - 1                                                                               MENSAGEM EM CONTA - 2                                                                               MENSAGEM EM CONTA - 3                                                                               MENSAGEM QUITACAO ANUAL DE DEBITOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  000010000010         33333333333333333333333333333333333333333333333311111111111                                           201501231212888888888            20150122";
-    	String linha1 = linhaCompleta.substring(0, 100);
-    	String linha2 = linhaCompleta.substring(100, 200);
-    	String linha3 = linhaCompleta.substring(200, 300);
-    	String linha4 = linhaCompleta.substring(300, 400);
-    	String linha5 = linhaCompleta.substring(400, 500);
-    	String linha6 = linhaCompleta.substring(500, 600);
-    	String linha7 = linhaCompleta.substring(600, 700);
-    	String linha8 = linhaCompleta.substring(700, 800);
-    	String linha9 = linhaCompleta.substring(800, 900);
-    	String linha10 = linhaCompleta.substring(900, 1000);
-    	String linha11 = linhaCompleta.substring(1000, 1100);
-    	String linha12 = linhaCompleta.substring(1100, 1200);
-    	String linha13 = linhaCompleta.substring(1200, 1300);
-    	String linha14 = linhaCompleta.substring(1300, 1400);
-    	String linha15 = linhaCompleta.substring(1400, linhaCompleta.length());
-    	System.out.println(linha1);
-    	System.out.println(linha2);
-    	System.out.println(linha3);
-    	System.out.println(linha4);
-    	System.out.println(linha5);
-    	System.out.println(linha6);
-    	System.out.println(linha7);
-    	System.out.println(linha8);
-    	System.out.println(linha9);
-    	System.out.println(linha10);
-    	System.out.println(linha11);
-    	System.out.println(linha12);
-    	System.out.println(linha13);
-    	System.out.println(linha14);
-    	System.out.println(linha15);
     }
     
     private Map<Integer, StringBuilder> getMapCliente() {
