@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoAnormalidadeAcaoBO;
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.ConsumoAnormalidade;
 import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -38,6 +39,7 @@ public class MensagemAnormalidadeTest {
     
     private AnormalidadeHistoricoConsumo anormalidadeHistoricoConsumo;
     
+    private Imovel imovel;
     
     Integer anoMesReferencia = 201501;
     
@@ -46,6 +48,8 @@ public class MensagemAnormalidadeTest {
     @Before
     public void init(){
         anormalidadeHistoricoConsumo = new AnormalidadeHistoricoConsumo(1, ConsumoAnormalidade.BAIXO_CONSUMO, LigacaoTipo.AGUA.getId(), anoMesReferencia);
+        
+        imovel = new Imovel(1);
         
         bo = new MensagemAnormalidadeContaBO();
         acao = new ConsumoAnormalidadeAcao();
@@ -57,7 +61,7 @@ public class MensagemAnormalidadeTest {
     @Test
     public void semMensagemAnormalidade(){
         mockSemAnormalidadeConsumo();
-        String[] retorno = bo.obterMensagemAnormalidadeConsumo(1, anoMesReferencia, 1);
+        String[] retorno = bo.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia);
         assertNull(retorno);
     }
     
@@ -66,7 +70,7 @@ public class MensagemAnormalidadeTest {
         mockComAnormalidadeAgua();
         mockBuscaCategoria();
         mockAcaoASerTomada(null);
-        String[] retorno = bo.obterMensagemAnormalidadeConsumo(1, anoMesReferencia, 1);
+        String[] retorno = bo.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia);
         assertNull(retorno);
     }
     
@@ -75,7 +79,7 @@ public class MensagemAnormalidadeTest {
         mockComAnormalidadeAguaESemEsgotoReferenciaAnterior();
         mockBuscaCategoria();
         mockAcaoASerTomada(acao);
-        String[] retorno = bo.obterMensagemAnormalidadeConsumo(1, anoMesReferencia, 1);
+        String[] retorno = bo.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia);
         assertEquals(acao.getDescricaoContaMensagemMes1(), retorno[0]);
     }
     
@@ -84,7 +88,7 @@ public class MensagemAnormalidadeTest {
         mockComAnormalidadeAguaEComEsgotoReferenciaAnterior();
         mockBuscaCategoria();
         mockAcaoASerTomada(acao);
-        String[] retorno = bo.obterMensagemAnormalidadeConsumo(1, anoMesReferencia, 1);
+        String[] retorno = bo.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia);
         assertEquals(acao.getDescricaoContaMensagemMes3(), retorno[0]);
     }
     

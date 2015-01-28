@@ -58,10 +58,10 @@ public class MensagemContaBO {
         return mensagem;
     }
     
-    public String[] obterMensagemConta(Imovel imovel, Integer anoMesReferencia, Integer idImovelPerfil, TipoConta tipoConta) {
+    public String[] obterMensagemConta(Imovel imovel, Integer anoMesReferencia, TipoConta tipoConta) {
         SistemaParametros sistemaParametros  = sistemaParametrosRepositorio.getSistemaParametros();
 
-        String[] mensagem = mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(imovel.getId(), anoMesReferencia, idImovelPerfil);
+        String[] mensagem = mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia);
 
 
         if (mensagem == null) {

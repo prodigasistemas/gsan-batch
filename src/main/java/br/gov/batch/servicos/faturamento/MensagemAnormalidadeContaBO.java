@@ -6,6 +6,7 @@ import javax.ejb.EJB;
 
 import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoAnormalidadeAcaoBO;
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
@@ -22,24 +23,24 @@ public class MensagemAnormalidadeContaBO {
     @EJB
     private ConsumoAnormalidadeAcaoBO consumoAnormalidadeAcaoBO;
     
-    public String[] obterMensagemAnormalidadeConsumo(Integer idImovel, Integer anoMesReferencia, Integer idImovelPerfil) {
+    public String[] obterMensagemAnormalidadeConsumo(Imovel imovel, Integer anoMesReferencia) {
 
         String[] mensagemConta = null;
         
         AnormalidadeHistoricoConsumo anormalidadeConsumo = 
-                consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.AGUA, anoMesReferencia);
+                consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(imovel.getId(), LigacaoTipo.AGUA, anoMesReferencia);
         
         if (anormalidadeConsumo == null){
-            anormalidadeConsumo = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.ESGOTO, anoMesReferencia);
+            anormalidadeConsumo = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(imovel.getId(), LigacaoTipo.ESGOTO, anoMesReferencia);
         }
         
         if (anormalidadeConsumo != null && anormalidadeConsumo.anormalidadeporBaixoAltoOuEstouroConsumo()){
-            Integer idCategoria = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(idImovel);
+            Integer idCategoria = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(imovel.getId());
             
-            ConsumoAnormalidadeAcao acao = consumoAnormalidadeAcaoBO.acaoASerTomada(anormalidadeConsumo.getIdAnormalidade(), idCategoria, idImovelPerfil);
+            ConsumoAnormalidadeAcao acao = consumoAnormalidadeAcaoBO.acaoASerTomada(anormalidadeConsumo.getIdAnormalidade(), idCategoria, imovel.getImovelPerfil().getId());
             
             if (acao != null){
-                anormalidadeConsumo = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.ESGOTO, reduzirMeses(anoMesReferencia, 1));
+                anormalidadeConsumo = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(imovel.getId(), LigacaoTipo.ESGOTO, reduzirMeses(anoMesReferencia, 1));
                 
                 String mensagemContaAnormalidade = "";
                 
@@ -47,7 +48,7 @@ public class MensagemAnormalidadeContaBO {
                     mensagemContaAnormalidade = acao.getDescricaoContaMensagemMes1();
                 }else{
                     anormalidadeConsumo = consumoHistoricoRepositorio
-                            .anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.ESGOTO, reduzirMeses(anoMesReferencia, 1), anormalidadeConsumo.getIdAnormalidade());
+                            .anormalidadeHistoricoConsumo(imovel.getId(), LigacaoTipo.ESGOTO, reduzirMeses(anoMesReferencia, 1), anormalidadeConsumo.getIdAnormalidade());
                     
                     if (anormalidadeConsumo == null) {
                         mensagemContaAnormalidade = acao.getDescricaoContaMensagemMes2();

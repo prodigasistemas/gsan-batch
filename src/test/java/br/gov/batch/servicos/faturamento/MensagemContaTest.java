@@ -148,7 +148,7 @@ public class MensagemContaTest {
     public void mensagemComAnormalidade(){
         mockSistemaParametros(sistemaParametros);
         mockMensagemAnormalidade(msgAnormalidade);
-        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, 1, TipoConta.CONTA_CLIENTE_RESPONSAVEL);
+        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, TipoConta.CONTA_CLIENTE_RESPONSAVEL);
         assertEquals(msgAnormalidade[0], retorno[0]);
         assertEquals(msgAnormalidade[1], retorno[1]);
         assertEquals(msgAnormalidade[2], retorno[2]);
@@ -160,7 +160,7 @@ public class MensagemContaTest {
         mockMensagemAnormalidade(null);
         mockExisteDebito(true);
         mockRecuperaMensagemConta();
-        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, 1, TipoConta.CONTA_CLIENTE_RESPONSAVEL);
+        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, TipoConta.CONTA_CLIENTE_RESPONSAVEL);
         assertEquals(msgAvisoDebitoVencimento, retorno[0]);
     }
     
@@ -171,7 +171,7 @@ public class MensagemContaTest {
         mockExisteDebito(true);
         mockRecuperaMensagemConta();
         mockDadosBancarios();
-        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, 1, TipoConta.CONTA_DEBITO_AUTOMATICO);
+        String[] retorno = bo.obterMensagemConta(imovel, anoMesReferencia, TipoConta.CONTA_DEBITO_AUTOMATICO);
         assertEquals(msgAvisoDebitoVencimento, retorno[0]);
         assertEquals(mensagemDebitoAutomatico.toString(), retorno[1]);
     }
@@ -192,7 +192,7 @@ public class MensagemContaTest {
     }
     
     private void mockMensagemAnormalidade(String[] msg){
-        expect(mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(1, anoMesReferencia, 1)).andReturn(msg);
+        expect(mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia)).andReturn(msg);
         replay(mensagemAnormalidadeContaBO);
     }
     
