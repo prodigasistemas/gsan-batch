@@ -64,7 +64,7 @@ public class ArquivoTextoTipo11Test {
 		sp.setIncrementoMaximoConsumoRateio(1);
 		sp.setIndicadorTarifaCategoria(Short.valueOf("1"));
 		sp.setVersaoCelular("CEL NOKIA");
-		sp.setIndicadorBloqueioContaMobile(Short.valueOf("1"));
+		sp.setIndicadorBloqueioContaMobile(1);
 		sp.setNumeroModuloDigitoVerificador(Short.valueOf("1"));
 	}
 
