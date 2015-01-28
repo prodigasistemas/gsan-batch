@@ -3,6 +3,7 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cobranca.to.VencimentoAnteriorTO;
 import br.gov.model.cadastro.Imovel;
@@ -12,6 +13,7 @@ import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 
+@Stateless
 public class ArquivoTextoTipo07 {
 
 	private final String TIPO_REGISTRO = "07";
