@@ -28,7 +28,6 @@ public class ArquivoTextoTipo10 {
 	}
 
 	public String build(List<Integer> idsConsumoTarifaCategoria, Short indicadorTarifaCategoria) {
-
 		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(idsConsumoTarifaCategoria);
 
 		for (ConsumoTarifaFaixaTO to : listaConsumoTarifaFaixa) {
