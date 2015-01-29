@@ -10,27 +10,22 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 
-public class ArquivoTextoTipo05 {
+public class ArquivoTextoTipo05 extends ArquivoTexto {
+	
+	private final String TIPO_REGISTRO = "05";
+	
 	@EJB
 	private FaturamentoRepositorio faturamentoRepositorio;
-	
-	private StringBuilder builder;
-	
-	private Integer quantidadeLinhas;
 	
 	private Integer qtdAnoMesDistintos;
 	
 	private CreditoRealizadoTO creditoRealizadoAnterior;
 	
-	private final String TIPO_REGISTRO = "05";
 	
 	private String anoMesAcumulado;
 	
 	public String build(Conta conta) {
 
-		builder = new StringBuilder();
-		quantidadeLinhas = 0;
-		
 		if(conta!=null){
 			creditoRealizadoAnterior = null;
 			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;
@@ -79,7 +74,6 @@ public class ArquivoTextoTipo05 {
 	private void gerarDadosCreditosRealizados(Conta conta, Integer qtdAnoMesDistintos,
 			String anoMesAcumulado, BigDecimal valorCreditoAcumulado) {
 		
-		quantidadeLinhas++;
 		builder.append(TIPO_REGISTRO);
 		builder.append(Utilitarios.completaComZerosEsquerda(9,conta.getImovel().getId()));
 		if(qtdAnoMesDistintos>1){
@@ -102,16 +96,3 @@ public class ArquivoTextoTipo05 {
 		builder.append(System.getProperty("line.separator"));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

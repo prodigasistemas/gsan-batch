@@ -15,26 +15,17 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.ConsumoAnormalidadeAcaoRepositorio;
 
 @Stateless
-public class ArquivoTextoTipo12 {
+public class ArquivoTextoTipo12 extends ArquivoTexto {
 
 	private final String TIPO_REGISTRO = "12";
 
 	@EJB
 	private ConsumoAnormalidadeAcaoRepositorio consumoAnormalidadeAcaoRepositorio;
 
-	private StringBuilder builder;
-
-	public ArquivoTextoTipo12() {
-		builder = new StringBuilder();
-	}
-
 	public String build() {
 		List<ConsumoAnormalidadeAcao> listaAcoes = consumoAnormalidadeAcaoRepositorio.consumoAnormalidadeAcaoAtivo();
 
-		int count = listaAcoes.size();
 		for (ConsumoAnormalidadeAcao acao : listaAcoes) {
-			count--;
-
 			builder.append(TIPO_REGISTRO);
 			builder.append(getConsumoAnormalidade(acao.getConsumoAnormalidade()));
 			builder.append(getCategoria(acao.getCategoria()));
@@ -49,17 +40,12 @@ public class ArquivoTextoTipo12 {
 			builder.append(getDescricaoContaMensagemMes2(acao.getDescricaoContaMensagemMes2()));
 			builder.append(getDescricaoContaMensagemMes3(acao.getDescricaoContaMensagemMes3()));
 
-			if (count != 0) {
+			if (getQuantidadeLinhas() < listaAcoes.size()) {
 				builder.append(System.getProperty("line.separator"));
 			}
 		}
 
 		return builder.toString();
-	}
-	
-	public int getQuantidadeLinhas() {
-		String[] linhas = builder.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
 	}
 	
 	private String getDescricaoContaMensagemMes3(String descricaoContaMensagemMes3) {

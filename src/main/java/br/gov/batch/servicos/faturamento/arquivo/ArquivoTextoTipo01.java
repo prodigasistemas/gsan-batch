@@ -32,7 +32,7 @@ import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 
 @Stateless
-public class ArquivoTextoTipo01 {
+public class ArquivoTextoTipo01 extends ArquivoTexto {
     private Imovel imovel;
 
     private Conta conta;
@@ -91,8 +91,6 @@ public class ArquivoTextoTipo01 {
     @EJB
     private PagamentoBO pagamentoBO;
 
-    private StringBuilder builder = new StringBuilder();
-    
     private SortedMap<Integer,StringBuilder> mapDados;
     
     @EJB
@@ -104,10 +102,6 @@ public class ArquivoTextoTipo01 {
     private ArquivoTextoTipo01DadosConta dadosConta;
     private ArquivoTextoTipo01DadosFaturamento dadosFaturamento;
     private ArquivoTextoTipo01DadosLocalizacaoImovel dadosLocalizacaoImovel;
-    
-    public ArquivoTextoTipo01() {
-        builder = new StringBuilder();
-    }
 
     public String build() {
         mapDados = new TreeMap<Integer, StringBuilder>();

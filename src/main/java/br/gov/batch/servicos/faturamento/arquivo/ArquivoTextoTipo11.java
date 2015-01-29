@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.model.cadastro.Imovel;
@@ -16,14 +15,9 @@ import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 
 @Stateless
-public class ArquivoTextoTipo11 {
-	
-//	@Inject
-//	private SistemaParametros sistemaParametros;
+public class ArquivoTextoTipo11 extends ArquivoTexto {
 	
 	private final String TIPO_REGISTRO = "11";
-	
-	private StringBuilder builder;
 	
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
@@ -31,7 +25,6 @@ public class ArquivoTextoTipo11 {
 	
 	public String build(SistemaParametros sistemaParametros, Imovel imovel, Integer sequenciaRota, Integer anoMesFaturamento){
 		Rota rota = verificarRota(imovel);
-		builder = new StringBuilder();
 		
 		builder.append(TIPO_REGISTRO);
 		builder.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));

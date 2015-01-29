@@ -14,19 +14,14 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 
 @Stateless
-public class ArquivoTextoTipo07 {
+public class ArquivoTextoTipo07 extends ArquivoTexto {
 
 	private final String TIPO_REGISTRO = "07";
 
 	@EJB
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorio;
 
-	private StringBuilder builder;
 	private Imovel imovel;
-
-	public ArquivoTextoTipo07() {
-		builder = new StringBuilder();
-	}
 
 	public String build(Imovel imovel, CobrancaDocumento cobrancaDocumento, int quantidadeContas) {
 		this.imovel = imovel;
@@ -56,11 +51,6 @@ public class ArquivoTextoTipo07 {
 		}
 		
 		return builder.toString();
-	}
-	
-	public int getQuantidadeLinhas() {
-		String[] linhas = builder.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
 	}
 
 	private void buildLinha(CobrancaDocumentoItem item) {

@@ -14,18 +14,12 @@ import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 
 @Stateless
-public class ArquivoTextoTipo10 {
+public class ArquivoTextoTipo10 extends ArquivoTexto {
 
 	private final String TIPO_REGISTRO = "10";
 
 	@EJB
 	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
-
-	private StringBuilder builder;
-	
-	public ArquivoTextoTipo10() {
-		builder = new StringBuilder();
-	}
 
 	public String build(List<Integer> idsConsumoTarifaCategoria, Short indicadorTarifaCategoria) {
 		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(idsConsumoTarifaCategoria);
@@ -46,11 +40,6 @@ public class ArquivoTextoTipo10 {
 		}
 
 		return builder.toString();
-	}
-	
-	public int getQuantidadeLinhas() {
-		String[] linhas = builder.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
 	}
 	
 	private String getValorConsumoTarifa(BigDecimal valorConsumoTarifa) {
