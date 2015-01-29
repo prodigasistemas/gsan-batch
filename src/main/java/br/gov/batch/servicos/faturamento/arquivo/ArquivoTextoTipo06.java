@@ -17,11 +17,11 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
 
 	public String build(Conta conta) {
-
-		List<ContaImpostosDeduzidosTO> contas;
-
+		
 		if (conta != null) {
-			contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
+			
+			List<ContaImpostosDeduzidosTO> contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
+			
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
 
 				builder.append(TIPO_REGISTRO);
