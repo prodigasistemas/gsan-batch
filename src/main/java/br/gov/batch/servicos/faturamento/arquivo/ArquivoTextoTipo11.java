@@ -18,15 +18,13 @@ import br.gov.model.util.Utilitarios;
 @Stateless
 public class ArquivoTextoTipo11 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "11";
-
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
 
 	public String build(SistemaParametros sistemaParametros, Imovel imovel, Integer sequenciaRota, Integer anoMesFaturamento) {
 		Rota rota = verificarRota(imovel);
 
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_11);
 		builder.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));
 		builder.append(Utilitarios.formataData(Utilitarios.converteParaDataComUltimoDiaMes(sistemaParametros.getAnoMesArrecadacao()), FormatoData.ANO_MES_DIA));
 		builder.append(anoMesFaturamento);

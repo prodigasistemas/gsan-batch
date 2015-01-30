@@ -16,8 +16,6 @@ import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 @Stateless
 public class ArquivoTextoTipo07 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "07";
-
 	@EJB
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorio;
 
@@ -54,7 +52,7 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 	}
 
 	private void buildLinha(CobrancaDocumentoItem item) {
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_07);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
 		builder.append(item.getContaGeral().getConta().getReferencia());
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(item.getValorItemCobrado())));
@@ -66,7 +64,7 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 	private void buildLinhaQuantidadeContasSuperior(List<CobrancaDocumentoItem> listaCobrancaDocumentoItem, int quantidadeContas) {
 		VencimentoAnteriorTO to = calcularValorDataVencimentoAnterior(listaCobrancaDocumentoItem, quantidadeContas);
 
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_07);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
 		builder.append("DB.ATE");
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(to.getValorAnterior())));

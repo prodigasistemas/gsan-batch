@@ -70,6 +70,7 @@ public class ArquivoTextoTipo04Test {
 		
 		debitosCobrados = new ArrayList<DebitoCobradoNaoParceladoTO>();
 		debitosCobrados.add(debitoCobrado);
+		debitosCobrados.add(debitoCobrado);
 		
 		arquivoTextoTipo04 = new ArquivoTextoTipo04();
 	}

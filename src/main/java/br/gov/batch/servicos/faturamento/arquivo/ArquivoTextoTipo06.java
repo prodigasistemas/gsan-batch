@@ -11,8 +11,6 @@ import br.gov.servicos.to.ContaImpostosDeduzidosTO;
 
 public class ArquivoTextoTipo06 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "06";
-
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
 	
@@ -21,7 +19,7 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 			List<ContaImpostosDeduzidosTO> contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
 			
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
-				builder.append(TIPO_REGISTRO);
+				builder.append(TIPO_REGISTRO_06);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 				builder.append(String.valueOf(contaImpostosDeduzidos.getTipoImpostoId()));
 				builder.append(Utilitarios.completaComEspacosADireita(15, contaImpostosDeduzidos.getDescricaoImposto()));

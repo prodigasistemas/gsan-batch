@@ -42,8 +42,6 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 	private Integer consumoMedio;
 	private MedicaoHistorico medicaoHistorico;
 	
-	private final String TIPO_REGISTRO = "08";
-	
 	public String build(Imovel imovel, Integer referencia) {
 
 		this.imovel = imovel;
@@ -62,7 +60,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia);
 			medicaoHistorico = obterMedicaoHistorico(medicaoHistoricoAtual);
 
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_08);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
 			builder.append(hidrometroMedicaoHistorico.getMedicaoTipo().toString());
 			builder.append(Utilitarios.completaComEspacosADireita(11, hidrometro.getNumero()));

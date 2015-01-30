@@ -17,8 +17,6 @@ import br.gov.servicos.micromedicao.ConsumoAnormalidadeAcaoRepositorio;
 @Stateless
 public class ArquivoTextoTipo12 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "12";
-
 	@EJB
 	private ConsumoAnormalidadeAcaoRepositorio consumoAnormalidadeAcaoRepositorio;
 
@@ -26,7 +24,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 		List<ConsumoAnormalidadeAcao> listaAcoes = consumoAnormalidadeAcaoRepositorio.consumoAnormalidadeAcaoAtivo();
 
 		for (ConsumoAnormalidadeAcao acao : listaAcoes) {
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_12);
 			builder.append(getConsumoAnormalidade(acao.getConsumoAnormalidade()));
 			builder.append(getCategoria(acao.getCategoria()));
 			builder.append(getImovelPerfil(acao.getImovelPerfil()));

@@ -106,7 +106,7 @@ public class ArquivoTextoTipo01 extends ArquivoTexto {
     public String build() {
         mapDados = new TreeMap<Integer, StringBuilder>();
     	
-	    builder.append("01");
+	    builder.append(TIPO_REGISTRO_01);
 	    builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(imovel.getId())));
 	
 	    mapDados.putAll(dadosCobranca.build());

@@ -11,20 +11,15 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.LeituraAnormalidadeRepositorio;
 
 @Stateless
-public class ArquivoTextoTipo14 {
+public class ArquivoTextoTipo14 extends ArquivoTexto{
 	
 	@EJB
 	private LeituraAnormalidadeRepositorio repositorio;
 	
-	private StringBuilder builder;
-	
-	private final String TIPO_REGISTRO = "14";
-	
 	public String build(Integer idLeituraAnormalidade){
-		builder = new StringBuilder();
 		List<LeituraAnormalidade> leituraAnormalidades = repositorio.listarLeituraAnormalidadePor(idLeituraAnormalidade, Status.ATIVO.getId());
 		
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_14);
 		for (LeituraAnormalidade leituraAnormalidade : leituraAnormalidades) {
 			
 			builder.append(Utilitarios.completaComZerosEsquerda(3, leituraAnormalidade.getId()));
@@ -42,9 +37,13 @@ public class ArquivoTextoTipo14 {
 			builder.append(Utilitarios.completaComEspacosADireita(2, 
 					(leituraAnormalidade.getLeituraAnormalidadeLeituraSemLeitura()!=null)?
 							leituraAnormalidade.getLeituraAnormalidadeLeituraSemLeitura().getId():null));
-			builder.append(Utilitarios.completaComEspacosADireita(1, leituraAnormalidade.getIndicadorUso()));
-			builder.append(Utilitarios.completaComEspacosADireita(2, leituraAnormalidade.getNumeroFatorSemLeitura()));
-			builder.append(Utilitarios.completaComEspacosADireita(4, leituraAnormalidade.getNumeroFatorComLeitura()));
+			builder.append(Utilitarios.completaComEspacosADireita(1,leituraAnormalidade.getIndicadorUso()));
+			builder.append((leituraAnormalidade.getNumeroFatorSemLeitura()!=null)?
+						Utilitarios.formatarBigDecimalComPonto(leituraAnormalidade.getNumeroFatorSemLeitura()):
+						Utilitarios.completaComEspacosADireita(4,leituraAnormalidade.getNumeroFatorSemLeitura()));
+			builder.append((leituraAnormalidade.getNumeroFatorComLeitura()!=null)?
+						Utilitarios.formatarBigDecimalComPonto(leituraAnormalidade.getNumeroFatorComLeitura()):
+						Utilitarios.completaComEspacosADireita(4,leituraAnormalidade.getNumeroFatorComLeitura()));
 			builder.append(System.getProperty("line.separator"));
 		}
 		

@@ -16,8 +16,6 @@ import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 @Stateless
 public class ArquivoTextoTipo10 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "10";
-
 	@EJB
 	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
 
@@ -25,7 +23,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(idsConsumoTarifaCategoria);
 
 		for (ConsumoTarifaFaixaTO to : listaConsumoTarifaFaixa) {
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_10);
 			builder.append(getIdConsumoTarifa(to.getIdConsumoTarifa()));
 			builder.append(getDataVigencia(to.getDataVigencia()));
 			builder.append(getIdCategoria(to.getIdCategoria()));

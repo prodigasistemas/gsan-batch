@@ -20,8 +20,6 @@ import br.gov.servicos.to.ParcelaDebitoCobradoTO;
 
 public class ArquivoTextoTipo04 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "04";
-	
 	@EJB
 	private DebitoCobradoRepositorio debitoCobradoRepositorio;
 	
@@ -38,7 +36,7 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 			if (colecaoDebitoCobradoDeParcelamento != null && !colecaoDebitoCobradoDeParcelamento.isEmpty()) {
 
 				for (ParcelaDebitoCobradoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
-					builder.append(TIPO_REGISTRO);
+					builder.append(TIPO_REGISTRO_04);
 					builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
 					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
 					builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
@@ -117,7 +115,7 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 																String anoMesAcumulado, BigDecimal valorPrestacaoAcumulado) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_04);
 		builder.append(completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
 		
 		if (qtdAnoMesDistintos > 1) {
