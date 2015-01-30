@@ -12,8 +12,6 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
 public class ArquivoTextoTipo03 extends ArquivoTexto {
 
-	private final String TIPO_REGISTRO = "03";
-	
 	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
 	
@@ -24,7 +22,7 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(imovel);
 
 		for (ConsumoHistorico consumoHistorico : colecaoConsumoHistorico) {
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_03);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
 			builder.append(String.valueOf(consumoHistorico.getLigacaoTipo()));
 			builder.append(String.valueOf(consumoHistorico.getReferenciaFaturamento()));

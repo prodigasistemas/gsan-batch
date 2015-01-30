@@ -12,8 +12,6 @@ import br.gov.servicos.to.CreditoRealizadoTO;
 
 public class ArquivoTextoTipo05 extends ArquivoTexto {
 	
-	private final String TIPO_REGISTRO = "05";
-	
 	@EJB
 	private FaturamentoRepositorio faturamentoRepositorio;
 	
@@ -74,25 +72,25 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 	private void gerarDadosCreditosRealizados(Conta conta, Integer qtdAnoMesDistintos,
 			String anoMesAcumulado, BigDecimal valorCreditoAcumulado) {
 		
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_05);
 		builder.append(Utilitarios.completaComZerosEsquerda(9,conta.getImovel().getId()));
 		if(qtdAnoMesDistintos>1){
 			
 			builder.append(Utilitarios.completaComEspacosADireita(90,creditoRealizadoAnterior.getCreditoTipo().getDescricao()+" "
-					+anoMesAcumulado+((qtdAnoMesDistintos>5)?" E OUTRAS":"")));
+					+anoMesAcumulado+((qtdAnoMesDistintos>5)?" E OUTRAS":null)));
 			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(valorCreditoAcumulado)));
 			
 		}else{
 			builder.append(Utilitarios.completaComEspacosADireita(90,creditoRealizadoAnterior.getCreditoTipo().getDescricao()+
 					((anoMesAcumulado == null || anoMesAcumulado.equals(""))?
 					" PARCELA "+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacaoCredito()+"/"
-					+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())):"")));
+					+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())):null)));
 			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(creditoRealizadoAnterior.getValorCredito())));
 			
 		}
 		builder.append(Utilitarios.completaComEspacosADireita(6,creditoRealizadoAnterior.getCreditoTipo()!=null?
 				((creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante()!=null)?
-						creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante():creditoRealizadoAnterior.getCreditoTipo().getId()):""));
+						creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante():creditoRealizadoAnterior.getCreditoTipo().getId()):null));
 		builder.append(System.getProperty("line.separator"));
 	}
 }

@@ -15,8 +15,6 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 @Stateless
 public class ArquivoTextoTipo02 extends ArquivoTexto {
 	
-	private final String TIPO_REGISTRO = "02";
-	
 	@Inject
 	private SistemaParametros sistemaParametro;
 
@@ -27,7 +25,7 @@ public class ArquivoTextoTipo02 extends ArquivoTexto {
 		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
 		
 		for (ICategoria categoria : colecaoCategorias) {
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_01);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
 			builder.append(getCodigoCategoriaOuSubcategoria(categoria));
 			builder.append(getDescricaoCategoriaOuSubcategoria(categoria));
