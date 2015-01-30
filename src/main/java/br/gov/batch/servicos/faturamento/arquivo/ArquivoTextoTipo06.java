@@ -14,8 +14,6 @@ public class ArquivoTextoTipo06 {
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
 	
-	private int quantidadeLinhas; 
-	
 	private StringBuilder builder;
 	
 	private final String TIPO_REGISTRO = "06";
@@ -23,14 +21,11 @@ public class ArquivoTextoTipo06 {
 	public String build(Conta conta) {
 
 		builder = new StringBuilder();
-		quantidadeLinhas = 0;
 		List<ContaImpostosDeduzidosTO> contas;
 		
 		if(conta!=null){
 			contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
-				quantidadeLinhas++;
-				
 				builder.append(TIPO_REGISTRO);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 				builder.append(String.valueOf(contaImpostosDeduzidos.getTipoImpostoId()));

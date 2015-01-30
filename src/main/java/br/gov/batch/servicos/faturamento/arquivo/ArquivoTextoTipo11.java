@@ -4,9 +4,9 @@ import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
+import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.FaturamentoAtividade;
@@ -50,7 +50,7 @@ public class ArquivoTextoTipo11 {
 		builder.append(Utilitarios.completaComZerosEsquerda(1, sistemaParametros.getIndicadorBloqueioContaMobile()));
 		builder.append((rota!=null && rota.getIndicadorSequencialLeitura()!=null)?
 				Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()):
-				Utilitarios.completaComZerosEsquerda(1, ConstantesSistema.NAO));
+				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId()));
 		builder.append(Utilitarios.completaComZerosEsquerda(2, 
 				faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA)));
 		builder.append(Utilitarios.completaComEspacosADireita(2, (sistemaParametros.getNumeroModuloDigitoVerificador()!=null
