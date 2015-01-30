@@ -41,6 +41,17 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		buildDadosDaRota(rota);
 		builder.append(Utilitarios.completaComEspacosADireita(10, sistemaParametros.getVersaoCelular()));
 		builder.append(Utilitarios.completaComZerosEsquerda(1, sistemaParametros.getIndicadorBloqueioContaMobile()));
+		builder.append((rota!=null && rota.getIndicadorSequencialLeitura()!=null)?
+				Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()):
+				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId()));
+		builder.append(Utilitarios.completaComZerosEsquerda(2, 
+				faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA)));
+		builder.append(Utilitarios.completaComEspacosADireita(2, (sistemaParametros.getNumeroModuloDigitoVerificador()!=null
+				&& sistemaParametros.getNumeroModuloDigitoVerificador().compareTo(ConstantesSistema.MODULO_VERIFICADOR_11) == 0)?
+						ConstantesSistema.MODULO_VERIFICADOR_11:ConstantesSistema.MODULO_VERIFICADOR_10));
+		builder.append(Utilitarios.formataData(Utilitarios.reduzirDias(new Date(),getDiasMobileBloqueio(sistemaParametros)),FormatoData.ANO_MES_DIA));
+		builder.append(Utilitarios.formataData(Utilitarios.adicionarDias(new Date(),getDiasMobileBloqueio(sistemaParametros)),FormatoData.ANO_MES_DIA));
+		builder.append(Utilitarios.completaComZerosEsquerda(4, (rota!=null)?rota.getId():null));
 		builder.append(getIndicadorSequencialLeitura(rota));
 		builder.append(getDiferencaDiasCronogramas(rota));
 		builder.append(getModuloDigitoVerificador(sistemaParametros.getNumeroModuloDigitoVerificador()));

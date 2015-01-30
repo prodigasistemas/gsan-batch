@@ -15,15 +15,12 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
-
+	
 	public String build(Conta conta) {
-		
 		if (conta != null) {
-			
 			List<ContaImpostosDeduzidosTO> contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
 			
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
-
 				builder.append(TIPO_REGISTRO);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 				builder.append(String.valueOf(contaImpostosDeduzidos.getTipoImpostoId()));
@@ -32,7 +29,6 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 				builder.append(System.getProperty("line.separator"));
 			}
 		}
-
 		return builder.toString();
 	}
 }
