@@ -170,6 +170,15 @@
 						<formats>
 							<format>html</format>
 						</formats>
+						<instrumentation>
+<!-- 							<ignores> -->
+<!-- 								<ignore>br.gov.batch.exception.*</ignore> -->
+<!-- 							</ignores> -->
+							<excludes>
+								<exclude>br/gov/batch/exception/*.class</exclude>
+								<exclude>br/gov/batch/util/*.class</exclude>
+							</excludes>
+						</instrumentation>
 					</configuration>
 					<dependencies>
 						<dependency>
