@@ -42,9 +42,13 @@ public class ArquivoTextoTipo14 {
 			builder.append(Utilitarios.completaComEspacosADireita(2, 
 					(leituraAnormalidade.getLeituraAnormalidadeLeituraSemLeitura()!=null)?
 							leituraAnormalidade.getLeituraAnormalidadeLeituraSemLeitura().getId():null));
-			builder.append(Utilitarios.completaComEspacosADireita(1, leituraAnormalidade.getIndicadorUso()));
-			builder.append(Utilitarios.completaComEspacosADireita(2, leituraAnormalidade.getNumeroFatorSemLeitura()));
-			builder.append(Utilitarios.completaComEspacosADireita(4, leituraAnormalidade.getNumeroFatorComLeitura()));
+			builder.append(Utilitarios.completaComEspacosADireita(1,leituraAnormalidade.getIndicadorUso()));
+			builder.append((leituraAnormalidade.getNumeroFatorSemLeitura()!=null)?
+						Utilitarios.formatarBigDecimalComPonto(leituraAnormalidade.getNumeroFatorSemLeitura()):
+						Utilitarios.completaComEspacosADireita(4,leituraAnormalidade.getNumeroFatorSemLeitura()));
+			builder.append((leituraAnormalidade.getNumeroFatorComLeitura()!=null)?
+						Utilitarios.formatarBigDecimalComPonto(leituraAnormalidade.getNumeroFatorComLeitura()):
+						Utilitarios.completaComEspacosADireita(4,leituraAnormalidade.getNumeroFatorComLeitura()));
 			builder.append(System.getProperty("line.separator"));
 		}
 		
