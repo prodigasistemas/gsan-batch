@@ -6,7 +6,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cobranca.to.VencimentoAnteriorTO;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.CobrancaDocumentoItem;
 import br.gov.model.util.FormatoData;
@@ -19,10 +18,7 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 	@EJB
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorio;
 
-	private Imovel imovel;
-
-	public String build(Imovel imovel, CobrancaDocumento cobrancaDocumento, int quantidadeContas) {
-		this.imovel = imovel;
+	public String build(Integer idImovel, CobrancaDocumento cobrancaDocumento, int quantidadeContas) {
 		
 		if (cobrancaDocumento != null && !cobrancaDocumento.equals("")) {
 			List<CobrancaDocumentoItem> listaCobrancaDocumentoItem = cobrancaDocumentoItemRepositorio.buscarCobrancaDocumentoItens(
@@ -30,30 +26,28 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 
 			if (listaCobrancaDocumentoItem != null && !listaCobrancaDocumentoItem.isEmpty()) {
 				if (listaCobrancaDocumentoItem.size() > quantidadeContas) {
-					buildLinhaQuantidadeContasSuperior(listaCobrancaDocumentoItem, quantidadeContas);
+					buildLinhaQuantidadeContasSuperior(idImovel,listaCobrancaDocumentoItem, quantidadeContas);
 				}
 				
 				int contadorImpressao = listaCobrancaDocumentoItem.size() - (quantidadeContas - 1);
 
 				if (contadorImpressao <= 1) {
 					for (CobrancaDocumentoItem item : listaCobrancaDocumentoItem) {
-						buildLinha(item);
+						buildLinha(idImovel,item);
 					}
 				} else {
-					while (contadorImpressao < listaCobrancaDocumentoItem.size()) {
-						buildLinha(listaCobrancaDocumentoItem.get(contadorImpressao));
-						contadorImpressao++;
+					for(;contadorImpressao < listaCobrancaDocumentoItem.size();contadorImpressao++) {
+						buildLinha(idImovel,listaCobrancaDocumentoItem.get(contadorImpressao));
 					}
 				}
 			}
 		}
-		
 		return builder.toString();
 	}
 
-	private void buildLinha(CobrancaDocumentoItem item) {
+	private void buildLinha(Integer idImovel, CobrancaDocumentoItem item) {
 		builder.append(TIPO_REGISTRO_07);
-		builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
+		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
 		builder.append(item.getContaGeral().getConta().getReferencia());
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(item.getValorItemCobrado())));
 		builder.append(Utilitarios.formataData(item.getContaGeral().getConta().getDataVencimentoConta(), FormatoData.ANO_MES_DIA));
@@ -61,11 +55,11 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 		builder.append(System.getProperty("line.separator"));
 	}
 
-	private void buildLinhaQuantidadeContasSuperior(List<CobrancaDocumentoItem> listaCobrancaDocumentoItem, int quantidadeContas) {
+	private void buildLinhaQuantidadeContasSuperior(Integer idImovel, List<CobrancaDocumentoItem> listaCobrancaDocumentoItem, int quantidadeContas) {
 		VencimentoAnteriorTO to = calcularValorDataVencimentoAnterior(listaCobrancaDocumentoItem, quantidadeContas);
 
 		builder.append(TIPO_REGISTRO_07);
-		builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
+		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
 		builder.append("DB.ATE");
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(to.getValorAnterior())));
 		builder.append(Utilitarios.formataData(to.getDataVencimentoAnterior(), FormatoData.ANO_MES_DIA));

@@ -21,7 +21,6 @@ public class ArquivoTextoTipo14 extends ArquivoTexto{
 		
 		builder.append(TIPO_REGISTRO_14);
 		for (LeituraAnormalidade leituraAnormalidade : leituraAnormalidades) {
-			
 			builder.append(Utilitarios.completaComZerosEsquerda(3, leituraAnormalidade.getId()));
 			builder.append(Utilitarios.completaComEspacosADireita(25, leituraAnormalidade.getDescricao()));
 			builder.append(Utilitarios.completaComEspacosADireita(1, leituraAnormalidade.getIndicadorLeitura()));
