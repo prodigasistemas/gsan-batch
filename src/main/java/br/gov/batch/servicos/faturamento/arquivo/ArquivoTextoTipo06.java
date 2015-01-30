@@ -9,22 +9,17 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ContaImpostosDeduzidosRepositorio;
 import br.gov.servicos.to.ContaImpostosDeduzidosTO;
 
-public class ArquivoTextoTipo06 {
+public class ArquivoTextoTipo06 extends ArquivoTexto {
+
+	private final String TIPO_REGISTRO = "06";
 
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
 	
-	private StringBuilder builder;
-	
-	private final String TIPO_REGISTRO = "06";
-	
 	public String build(Conta conta) {
-
-		builder = new StringBuilder();
-		List<ContaImpostosDeduzidosTO> contas;
-		
-		if(conta!=null){
-			contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
+		if (conta != null) {
+			List<ContaImpostosDeduzidosTO> contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
+			
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
 				builder.append(TIPO_REGISTRO);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
@@ -34,7 +29,6 @@ public class ArquivoTextoTipo06 {
 				builder.append(System.getProperty("line.separator"));
 			}
 		}
-	
 		return builder.toString();
 	}
 }

@@ -18,7 +18,7 @@ import br.gov.servicos.to.DebitoCobradoNaoParceladoTO;
 import br.gov.servicos.to.ParcelaDebitoCobradoTO;
 
 
-public class ArquivoTextoTipo04 {
+public class ArquivoTextoTipo04 extends ArquivoTexto {
 
 	private final String TIPO_REGISTRO = "04";
 	
@@ -28,12 +28,8 @@ public class ArquivoTextoTipo04 {
 	private BigDecimal valorPrestacaoAcumulado;
 	private String anoMesAcumulado;
 	private Integer qtdAnoMesDistintos;
-	private StringBuilder builder;
 	
 	public String build(Conta conta) {
-
-		builder = new StringBuilder();
-		int quantidadeLinhas = 0;
 
 		if (conta != null) {
 
@@ -42,9 +38,6 @@ public class ArquivoTextoTipo04 {
 			if (colecaoDebitoCobradoDeParcelamento != null && !colecaoDebitoCobradoDeParcelamento.isEmpty()) {
 
 				for (ParcelaDebitoCobradoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
-					
-					quantidadeLinhas = quantidadeLinhas + 1;
-					
 					builder.append(TIPO_REGISTRO);
 					builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
 					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
@@ -65,38 +58,36 @@ public class ArquivoTextoTipo04 {
 			for (DebitoCobradoNaoParceladoTO atual : debitosCobradosNaoParcelados) {
 
 				if (atual.possuiMesmoTipoDebitoAnterior(debitoCobradoAnterior)) {
-					quantidadeLinhas = buildLinhaOuAtualizaParametros(conta, quantidadeLinhas, debitoCobradoAnterior, atual, qtdAnoMesDistintos++);
+					buildLinhaOuAtualizaParametros(conta, debitoCobradoAnterior, atual, qtdAnoMesDistintos++);
 				} else {
 					if (qtdAnoMesDistintos > 0) {
-						quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
+						adicionaLinha(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
 					}
 
 					qtdAnoMesDistintos = 0;
 
-					quantidadeLinhas = buildLinhaOuAtualizaParametros(conta, quantidadeLinhas, debitoCobradoAnterior, atual, 1);
+					buildLinhaOuAtualizaParametros(conta, debitoCobradoAnterior, atual, 1);
 				}
 				
 				debitoCobradoAnterior = atual;
 			}
 
 			if (qtdAnoMesDistintos > 0) {
-				quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
+				adicionaLinha(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
 			}
 		}
 
 		return builder.toString();
 	}
 
-	private int buildLinhaOuAtualizaParametros(Conta conta, int quantidadeLinhas, DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual, int qtdAnoMesDistintos) {
+	private void buildLinhaOuAtualizaParametros(Conta conta, DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual, int qtdAnoMesDistintos) {
 		if (atual.getAnoMesReferencia() != null) {
 			atualizaParametros(calculaValorPrestacao(anterior, atual), 
 							   calculaAnoMes(anterior, atual),
 							   qtdAnoMesDistintos);
 		} else {
-			quantidadeLinhas = adicionaLinha(conta, quantidadeLinhas, atual, 1, "", atual.getValorPrestacao());
+			adicionaLinha(conta, atual, 1, "", atual.getValorPrestacao());
 		}
-		
-		return quantidadeLinhas;
 	}
 	
 	private BigDecimal calculaValorPrestacao(DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual) {
@@ -118,10 +109,8 @@ public class ArquivoTextoTipo04 {
 		anoMesAcumulado = anoMes;
 	}
 
-	private int adicionaLinha(Conta conta, int quantidadeLinhas, DebitoCobradoNaoParceladoTO debito, int qtdMeses, String anoMesAcumulado, BigDecimal valorPrestacao) {
-		quantidadeLinhas = quantidadeLinhas + 1;
+	private void adicionaLinha(Conta conta, DebitoCobradoNaoParceladoTO debito, int qtdMeses, String anoMesAcumulado, BigDecimal valorPrestacao) {
 		builder.append(this.obterDadosServicosParcelamentos(conta, debito, qtdMeses, anoMesAcumulado, valorPrestacao));
-		return quantidadeLinhas;
 	}
 	
 	public StringBuilder obterDadosServicosParcelamentos(Conta conta, DebitoCobradoNaoParceladoTO debito, Integer qtdAnoMesDistintos, 

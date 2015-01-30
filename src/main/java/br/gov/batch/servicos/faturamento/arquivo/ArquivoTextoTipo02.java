@@ -13,7 +13,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @Stateless
-public class ArquivoTextoTipo02 {
+public class ArquivoTextoTipo02 extends ArquivoTexto {
+	
+	private final String TIPO_REGISTRO = "02";
 	
 	@Inject
 	private SistemaParametros sistemaParametro;
@@ -21,38 +23,26 @@ public class ArquivoTextoTipo02 {
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
-	private StringBuilder builder;
-	private final String TIPO_REGISTRO = "02";
-
 	public String build(Imovel imovel){
-		builder = new StringBuilder();
-
-		int quantidadeLinhas = 0;
-
 		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
 		
 		for (ICategoria categoria : colecaoCategorias) {
-			quantidadeLinhas = quantidadeLinhas + 1;
-			buildTipo02(categoria, imovel.getId());
+			builder.append(TIPO_REGISTRO);
+			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
+			builder.append(getCodigoCategoriaOuSubcategoria(categoria));
+			builder.append(getDescricaoCategoriaOuSubcategoria(categoria));
+			builder.append(getCodigoSubcategoria(categoria));
+			builder.append(getDescricaoSubcategoria(categoria));
+			builder.append(Utilitarios.completaComZerosEsquerda(4, categoria.getQuantidadeEconomias()));
+			builder.append(Utilitarios.completaTexto(3, categoria.getCategoriaDescricaoAbreviada()));
+			builder.append(getSubcategoriaDescricaoAbreviada(categoria));
+			builder.append(getFatorEconomias(categoria));
+			builder.append(System.getProperty("line.separator"));
 		}
 		
 		return builder.toString();
 	}
-	
-	private void buildTipo02(ICategoria iCategoria, Integer idImovel) {
-		builder.append(TIPO_REGISTRO);
-		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel.toString()));
-		builder.append(getCodigoCategoriaOuSubcategoria(iCategoria));
-		builder.append(getDescricaoCategoriaOuSubcategoria(iCategoria));
-		builder.append(getCodigoSubcategoria(iCategoria));
-		builder.append(getDescricaoSubcategoria(iCategoria));
-		builder.append(Utilitarios.completaComZerosEsquerda(4, "" + iCategoria.getQuantidadeEconomias()));
-		builder.append(Utilitarios.completaTexto(3, iCategoria.getCategoriaDescricaoAbreviada()));
-		builder.append(getSubcategoriaDescricaoAbreviada(iCategoria));
-		builder.append(getFatorEconomias(iCategoria));
-		builder.append(System.getProperty("line.separator"));
-	}
-	
+
 	private String getCodigoSubcategoria(ICategoria iCategoria) {
 		if (sistemaParametro.indicadorTarifaCategoria()) {
 			return Utilitarios.completaComZerosEsquerda(3, "0");
