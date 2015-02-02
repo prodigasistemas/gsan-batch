@@ -15,7 +15,7 @@ public class ImovelSubcategoriaBO {
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio; 
 
     public Integer buscaIdCategoriaComMaisEconomias(Integer idImovel){
-        Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(idImovel);
+        Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarCategoria(idImovel);
         
         int idCategoria = 0;
         

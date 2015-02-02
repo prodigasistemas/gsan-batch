@@ -162,8 +162,8 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
     	List<ICategoria> categorias = categoriasSetUp(); 
     	List<ICategoria> subcategorias = subcategoriasSetUp();
     	
-    	expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasCategoria(imovel.getId())).andReturn(categorias);
-    	expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasSubcategoria(imovel.getId())).andReturn(subcategorias);
+    	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
+    	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
     	replay(imovelSubcategoriaRepositorioMock);
     	
     	expect(faturamentoAtividadeCronogramaBOMock.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(new Date());

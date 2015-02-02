@@ -165,7 +165,7 @@ public class ArquivoTextoTipo01DadosFaturamento {
     }
 	
 	private Short isImovelSazonal() {
-		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(imovel.getId());
+		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarSubcategoria(imovel.getId());
 
 		for(ICategoria subcategoria : subcategorias) {
 			if (subcategoria.getIndicadorSazonalidade() != null && subcategoria.getIndicadorSazonalidade() == Status.ATIVO.getId()) {

@@ -48,7 +48,7 @@ public class ImovelSubcategoriaBOTest {
     
     @Test
     public void testBuscaIdCategoriaComMaisEconomias(){
-        expect(imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(1)).andReturn(categorias);
+        expect(imovelSubcategoriaRepositorio.buscarCategoria(1)).andReturn(categorias);
         replay(imovelSubcategoriaRepositorio);
         
         Integer id = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1);
@@ -58,7 +58,7 @@ public class ImovelSubcategoriaBOTest {
     
     @Test
     public void testBuscaIdCategoriaSemEconomias(){
-        expect(imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(1)).andReturn(new ArrayList<ICategoria>());
+        expect(imovelSubcategoriaRepositorio.buscarCategoria(1)).andReturn(new ArrayList<ICategoria>());
         replay(imovelSubcategoriaRepositorio);
         
         Integer id = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1);

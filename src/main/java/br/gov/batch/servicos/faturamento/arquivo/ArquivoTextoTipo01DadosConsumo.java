@@ -134,7 +134,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 	private void escreverDadosConsumoCategoria() {
 		StringBuilder builder = new StringBuilder();
 		
-        Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(imovel.getId());
+        Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarCategoria(imovel.getId());
         
         int consumoTotalReferenciaAltoConsumo = 0;
         int consumoTotalReferenciaEstouroConsumo = 0;

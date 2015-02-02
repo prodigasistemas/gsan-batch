@@ -41,7 +41,7 @@ public class MensagemAnormalidadeConsumoBO {
 				anormalidade.getIdAnormalidade() == ConsumoAnormalidade.ALTO_CONSUMO ||
 				anormalidade.getIdAnormalidade() == ConsumoAnormalidade.ESTOURO_CONSUMO){
 				
-				Collection<ICategoria> colecaoCategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(idImovel);
+				Collection<ICategoria> colecaoCategoria = imovelSubcategoriaRepositorio.buscarCategoria(idImovel);
 
 				Integer categoriaComMaisEconomias = null;
 				int maiorQuantidadeEconomia = 0;

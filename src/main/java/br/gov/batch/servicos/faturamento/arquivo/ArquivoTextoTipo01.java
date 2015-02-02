@@ -105,6 +105,8 @@ public class ArquivoTextoTipo01 {
     private ArquivoTextoTipo01DadosFaturamento dadosFaturamento;
     private ArquivoTextoTipo01DadosLocalizacaoImovel dadosLocalizacaoImovel;
     
+    private final String TIPO_REGISTRO = "01";
+    
     public ArquivoTextoTipo01() {
         builder = new StringBuilder();
     }
@@ -112,7 +114,7 @@ public class ArquivoTextoTipo01 {
     public String build() {
         mapDados = new TreeMap<Integer, StringBuilder>();
     	
-	    builder.append("01");
+	    builder.append(TIPO_REGISTRO);
 	    builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(imovel.getId())));
 	
 	    mapDados.putAll(dadosCobranca.build());

@@ -170,8 +170,8 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	expect(consumoBOMock.consumoNaoMedido(imovel.getId(), faturamentoGrupo.getAnoMesReferencia())).andReturn(10);
     	replay(consumoBOMock);
     	
-    	expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasCategoria(imovel.getId())).andReturn(categorias);
-    	expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasSubcategoria(imovel.getId())).andReturn(subcategorias);
+    	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
+    	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
     	replay(imovelSubcategoriaRepositorioMock);
     	
     }

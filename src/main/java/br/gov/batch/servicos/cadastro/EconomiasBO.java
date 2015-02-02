@@ -17,7 +17,7 @@ public class EconomiasBO {
         
         Integer qtdEconomias = 0;
         
-        Collection<ICategoria> colecaoSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(idImovel);
+        Collection<ICategoria> colecaoSubcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
         
         for (ICategoria iCategoria : colecaoSubcategoria) {
             if (iCategoria.getCategoria().getFatorEconomias() != null){

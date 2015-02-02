@@ -71,7 +71,7 @@ public class ConsumoBO {
 
         BigDecimal areaConstruidaVirtual = areaConstruida.divide(new BigDecimal(qtdEconomiasVirtuais), 2, BigDecimal.ROUND_HALF_UP);
         
-        Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(idImovel);
+        Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
         
         Integer consumoNaoMedido = 0;
         
