@@ -10,27 +10,20 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 
-public class ArquivoTextoTipo05 {
+public class ArquivoTextoTipo05 extends ArquivoTexto {
+	
 	@EJB
 	private FaturamentoRepositorio faturamentoRepositorio;
-	
-	private StringBuilder builder;
-	
-	private Integer quantidadeLinhas;
 	
 	private Integer qtdAnoMesDistintos;
 	
 	private CreditoRealizadoTO creditoRealizadoAnterior;
 	
-	private final String TIPO_REGISTRO = "05";
 	
 	private String anoMesAcumulado;
 	
 	public String build(Conta conta) {
 
-		builder = new StringBuilder();
-		quantidadeLinhas = 0;
-		
 		if(conta!=null){
 			creditoRealizadoAnterior = null;
 			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;
@@ -79,39 +72,25 @@ public class ArquivoTextoTipo05 {
 	private void gerarDadosCreditosRealizados(Conta conta, Integer qtdAnoMesDistintos,
 			String anoMesAcumulado, BigDecimal valorCreditoAcumulado) {
 		
-		quantidadeLinhas++;
-		builder.append(TIPO_REGISTRO);
+		builder.append(TIPO_REGISTRO_05);
 		builder.append(Utilitarios.completaComZerosEsquerda(9,conta.getImovel().getId()));
 		if(qtdAnoMesDistintos>1){
 			
 			builder.append(Utilitarios.completaComEspacosADireita(90,creditoRealizadoAnterior.getCreditoTipo().getDescricao()+" "
-					+anoMesAcumulado+((qtdAnoMesDistintos>5)?" E OUTRAS":"")));
+					+anoMesAcumulado+((qtdAnoMesDistintos>5)?" E OUTRAS":null)));
 			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(valorCreditoAcumulado)));
 			
 		}else{
 			builder.append(Utilitarios.completaComEspacosADireita(90,creditoRealizadoAnterior.getCreditoTipo().getDescricao()+
 					((anoMesAcumulado == null || anoMesAcumulado.equals(""))?
 					" PARCELA "+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacaoCredito()+"/"
-					+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())):"")));
+					+Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())):null)));
 			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(creditoRealizadoAnterior.getValorCredito())));
 			
 		}
 		builder.append(Utilitarios.completaComEspacosADireita(6,creditoRealizadoAnterior.getCreditoTipo()!=null?
 				((creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante()!=null)?
-						creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante():creditoRealizadoAnterior.getCreditoTipo().getId()):""));
+						creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante():creditoRealizadoAnterior.getCreditoTipo().getId()):null));
 		builder.append(System.getProperty("line.separator"));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

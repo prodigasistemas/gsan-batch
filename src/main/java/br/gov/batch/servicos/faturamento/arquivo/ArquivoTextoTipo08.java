@@ -20,7 +20,7 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
-public class ArquivoTextoTipo08 {
+public class ArquivoTextoTipo08 extends ArquivoTexto {
 
 	@EJB
 	private FaixaLeituraBO faixaLeituraBO;
@@ -42,13 +42,8 @@ public class ArquivoTextoTipo08 {
 	private Integer consumoMedio;
 	private MedicaoHistorico medicaoHistorico;
 	
-	private StringBuilder builder;
-	private final String TIPO_REGISTRO = "08";
-	
 	public String build(Imovel imovel, Integer referencia) {
 
-		builder = new StringBuilder();
-		
 		this.imovel = imovel;
 
 		int quantidadeLinhas = 0;
@@ -65,7 +60,7 @@ public class ArquivoTextoTipo08 {
 			MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia);
 			medicaoHistorico = obterMedicaoHistorico(medicaoHistoricoAtual);
 
-			builder.append(TIPO_REGISTRO);
+			builder.append(TIPO_REGISTRO_08);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
 			builder.append(hidrometroMedicaoHistorico.getMedicaoTipo().toString());
 			builder.append(Utilitarios.completaComEspacosADireita(11, hidrometro.getNumero()));
@@ -127,7 +122,6 @@ public class ArquivoTextoTipo08 {
 	}
 
 	private int getConsumoMedioHidrometro(Integer medicaoTipo, Integer referencia) {
-		boolean houveIntslacaoHidrometro = hidrometroBO.houveInstalacaoOuSubstituicao(imovel.getId());
 		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo);
 		return volumeMedioAguaEsgotoTO.getConsumoMedio();
 	}

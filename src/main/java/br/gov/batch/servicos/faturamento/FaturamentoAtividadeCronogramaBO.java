@@ -9,6 +9,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoAtividadeCronograma;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
@@ -62,4 +63,19 @@ public class FaturamentoAtividadeCronogramaBO {
 		return dataLeitura;
 	}
 	
+	public long obterDiferencaDiasCronogramas(Rota rota, Integer idFaturamentoAtividade) {
+
+		Date dataCronogramaMesAtual = repositorio.pesquisarFaturamentoAtividadeCronogramaDataPrevista(
+				rota.getFaturamentoGrupo().getId(),idFaturamentoAtividade, rota.getFaturamentoGrupo().getAnoMesReferencia());
+		
+		Date dataCronogramaMesAnterior = repositorio.pesquisarFaturamentoAtividadeCronogramaDataPrevista(
+				rota.getFaturamentoGrupo().getId(),idFaturamentoAtividade, 
+				Utilitarios.reduzirMeses(rota.getFaturamentoGrupo().getAnoMesReferencia(), 1));
+		
+		if (dataCronogramaMesAnterior != null) {
+			return Utilitarios.obterDiferencaEntreDatas(dataCronogramaMesAnterior, dataCronogramaMesAtual);
+		} else {
+			return rota.getNumeroDiasConsumoAjuste();
+		}
+	}
 }
