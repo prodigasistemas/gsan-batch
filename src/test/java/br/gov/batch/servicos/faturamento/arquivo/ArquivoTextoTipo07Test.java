@@ -52,7 +52,7 @@ public class ArquivoTextoTipo07Test {
 	public void buildArquivoTextoTipo07ItensInferiorQuantidadeContas() {
 		carregarMockItensInferiorQuantidadeContas();
 		
-		String linha = arquivoTextoTipo07.build(imovel, cobrancaDocumento, 17);
+		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 17);
 		
 		assertNotNull(linha);
 		assertEquals(getRegistroValidoItensInferiorQuantidadeContas(), linha);
@@ -62,7 +62,7 @@ public class ArquivoTextoTipo07Test {
 	public void buildArquivoTextoTipo07VencimentoAnterior() {
 		carregarMockVencimentoAnterior();
 		
-		String linha = arquivoTextoTipo07.build(imovel, cobrancaDocumento, 2);
+		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 2);
 		
 		assertNotNull(linha);
 		assertEquals(getRegistroValidoVencimentoAnterior(), linha);
@@ -72,7 +72,7 @@ public class ArquivoTextoTipo07Test {
 	public void buildArquivoTextoTipo07TamanhoLinha() {
 		carregarMockItensInferiorQuantidadeContas();
 		
-		String linha = arquivoTextoTipo07.build(imovel, cobrancaDocumento, 17);
+		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 17);
 		
 		String[] linhas = linha.split(System.getProperty("line.separator"));
 		
