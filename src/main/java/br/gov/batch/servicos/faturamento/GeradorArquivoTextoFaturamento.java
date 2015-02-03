@@ -64,12 +64,12 @@ public class GeradorArquivoTextoFaturamento {
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia){
 		boolean retorno = true;
 		
-		ArquivoTextoRoteiroEmpresa arquivo = arquivoRepositorio.recuperaArquivoTextoRoteiroEmpresa(idRota, anoMesReferencia);
+		ArquivoTextoRoteiroEmpresa arquivo = arquivoRepositorio.pesquisarPorRotaEReferencia(idRota, anoMesReferencia);
 
 		if (arquivo != null) {
 			if (arquivo.getSituacaoTransmissaoLeitura() == SituacaoTransmissaoLeitura.DISPONIVEL.getId()) {
-				arquivoDivisaoRepositorio.deletaArquivoTextoRoteiroEmpresaDivisao(arquivo.getId());
-				arquivoRepositorio.deletaArquivoTextoRoteiroEmpresa(arquivo.getId());
+				arquivoDivisaoRepositorio.deletarPorArquivoTextoRoteiroEmpresa(arquivo.getId());
+				arquivoRepositorio.deletarPorId(arquivo.getId());
 			} else {
 				retorno = false;
 			}
