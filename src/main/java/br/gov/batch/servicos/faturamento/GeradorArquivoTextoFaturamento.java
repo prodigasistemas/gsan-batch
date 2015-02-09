@@ -18,6 +18,10 @@ import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo07;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo08;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo09;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo10;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo11;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo12;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo13;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo14;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cobranca.CobrancaDocumento;
@@ -51,6 +55,8 @@ public class GeradorArquivoTextoFaturamento {
 	@EJB
 	private CobrancaDocumentoRepositorio cobrancaDocumentoRepositorio;
 
+	private ArquivoTextoTO to;
+	
 	private StringBuilder arquivoTexto;
 	
 	private StringBuilder arquivoTextoDivisao;
@@ -58,6 +64,7 @@ public class GeradorArquivoTextoFaturamento {
 	public GeradorArquivoTextoFaturamento() {
 		super();
 
+		to = new ArquivoTextoTO();
 		arquivoTexto = new StringBuilder();
 		arquivoTextoDivisao = new StringBuilder();
 	}
@@ -89,7 +96,7 @@ public class GeradorArquivoTextoFaturamento {
 					}
 				}
 			} else {
-//				gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
+//				carregarArquivo(imovel, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 //
 //				int tamanhoArquivoRetorno = 0;
 //
@@ -119,6 +126,11 @@ public class GeradorArquivoTextoFaturamento {
 		}
 	}
 
+	public int getQuantidadeLinhas() {
+		String[] linhas = arquivoTexto.toString().split(System.getProperty("line.separator"));
+		return linhas.length;
+	}
+	
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
 		boolean retorno = true;
 
@@ -176,19 +188,19 @@ public class GeradorArquivoTextoFaturamento {
 		return imoveis;
 	}
 
-	public void carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+	private void carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
 
 		gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 	}
 
-	public void gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+	private void gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
 		CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
 
-		ArquivoTextoTO to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
+		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 
 		ArquivoTexto arquivo = new ArquivoTextoTipo01();
 		arquivoTexto.append(arquivo.build(to));
@@ -221,8 +233,19 @@ public class GeradorArquivoTextoFaturamento {
 		arquivoTexto.append(arquivo.build(to));
 	}
 
-	public int getQuantidadeLinhas() {
-		String[] linhas = arquivoTexto.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
+	private void gerarPassosFinais() {
+		arquivoTexto.append(System.getProperty("line.separator"));
+		
+		ArquivoTexto arquivo = new ArquivoTextoTipo11();
+		arquivoTexto.append(arquivo.build(to));
+		
+		arquivo = new ArquivoTextoTipo12();
+		arquivoTexto.append(arquivo.build(to));
+
+		arquivo = new ArquivoTextoTipo13();
+		arquivoTexto.append(arquivo.build(to));
+
+		arquivo = new ArquivoTextoTipo14();
+		arquivoTexto.append(arquivo.build(to));
 	}
 }

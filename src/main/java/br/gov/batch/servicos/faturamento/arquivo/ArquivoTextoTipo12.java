@@ -29,6 +29,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 		List<ConsumoAnormalidadeAcao> listaAcoes = consumoAnormalidadeAcaoRepositorio.consumoAnormalidadeAcaoAtivo();
 
 		for (ConsumoAnormalidadeAcao acao : listaAcoes) {
+			builder.append(System.getProperty("line.separator"));
 			builder.append(TIPO_REGISTRO_12);
 			builder.append(getConsumoAnormalidade(acao.getConsumoAnormalidade()));
 			builder.append(getCategoria(acao.getCategoria()));

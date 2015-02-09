@@ -58,7 +58,7 @@ public class ArquivoTextoTipo12Test {
 		
 		String[] linhas = linha.split(System.getProperty("line.separator"));
 		
-		for (int i = 0; i < linhas.length; i++) {
+		for (int i = 1; i < linhas.length; i++) {
 			assertEquals(TAMANHO_LINHA, linhas[i].length());
 		}
 	}
@@ -110,7 +110,7 @@ public class ArquivoTextoTipo12Test {
 	
 	private String getLinhaValida() {
 		StringBuilder builder = new StringBuilder();
-		
+		builder.append(System.getProperty("line.separator"));
 		builder.append("120101010102031.001.502.00                                                                                                                   MSG 1                                                                                                                   MSG 2                                                                                                                   MSG 3");
 		builder.append(System.getProperty("line.separator"));
 		builder.append("120202020405063.003.504.00                                                                                                                   MSG 4                                                                                                                   MSG 5                                                                                                                   MSG 6");

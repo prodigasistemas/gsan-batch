@@ -24,6 +24,7 @@ public class ArquivoTextoTipo14 extends ArquivoTexto {
 	public String build(ArquivoTextoTO to) {
 		List<LeituraAnormalidade> leituraAnormalidades = repositorio.listarLeituraAnormalidadePor(to.getIdLeituraAnormalidade(), Status.ATIVO.getId());
 
+		builder.append(System.getProperty("line.separator"));
 		builder.append(TIPO_REGISTRO_14);
 		for (LeituraAnormalidade leituraAnormalidade : leituraAnormalidades) {
 			builder.append(Utilitarios.completaComZerosEsquerda(3, leituraAnormalidade.getId()));

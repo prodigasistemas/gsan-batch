@@ -26,6 +26,8 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 	}
 
 	public String build(ArquivoTextoTO to) {
+		builder.append(System.getProperty("line.separator"));
+		
 		Rota rota = verificarRota(to.getImovel());
 
 		builder.append(TIPO_REGISTRO_11);
