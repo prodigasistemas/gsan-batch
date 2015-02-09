@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ImovelPerfil;
 import br.gov.model.micromedicao.ConsumoAnormalidade;
@@ -27,23 +28,23 @@ import br.gov.servicos.micromedicao.ConsumoAnormalidadeAcaoRepositorio;
 public class ArquivoTextoTipo12Test {
 
 	@TestSubject
-	private ArquivoTextoTipo12 arquivoTextoTipo12;
+	private ArquivoTextoTipo12 arquivo;
+	
+	private int TAMANHO_LINHA = 386;
 	
 	@Mock
 	private ConsumoAnormalidadeAcaoRepositorio consumoAnormalidadeAcaoRepositorioMock;
 	
-	private int TAMANHO_LINHA = 386;
-	
 	@Before
 	public void setup() {
-		arquivoTextoTipo12 = new ArquivoTextoTipo12();
+		arquivo = new ArquivoTextoTipo12();
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo12() {
 		carregarMock();
 		
-		String linha = arquivoTextoTipo12.build();
+		String linha = arquivo.build(new ArquivoTextoTO());
 		
 		assertNotNull(linha);
 		assertEquals(getLinhaValida(), linha);
@@ -53,7 +54,7 @@ public class ArquivoTextoTipo12Test {
 	public void buildArquivoTextoTipo10TamanhoLinha() {
 		carregarMock();
 		
-		String linha = arquivoTextoTipo12.build();
+		String linha = arquivo.build(new ArquivoTextoTO());
 		
 		String[] linhas = linha.split(System.getProperty("line.separator"));
 		

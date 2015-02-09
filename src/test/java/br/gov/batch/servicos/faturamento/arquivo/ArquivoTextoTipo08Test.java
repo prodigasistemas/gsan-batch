@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.FaixaLeituraBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
@@ -37,42 +38,45 @@ import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 public class ArquivoTextoTipo08Test {
 
 	@TestSubject
-	private ArquivoTextoTipo08 arquivoTextoTipo08;
-	
+	private ArquivoTextoTipo08 arquivo;
+
+	private int TAMANHO_LINHA = 120;
+
 	private Imovel imovel;
 	private Integer referencia;
 	private boolean houveInstalacaoOuSubstituicaoHidrometro;
 	private LigacaoTipo ligacaoTipo = LigacaoTipo.AGUA;
 	private MedicaoHistorico medicaoHistorico;
-	
 	private List<HidrometroMedicaoHistoricoTO> hidrometrosMedicaoHistoricoTO;
-	
+
 	@Mock
 	private MedicaoHistoricoBO medicaoHistoricoBOMock;
-	
+
 	@Mock
 	private HidrometroBO hidrometroBOMock;
-	
+
 	@Mock
 	private AguaEsgotoBO aguaEsgotoBOMock;
-	
+
 	@Mock
 	private FaixaLeituraBO faixaLeituraBOMock;
 
 	@Mock
 	private MedicaoHistoricoRepositorio medicaoHistoricoMock;
+
+	private ArquivoTextoTO to;
 	
 	@Before
-	public void setup() {	
+	public void setup() {
 		referencia = new Integer(201201);
 		imovel = new Imovel(1);
-		
+
 		LigacaoAgua ligacaoAgua = new LigacaoAgua();
 		ligacaoAgua.setDataLigacao(new Date());
-		
+
 		imovel.setLigacaoAgua(ligacaoAgua);
 		houveInstalacaoOuSubstituicaoHidrometro = false;
-		
+
 		HidrometroMedicaoHistoricoTO hidrometroMH = new HidrometroMedicaoHistoricoTO();
 		hidrometroMH.setMedicaoTipo(MedicaoTipo.LIGACAO_AGUA.getId());
 		hidrometroMH.setNumero("A98N128712");
@@ -82,7 +86,7 @@ public class ArquivoTextoTipo08Test {
 		hidrometroMH.setDescricaoLocalInstalacao("JARDIM (FRENTE) CEN ");
 		hidrometroMH.setRateioTipo(RateioTipo.SEM_RATEIO.getId());
 		hidrometroMH.setNumeroLeituraInstalacao(0);
-		
+
 		hidrometrosMedicaoHistoricoTO = new ArrayList<HidrometroMedicaoHistoricoTO>();
 		hidrometrosMedicaoHistoricoTO.add(hidrometroMH);
 
@@ -91,40 +95,35 @@ public class ArquivoTextoTipo08Test {
 		medicaoHistorico.setDataLeituraAnteriorFaturamento(new Date());
 		medicaoHistorico.setLeituraAnteriorInformada(new Integer(180));
 		medicaoHistorico.setDataLeituraAtualInformada(new Date());
-		
-		arquivoTextoTipo08 = new ArquivoTextoTipo08();
+
+		to = new ArquivoTextoTO();
+		to.setImovel(imovel);
+		to.setAnoMesReferencia(referencia);
+		arquivo = new ArquivoTextoTipo08();
 	}
-	
+
 	@Test
 	public void buildArquivoTextoTipo08() {
 		carregarMocks();
-		
-		assertNotNull(arquivoTextoTipo08.build(imovel, referencia));
+
+		assertNotNull(arquivo.build(to));
 	}
-	
+
 	@Test
 	public void buildArquivoTextoTipo08TamanhoLinha() {
 		carregarMocks();
-		
-		String linha = arquivoTextoTipo08.build(imovel, referencia);
-		int tamanhoLinha = linha.length();
-		
-		System.out.println(linha);
-		System.out.println(tamanhoLinha);
-		
-		assertTrue(tamanhoLinha == 120);
+
+		String linha = arquivo.build(to);
+		assertTrue(linha.length() == TAMANHO_LINHA);
 	}
-	
+
 	private void carregarMocks() {
 		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(1);
 		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(1);
 		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia)).andReturn(medicaoHistorico).times(1);
-		
 		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250));
-		
-		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId()))
-		.andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(1);
-		
+		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId())).andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(1);
+
 		replay(medicaoHistoricoBOMock);
 		replay(hidrometroBOMock);
 		replay(aguaEsgotoBOMock);

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ImovelPerfil;
 import br.gov.model.micromedicao.ConsumoAnormalidade;
@@ -20,7 +21,11 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 	@EJB
 	private ConsumoAnormalidadeAcaoRepositorio consumoAnormalidadeAcaoRepositorio;
 
-	public String build() {
+	public ArquivoTextoTipo12() {
+		super();
+	}
+
+	public String build(ArquivoTextoTO to) {
 		List<ConsumoAnormalidadeAcao> listaAcoes = consumoAnormalidadeAcaoRepositorio.consumoAnormalidadeAcaoAtivo();
 
 		for (ConsumoAnormalidadeAcao acao : listaAcoes) {
@@ -45,7 +50,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 
 		return builder.toString();
 	}
-	
+
 	private String getDescricaoContaMensagemMes3(String descricaoContaMensagemMes3) {
 		if (descricaoContaMensagemMes3 != null && !descricaoContaMensagemMes3.equals("")) {
 			return Utilitarios.completaTexto(120, descricaoContaMensagemMes3);
@@ -53,7 +58,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			return Utilitarios.completaTexto(120, "");
 		}
 	}
-	
+
 	private String getDescricaoContaMensagemMes2(String descricaoContaMensagemMes2) {
 		if (descricaoContaMensagemMes2 != null && !descricaoContaMensagemMes2.equals("")) {
 			return Utilitarios.completaTexto(120, descricaoContaMensagemMes2);
@@ -61,7 +66,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			return Utilitarios.completaTexto(120, "");
 		}
 	}
-	
+
 	private String getDescricaoContaMensagemMes1(String descricaoContaMensagemMes1) {
 		if (descricaoContaMensagemMes1 != null && !descricaoContaMensagemMes1.equals("")) {
 			return Utilitarios.completaTexto(120, descricaoContaMensagemMes1);
@@ -77,7 +82,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			return Utilitarios.completaComZerosEsquerda(4, "");
 		}
 	}
-	
+
 	private String getNumerofatorConsumoMes2(BigDecimal numerofatorConsumoMes2) {
 		if (numerofatorConsumoMes2 != null && !numerofatorConsumoMes2.equals("")) {
 			return Utilitarios.completaComZerosEsquerda(4, numerofatorConsumoMes2);
@@ -85,7 +90,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			return Utilitarios.completaComZerosEsquerda(4, "");
 		}
 	}
-	
+
 	private String getNumerofatorConsumoMes1(BigDecimal numerofatorConsumoMes1) {
 		if (numerofatorConsumoMes1 != null && !numerofatorConsumoMes1.equals("")) {
 			return Utilitarios.completaComZerosEsquerda(4, numerofatorConsumoMes1);
@@ -101,7 +106,7 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			return Utilitarios.completaComZerosEsquerda(2, "");
 		}
 	}
-	
+
 	private String getLeituraAnormalidadeConsumoMes2(LeituraAnormalidadeConsumo leituraAnormalidadeConsumoMes2) {
 		if (leituraAnormalidadeConsumoMes2 != null && leituraAnormalidadeConsumoMes2.getId() != null) {
 			return Utilitarios.completaComZerosEsquerda(2, leituraAnormalidadeConsumoMes2.getId());

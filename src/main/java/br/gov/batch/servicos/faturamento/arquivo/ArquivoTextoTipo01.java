@@ -14,13 +14,9 @@ import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
-import br.gov.model.cadastro.Imovel;
-import br.gov.model.cobranca.CobrancaDocumento;
-import br.gov.model.faturamento.Conta;
-import br.gov.model.faturamento.FaturamentoGrupo;
-import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
@@ -33,151 +29,105 @@ import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo01 extends ArquivoTexto {
-    private Imovel imovel;
 
-    private Conta conta;
-    
-    private FaturamentoGrupo faturamentoGrupo;
-    
-    private Rota rota;
-    
-    private CobrancaDocumento cobrancaDocumento;
+	@EJB
+	private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
 
-    @EJB
-    private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
+	@EJB
+	private FaturamentoParametroRepositorio repositorioParametros;
 
-    @EJB
-    private FaturamentoParametroRepositorio repositorioParametros;
-    
-    @EJB
-    private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
+	@EJB
+	private QualidadeAguaPadraoRepositorio qualidadeAguaPadraoRepositorio;
 
-    @EJB
-    private QualidadeAguaRepositorio qualidadeAguaRepositorio;
-    
-    @EJB
-    private QuadraFaceRepositorio quadraFaceRepositorio;
+	@EJB
+	private QualidadeAguaRepositorio qualidadeAguaRepositorio;
 
-    @EJB
-    private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
-    
-    @EJB
-    private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
-    
-    @EJB
-    private FaturamentoSituacaoBO faturamentoSituacaoBO;
-    
-    @EJB
-    private HidrometroBO hidrometroBO;
-    
-    @EJB
-    private EsgotoBO esgotoBO;
-    
-    @EJB
-    private AguaEsgotoBO aguaEsgotoBO;
+	@EJB
+	private QuadraFaceRepositorio quadraFaceRepositorio;
 
-    @EJB
-    private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
-    
-    @EJB
-    private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
-    
-    @EJB
-    private MensagemContaBO mensagemContaBO;
-    
-    @EJB
-    private ExtratoQuitacaoBO extratoQuitacaoBO;
-    
-    @EJB
-    private PagamentoBO pagamentoBO;
+	@EJB
+	private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
 
-    private SortedMap<Integer,StringBuilder> mapDados;
-    
-    @EJB
-    private ConsumoBO consumoBO;
+	@EJB
+	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
 
-    private ArquivoTextoTipo01DadosCobranca dadosCobranca;
-    private ArquivoTextoTipo01DadosCliente dadosCliente;
-    private ArquivoTextoTipo01DadosConsumo dadosConsumo;
-    private ArquivoTextoTipo01DadosConta dadosConta;
-    private ArquivoTextoTipo01DadosFaturamento dadosFaturamento;
-    private ArquivoTextoTipo01DadosLocalizacaoImovel dadosLocalizacaoImovel;
+	@EJB
+	private FaturamentoSituacaoBO faturamentoSituacaoBO;
 
-    public String build() {
-        mapDados = new TreeMap<Integer, StringBuilder>();
-    	
-	    builder.append(TIPO_REGISTRO_01);
-	    builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(imovel.getId())));
-	
-	    mapDados.putAll(dadosCobranca.build());
-	    mapDados.putAll(dadosCliente.build());
-	    mapDados.putAll(dadosConsumo.build());
-	    mapDados.putAll(dadosLocalizacaoImovel.build());
-	    mapDados.putAll(dadosConta.build());
-	    mapDados.putAll(dadosFaturamento.build());
-	    
-	    Iterator<Integer> itKeys = mapDados.keySet().iterator();
-	    		
-	    while (itKeys.hasNext()) {
-	    	System.out.println(itKeys.next());
-	    }
-	    		
-	    Iterator<StringBuilder> it = mapDados.values().iterator();
-	    
-	    while (it.hasNext()) {
-	    	builder.append(it.next());
-	    }
-	    
-	    builder.append(System.getProperty("line.separator"));
-	    
- 	    return builder.toString();
- 	    
-    }
+	@EJB
+	private HidrometroBO hidrometroBO;
 
-	public Imovel getImovel() {
-		return imovel;
+	@EJB
+	private EsgotoBO esgotoBO;
+
+	@EJB
+	private AguaEsgotoBO aguaEsgotoBO;
+
+	@EJB
+	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
+
+	@EJB
+	private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
+
+	@EJB
+	private MensagemContaBO mensagemContaBO;
+
+	@EJB
+	private ExtratoQuitacaoBO extratoQuitacaoBO;
+
+	@EJB
+	private PagamentoBO pagamentoBO;
+
+	private SortedMap<Integer, StringBuilder> mapDados;
+
+	@EJB
+	private ConsumoBO consumoBO;
+
+	private ArquivoTextoTipo01DadosCobranca dadosCobranca;
+	private ArquivoTextoTipo01DadosCliente dadosCliente;
+	private ArquivoTextoTipo01DadosConsumo dadosConsumo;
+	private ArquivoTextoTipo01DadosConta dadosConta;
+	private ArquivoTextoTipo01DadosFaturamento dadosFaturamento;
+	private ArquivoTextoTipo01DadosLocalizacaoImovel dadosLocalizacaoImovel;
+
+	public ArquivoTextoTipo01() {
+		super();
 	}
 
-	public void setImovel(Imovel imovel) {
-		this.imovel = imovel;
-	}
+	@Override
+	public String build(ArquivoTextoTO to) {
+		mapDados = new TreeMap<Integer, StringBuilder>();
 
-	public FaturamentoGrupo getFaturamentoGrupo() {
-		return faturamentoGrupo;
-	}
+		builder.append(TIPO_REGISTRO_01);
+		builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(to.getImovel().getId())));
 
-	public void setFaturamentoGrupo(FaturamentoGrupo faturamentoGrupo) {
-		this.faturamentoGrupo = faturamentoGrupo;
-	}
+		mapDados.putAll(dadosCobranca.build());
+		mapDados.putAll(dadosCliente.build());
+		mapDados.putAll(dadosConsumo.build());
+		mapDados.putAll(dadosLocalizacaoImovel.build());
+		mapDados.putAll(dadosConta.build());
+		mapDados.putAll(dadosFaturamento.build());
 
-	public Rota getRota() {
-		return rota;
-	}
+		Iterator<Integer> iteratorKeys = mapDados.keySet().iterator();
+		while (iteratorKeys.hasNext()) {
+			System.out.println(iteratorKeys.next());
+		}
 
-	public void setRota(Rota rota) {
-		this.rota = rota;
-	}
+		Iterator<StringBuilder> iterator = mapDados.values().iterator();
 
-	public Conta getConta() {
-		return conta;
-	}
+		while (iterator.hasNext()) {
+			builder.append(iterator.next());
+		}
 
-	public void setConta(Conta conta) {
-		this.conta = conta;
-	}
+		builder.append(System.getProperty("line.separator"));
 
-	public CobrancaDocumento getCobrancaDocumento() {
-		return cobrancaDocumento;
-	}
-
-	public void setCobrancaDocumento(CobrancaDocumento cobrancaDocumento) {
-		this.cobrancaDocumento = cobrancaDocumento;
+		return builder.toString();
 	}
 
 	public ArquivoTextoTipo01DadosCobranca getDadosCobranca() {
 		return dadosCobranca;
 	}
-	
+
 	public void setDadosCobranca(ArquivoTextoTipo01DadosCobranca dadosCobranca) {
 		this.dadosCobranca = dadosCobranca;
 	}
@@ -221,5 +171,4 @@ public class ArquivoTextoTipo01 extends ArquivoTexto {
 	public void setDadosLocalizacaoImovel(ArquivoTextoTipo01DadosLocalizacaoImovel dadosLocalizacaoImovel) {
 		this.dadosLocalizacaoImovel = dadosLocalizacaoImovel;
 	}
-	
 }

@@ -4,29 +4,28 @@ import java.util.Collection;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.ICategoria;
-import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo02 extends ArquivoTexto {
-	
-	@Inject
-	private SistemaParametros sistemaParametro;
 
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
-	public String build(Imovel imovel){
-		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
-		
+	public ArquivoTextoTipo02() {
+		super();
+	}
+
+	public String build(ArquivoTextoTO to) {
+		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(to.getImovel().getId());
+
 		for (ICategoria categoria : colecaoCategorias) {
-			builder.append(TIPO_REGISTRO_01);
-			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId()));
+			builder.append(TIPO_REGISTRO_02);
+			builder.append(Utilitarios.completaComZerosEsquerda(9, to.getImovel().getId()));
 			builder.append(getCodigoCategoriaOuSubcategoria(categoria));
 			builder.append(getDescricaoCategoriaOuSubcategoria(categoria));
 			builder.append(getCodigoSubcategoria(categoria));
@@ -37,53 +36,53 @@ public class ArquivoTextoTipo02 extends ArquivoTexto {
 			builder.append(getFatorEconomias(categoria));
 			builder.append(System.getProperty("line.separator"));
 		}
-		
+
 		return builder.toString();
 	}
 
-	private String getCodigoSubcategoria(ICategoria iCategoria) {
-		if (sistemaParametro.indicadorTarifaCategoria()) {
+	private String getCodigoSubcategoria(ICategoria categoria) {
+		if (sistemaParametros.indicadorTarifaCategoria()) {
 			return Utilitarios.completaComZerosEsquerda(3, "0");
 		} else {
-			return Utilitarios.completaComZerosEsquerda(3, iCategoria.getId().toString());
+			return Utilitarios.completaComZerosEsquerda(3, categoria.getId().toString());
 		}
 	}
-	
-	private String getDescricaoSubcategoria(ICategoria iCategoria) {
-		if (sistemaParametro.indicadorTarifaCategoria()) {
+
+	private String getDescricaoSubcategoria(ICategoria categoria) {
+		if (sistemaParametros.indicadorTarifaCategoria()) {
 			return Utilitarios.completaTexto(50, "");
 		} else {
-			return Utilitarios.completaTexto(50, iCategoria.getSubcategoriaDescricao());
-		}
-	}
-	
-	private String getSubcategoriaDescricaoAbreviada(ICategoria iCategoria) {
-		if (sistemaParametro.indicadorTarifaCategoria()) {
-			return Utilitarios.completaTexto(3, iCategoria.getSubcategoriaDescricaoAbreviada());
-		} else {
-			return Utilitarios.completaTexto(3, iCategoria.getCategoria().getCategoriaDescricaoAbreviada());
+			return Utilitarios.completaTexto(50, categoria.getSubcategoriaDescricao());
 		}
 	}
 
-	private String getCodigoCategoriaOuSubcategoria(ICategoria iCategoria) {
-		if (sistemaParametro.indicadorTarifaCategoria()) {
-			return iCategoria.getId().toString();
+	private String getSubcategoriaDescricaoAbreviada(ICategoria categoria) {
+		if (sistemaParametros.indicadorTarifaCategoria()) {
+			return Utilitarios.completaTexto(3, categoria.getSubcategoriaDescricaoAbreviada());
 		} else {
-			return iCategoria.getCategoria().getId().toString();
-		}
-	}
-	
-	private String getDescricaoCategoriaOuSubcategoria(ICategoria iCategoria) {
-		if (sistemaParametro.indicadorTarifaCategoria()) {
-			return Utilitarios.completaTexto(15, iCategoria.getCategoriaDescricao());
-		} else {
-			return Utilitarios.completaTexto(15, iCategoria.getSubcategoriaDescricao());
+			return Utilitarios.completaTexto(3, categoria.getCategoria().getCategoriaDescricaoAbreviada());
 		}
 	}
 
-	private String getFatorEconomias(ICategoria iCategoria) {
-		if (iCategoria.getFatorEconomias() != null) {
-			return Utilitarios.completaTexto(2, iCategoria.getFatorEconomias().toString());
+	private String getCodigoCategoriaOuSubcategoria(ICategoria categoria) {
+		if (sistemaParametros.indicadorTarifaCategoria()) {
+			return categoria.getId().toString();
+		} else {
+			return categoria.getCategoria().getId().toString();
+		}
+	}
+
+	private String getDescricaoCategoriaOuSubcategoria(ICategoria categoria) {
+		if (sistemaParametros.indicadorTarifaCategoria()) {
+			return Utilitarios.completaTexto(15, categoria.getCategoriaDescricao());
+		} else {
+			return Utilitarios.completaTexto(15, categoria.getSubcategoriaDescricao());
+		}
+	}
+
+	private String getFatorEconomias(ICategoria categoria) {
+		if (categoria.getFatorEconomias() != null) {
+			return Utilitarios.completaTexto(2, categoria.getFatorEconomias().toString());
 		} else {
 			return Utilitarios.completaTexto(2, "");
 		}

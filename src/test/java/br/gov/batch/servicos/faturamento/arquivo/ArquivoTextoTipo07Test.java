@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.CobrancaDocumentoItem;
@@ -29,30 +30,28 @@ import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 public class ArquivoTextoTipo07Test {
 
 	@TestSubject
-	private ArquivoTextoTipo07 arquivoTextoTipo07;
+	private ArquivoTextoTipo07 arquivo;
 
+	private int TAMANHO_LINHA = 53;
+	
 	@Mock
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorioMock;
 	
-	private Imovel imovel;
-	private CobrancaDocumento cobrancaDocumento;
-	
-	private int TAMANHO_LINHA = 53;
+	private ArquivoTextoTO to;
 	
 	@Before
 	public void setup() {
-		imovel = new Imovel(1);
-		cobrancaDocumento = new CobrancaDocumento();
-		cobrancaDocumento.setId(1);
-		
-		arquivoTextoTipo07 = new ArquivoTextoTipo07();
+		to = new ArquivoTextoTO();
+		to.setImovel(new Imovel(1));
+		to.setCobrancaDocumento(new CobrancaDocumento(1));
+		arquivo = new ArquivoTextoTipo07();
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo07ItensInferiorQuantidadeContas() {
 		carregarMockItensInferiorQuantidadeContas();
 		
-		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 17);
+		String linha = arquivo.build(to);
 		
 		assertNotNull(linha);
 		assertEquals(getRegistroValidoItensInferiorQuantidadeContas(), linha);
@@ -62,7 +61,7 @@ public class ArquivoTextoTipo07Test {
 	public void buildArquivoTextoTipo07VencimentoAnterior() {
 		carregarMockVencimentoAnterior();
 		
-		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 2);
+		String linha = arquivo.build(to);
 		
 		assertNotNull(linha);
 		assertEquals(getRegistroValidoVencimentoAnterior(), linha);
@@ -72,7 +71,7 @@ public class ArquivoTextoTipo07Test {
 	public void buildArquivoTextoTipo07TamanhoLinha() {
 		carregarMockItensInferiorQuantidadeContas();
 		
-		String linha = arquivoTextoTipo07.build(imovel.getId(), cobrancaDocumento, 17);
+		String linha = arquivo.build(to);
 		
 		String[] linhas = linha.split(System.getProperty("line.separator"));
 		
@@ -95,7 +94,7 @@ public class ArquivoTextoTipo07Test {
 		List<CobrancaDocumentoItem> lista = new ArrayList<CobrancaDocumentoItem>();
 		
 		CobrancaDocumentoItem item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
+		item.setCobrancaDocumento(to.getCobrancaDocumento());
 		item.setValorItemCobrado(BigDecimal.valueOf(14.56));
 		item.setValorAcrescimos(BigDecimal.valueOf(1.23));
 		Conta conta = new Conta();
@@ -108,7 +107,7 @@ public class ArquivoTextoTipo07Test {
 		lista.add(item);
 		
 		item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
+		item.setCobrancaDocumento(to.getCobrancaDocumento());
 		item.setValorItemCobrado(BigDecimal.valueOf(20.12));
 		item.setValorAcrescimos(BigDecimal.valueOf(3.56));
 		conta = new Conta();
@@ -136,7 +135,7 @@ public class ArquivoTextoTipo07Test {
 		List<CobrancaDocumentoItem> lista = new ArrayList<CobrancaDocumentoItem>();
 		
 		CobrancaDocumentoItem item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
+		item.setCobrancaDocumento(to.getCobrancaDocumento());
 		item.setValorItemCobrado(BigDecimal.valueOf(14.00));
 		item.setValorAcrescimos(BigDecimal.valueOf(2.00));
 		Conta conta = new Conta();
@@ -145,37 +144,29 @@ public class ArquivoTextoTipo07Test {
 		ContaGeral contaGeral = new ContaGeral();
 		contaGeral.setConta(conta);
 		item.setContaGeral(contaGeral);
-		
-		lista.add(item);
-
-		item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
-		item.setValorItemCobrado(BigDecimal.valueOf(13.00));
-		item.setValorAcrescimos(BigDecimal.valueOf(1.50));
-		conta = new Conta();
-		conta.setReferencia(201410);
-		conta.setDataVencimentoConta(Utilitarios.converterStringParaData("2014-11-05", FormatoData.ANO_MES_DIA_SEPARADO));
-		contaGeral = new ContaGeral();
-		contaGeral.setConta(conta);
-		item.setContaGeral(contaGeral);
-		
 		lista.add(item);
 		
-		item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
-		item.setValorItemCobrado(BigDecimal.valueOf(15.00));
-		item.setValorAcrescimos(BigDecimal.valueOf(2.50));
-		conta = new Conta();
-		conta.setReferencia(201411);
-		conta.setDataVencimentoConta(Utilitarios.converterStringParaData("2014-12-05", FormatoData.ANO_MES_DIA_SEPARADO));
-		contaGeral = new ContaGeral();
-		contaGeral.setConta(conta);
-		item.setContaGeral(contaGeral);
-		
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
+		lista.add(item);
 		lista.add(item);
 		
 		item = new CobrancaDocumentoItem();
-		item.setCobrancaDocumento(cobrancaDocumento);
+		item.setCobrancaDocumento(to.getCobrancaDocumento());
 		item.setValorItemCobrado(BigDecimal.valueOf(16.00));
 		item.setValorAcrescimos(BigDecimal.valueOf(3.00));
 		conta = new Conta();
@@ -191,11 +182,41 @@ public class ArquivoTextoTipo07Test {
 	
 	private String getRegistroValidoVencimentoAnterior() {
     	StringBuilder linha = new StringBuilder();
-    	
-    	linha.append("07000000001DB.ATE00000000058.002015010700000000009.00");
+    	linha.append("07000000001DB.ATE00000000070.002014100800000000010.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
+    	linha.append(System.getProperty("line.separator"));
+    	linha.append("0700000000120140900000000014.002014100800000000002.00");
     	linha.append(System.getProperty("line.separator"));
     	linha.append("0700000000120141200000000016.002015010700000000003.00");
     	linha.append(System.getProperty("line.separator"));
+
     	return linha.toString();
     }
 }

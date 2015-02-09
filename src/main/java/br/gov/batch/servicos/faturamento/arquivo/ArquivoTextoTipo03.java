@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.ejb.EJB;
 
-import br.gov.model.cadastro.Imovel;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
@@ -14,16 +14,20 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 
 	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
-	
+
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
 	
-	public String build(Imovel imovel) {
-		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(imovel);
+	public ArquivoTextoTipo03() {
+		super();
+	}
+
+	public String build(ArquivoTextoTO to) {
+		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(to.getImovel());
 
 		for (ConsumoHistorico consumoHistorico : colecaoConsumoHistorico) {
 			builder.append(TIPO_REGISTRO_03);
-			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
+			builder.append(Utilitarios.completaComZerosEsquerda(9, to.getImovel().getId()));
 			builder.append(String.valueOf(consumoHistorico.getLigacaoTipo()));
 			builder.append(String.valueOf(consumoHistorico.getReferenciaFaturamento()));
 			builder.append(getNumeroConsumoFaturadoMes(consumoHistorico));
@@ -37,7 +41,7 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 
 	private String getConsumoAnormalidade(ConsumoHistorico consumoHistorico) {
 		if (consumoHistorico.getConsumoAnormalidade() != null) {
-			return Utilitarios.completaComZerosEsquerda(2, consumoHistorico.getConsumoAnormalidade().getId().toString());
+			return Utilitarios.completaComZerosEsquerda(2, consumoHistorico.getConsumoAnormalidade().getId());
 		} else {
 			return Utilitarios.completaComZerosEsquerda(2, "0");
 		}
@@ -46,7 +50,7 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 	private String getIdLeituraAnormalidadeFaturamento(ConsumoHistorico consumoHistorico) {
 		Integer idLeituraAnormalidadeFaturamento = medicaoHistoricoRepositorio.buscarLeituraAnormalidadeFaturamento(consumoHistorico);
 		if (idLeituraAnormalidadeFaturamento != null) {
-			return Utilitarios.completaComZerosEsquerda(2, idLeituraAnormalidadeFaturamento.toString());
+			return Utilitarios.completaComZerosEsquerda(2, idLeituraAnormalidadeFaturamento);
 		} else {
 			return Utilitarios.completaComZerosEsquerda(2, "0");
 		}
@@ -54,7 +58,7 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 
 	private String getNumeroConsumoFaturadoMes(ConsumoHistorico consumoHistorico) {
 		if (consumoHistorico.getNumeroConsumoFaturadoMes() != null) {
-			return Utilitarios.completaComZerosEsquerda(6, consumoHistorico.getNumeroConsumoFaturadoMes().toString());
+			return Utilitarios.completaComZerosEsquerda(6, consumoHistorico.getNumeroConsumoFaturadoMes());
 		} else {
 			return Utilitarios.completaComZerosEsquerda(6, "0");
 		}

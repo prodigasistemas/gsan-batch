@@ -15,35 +15,41 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
 import br.gov.model.micromedicao.LeituraAnormalidade;
 import br.gov.model.micromedicao.LeituraAnormalidadeConsumo;
 import br.gov.model.micromedicao.LeituraAnormalidadeLeitura;
 import br.gov.servicos.micromedicao.LeituraAnormalidadeRepositorio;
 
-
 @RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo14Test {
 
 	@TestSubject
-	private ArquivoTextoTipo14 arquivoTextoTipo14;
+	private ArquivoTextoTipo14 arquivo;
 	
+	private int TAMANHO_LINHA = 49;
+
 	@Mock
 	private LeituraAnormalidadeRepositorio repositorio;
-	
+
 	private LeituraAnormalidade leituraAnormalidade;
-	
+
 	private List<LeituraAnormalidade> lista;
+
+	private ArquivoTextoTO to;
 	
 	@Before
-	public void init(){
-		arquivoTextoTipo14 = new ArquivoTextoTipo14();
-		
+	public void setup() {
+		arquivo = new ArquivoTextoTipo14();
+		to = new ArquivoTextoTO();
+		to.setIdLeituraAnormalidade(1);
+
 		leituraAnormalidade = new LeituraAnormalidade();
 		leituraAnormalidade.setId(1);
 		leituraAnormalidade.setDescricao("DESC ANORMALIDADE");
 		leituraAnormalidade.setIndicadorLeitura(Short.valueOf("1"));
-		
+
 		leituraAnormalidade.setNumeroFatorComLeitura(BigDecimal.valueOf(2.00));
 		LeituraAnormalidadeConsumo l1 = new LeituraAnormalidadeConsumo();
 		l1.setId(8);
@@ -51,33 +57,27 @@ public class ArquivoTextoTipo14Test {
 		l2.setId(8);
 		leituraAnormalidade.setLeituraAnormalidadeConsumoComLeitura(l1);
 		leituraAnormalidade.setLeituraAnormalidadeConsumoSemLeitura(l2);
-		
+
 		LeituraAnormalidadeLeitura l3 = new LeituraAnormalidadeLeitura();
 		l3.setId(9);
 		LeituraAnormalidadeLeitura l4 = new LeituraAnormalidadeLeitura();
 		l4.setId(9);
-//		leituraAnormalidade.setLeituraAnormalidadeLeituraComLeitura(l3);
 		leituraAnormalidade.setLeituraAnormalidadeLeituraSemLeitura(l4);
 		leituraAnormalidade.setIndicadorUso(Short.valueOf("1"));
 		lista = new ArrayList<LeituraAnormalidade>();
 		lista.add(leituraAnormalidade);
 	}
-	
+
 	@Test
-	public void buildLinha14(){
-		loadMocks();
-		
-		String linha = arquivoTextoTipo14.build(Integer.valueOf("1"));
-		System.out.println(linha);
-		System.out.println(linha.length());
-		
-		assertTrue(linha.length() >= 49);
+	public void buildLinha14() {
+		carregarMocks();
+
+		String linha = arquivo.build(to);
+		assertTrue(linha.length() >= TAMANHO_LINHA);
 	}
 
-	private void loadMocks() {
+	private void carregarMocks() {
 		expect(repositorio.listarLeituraAnormalidadePor(1, Status.ATIVO.getId())).andReturn(lista);
 		replay(repositorio);
 	}
-	
-	
 }

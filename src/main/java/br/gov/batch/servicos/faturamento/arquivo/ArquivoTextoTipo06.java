@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.EJB;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ContaImpostosDeduzidosRepositorio;
@@ -13,11 +14,17 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
-	
-	public String build(Conta conta) {
+
+	public ArquivoTextoTipo06() {
+		super();
+	}
+
+	public String build(ArquivoTextoTO to) {
+		Conta conta = to.getConta();
+		
 		if (conta != null) {
 			List<ContaImpostosDeduzidosTO> contas = contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId());
-			
+
 			for (ContaImpostosDeduzidosTO contaImpostosDeduzidos : contas) {
 				builder.append(TIPO_REGISTRO_06);
 				builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));

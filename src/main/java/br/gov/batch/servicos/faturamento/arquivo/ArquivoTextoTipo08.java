@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ejb.EJB;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.FaixaLeituraBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
@@ -24,40 +25,38 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 
 	@EJB
 	private FaixaLeituraBO faixaLeituraBO;
-	
+
 	@EJB
 	private HidrometroBO hidrometroBO;
-	
+
 	@EJB
 	private AguaEsgotoBO aguaEsgotoBO;
-	
+
 	@EJB
-	private MedicaoHistoricoBO medicaoHistoricoBO; 
+	private MedicaoHistoricoBO medicaoHistoricoBO;
 
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
-	
-	private Imovel imovel;
+
 	private Hidrometro hidrometro;
 	private Integer consumoMedio;
 	private MedicaoHistorico medicaoHistorico;
-	
-	public String build(Imovel imovel, Integer referencia) {
 
-		this.imovel = imovel;
+	public ArquivoTextoTipo08() {
+		super();
+	}
 
-		int quantidadeLinhas = 0;
-
-		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = medicaoHistoricoBO.obterDadosTiposMedicao(imovel.getId(), referencia);
+	public String build(ArquivoTextoTO to) {
+		Imovel imovel = to.getImovel();
+		Integer anoMesReferencia = to.getAnoMesReferencia();
+		
+		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = medicaoHistoricoBO.obterDadosTiposMedicao(imovel.getId(), anoMesReferencia);
 
 		for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : listaHidrometroMedicaoHistorico) {
-
-			consumoMedio = getConsumoMedioHidrometro(hidrometroMedicaoHistorico.getMedicaoTipo(), referencia);
+			consumoMedio = getConsumoMedioHidrometro(imovel.getId(), hidrometroMedicaoHistorico.getMedicaoTipo(), anoMesReferencia);
 			hidrometro = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
-			quantidadeLinhas = quantidadeLinhas + 1;
-
-			MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia);
+			MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferencia);
 			medicaoHistorico = obterMedicaoHistorico(medicaoHistoricoAtual);
 
 			builder.append(TIPO_REGISTRO_08);
@@ -69,10 +68,9 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			builder.append(Utilitarios.completaComZerosEsquerda(7, medicaoHistoricoAtual.getLeituraAnteriorFaturamento().toString()));
 			builder.append(getDataLeituraAnteriorFaturada(medicaoHistoricoAtual, hidrometroMedicaoHistorico.getDataInstalacao()));
 			builder.append(getSituacaoLeituraAtual(hidrometroMedicaoHistorico, medicaoHistorico));
-			buildFaixaLeitura();
+			buildFaixaLeitura(imovel);
 			builder.append(Utilitarios.completaComZerosEsquerda(6, consumoMedio));
 			builder.append(getLocalInstalacaoHidrometro(hidrometroMedicaoHistorico.getDescricaoLocalInstalacao()));
-			
 			builder.append(getLeituraAnteriorInformada(medicaoHistoricoAtual));
 			builder.append(getDataLeituraAnteiorInformada(medicaoHistoricoAtual.getDataLeituraAtualInformada(), hidrometroMedicaoHistorico.getDataLeituraAtualInformada()));
 			builder.append(Utilitarios.formataData(getDataLigacao(imovel, hidrometroMedicaoHistorico.getMedicaoTipo()), FormatoData.ANO_MES_DIA));
@@ -91,7 +89,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		if (medicaoHistoricoAtual.getLeituraAnteriorInformada() != null) {
 			medicaoHistorico.setLeituraAnteriorInformada(medicaoHistoricoAtual.getLeituraAnteriorInformada());
 		}
-		
+
 		return medicaoHistorico;
 	}
 
@@ -108,8 +106,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		if (possuiDataLeituraAnteriorInformada(dataLeituraAnteriorInformada)) {
 			return Utilitarios.formataData(dataLeituraAnteriorInformada, FormatoData.ANO_MES_DIA);
 		} else {
-			return dataLeituraAnteriorInformadaHidrometro != null ? 
-					Utilitarios.formataData(dataLeituraAnteriorInformadaHidrometro, FormatoData.ANO_MES_DIA) : Utilitarios.completaTexto(8, " ");
+			return dataLeituraAnteriorInformadaHidrometro != null ? Utilitarios.formataData(dataLeituraAnteriorInformadaHidrometro, FormatoData.ANO_MES_DIA) : Utilitarios.completaTexto(8, " ");
 		}
 	}
 
@@ -121,12 +118,12 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		return local != null ? Utilitarios.completaTexto(20, "" + local) : Utilitarios.completaTexto(20, " ");
 	}
 
-	private int getConsumoMedioHidrometro(Integer medicaoTipo, Integer referencia) {
-		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(),referencia, medicaoTipo);
+	private int getConsumoMedioHidrometro(Integer idImovel, Integer medicaoTipo, Integer anoMesReferencia) {
+		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(idImovel, anoMesReferencia, medicaoTipo);
 		return volumeMedioAguaEsgotoTO.getConsumoMedio();
 	}
-	
-	private void buildFaixaLeitura() {
+
+	private void buildFaixaLeitura(Imovel imovel) {
 		FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, consumoMedio, medicaoHistorico);
 
 		builder.append(Utilitarios.completaComZerosEsquerda(7, faixaLeitura.getFaixaInferior().toString()));
@@ -134,11 +131,10 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 	}
 
 	private String getLeituraAnteriorInformada(MedicaoHistorico medicaoHistoricoAtual) {
-		return medicaoHistoricoAtual.getLeituraAnteriorInformada() != null ? 
-				Utilitarios.completaComZerosEsquerda(7,medicaoHistoricoAtual.getLeituraAnteriorInformada().toString()) : Utilitarios.completaTexto(7, " ");
+		return medicaoHistoricoAtual.getLeituraAnteriorInformada() != null ? Utilitarios.completaComZerosEsquerda(7, medicaoHistoricoAtual.getLeituraAnteriorInformada().toString()) : Utilitarios.completaTexto(7, " ");
 	}
 
-	private String  getDataLeituraAnteriorFaturada(MedicaoHistorico medicaoHistoricoAtual, Date dataInstalacaoHidrometro) {
+	private String getDataLeituraAnteriorFaturada(MedicaoHistorico medicaoHistoricoAtual, Date dataInstalacaoHidrometro) {
 		if (possuiLeituraAnteriorFaturada()) {
 			return Utilitarios.formataData(medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento(), FormatoData.ANO_MES_DIA);
 		} else {
@@ -151,9 +147,9 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 	}
 
 	private String getLeituraInstalacaoHidrometro(Integer leituraInstalacao) {
-		return leituraInstalacao != null ? Utilitarios.completaComZerosEsquerda(7,leituraInstalacao) : Utilitarios.completaTexto(7, " ");
+		return leituraInstalacao != null ? Utilitarios.completaComZerosEsquerda(7, leituraInstalacao) : Utilitarios.completaTexto(7, " ");
 	}
-	
+
 	private Date getDataLigacao(Imovel imovel, Integer medicaoTipo) {
 		return medicaoTipo.intValue() == MedicaoTipo.LIGACAO_AGUA.getId() ? imovel.getLigacaoAgua().getDataLigacao() : imovel.getLigacaoEsgoto().getDataLigacao();
 	}
@@ -171,8 +167,8 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		if (numeroHidrometro != null) {
 			hidrometro = new Hidrometro();
 			hidrometro.setNumero(numeroHidrometro);
-		} 
-		
+		}
+
 		return hidrometro;
 	}
 

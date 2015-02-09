@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.ConsumoAnormalidade;
 import br.gov.model.micromedicao.ConsumoHistorico;
@@ -26,21 +27,26 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 public class ArquivoTextoTipo03Test {
 	
 	@TestSubject
-	private ArquivoTextoTipo03 arquivoTextoTipo03;
+	private ArquivoTextoTipo03 arquivo;
+	
+	private int TAMANHO_LINHA = 29;
 	
 	@Mock 
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorioMock;
 	
 	@Mock 
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorioMock;
-	
-	private Imovel imovel;
+
+	private ArquivoTextoTO to;
 	private Collection<ConsumoHistorico> consumosHistoricos;
 	private ConsumoHistorico consumoHistorico;
 	
 	@Before
 	public void setup() {
-		imovel = new Imovel(1);
+		to = new ArquivoTextoTO();
+		to.setImovel(new Imovel(1));
+		arquivo = new ArquivoTextoTipo03();
+		arquivo.setArquivoTextoTO(to);
 		
 		consumoHistorico = new ConsumoHistorico();
 		consumoHistorico.setId(1);
@@ -53,32 +59,23 @@ public class ArquivoTextoTipo03Test {
 		
 		consumosHistoricos = new ArrayList<ConsumoHistorico>();
 		consumosHistoricos.add(consumoHistorico);
-		
-		arquivoTextoTipo03 = new ArquivoTextoTipo03();
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo03() {
 		carregarMocks();
-		
-		assertNotNull(arquivoTextoTipo03.build(imovel));
+		assertNotNull(arquivo.build(to));
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo03TamanhoLinha() {
 		carregarMocks();
-		
-		String linha = arquivoTextoTipo03.build(imovel);
-		int tamanhoLinha = linha.length();
-		
-		System.out.println(linha);
-		System.out.println(tamanhoLinha);
-		
-		assertTrue(tamanhoLinha >= 29);
+		String linha = arquivo.build(to);
+		assertTrue(linha.length() >= TAMANHO_LINHA);
 	}
 	
 	private void carregarMocks() {
-		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(imovel)).andReturn(consumosHistoricos);
+		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(to.getImovel())).andReturn(consumosHistoricos);
 		replay(consumoHistoricoRepositorioMock);
 		
 		expect(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).andReturn(1);

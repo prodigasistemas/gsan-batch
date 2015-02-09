@@ -16,7 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.model.Status;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
+import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
@@ -26,29 +27,32 @@ import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 public class ArquivoTextoTipo10Test {
 
 	@TestSubject
-	private ArquivoTextoTipo10 arquivoTextoTipo10;
+	private ArquivoTextoTipo10 arquivo;
+	
+	private int TAMANHO_LINHA = 42;
+	
+	@Mock
+	private SistemaParametros sistemaParametrosMock;
 	
 	@Mock
 	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
 	
-	private List<Integer> idsConsumoTarifaCategoria;
-	
-	private int TAMANHO_LINHA = 42;
+	private ArquivoTextoTO to;
 	
 	@Before
 	public void setup() {
-		arquivoTextoTipo10 = new ArquivoTextoTipo10();
+		to = new ArquivoTextoTO();
+		to.addIdsConsumoTarifaCategoria(1);
+		to.addIdsConsumoTarifaCategoria(3);
 		
-		idsConsumoTarifaCategoria = new ArrayList<Integer>();
-		idsConsumoTarifaCategoria.add(1);
-		idsConsumoTarifaCategoria.add(3);
+		arquivo = new ArquivoTextoTipo10();
 	}
 	
 	@Test
 	public void buildArquivoTextoTipo10() {
 		carregarMock();
 		
-		String linha = arquivoTextoTipo10.build(idsConsumoTarifaCategoria, Status.INATIVO.getId());
+		String linha = arquivo.build(to);
 		
 		assertNotNull(linha);
 		assertEquals(getLinhaValida(), linha);
@@ -58,8 +62,7 @@ public class ArquivoTextoTipo10Test {
 	public void buildArquivoTextoTipo10TamanhoLinha() {
 		carregarMock();
 		
-		String linha = arquivoTextoTipo10.build(idsConsumoTarifaCategoria, Status.INATIVO.getId());
-		
+		String linha = arquivo.build(to);
 		String[] linhas = linha.split(System.getProperty("line.separator"));
 		
 		for (int i = 0; i < linhas.length; i++) {
@@ -68,7 +71,10 @@ public class ArquivoTextoTipo10Test {
 	}
 	
 	private void carregarMock() {
-		expect(consumoTarifaFaixaRepositorioMock.dadosConsumoTarifaFaixa(idsConsumoTarifaCategoria)).andReturn(getFaixas());
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(false);
+		replay(sistemaParametrosMock);
+		
+		expect(consumoTarifaFaixaRepositorioMock.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria())).andReturn(getFaixas());
 		replay(consumoTarifaFaixaRepositorioMock);
 	}
 

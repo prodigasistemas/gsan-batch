@@ -7,7 +7,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.model.Status;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
@@ -19,18 +19,22 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 	@EJB
 	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
 
-	public String build(List<Integer> idsConsumoTarifaCategoria, Short indicadorTarifaCategoria) {
-		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(idsConsumoTarifaCategoria);
+	public ArquivoTextoTipo10() {
+		super();
+	}
 
-		for (ConsumoTarifaFaixaTO to : listaConsumoTarifaFaixa) {
+	public String build(ArquivoTextoTO to) {
+		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria());
+
+		for (ConsumoTarifaFaixaTO faixaTO : listaConsumoTarifaFaixa) {
 			builder.append(TIPO_REGISTRO_10);
-			builder.append(getIdConsumoTarifa(to.getIdConsumoTarifa()));
-			builder.append(getDataVigencia(to.getDataVigencia()));
-			builder.append(getIdCategoria(to.getIdCategoria()));
-			builder.append(getIdSubcategoria(to.getIdSubcategoria(), indicadorTarifaCategoria));
-			builder.append(getNumeroConsumoFaixaInicio(to.getNumeroConsumoFaixaInicio()));
-			builder.append(getNumeroConsumoFaixaFim(to.getNumeroConsumoFaixaFim()));
-			builder.append(getValorConsumoTarifa(to.getValorConsumoTarifa()));
+			builder.append(getIdConsumoTarifa(faixaTO.getIdConsumoTarifa()));
+			builder.append(getDataVigencia(faixaTO.getDataVigencia()));
+			builder.append(getIdCategoria(faixaTO.getIdCategoria()));
+			builder.append(getIdSubcategoria(faixaTO.getIdSubcategoria()));
+			builder.append(getNumeroConsumoFaixaInicio(faixaTO.getNumeroConsumoFaixaInicio()));
+			builder.append(getNumeroConsumoFaixaFim(faixaTO.getNumeroConsumoFaixaFim()));
+			builder.append(getValorConsumoTarifa(faixaTO.getValorConsumoTarifa()));
 			
 			if (getQuantidadeLinhas() < listaConsumoTarifaFaixa.size()) {
 				builder.append(System.getProperty("line.separator"));
@@ -64,8 +68,8 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 		}
 	}
 
-	private String getIdSubcategoria(Integer idSubcategoria, Short indicadorTarifaCategoria) {
-		if (indicadorTarifaCategoria.equals(Status.INATIVO.getId()) && idSubcategoria != null) {
+	private String getIdSubcategoria(Integer idSubcategoria) {
+		if (!sistemaParametros.indicadorTarifaCategoria() && idSubcategoria != null) {
 			return Utilitarios.completaComZerosEsquerda(3, idSubcategoria);
 		} else {
 			return Utilitarios.completaTexto(3, "");

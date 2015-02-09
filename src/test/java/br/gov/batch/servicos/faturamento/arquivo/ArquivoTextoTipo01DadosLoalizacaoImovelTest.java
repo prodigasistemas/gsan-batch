@@ -29,7 +29,7 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
 	private Rota rota;
 	
 	@Before
-	public void init() {
+	public void setup() {
 
     	imovel = new Imovel(1234567);
     	
@@ -68,18 +68,10 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
 
     	StringBuilder linhaValida = new StringBuilder();
     	linhaValida.append("BELEM                    DESCRICAO DA LOCALIDADE  00100112340000000                                 ")
-    		.append("                                     0010000099                                                            ")
-    		.append("          33224455   000000000");
+    		       .append("                                     0010000001                                                            ")
+    		       .append("          33224455   000000000");
 
     	
-    	System.out.println(mapDados.get(0));
-    	System.out.println(mapDados.get(1));
-    	System.out.println(mapDados.get(23));
-    	System.out.println(mapDados.get(24));
-    	
-    	System.out.println(mapDados.get(28));
-    	System.out.println(mapDados.get(4));
-    	System.out.println(mapDados.get(5));
     	assertNotNull(mapDados);
     	assertEquals(8, mapDados.keySet().size());
     	assertEquals(linha, linhaValida.toString());
@@ -90,10 +82,9 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	
     	Collection<StringBuilder> dados = mapDados.values();
     	
-    	Iterator<StringBuilder> it = dados.iterator();
-    	
-    	while (it.hasNext()) {
-    		builder.append(it.next());
+    	Iterator<StringBuilder> iterator = dados.iterator();
+    	while (iterator.hasNext()) {
+    		builder.append(iterator.next());
     	}
     	
     	return builder.toString();

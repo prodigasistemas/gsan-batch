@@ -1,11 +1,11 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.anyObject;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
-import br.gov.model.Status;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
@@ -34,6 +34,7 @@ import br.gov.model.faturamento.TarifaTipoCalculo;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
+import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
 import br.gov.servicos.faturamento.TarifaTipoCalculoRepositorio;
@@ -45,6 +46,8 @@ public class ArquivoTextoTipo09Test {
 
 	@TestSubject
 	private ArquivoTextoTipo09 arquivo;
+	
+	private int TAMANHO_LINHA = 37;
 	
 	@Mock
 	private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorioMock;
@@ -67,11 +70,17 @@ public class ArquivoTextoTipo09Test {
 	@Mock
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBOMock;
 	
+	@Mock
+	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
+	
+	@Mock
+	private SistemaParametros sistemaParametrosMock;;
+	
+	private ArquivoTextoTO to;
 	
 	private Imovel imovel;
 	private Integer anoMesReferencia;
-	private FaturamentoGrupo grupo;
-	private SistemaParametros sistemaParametros;
+	private FaturamentoGrupo faturamentoGrupo;
 	
 	private TarifaTipoCalculo tipoCalculoTarifa;
 	private Collection<ICategoria> dadosSubcategoria;
@@ -82,8 +91,7 @@ public class ArquivoTextoTipo09Test {
 	private ConsumoTarifaCategoria consumoTarifaCategoria;
 	
 	@Before
-	public void setUp() {
-		
+	public void setup() {
 		imovel = new Imovel(1);
 		imovel.setConsumoTarifa(new ConsumoTarifa(1));
 		
@@ -119,42 +127,45 @@ public class ArquivoTextoTipo09Test {
 		consumoTarifaCategoria = new ConsumoTarifaCategoria();
 		consumoTarifaCategoria.setConsumoTarifaVigencia(consumoTarifaVigencia);
 		consumoTarifaCategoria.setCategoria(categoria);
-		consumoTarifaCategoria.setSubCategoria(subcategoria);
+		consumoTarifaCategoria.setSubcategoria(subcategoria);
 		consumoTarifaCategoria.setNumeroConsumoMinimo(10);
 		consumoTarifaCategoria.setValorTarifaMinima(new BigDecimal(14.00));
 		
-		sistemaParametros = new SistemaParametros();
-		sistemaParametros.setIndicadorTarifaCategoria(Status.ATIVO.getId());
+		faturamentoGrupo = new FaturamentoGrupo();
+		faturamentoGrupo.setAnoMesReferencia(anoMesReferencia);
 		
-		grupo = new FaturamentoGrupo();
-		grupo.setAnoMesReferencia(anoMesReferencia);
-		arquivo = new ArquivoTextoTipo09(imovel, grupo, sistemaParametros);
+		to = new ArquivoTextoTO();
+		to.setImovel(imovel);
+		to.setFaturamentoGrupo(faturamentoGrupo);
+		to.addIdsConsumoTarifaCategoria(1);
+		arquivo = new ArquivoTextoTipo09();
 	}
 	
 	@Test
-	public void buildArquivoTextoTipo08() {
+	public void buildArquivoTextoTipo09() {
 		carregarMocks();
-		assertNotNull(arquivo.build().toString());
+		assertNotNull(arquivo.build(to).toString());
 	}
 	
 	@Test
-	public void buildArquivoTextoTipo08TamanhoLinha() {
+	public void buildArquivoTextoTipo09TamanhoLinha() {
 		carregarMocks();
-		assertTrue(arquivo.build().toString().length() == 37);
+		assertTrue(arquivo.build(to).toString().length() == TAMANHO_LINHA);
 	}
 	
 	@Test
-	public void buildArquivoTextoTipo08Layout() {
+	public void buildArquivoTextoTipo09Layout() {
 		carregarMocks();
 		
 		StringBuilder linha = new StringBuilder("0901201512011   00001000000000014.00");
 		linha.append(System.getProperty("line.separator"));
 		
-		assertEquals(linha.toString(), arquivo.build().toString());
+		assertEquals(linha.toString(), arquivo.build(to).toString());
 	}
 	
 	private void carregarMocks() {
-
+		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(true);
+		replay(sistemaParametrosMock);
 		
 		expect(tarifaTipoCalculoRepositorioMock.tarifaTipoCalculoAtiva()).andReturn(tipoCalculoTarifa).times(3);
 		replay(tarifaTipoCalculoRepositorioMock);
@@ -172,5 +183,4 @@ public class ArquivoTextoTipo09Test {
 				subcategoria.getSubcategoria().getId())).andReturn(consumoTarifaCategoria).times(3);
 		replay(consumoTarifaCategoriaRepositorioMock);
 	}
-
 }

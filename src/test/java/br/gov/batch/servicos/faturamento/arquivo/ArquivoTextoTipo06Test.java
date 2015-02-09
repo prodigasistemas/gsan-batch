@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ImpostoTipo;
@@ -26,26 +27,31 @@ import br.gov.servicos.to.ContaImpostosDeduzidosTO;
 public class ArquivoTextoTipo06Test {
 
 	@TestSubject
-	private ArquivoTextoTipo06 arquivoTextoTipo06;
-	
+	private ArquivoTextoTipo06 arquivo;
+
+	private int TAMANHO_LINHA = 34;
+
 	@Mock
-	private  ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
-	
+	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
+
 	private ContaImpostosDeduzidosTO contaTO;
-	
 	private List<ContaImpostosDeduzidosTO> lista;
 	
-	private Conta conta;
-	
+	private ArquivoTextoTO to;
+
 	@Before
-	public void setup(){
-		arquivoTextoTipo06 = new ArquivoTextoTipo06();
-		lista = new ArrayList<ContaImpostosDeduzidosTO>();
-		contaTO = new ContaImpostosDeduzidosTO();
-		conta = new Conta();
+	public void setup() {
+		Conta conta = new Conta();
 		conta.setId(1);
 		conta.setImovel(new Imovel(1));
-		
+		to = new ArquivoTextoTO();
+		to.setConta(conta);
+		arquivo = new ArquivoTextoTipo06();
+		arquivo.setArquivoTextoTO(to);
+
+		lista = new ArrayList<ContaImpostosDeduzidosTO>();
+		contaTO = new ContaImpostosDeduzidosTO();
+
 		ImpostoTipo impostoTipo = new ImpostoTipo();
 		impostoTipo.setDescricaoAbreviada("TESTE DESC ABREV");
 		impostoTipo.setId(1);
@@ -54,32 +60,27 @@ public class ArquivoTextoTipo06Test {
 		contaTO.setPercentualAliquota(BigDecimal.valueOf(1));
 		contaTO.setTipoImpostoId(1);
 		contaTO.setValorImposto(BigDecimal.valueOf(1));
-		
+
 		lista.add(contaTO);
 	}
-	
+
 	@Test
 	public void buildArquivoTextoTipo05TamanhoLinha() {
 		carregarMocks();
-		
-		String linha = arquivoTextoTipo06.build(conta);
-		int tamanhoLinha = linha.length();
-		
-		System.out.println(linha);
-		System.out.println(tamanhoLinha);
-		
-		assertTrue(tamanhoLinha >= 34);
+
+		String linha = arquivo.build(to);
+		assertTrue(linha.length() >= TAMANHO_LINHA);
 	}
-	
+
 	@Test
-	public void arquivoTextoTipo05BuildLinha(){
+	public void arquivoTextoTipo05BuildLinha() {
 		carregarMocks();
-		
-		assertNotNull(arquivoTextoTipo06.build(conta));
+
+		assertNotNull(arquivo.build(to));
 	}
-	
+
 	public void carregarMocks() {
-		expect(contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(conta.getId())).andReturn(lista);
+		expect(contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(to.getConta().getId())).andReturn(lista);
 		replay(contaImpostosDeduzidosRepositorio);
 	}
 }
