@@ -57,25 +57,21 @@ public class GeradorArquivoTextoFaturamento {
 
 	private ArquivoTextoTO to;
 	
-	private StringBuilder arquivoTexto;
-	
-	private StringBuilder arquivoTextoDivisao;
-
 	public GeradorArquivoTextoFaturamento() {
 		super();
 
 		to = new ArquivoTextoTO();
-		arquivoTexto = new StringBuilder();
-		arquivoTextoDivisao = new StringBuilder();
 	}
 
-	public void gerar(Rota rota, Integer anoMesFaturamento) {
+	public void gerar(Rota rota, Integer anoMesFaturamento, FaturamentoGrupo grupoFaturamento, Date dataComando) {
 		final int quantidadeRegistros = 3000;
 		int primeiroRegistro = 0;
 
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
 
 		List<Imovel> imoveisArquivo = new ArrayList<Imovel>();
+		
+		StringBuilder texto = new StringBuilder();
 
 		for (Imovel imovel : imoveis) {
 			if (imovel.isCondominio()) {
@@ -93,6 +89,14 @@ public class GeradorArquivoTextoFaturamento {
 
 					if (imovelMicroComConta) {
 						imoveisArquivo.add(imovel);
+						texto.append(texto.length() > 0 ? System.getProperty("line.separator") : "");
+						texto.append(gerarArquivoTexto(imovel, null, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+						
+						imoveisCondominio.forEach(e -> {
+						    texto.append(System.getProperty("line.separator"))
+						        .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+						    imoveisArquivo.add(e);
+						});
 					}
 				}
 			} else {
@@ -123,14 +127,12 @@ public class GeradorArquivoTextoFaturamento {
 //					imoveisArquivo.add(imovel);
 //				}
 			}
+			
+			
+			
 		}
 	}
 
-	public int getQuantidadeLinhas() {
-		String[] linhas = arquivoTexto.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
-	}
-	
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
 		boolean retorno = true;
 
@@ -180,7 +182,7 @@ public class GeradorArquivoTextoFaturamento {
 		List<Imovel> imoveis = new ArrayList<Imovel>();
 
 		for (Imovel imovel : imoveisConsulta) {
-			if (imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()) {
+			if (imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometro()) {
 				imoveis.add(imovel);
 			}
 		}
@@ -188,21 +190,24 @@ public class GeradorArquivoTextoFaturamento {
 		return imoveis;
 	}
 
-	private void carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
 
-		gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
+		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 	}
 
-	private void gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+	public StringBuilder gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
 		CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
 
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 
+		StringBuilder arquivoTexto = new StringBuilder();
+		
 		ArquivoTexto arquivo = new ArquivoTextoTipo01();
+		
 		arquivoTexto.append(arquivo.build(to));
 
 		arquivo = new ArquivoTextoTipo02();
@@ -231,9 +236,12 @@ public class GeradorArquivoTextoFaturamento {
 
 		arquivo = new ArquivoTextoTipo10();
 		arquivoTexto.append(arquivo.build(to));
+		
+		return arquivoTexto;
 	}
 
 	private void gerarPassosFinais() {
+	    StringBuilder arquivoTexto = new StringBuilder();
 		arquivoTexto.append(System.getProperty("line.separator"));
 		
 		ArquivoTexto arquivo = new ArquivoTextoTipo11();
