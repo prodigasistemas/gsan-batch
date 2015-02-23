@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
@@ -35,6 +36,8 @@ public class ArquivoTextoTipo01DadosClienteTest {
 	private FaturamentoParametroRepositorio repositorioParametros;
 
 	private Imovel imovel;
+	
+	private ArquivoTextoTO arquivoTextoTO;
 
 	@Before
 	public void setup() {
@@ -65,14 +68,18 @@ public class ArquivoTextoTipo01DadosClienteTest {
 
 		imovel.setImovelContaEnvio(1);
 
-		arquivo = new ArquivoTextoTipo01DadosCliente(imovel);
+		arquivo = new ArquivoTextoTipo01DadosCliente();
+		
+		arquivoTextoTO = new ArquivoTextoTO();
+		arquivoTextoTO.setImovel(imovel);
+		
 	}
 
 	@Test
 	public void testaQuantidadeDados() {
 		carregarMocks();
 
-		Map<Integer, StringBuilder> mapDados = arquivo.build();
+		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 
 		assertNotNull(mapDados);
 		assertEquals(4, mapDados.keySet().size());
@@ -86,7 +93,7 @@ public class ArquivoTextoTipo01DadosClienteTest {
 		linhaValida.append("MARIA JOSÉ DA SILVA           11111111111                                        ")
 				   .append("                                                                            1");
 
-		Map<Integer, StringBuilder> mapDados = arquivo.build();
+		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 
 		String linha = getLinha(mapDados);
 

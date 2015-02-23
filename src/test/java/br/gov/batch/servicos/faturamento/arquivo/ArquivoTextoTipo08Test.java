@@ -24,6 +24,7 @@ import br.gov.batch.servicos.micromedicao.FaixaLeituraBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
 import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.model.atendimentopublico.LigacaoAgua;
+import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.LeituraSituacao;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -48,6 +49,7 @@ public class ArquivoTextoTipo08Test {
 	private LigacaoTipo ligacaoTipo = LigacaoTipo.AGUA;
 	private MedicaoHistorico medicaoHistorico;
 	private List<HidrometroMedicaoHistoricoTO> hidrometrosMedicaoHistoricoTO;
+	private LigacaoAguaSituacao situacao = new LigacaoAguaSituacao();
 
 	@Mock
 	private MedicaoHistoricoBO medicaoHistoricoBOMock;
@@ -95,6 +97,10 @@ public class ArquivoTextoTipo08Test {
 		medicaoHistorico.setDataLeituraAnteriorFaturamento(new Date());
 		medicaoHistorico.setLeituraAnteriorInformada(new Integer(180));
 		medicaoHistorico.setDataLeituraAtualInformada(new Date());
+		
+		situacao = new LigacaoAguaSituacao();
+		situacao.setId(LigacaoAguaSituacao.POTENCIAL);
+		imovel.setLigacaoAguaSituacao(situacao);
 
 		to = new ArquivoTextoTO();
 		to.setImovel(imovel);

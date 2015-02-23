@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
-import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01DadosConta;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
@@ -69,6 +69,8 @@ public class ArquivoTextoTipo01DadosContaTest {
 	private QuadraFace quadraFace;
 	private Conta conta;
 	private FaturamentoGrupo faturamentoGrupo;
+	
+	private ArquivoTextoTO arquivoTextoTO;
 
 	@Before
 	public void setup() {
@@ -92,14 +94,20 @@ public class ArquivoTextoTipo01DadosContaTest {
 		imovel.setQuadraFace(quadraFace);
 		imovel.setSetorComercial(new SetorComercial(1));
 
-		arquivo = new ArquivoTextoTipo01DadosConta(imovel, conta);
+		arquivo = new ArquivoTextoTipo01DadosConta();
+		
+		arquivoTextoTO = new ArquivoTextoTO();
+		arquivoTextoTO.setConta(conta);
+		arquivoTextoTO.setImovel(imovel);
+		arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
+		arquivoTextoTO.setAnoMesReferencia(201501);
 	}
 
 	@Test
 	public void buildArquivoDadosCobranca() {
 		carregarMocks();
 
-		Map<Integer, StringBuilder> mapDados = arquivo.build();
+		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 
 		StringBuilder linhaValida = new StringBuilder();
 

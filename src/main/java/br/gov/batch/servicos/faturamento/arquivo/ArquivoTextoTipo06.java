@@ -3,6 +3,11 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.faturamento.Conta;
@@ -10,7 +15,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ContaImpostosDeduzidosRepositorio;
 import br.gov.servicos.to.ContaImpostosDeduzidosTO;
 
+@Stateless
 public class ArquivoTextoTipo06 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo06.class);
 
 	@EJB
 	private ContaImpostosDeduzidosRepositorio contaImpostosDeduzidosRepositorio;
@@ -19,7 +26,10 @@ public class ArquivoTextoTipo06 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
+//        logger.info("Construcao da linha 06");
+ 
 		Conta conta = to.getConta();
 		
 		if (conta != null) {

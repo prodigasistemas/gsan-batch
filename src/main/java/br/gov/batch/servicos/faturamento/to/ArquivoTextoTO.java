@@ -15,6 +15,9 @@ public class ArquivoTextoTO implements Serializable {
 	private static final long serialVersionUID = 6607302754718865649L;
 
 	private Imovel imovel;
+	
+	//TODO: Deixar apenas o id do imovel
+	private Integer idImovel;
 
 	private Conta conta;
 
@@ -34,7 +37,6 @@ public class ArquivoTextoTO implements Serializable {
 
 	public ArquivoTextoTO() {
 		super();
-		this.idsConsumoTarifaCategoria = new ArrayList<Integer>();
 	}
 
 	public ArquivoTextoTO(
@@ -106,11 +108,10 @@ public class ArquivoTextoTO implements Serializable {
 		return idsConsumoTarifaCategoria;
 	}
 
-	public void setIdsConsumoTarifaCategoria(List<Integer> idsConsumoTarifaCategoria) {
-		this.idsConsumoTarifaCategoria = idsConsumoTarifaCategoria;
-	}
-	
 	public void addIdsConsumoTarifaCategoria(Integer id) {
+	    if (this.idsConsumoTarifaCategoria == null){
+	        this.idsConsumoTarifaCategoria = new ArrayList<Integer>();
+	    }
 		this.idsConsumoTarifaCategoria.add(id);
 	}
 
@@ -129,4 +130,12 @@ public class ArquivoTextoTO implements Serializable {
 	public void setIdLeituraAnormalidade(Integer idLeituraAnormalidade) {
 		this.idLeituraAnormalidade = idLeituraAnormalidade;
 	}
+
+    public Integer getIdImovel() {
+        return idImovel;
+    }
+
+    public void setIdImovel(Integer idImovel) {
+        this.idImovel = idImovel;
+    }
 }

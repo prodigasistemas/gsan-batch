@@ -5,8 +5,11 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.ContaBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
@@ -14,6 +17,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 
 @Stateless
@@ -25,6 +29,9 @@ public class ArquivoTextoTipo01DadosCliente {
 	@EJB
     private FaturamentoParametroRepositorio repositorioParametros;
 	
+    @EJB
+    private ImovelRepositorio imovelRepositorio;
+
 	@EJB
 	private ContaBO contaBO;
 	
@@ -35,12 +42,9 @@ public class ArquivoTextoTipo01DadosCliente {
     private Cliente clienteUsuario = null;
     private Cliente clienteResponsavel = null;
 
-	
-	public ArquivoTextoTipo01DadosCliente(Imovel imovel) {
-		this.imovel = imovel;
-	}
-	
-	public Map<Integer, StringBuilder> build() {
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
 		dadosCliente = new HashMap<Integer, StringBuilder>();
 		
 	    escreverNomeCliente();
@@ -68,7 +72,11 @@ public class ArquivoTextoTipo01DadosCliente {
 	        }
 	    }
 	
-	    builder.append(Utilitarios.completaComEspacosADireita(30, clienteUsuario.getNome()));
+		if (clienteUsuario != null) {
+		    builder.append(Utilitarios.completaComEspacosADireita(30, clienteUsuario.getNome()));
+		} else {
+		    builder.append(Utilitarios.completaComEspacosADireita(30, ""));
+		}
 	    
 	    dadosCliente.put(2, builder);
 	}
@@ -127,6 +135,5 @@ public class ArquivoTextoTipo01DadosCliente {
         builder.append(indicadorEmissaoConta.toString());
         
         dadosCliente.put(14, builder);
-    }
-	
+    }	
 }

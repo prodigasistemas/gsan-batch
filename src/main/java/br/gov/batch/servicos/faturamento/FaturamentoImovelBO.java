@@ -71,10 +71,9 @@ public class FaturamentoImovelBO {
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
-		Imovel parametroImovel = faturamentoTO.getImovel();
 		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
 		
-		Imovel imovel = imovelRepositorio.buscarPeloId(parametroImovel.getId());
+		Imovel imovel = imovelRepositorio.obterPorID(faturamentoTO.getIdImovel());
 		
 		boolean valoresAguaEsgotoZerados = false;
 		if (imovel.possuiLigacaoAguaAtiva() || imovel.possuiLigacaoEsgotoAtiva() || imovel.existeHidrometro()) {
@@ -82,15 +81,15 @@ public class FaturamentoImovelBO {
 		}
 		
 		if (analisadorGeracaoConta.verificarGeracaoConta(valoresAguaEsgotoZerados, anoMesFaturamento, imovel)) {
-			DebitosContaTO debitosContaTO = debitosContaBO.gerarDebitosConta(imovel, anoMesFaturamento);
-			CreditosContaTO creditosContaTO = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
-			ImpostosDeduzidosContaTO impostosDeduzidosContaTO = impostosContaBO.gerarImpostosDeduzidosConta(imovel, anoMesFaturamento, 
+			DebitosContaTO debitosContaTO = debitosContaBO.gerarDebitosConta(imovel.getId(), anoMesFaturamento);
+			CreditosContaTO creditosContaTO = creditosContaBO.gerarCreditosConta(imovel.getId(), anoMesFaturamento);
+			ImpostosDeduzidosContaTO impostosDeduzidosContaTO = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(), anoMesFaturamento, 
 																				debitosContaTO.getValorTotalDebito(), creditosContaTO.getValorTotalCreditos());
 
 			Conta conta = contaBO.gerarConta(faturamentoTO, debitosContaTO, creditosContaTO, impostosDeduzidosContaTO);
 
-			contaCategoriaBO.inserirContasCategoriaValoresZerados(imovel.getId(), conta);
-			clienteContaBO.inserirClienteContaComImoveisAtivos(imovel, conta);
+			contaCategoriaBO.inserirContasCategoriaValoresZerados(imovel.getId(), conta.getId());
+			clienteContaBO.inserirClienteContaComImoveisAtivos(imovel.getId(), conta);
 			contaImpostosDeduzidosBO.inserirContaImpostosDeduzidos(conta, impostosDeduzidosContaTO);
 
 			debitoCobradoBO.inserirDebitoCobrado(debitosContaTO, conta);

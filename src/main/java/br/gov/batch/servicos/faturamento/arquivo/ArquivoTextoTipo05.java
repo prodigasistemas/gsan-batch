@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.faturamento.Conta;
@@ -11,8 +14,8 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 
+@Stateless
 public class ArquivoTextoTipo05 extends ArquivoTexto {
-
 	@EJB
 	private FaturamentoRepositorio faturamentoRepositorio;
 
@@ -24,6 +27,7 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
 		Conta conta = to.getConta();
 		
@@ -71,17 +75,24 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 		builder.append(TIPO_REGISTRO_05_CREDITO);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 		
+		String descricaoCredito = "";
+		String valorCredito = "";
 		if (qtdAnoMesDistintos > 1) {
-			builder.append(Utilitarios.completaComEspacosADireita(90, creditoRealizadoAnterior.getCreditoTipo().getDescricao() + " " + anoMesAcumulado + ((qtdAnoMesDistintos > 5) ? " E OUTRAS" : null)));
-			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(valorCreditoAcumulado)));
-
+		    descricaoCredito = creditoRealizadoAnterior.getCreditoTipo().getDescricao() + " " + anoMesAcumulado + (qtdAnoMesDistintos > 5 ? " E OUTRAS" : "");
+		    valorCredito = Utilitarios.formatarBigDecimalComPonto(valorCreditoAcumulado);
 		} else {
-			builder.append(Utilitarios.completaComEspacosADireita(90, creditoRealizadoAnterior.getCreditoTipo().getDescricao()
-					+ ((anoMesAcumulado == null || anoMesAcumulado.equals("")) ? " PARCELA " + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacaoCredito()
-							+ "/" + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())) : null)));
-			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(creditoRealizadoAnterior.getValorCredito())));
-
+		    descricaoCredito = creditoRealizadoAnterior.getCreditoTipo().getDescricao()
+                    + ( anoMesAcumulado == null || anoMesAcumulado.equals("") 
+                        ? " PARCELA " + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacaoCredito()
+                          + "/" + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())) 
+                        : ""
+                      );
+		    valorCredito = Utilitarios.formatarBigDecimalComPonto(creditoRealizadoAnterior.getValorCredito());
 		}
+		
+		builder.append(Utilitarios.completaComEspacosADireita(90, descricaoCredito));
+		builder.append(Utilitarios.completaComEspacosADireita(14, valorCredito));
+		
 		builder.append(Utilitarios.completaComEspacosADireita(6, creditoRealizadoAnterior.getCreditoTipo() != null ? (
 				(creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante() != null) ? creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante() : 
 					creditoRealizadoAnterior.getCreditoTipo().getId()) : null));

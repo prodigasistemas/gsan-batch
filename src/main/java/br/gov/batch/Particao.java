@@ -64,9 +64,4 @@ public abstract class Particao implements PartitionMapper {
             }
         };
     }
-    
-    public static void main(String[] args) {
-		Integer t = 30 / 20;
-		System.out.println(t);
-	}
 }

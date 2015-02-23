@@ -101,7 +101,7 @@ public class ApagarDadosRota implements Batchlet{
     	
     	logger.info(util.parametroDoBatch("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
     	
-    	Rota rota = rotaRepositorio.findById(idRota);
+    	Rota rota = rotaRepositorio.obterPorID(idRota);
     	
     	List<Integer> idsContas  = new ArrayList<Integer>();
     	List<Integer> idsImoveis = new ArrayList<Integer>();

@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
@@ -25,8 +28,8 @@ import br.gov.servicos.faturamento.TarifaTipoCalculoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
+@Stateless
 public class ArquivoTextoTipo09 extends ArquivoTexto {
-
 	@EJB
 	private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorio;
 
@@ -52,22 +55,25 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
 		List<ConsumoTarifaCategoria> colecaoDadosTarifaCategoria = obterDadosTarifa(to.getImovel(), to.getFaturamentoGrupo());
 		
-		if (colecaoDadosTarifaCategoria != null && !colecaoDadosTarifaCategoria.isEmpty()) {
-			for (ConsumoTarifaCategoria dadosTarifaCategoria : colecaoDadosTarifaCategoria) {
-				builder.append(TIPO_REGISTRO_09_TARIFA);
-				builder.append(Utilitarios.completaComZerosEsquerda(2, dadosTarifaCategoria.getConsumoTarifaVigencia().getConsumoTarifa().getId()));
-				builder.append(Utilitarios.formataData(dadosTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia(), FormatoData.ANO_MES_DIA));
-				builder.append(Utilitarios.completaComZerosEsquerda(1, dadosTarifaCategoria.getCategoria().getId()));
-				buildDadosTarifaSubcategoria(dadosTarifaCategoria);
-				builder.append(Utilitarios.completaComZerosEsquerda(6, dadosTarifaCategoria.getNumeroConsumoMinimo()));
-				builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto((BigDecimal) dadosTarifaCategoria.getValorTarifaMinima())));
-				builder.append(System.getProperty("line.separator"));
-				
-				to.addIdsConsumoTarifaCategoria(dadosTarifaCategoria.getId());
-			}
+		for (ConsumoTarifaCategoria dadosTarifaCategoria : colecaoDadosTarifaCategoria) {
+		    if (dadosTarifaCategoria.getConsumoTarifaVigencia() == null || dadosTarifaCategoria.getConsumoTarifaVigencia().getConsumoTarifa() == null){
+		        continue;
+		    }
+		    
+			builder.append(TIPO_REGISTRO_09_TARIFA);
+			builder.append(Utilitarios.completaComZerosEsquerda(2, dadosTarifaCategoria.getConsumoTarifaVigencia().getConsumoTarifa().getId()));
+			builder.append(Utilitarios.formataData(dadosTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia(), FormatoData.ANO_MES_DIA));
+			builder.append(Utilitarios.completaComZerosEsquerda(1, dadosTarifaCategoria.getCategoria().getId()));
+			buildDadosTarifaSubcategoria(dadosTarifaCategoria);
+			builder.append(Utilitarios.completaComZerosEsquerda(6, dadosTarifaCategoria.getNumeroConsumoMinimo()));
+			builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto((BigDecimal) dadosTarifaCategoria.getValorTarifaMinima())));
+			builder.append(System.getProperty("line.separator"));
+			
+			to.addIdsConsumoTarifaCategoria(dadosTarifaCategoria.getId());
 		}
 		return builder.toString();
 	}
@@ -114,26 +120,24 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 
 	private List<ConsumoTarifaCategoria> obterTarifasParaCalculoPorReferencia(List<ICategoria> colecaoCatSub, Integer anoMesReferencia, Imovel imovel) {
 
-		List<ConsumoTarifaCategoria> colecaoConsumoTarifaCategoriaVigente = new ArrayList<ConsumoTarifaCategoria>();
+		List<ConsumoTarifaCategoria> tarifasVigentes = new ArrayList<ConsumoTarifaCategoria>();
 
 		Date dataFaturamento = Utilitarios.criarData(1, Utilitarios.extrairMes(anoMesReferencia), Utilitarios.extrairAno(anoMesReferencia));
 
-		ConsumoTarifaVigenciaTO consumoTarifaVigente = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifaPorData(
+		ConsumoTarifaVigenciaTO tarifaTO = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifaPorData(
 				imovel.getConsumoTarifa().getId(), dataFaturamento);
 
-		if (consumoTarifaVigente != null) {
-			for (ICategoria subcategoria : colecaoCatSub) {
-				obterTarifaCategoriaVigente(colecaoConsumoTarifaCategoriaVigente, subcategoria, consumoTarifaVigente);
-			}
+		for (ICategoria subcategoria : colecaoCatSub) {
+            obterTarifaCategoriaVigente(tarifasVigentes, subcategoria, tarifaTO);
 		}
-		return colecaoConsumoTarifaCategoriaVigente;
+		return tarifasVigentes;
 	}
 
 	private List<ConsumoTarifaCategoria> obterTarifasParaCalculoPorReferenciaAnterior(List<ICategoria> subcategorias, Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
 
-		List<ConsumoTarifaCategoria> colecaoConsumoTarifaCategoria = new ArrayList<ConsumoTarifaCategoria>();
+		List<ConsumoTarifaCategoria> tarifasCategoriaConsumo = new ArrayList<ConsumoTarifaCategoria>();
 
-		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraAnteriorCronograma(imovel, faturamentoGrupo);
+		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraAnterior(imovel, faturamentoGrupo);
 
 		boolean dataVigenciaIgualAnterior = false;
 
@@ -155,57 +159,58 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 				}
 
 				if (!dataVigenciaIgualAnterior) {
-					ConsumoTarifaVigenciaTO colecaoDadosMaiorTarifa = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(
+					ConsumoTarifaVigenciaTO tarifaTO = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(
 							imovel.getConsumoTarifa().getId());
-					obterTarifaCategoriaVigente(colecaoConsumoTarifaCategoria, subcategoria, colecaoDadosMaiorTarifa);
+					
+					obterTarifaCategoriaVigente(tarifasCategoriaConsumo, subcategoria, tarifaTO);
 				}
 
-				colecaoConsumoTarifaCategoria.addAll(colecaoDadosTarifaCategoria);
+				tarifasCategoriaConsumo.addAll(colecaoDadosTarifaCategoria);
 			} else {
-				ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifaPorData(
+				ConsumoTarifaVigenciaTO tarifaTO = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifaPorData(
 						imovel.getConsumoTarifa().getId(), dataLeituraAnterior);
-
-				obterTarifaCategoriaVigente(colecaoConsumoTarifaCategoria, subcategoria, consumoTarifaVigencia);
+				
+				obterTarifaCategoriaVigente(tarifasCategoriaConsumo, subcategoria, tarifaTO);
 			}
 		}
 
-		return colecaoConsumoTarifaCategoria;
+		return tarifasCategoriaConsumo;
 	}
 
-	private void obterTarifaCategoriaVigente(List<ConsumoTarifaCategoria> colecaoConsumoTarifaCategoriaVigente, ICategoria subcategoria,
-			ConsumoTarifaVigenciaTO consumoTarifaVigente) {
-
-		if (consumoTarifaVigente != null) {
-
-			ConsumoTarifaCategoria tarifaCategoriaVigente = obterTarifaCategoriaVigente(consumoTarifaVigente, subcategoria);
-			boolean consumoTarifaCategoriaDiferente = true;
-			if (colecaoConsumoTarifaCategoriaVigente != null) {
-
-				for (ConsumoTarifaCategoria consumoTarifaCategoria : colecaoConsumoTarifaCategoriaVigente) {
-					if (tarifaCategoriaVigente != null && consumoTarifaCategoria.getId().equals(tarifaCategoriaVigente.getId())) {
-						consumoTarifaCategoriaDiferente = false;
-						break;
-					}
-				}
-			}
-			if (consumoTarifaCategoriaDiferente) {
-				colecaoConsumoTarifaCategoriaVigente.add(tarifaCategoriaVigente);
-			}
-
-		}
+	private void obterTarifaCategoriaVigente(List<ConsumoTarifaCategoria> tarifasVigentes, ICategoria subcategoria, ConsumoTarifaVigenciaTO tarifaTO) {
+	    
+	    ConsumoTarifaCategoria tarifa = obterTarifaCategoriaVigente(tarifaTO, subcategoria);
+	    
+	    if (tarifa == null){
+	        Integer idSub = subcategoria.getSubcategoria() != null ? subcategoria.getSubcategoria().getId() : null;
+	        Integer idCat = subcategoria.getCategoria() != null ? subcategoria.getCategoria().getId() : null;
+	    }
+	    
+	    if (tarifa != null){
+	        boolean tarifaDiferente = true;
+	        
+	        for (ConsumoTarifaCategoria consumoTarifaCategoria : tarifasVigentes) {
+	            if (consumoTarifaCategoria.getId().equals(tarifa.getId())) {
+	                tarifaDiferente = false;
+	                break;
+	            }
+	        }
+	        
+	        if (tarifaDiferente) {
+	            tarifasVigentes.add(tarifa);
+	        }
+	    }
 	}
 
-	private ConsumoTarifaCategoria obterTarifaCategoriaVigente(
-			ConsumoTarifaVigenciaTO consumoTarifaVigente, 
-			ICategoria subcategoria) {
+	private ConsumoTarifaCategoria obterTarifaCategoriaVigente(ConsumoTarifaVigenciaTO tarifaTO, ICategoria subcategoria) {
 		
 		ConsumoTarifaCategoria consumoTarifaCategoria = consumoTarifaCategoriaRepositorio.buscarConsumoTarifaCategoriaVigente(
-				consumoTarifaVigente.getDataVigencia(), consumoTarifaVigente.getIdVigencia(), subcategoria.getCategoria().getId(),
+				tarifaTO.getDataVigencia(), tarifaTO.getIdVigencia(), subcategoria.getCategoria().getId(),
 				subcategoria.getSubcategoria().getId());
 
 		if (consumoTarifaCategoria == null) {
-			consumoTarifaCategoria = consumoTarifaCategoriaRepositorio.buscarConsumoTarifaCategoriaVigente(consumoTarifaVigente.getDataVigencia(),
-					consumoTarifaVigente.getIdVigencia(), subcategoria.getCategoria().getId(), 0);
+			consumoTarifaCategoria = consumoTarifaCategoriaRepositorio.buscarConsumoTarifaCategoriaVigente(tarifaTO.getDataVigencia(),
+					tarifaTO.getIdVigencia(), subcategoria.getCategoria().getId(), 0);
 		}
 
 		return consumoTarifaCategoria;

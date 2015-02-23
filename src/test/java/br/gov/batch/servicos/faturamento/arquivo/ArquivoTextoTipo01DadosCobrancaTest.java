@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.arrecadacao.PagamentoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
 import br.gov.model.cobranca.CobrancaDocumento;
@@ -42,9 +43,11 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 
 	private Imovel imovel;
 	private CobrancaDocumento cobrancaDocumento;
+	private ArquivoTextoTO arquivoTextoTO;
 
 	@Before
 	public void init() {
+	    
 		imovel = new Imovel(1234567);
 
 		cobrancaDocumento = new CobrancaDocumento();
@@ -55,14 +58,18 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 		cobrancaDocumento.setNumeroSequenciaDocumento(1);
 		cobrancaDocumento.setDocumentoTipo(DocumentoTipo.AVISO_CORTE.getId());
 
-		arquivo = new ArquivoTextoTipo01DadosCobranca(imovel, cobrancaDocumento);
+		arquivo = new ArquivoTextoTipo01DadosCobranca();
+		
+		arquivoTextoTO = new ArquivoTextoTO();
+		arquivoTextoTO.setImovel(imovel);
+		arquivoTextoTO.setCobrancaDocumento(cobrancaDocumento);
 	}
 
 	@Test
 	public void buildArquivoDadosCobranca() {
 		carregarMocks();
 
-		Map<Integer, StringBuilder> mapDados = arquivo.build();
+		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 		String linha = getLinha(mapDados);
 
 		assertNotNull(mapDados);

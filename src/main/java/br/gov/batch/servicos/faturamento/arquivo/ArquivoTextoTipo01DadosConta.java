@@ -5,19 +5,23 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.QuadraFace;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.faturamento.QualidadeAgua;
 import br.gov.model.faturamento.QualidadeAguaPadrao;
 import br.gov.model.faturamento.TipoConta;
-import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 import br.gov.servicos.faturamento.QuadraFaceRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
@@ -46,19 +50,20 @@ public class ArquivoTextoTipo01DadosConta {
 	@EJB
     private QualidadeAguaRepositorio qualidadeAguaRepositorio;
 	
+    @EJB
+    private ImovelRepositorio imovelRepositorio;
+
 	private Imovel imovel;
 	private Conta conta;
 	private FaturamentoGrupo faturamentoGrupo;
 	private Integer anoMesReferencia;
 	
-	public ArquivoTextoTipo01DadosConta(Imovel imovel, Conta conta) {
-		this.imovel = imovel;
-		this.conta = conta;
-		this.faturamentoGrupo = conta.getFaturamentoGrupo();
-		this.anoMesReferencia = faturamentoGrupo.getAnoMesReferencia();
-	}
-	
-	public Map<Integer, StringBuilder> build() {
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.conta  = to.getConta();
+	    this.faturamentoGrupo = to.getFaturamentoGrupo();
+	    this.anoMesReferencia = to.getAnoMesReferencia();
 		
 		dadosConta = new HashMap<Integer, StringBuilder>();
 		
@@ -238,5 +243,4 @@ public class ArquivoTextoTipo01DadosConta {
 		}
 		dadosConta.put(30, builder);
 	}
-	
 }

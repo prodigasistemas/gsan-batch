@@ -18,23 +18,23 @@ public class FaturamentoSituacaoBO {
 
 	
 	public Status verificarParalisacaoFaturamentoAgua(Imovel imovel, Integer anoMesReferencia) {
+	    if (imovel.getFaturamentoSituacaoTipo() == null)
+	        return Status.INATIVO;
 		return verificarParalisacaoFaturamento(imovel, anoMesReferencia, imovel.getFaturamentoSituacaoTipo().paralisacaoFaturamentoAgua());
     }
 	
 	public Status verificarParalisacaoFaturamentoEsgoto(Imovel imovel, Integer anoMesReferencia) {
+	    if (imovel.getFaturamentoSituacaoTipo() == null)
+	        return Status.INATIVO;
 		return verificarParalisacaoFaturamento(imovel, anoMesReferencia, imovel.getFaturamentoSituacaoTipo().paralisacaoFaturamentoEsgoto());
     }
 
 	public Status verificarParalisacaoFaturamento(Imovel imovel, Integer anoMesReferencia, boolean statusParalisacaoFaturamento) {
-    	Status paralisar = Status.INATIVO;
-    	
-    	if (imovel.getFaturamentoSituacaoTipo() != null) {
-    		if (obterFaturamentoSituacaoVigente(imovel, anoMesReferencia) != null && statusParalisacaoFaturamento) {
-    			paralisar = Status.ATIVO;
-    		}
+		if (obterFaturamentoSituacaoVigente(imovel, anoMesReferencia) != null && statusParalisacaoFaturamento) {
+			return Status.ATIVO;
+		}else{
+		    return Status.INATIVO;
 		}
-    	
-    	return paralisar;
     }
 	
 	public boolean isSituacaoEmVigencia(Integer referencia, FaturamentoSituacaoHistorico situacao) {

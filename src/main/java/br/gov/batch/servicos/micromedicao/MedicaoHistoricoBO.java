@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.util.Utilitarios;
@@ -22,6 +24,7 @@ public class MedicaoHistoricoBO {
 	@EJB
 	private HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoHistoricoRepositorio;
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public List<HidrometroMedicaoHistoricoTO> obterDadosTiposMedicao(Integer idImovel, Integer anoMesReferencia) {
 
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = new ArrayList<>();

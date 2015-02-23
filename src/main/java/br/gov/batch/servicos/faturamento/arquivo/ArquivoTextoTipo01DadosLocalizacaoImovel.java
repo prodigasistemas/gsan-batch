@@ -3,27 +3,34 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo01DadosLocalizacaoImovel {
 
 	private Map<Integer, StringBuilder> dadosLocalizacaoImovel;
 
+	@EJB
+	private ImovelRepositorio imovelRepositorio;
+
 	private Imovel imovel;
+	
 	private Rota rota;
-	
-	public ArquivoTextoTipo01DadosLocalizacaoImovel(Imovel imovel, Rota rota) {
-		this.imovel = imovel;
-		this.rota = rota;
-	}
-	
-	public Map<Integer, StringBuilder> build() {
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.rota   = to.getRota();
 		
 		dadosLocalizacaoImovel = new HashMap<Integer, StringBuilder>();
 		

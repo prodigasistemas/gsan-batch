@@ -3,6 +3,7 @@ package br.gov.batch.servicos.cobranca.parcelamento;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.cobranca.Parcelamento;
@@ -15,6 +16,7 @@ import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.cobranca.parcelamento.ParcelamentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 
+@Stateless
 public class ParcelamentoImovelBO {
     
     @EJB

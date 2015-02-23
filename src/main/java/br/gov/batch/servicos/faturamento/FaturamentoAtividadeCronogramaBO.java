@@ -9,6 +9,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoAtividadeCronograma;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
@@ -37,10 +38,12 @@ public class FaturamentoAtividadeCronogramaBO {
 		return dataLeitura;
 	}
 	
-	public Date obterDataLeituraAnteriorCronograma(Imovel imovel, FaturamentoGrupo grupo) {
+	public Date obterDataLeituraAnterior(Imovel imovel, FaturamentoGrupo grupo) {
 		Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
 		
-		Date dataLeitura = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferenciaAnterior).getDataLeituraAtualFaturamento();
+		MedicaoHistorico medicao = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferenciaAnterior);
+		
+		Date dataLeitura = medicao != null ? medicao.getDataLeituraAtualFaturamento() : null;
 
 		if (dataLeitura == null || dataLeitura.equals("")) {
 			

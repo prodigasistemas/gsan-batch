@@ -5,6 +5,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.FaixaLeituraEsperadaParametros;
@@ -15,6 +21,7 @@ import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.StatusFaixaFalsa;
 import br.gov.model.micromedicao.StatusUsoFaixaFalsa;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
@@ -23,24 +30,33 @@ import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
+@Stateless
 public class FaixaLeituraBO {
 
-	// @Inject
 	private SistemaParametros sistemaParametro;
 		
-	// @EJB
-	private ConsumoTarifaRepositorio consumoTarifaRepositorio;
+	 @EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
+	 
+	 @EJB
+	 private ConsumoTarifaRepositorio consumoTarifaRepositorio;
 	
-	// @EJB
+	 @EJB
 	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
 	
-	// @EJB
+	 @EJB
 	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
 
-	// @EJB
+	 @EJB
 	private FaixaLeituraRepositorio faixaLeituraRepositorio;
+	 
+	 @PostConstruct
+	 public void init(){
+	     sistemaParametro = sistemaParametrosRepositorio.getSistemaParametros();
+	 }
 	
-	public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
+	 @TransactionAttribute(TransactionAttributeType.REQUIRED)
+	 public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
 		
 		if (hidrometro == null) {
 			return new FaixaLeituraTO(0, 0);
@@ -53,7 +69,6 @@ public class FaixaLeituraBO {
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
 						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
 				
-				System.out.println(faixaLeituraFalsa.isHidrometroSelecionado());
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
 					return faixaLeituraFalsa;
 				} else {
@@ -63,7 +78,6 @@ public class FaixaLeituraBO {
 		}
 	}
 	
-	// TESTED
 	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media,MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
 
 		BigDecimal faixaInicial = null;
@@ -142,7 +156,6 @@ public class FaixaLeituraBO {
 		FaixaLeituraTO faixaLeitura = new FaixaLeituraTO();
 
 		BigDecimal multiplicaFaxaFalsa = obterFatorMultiplicacaoFaixaFalsa(imovel);
-System.out.println(multiplicaFaxaFalsa); 
 		Integer leituraAnteriorFalsa = null;
 
 		if (multiplicaFaxaFalsa != null) {

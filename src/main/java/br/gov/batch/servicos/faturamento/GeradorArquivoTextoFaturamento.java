@@ -11,8 +11,9 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
-import br.gov.batch.servicos.faturamento.arquivo.ArquivoTexto;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo02;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo03;
@@ -46,10 +47,10 @@ import br.gov.servicos.cobranca.CobrancaDocumentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaDivisaoRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
+import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoFaturamento {
-
 	@EJB
 	private ArquivoTextoRoteiroEmpresaDivisaoRepositorio arquivoDivisaoRepositorio;
 
@@ -76,17 +77,82 @@ public class GeradorArquivoTextoFaturamento {
 	
 	private ArquivoTextoTO to;
 	
+    @EJB
+	private ArquivoTextoTipo01 tipo01;
+    
+    @EJB
+    private ArquivoTextoTipo02 tipo02;
+    
+    @EJB
+    private ArquivoTextoTipo03 tipo03;
+
+    @EJB
+    private ArquivoTextoTipo04 tipo04;
+
+    @EJB
+    private ArquivoTextoTipo05 tipo05;
+
+    @EJB
+    private ArquivoTextoTipo06 tipo06;
+
+    @EJB
+    private ArquivoTextoTipo07 tipo07;
+
+    @EJB
+    private ArquivoTextoTipo08 tipo08;
+
+    @EJB
+    private ArquivoTextoTipo09 tipo09;
+
+    @EJB
+    private ArquivoTextoTipo10 tipo10;
+    
+    @EJB
+    private ArquivoTextoTipo11 tipo11;
+    
+    @EJB
+    private ArquivoTextoTipo12 tipo12;
+    
+    @EJB
+    private ArquivoTextoTipo13 tipo13;
+    
+    @EJB
+    private ArquivoTextoTipo14 tipo14;
+    
+    @EJB
+    private RotaRepositorio rotaRepositorio;
+	
 	public GeradorArquivoTextoFaturamento() {
 		super();
 
 		to = new ArquivoTextoTO();
 	}
 
-	public void gerar(Rota rota, Integer anoMesFaturamento, FaturamentoGrupo grupoFaturamento, Date dataComando) {
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public void gerar(Integer idRota, Date dataComando) {
+	    if (idRota != 697){
+	        return;
+	    }
+	    
+	    Rota rota = rotaRepositorio.obterPorID(idRota);
+	    
+	    //TODO: Alterar no batch-manager para nao inserir rotas inativas
+	    if (!rota.isAtiva())
+	        return;
+	    
+	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
+	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
+
+	    rota.getFaturamentoGrupo().getAnoMesReferencia();
+
 		final int quantidadeRegistros = 3000;
 		int primeiroRegistro = 0;
 
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
+		
+		if (imoveis.isEmpty()){
+		    return;
+		}
 
 		List<Imovel> imoveisArquivo = new ArrayList<Imovel>();
 
@@ -102,7 +168,7 @@ public class GeradorArquivoTextoFaturamento {
 					boolean imovelMicroComConta = false;
 
 					for (Imovel imovelCondominio : imoveisCondominio) {
-						if (contaRepositorio.existeContaPreFaturada(imovelCondominio.getId(), anoMesFaturamento)) {
+						if (contaRepositorio.existeContaPreFaturadaSemMovimento(imovelCondominio.getId(), anoMesFaturamento)) {
 							imovelMicroComConta = true;
 							break;
 						}
@@ -115,7 +181,7 @@ public class GeradorArquivoTextoFaturamento {
 
 						for (Imovel micro : imoveisCondominio) {
 							conteudo.append(System.getProperty("line.separator"))
-							        .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+							     .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
@@ -125,42 +191,44 @@ public class GeradorArquivoTextoFaturamento {
 				conteudo.append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 				imoveisArquivo.add(imovel);
 			}
-
-			if (rota.existeLimiteImoveis()) {
-				if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
-					divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
-					conteudo = new StringBuilder();
-					imoveisArquivo.clear();
-				}
-			}
+			
+		    if (rota.existeLimiteImoveis()) {
+		        if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
+		            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+		            conteudo = new StringBuilder();
+		            imoveisArquivo.clear();
+		        }
+		    }
 		}
-
+		
 		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
 
 		ArquivoTextoRoteiroEmpresa roteiro = criarRoteiroArquivoTexto(rota, imoveis.get(0), grupoFaturamento, anoMesFaturamento, imoveisPreFaturados.size());
-
+		
 		roteiro.setDivisoes(divisoes);
-
-		for (int i = 0; i < divisoes.size(); i++) {
-			divisoes.get(i).acrescentaSequencial(i + 1);
-			divisoes.get(i).setArquivoTextoRoteiroEmpresa(roteiro);
+		
+		for (int i = 0; i < divisoes.size() ; i++){
+		    divisoes.get(i).acrescentaSequencial(i + 1);
+		    divisoes.get(i).setArquivoTextoRoteiroEmpresa(roteiro);
 		}
-
-		if (rota.existeLimiteImoveis()) {
-			divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
-		}
-
-		arquivoRepositorio.salvar(roteiro);
-
-		if (rota.existeLimiteImoveis()) {
-			divisoes.forEach(e -> criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
-		} else {
-			conteudo.append(gerarPassosFinais());
-			criarArquivo(roteiro.getNomeArquivo(), "", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
-		}
-
-		movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+		
+        if (rota.existeLimiteImoveis()) {
+            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+        }
+        
+        arquivoRepositorio.salvar(roteiro);
+        
+        if (rota.existeLimiteImoveis()){
+            divisoes.forEach(e -> criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+        }else{
+            conteudo.append(gerarPassosFinais());
+            //TODO: Recuperar caminho  por parametros
+            criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
+        }
+        
+        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
 	}
+	
 	
 	public ArquivoTextoRoteiroEmpresaDivisao criarRoteiroArquivoDividido(StringBuilder texto, Rota rota, Integer anoMesFaturamento, List<Imovel> imoveis){
 	    List<Integer> ids = new ArrayList<Integer>();
@@ -191,16 +259,22 @@ public class GeradorArquivoTextoFaturamento {
 	    StringBuilder nomeArquivo = new StringBuilder("G");
 	    nomeArquivo.append(completaComZerosEsquerda(3, faturamentoGrupo.getId()));
 
+	    //TODO: confirmar se a localidade para rota alternativa vem do imovel ou da rota
 	    if (rota.isAlternativa()) {
 	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
-	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
+	        
 	        arquivo.setLocalidade(rota.getSetorComercial().getLocalidade());
 	        arquivo.setCodigoSetorComercial1(rota.getSetorComercial().getCodigo());
 	    }else{
 	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getLocalidade().getId()));
-	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getSetorComercial().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getSetorComercial().getCodigo()));
+	        
+	        arquivo.setLocalidade(imovel.getLocalidade());
+	        arquivo.setCodigoSetorComercial1(imovel.getSetorComercial().getCodigo());
 	    }
-	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getId()));
+	    
+	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getCodigo()));
 	    nomeArquivo.append(completaComZerosEsquerda(6, anoMesFaturamento));
 	    
         arquivo.setAnoMesReferencia(anoMesFaturamento);
@@ -311,39 +385,30 @@ public class GeradorArquivoTextoFaturamento {
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
 
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
+		
+		to.setIdImovel(imovel.getId());
 
 		StringBuilder arquivoTexto = new StringBuilder();
 		
-		ArquivoTexto arquivo = new ArquivoTextoTipo01();
-		
-		arquivoTexto.append(arquivo.build(to));
+//		arquivoTexto.append(tipo01.build(to));
 
-		arquivo = new ArquivoTextoTipo02();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo02.build(to));
 
-		arquivo = new ArquivoTextoTipo03();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo03.build(to));
 
-		arquivo = new ArquivoTextoTipo04();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo04.build(to));
 
-		arquivo = new ArquivoTextoTipo05();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo05.build(to));
 
-		arquivo = new ArquivoTextoTipo06();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo06.build(to));
 
-		arquivo = new ArquivoTextoTipo07();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo07.build(to));
 
-		arquivo = new ArquivoTextoTipo08();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo08.build(to));
 
-		arquivo = new ArquivoTextoTipo09();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo09.build(to));
 
-		arquivo = new ArquivoTextoTipo10();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo10.build(to));
 		
 		return arquivoTexto;
 	}
@@ -352,17 +417,13 @@ public class GeradorArquivoTextoFaturamento {
 	    
 	    StringBuilder arquivoTexto = new StringBuilder();
 		
-		ArquivoTexto arquivo = new ArquivoTextoTipo11();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo11.build(to));
 		
-		arquivo = new ArquivoTextoTipo12();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo12.build(to));
 
-		arquivo = new ArquivoTextoTipo13();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo13.build(to));
 
-		arquivo = new ArquivoTextoTipo14();
-		arquivoTexto.append(arquivo.build(to));
+		arquivoTexto.append(tipo14.build(to));
 		
 		return arquivoTexto;
 	}

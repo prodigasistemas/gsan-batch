@@ -3,6 +3,11 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import java.util.Collection;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.micromedicao.ConsumoHistorico;
@@ -10,7 +15,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
+@Stateless
 public class ArquivoTextoTipo03 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo03.class);
 
 	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
@@ -22,8 +29,11 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(to.getImovel());
+//        logger.info("Construcao da linha 03");
+	    
+		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(to.getIdImovel());
 
 		for (ConsumoHistorico consumoHistorico : colecaoConsumoHistorico) {
 			builder.append(TIPO_REGISTRO_03_CONSUMO_HISTORICO);

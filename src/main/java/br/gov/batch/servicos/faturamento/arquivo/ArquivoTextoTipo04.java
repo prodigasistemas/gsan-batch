@@ -10,16 +10,18 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.faturamento.Conta;
-import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
 import br.gov.servicos.to.DebitoCobradoNaoParceladoTO;
 import br.gov.servicos.to.ParcelaDebitoCobradoTO;
 
+@Stateless
 public class ArquivoTextoTipo04 extends ArquivoTexto {
-
 	@EJB
 	private DebitoCobradoRepositorio debitoCobradoRepositorio;
 
@@ -31,7 +33,11 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
+	    //TODO: Criar TO para guardar os dados da linha04, para depois escrever no final
+	    //TODO: Refatorar linha 04
+	    
 		Conta conta = to.getConta();
 		
 		if (conta != null) {
@@ -41,10 +47,10 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 
 				for (ParcelaDebitoCobradoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
 					builder.append(TIPO_REGISTRO_04_PARCELAMENTO);
-					builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
+					builder.append(completaComZerosEsquerda(9, conta.getImovel().getId()));
 					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
-					builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
-					builder.append(Utilitarios.completaTexto(6, (debitoParcelamento.getCodigoConstante() != null ? debitoParcelamento.getCodigoConstante() : "") + ""));
+					builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
+					builder.append(completaTexto(6, debitoParcelamento.getCodigoConstante()));
 					builder.append(System.getProperty("line.separator"));
 				}
 			}
@@ -139,7 +145,7 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 			builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(debito.getValorPrestacao())));
 		}
 
-		builder.append(completaTexto(6, debito.getConstanteTipoDebito() + ""));
+		builder.append(completaTexto(6, debito.getConstanteTipoDebito()));
 		builder.append(System.getProperty("line.separator"));
 
 		return builder;

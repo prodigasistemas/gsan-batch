@@ -45,6 +45,7 @@ public class ArquivoTextoTipo03Test {
 	public void setup() {
 		to = new ArquivoTextoTO();
 		to.setImovel(new Imovel(1));
+		to.setIdImovel(1);
 		arquivo = new ArquivoTextoTipo03();
 		arquivo.setArquivoTextoTO(to);
 		
@@ -75,7 +76,7 @@ public class ArquivoTextoTipo03Test {
 	}
 	
 	private void carregarMocks() {
-		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(to.getImovel())).andReturn(consumosHistoricos);
+		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(to.getIdImovel())).andReturn(consumosHistoricos);
 		replay(consumoHistoricoRepositorioMock);
 		
 		expect(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).andReturn(1);

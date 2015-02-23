@@ -5,9 +5,12 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.arrecadacao.PagamentoBO;
 import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.DocumentoTipo;
@@ -15,6 +18,7 @@ import br.gov.model.faturamento.TipoPagamento;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
 @Stateless
@@ -26,17 +30,20 @@ public class ArquivoTextoTipo01DadosCobranca {
 	@EJB
     private PagamentoBO pagamentoBO;
 	
+	@EJB
+	private ImovelRepositorio imovelRepositorio;
+	
 	private Map<Integer, StringBuilder> dadosCobranca;
 	
 	private Imovel imovel;
+	
 	private CobrancaDocumento cobrancaDocumento;
-	
-	public ArquivoTextoTipo01DadosCobranca(Imovel imovel, CobrancaDocumento cobrancaDocumento) {
-		this.imovel = imovel;
-		this.cobrancaDocumento = cobrancaDocumento;
-	}
-	
-	public Map<Integer, StringBuilder> build() {
+		
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.cobrancaDocumento = to.getCobrancaDocumento();
+	    
 		dadosCobranca = new HashMap<Integer, StringBuilder>();
 		
 		escreverDadosBancarios();
@@ -107,5 +114,4 @@ public class ArquivoTextoTipo01DadosCobranca {
 		
 		dadosCobranca.put(45, builder);
 	}
-
 }

@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 import br.gov.batch.servicos.cobranca.to.VencimentoAnteriorTO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
@@ -15,6 +19,7 @@ import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo07 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo07.class);
 
 	@EJB
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorio;
@@ -25,7 +30,10 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
+//        logger.info("Construcao da linha 07");
+	    
 		CobrancaDocumento cobrancaDocumento = to.getCobrancaDocumento();
 		Integer idImovel = to.getImovel().getId();
 		

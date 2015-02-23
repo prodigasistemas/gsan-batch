@@ -8,7 +8,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.ICategoria;
-import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaCategoria;
 import br.gov.model.faturamento.ContaCategoriaPK;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
@@ -23,13 +22,13 @@ public class ContaCategoriaBO {
 	@EJB
 	private ContaCategoriaRepositorio contaCategoriaRepositorio;
 
-	public void inserirContasCategoriaValoresZerados(Integer idImovel, Conta conta) throws Exception {
+	public void inserirContasCategoriaValoresZerados(Integer idImovel, Integer idConta) throws Exception {
 		Collection<ICategoria> colecaoCategoriaOUSubcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
-		Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(conta, colecaoCategoriaOUSubcategoria);
+		Collection<ContaCategoria> contasCategoria = this.gerarContaCategoriaValoresZerados(idConta, colecaoCategoriaOUSubcategoria);
 		contaCategoriaRepositorio.inserir(contasCategoria);
 	}
 	
-	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Conta conta, Collection<ICategoria> colecaoCategorias) throws Exception {
+	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Integer idConta, Collection<ICategoria> colecaoCategorias) throws Exception {
 		Collection<ContaCategoria> helper = new ArrayList<ContaCategoria>();
 		
 		ContaCategoria contaCategoria = null;
@@ -39,9 +38,9 @@ public class ContaCategoriaBO {
 			
 			contaCategoria = new ContaCategoria();
 			contaCategoriaPK = new ContaCategoriaPK();
-			contaCategoriaPK.setContaId(conta.getId());
+			contaCategoriaPK.setContaId(idConta);
 			contaCategoriaPK.setCategoriaId(categoria.getCategoria().getId());
-			contaCategoriaPK.setSubcategoriaId(categoria.getSubcategoria().getId());
+			contaCategoriaPK.setSubcategoriaId(categoria.getSubcategoria() != null ? categoria.getSubcategoria().getId() : 0);
 			contaCategoria.setPk(contaCategoriaPK);
 			contaCategoria.setQuantidadeEconomia(categoria.getQuantidadeEconomias().shortValue());
 			contaCategoria.setValorAgua(new BigDecimal("0.00"));

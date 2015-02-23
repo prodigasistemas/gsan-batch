@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
@@ -57,7 +58,8 @@ public class ArquivoTextoTipo01DadosConsumoTest {
 	private Imovel imovel;
 	private FaturamentoGrupo faturamentoGrupo;
 	
-	
+	private ArquivoTextoTO arquivoTextoTO;
+
 	@Before
     public void init(){
 
@@ -67,7 +69,12 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	faturamentoGrupo = new FaturamentoGrupo(1);
         faturamentoGrupo.setAnoMesReferencia(201501);
         
-        arquivo = new ArquivoTextoTipo01DadosConsumo(imovel, faturamentoGrupo);
+        arquivo = new ArquivoTextoTipo01DadosConsumo();
+        
+        arquivoTextoTO = new ArquivoTextoTO();
+        arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
+        
 	}
 	
 	private List<ICategoria> categoriasSetUp() {
@@ -103,7 +110,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     public void buildArquivoDadosConsumo() {
     	carregarMocks();
     	
-    	Map<Integer, StringBuilder> mapDados = arquivo.build();
+    	Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
     	
     	assertNotNull(mapDados);
     	assertEquals(12, mapDados.keySet().size());

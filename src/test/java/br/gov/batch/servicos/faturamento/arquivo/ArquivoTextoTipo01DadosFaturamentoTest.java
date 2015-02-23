@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
@@ -55,6 +56,8 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
 	private FaturamentoGrupo faturamentoGrupo;
 	private Conta conta;
 	
+	private ArquivoTextoTO arquivoTextoTO;
+
 	@Before
 	public void setup() {
 		
@@ -79,7 +82,13 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
         conta.setLigacaoEsgotoSituacao(ligacaoEsgotoSituacao);
         conta.setFaturamentoGrupo(faturamentoGrupo);
         
-        arquivo = new ArquivoTextoTipo01DadosFaturamento(imovel, conta);
+        arquivo = new ArquivoTextoTipo01DadosFaturamento();
+        
+        arquivoTextoTO = new ArquivoTextoTO();
+        arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setConta(conta);
+        arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
+        arquivoTextoTO.setAnoMesReferencia(201501);
 	}
 	
 	private List<ICategoria> categoriasSetup() {
@@ -115,7 +124,7 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
     public void buildArquivoDadosFaturamento() {
     	carregarMocks();
     	
-    	Map<Integer, StringBuilder> mapDados = arquivo.build();
+    	Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
     	
     	String linha = getLinha(mapDados);
     	

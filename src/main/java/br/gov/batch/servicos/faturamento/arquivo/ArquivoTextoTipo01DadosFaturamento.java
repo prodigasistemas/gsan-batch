@@ -6,9 +6,12 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
@@ -19,6 +22,7 @@ import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoTipoRepositorio;
 
@@ -39,21 +43,22 @@ public class ArquivoTextoTipo01DadosFaturamento {
 	@EJB
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 	
+   @EJB
+    private ImovelRepositorio imovelRepositorio;
+
 	private Imovel imovel;
 	private FaturamentoGrupo faturamentoGrupo;
 	private Conta conta;
 	private Integer anoMesReferencia;
 	
-	public ArquivoTextoTipo01DadosFaturamento(Imovel imovel , Conta conta) {
-		this.imovel = imovel;
-		this.conta = conta;
-		this.faturamentoGrupo = conta.getFaturamentoGrupo();
-		this.anoMesReferencia = faturamentoGrupo.getAnoMesReferencia();
-	}
-	
-	public Map<Integer, StringBuilder> build() {
-		
-		dadosFaturamento = new HashMap<Integer, StringBuilder>();
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.conta = to.getConta();
+	    this.faturamentoGrupo = to.getFaturamentoGrupo();
+	    this.anoMesReferencia = to.getAnoMesReferencia();
+
+	    dadosFaturamento = new HashMap<Integer, StringBuilder>();
 		
 		Short paralisarAgua = faturamentoSituacaoBO.verificarParalisacaoFaturamentoAgua(imovel, anoMesReferencia).getId();
 		Short paralisarsgoto = faturamentoSituacaoBO.verificarParalisacaoFaturamentoEsgoto(imovel, anoMesReferencia).getId();

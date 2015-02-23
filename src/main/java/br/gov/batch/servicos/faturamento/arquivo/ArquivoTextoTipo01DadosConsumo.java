@@ -7,9 +7,12 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.batch.servicos.micromedicao.HidrometroBO;
@@ -18,6 +21,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @Stateless
@@ -38,18 +42,20 @@ public class ArquivoTextoTipo01DadosConsumo {
 	@EJB
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 	
-	private Imovel imovel;
+    @EJB
+    private ImovelRepositorio imovelRepositorio;
+
+    private Imovel imovel;
 	
 	private FaturamentoGrupo faturamentoGrupo;
 	
 	private Map<Integer, StringBuilder> dadosConsumo;
 	
-	public ArquivoTextoTipo01DadosConsumo(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
-		this.imovel = imovel;
-		this.faturamentoGrupo = faturamentoGrupo;
-	}
-	
-	public Map<Integer, StringBuilder> build() {
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
+	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.faturamentoGrupo = to.getFaturamentoGrupo();
+	    
 		dadosConsumo = new HashMap<Integer, StringBuilder>();
 		
 		escreverConsumoMedioLigacao();
@@ -200,5 +206,4 @@ public class ArquivoTextoTipo01DadosConsumo {
 		}
 		 dadosConsumo.put(44, builder);
 	}
-
 }

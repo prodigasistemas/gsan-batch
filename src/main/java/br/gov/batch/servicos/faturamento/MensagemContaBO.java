@@ -3,6 +3,7 @@ package br.gov.batch.servicos.faturamento;
 import java.util.Date;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
@@ -15,6 +16,7 @@ import br.gov.servicos.faturamento.ContaMensagemRepositorio;
 import br.gov.servicos.to.ConsultaDebitoImovelTO;
 import br.gov.servicos.to.DadosBancariosTO;
 
+@Stateless
 public class MensagemContaBO {
     
     @EJB

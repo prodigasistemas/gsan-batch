@@ -11,6 +11,7 @@ import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.GerenciaRegional;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
@@ -28,6 +29,8 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
 	private Imovel imovel;
 	private Rota rota;
 	
+    private ArquivoTextoTO arquivoTextoTO;
+
 	@Before
 	public void setup() {
 
@@ -57,12 +60,16 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	
     	imovel.setSetorComercial(new SetorComercial(1));
     	
-    	arquivo = new ArquivoTextoTipo01DadosLocalizacaoImovel(imovel, rota);
+    	arquivo = new ArquivoTextoTipo01DadosLocalizacaoImovel();
+    	
+    	arquivoTextoTO = new ArquivoTextoTO();
+    	arquivoTextoTO.setRota(rota);
+    	arquivoTextoTO.setImovel(imovel);
 	}
 	
 	@Test
     public void buildArquivoDadosCobranca() {
-    	Map<Integer, StringBuilder> mapDados = arquivo.build();
+    	Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
     	
     	String linha = getLinha(mapDados);
 

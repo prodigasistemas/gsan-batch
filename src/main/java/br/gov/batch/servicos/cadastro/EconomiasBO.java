@@ -3,11 +3,12 @@ package br.gov.batch.servicos.cadastro;
 import java.util.Collection;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.ICategoria;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
-@EJB
+@Stateless
 public class EconomiasBO {
     
     @EJB

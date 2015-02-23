@@ -4,6 +4,10 @@ import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
@@ -17,6 +21,7 @@ import br.gov.model.util.Utilitarios;
 
 @Stateless
 public class ArquivoTextoTipo11 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo11.class);
 
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
@@ -25,7 +30,10 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		super();
 	}
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
+//        logger.info("Construcao da linha 11");
+	    
 		builder.append(System.getProperty("line.separator"));
 
 		Rota rota = verificarRota(to.getImovel());

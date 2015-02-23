@@ -10,7 +10,6 @@ import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.cobranca.CobrancaDocumentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 
-@Stateless
 public abstract class ArquivoTexto {
 
 	protected static final String TIPO_REGISTRO_01_IMOVEL = "01";

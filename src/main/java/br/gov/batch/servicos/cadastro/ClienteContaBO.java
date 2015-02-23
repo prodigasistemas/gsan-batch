@@ -8,7 +8,6 @@ import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.ClienteConta;
 import br.gov.model.cadastro.ClienteImovel;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.servicos.cadastro.ClienteContaRepositorio;
 import br.gov.servicos.cadastro.ClienteImovelRepositorio;
@@ -22,8 +21,8 @@ public class ClienteContaBO {
 	@EJB
 	private ClienteContaRepositorio clienteContaRepositorio;
 	
-	public void inserirClienteContaComImoveisAtivos(Imovel imovel, Conta conta) {
-		List<ClienteImovel> clienteImovelAtivos = clienteImovelRepositorio.pesquisarClienteImovelAtivos(imovel);
+	public void inserirClienteContaComImoveisAtivos(Integer idImovel, Conta conta) {
+		List<ClienteImovel> clienteImovelAtivos = clienteImovelRepositorio.pesquisarClienteImovelAtivos(idImovel);
 
 		clienteImovelAtivos.forEach(clienteImovel -> {
 			ClienteConta clienteConta = new ClienteConta();

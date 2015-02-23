@@ -3,6 +3,7 @@ package br.gov.batch.servicos.faturamento;
 import static br.gov.model.util.Utilitarios.reduzirMeses;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoAnormalidadeAcaoBO;
@@ -12,6 +13,7 @@ import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
+@Stateless
 public class MensagemAnormalidadeContaBO {
     
     @EJB

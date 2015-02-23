@@ -80,22 +80,22 @@ public class ArquivoTextoTipo01Test {
 	}
 
 	public void carregarMocks() {
-		expect(dadosClienteMock.build()).andReturn(getMapCliente());
+		expect(dadosClienteMock.build(to)).andReturn(getMapCliente());
 		replay(dadosClienteMock);
 
-		expect(dadosCobrancaMock.build()).andReturn(getMapCobranca());
+		expect(dadosCobrancaMock.build(to)).andReturn(getMapCobranca());
 		replay(dadosCobrancaMock);
 
-		expect(dadosConsumoMock.build()).andReturn(getMapConsumo());
+		expect(dadosConsumoMock.build(to)).andReturn(getMapConsumo());
 		replay(dadosConsumoMock);
 
-		expect(dadosContaMock.build()).andReturn(getMapConta());
+		expect(dadosContaMock.build(to)).andReturn(getMapConta());
 		replay(dadosContaMock);
 
-		expect(dadosFaturamentoMock.build()).andReturn(getMapFaturamento());
+		expect(dadosFaturamentoMock.build(to)).andReturn(getMapFaturamento());
 		replay(dadosFaturamentoMock);
 
-		expect(dadosLocalizacaoImovelMock.build()).andReturn(getMapLocalizacao());
+		expect(dadosLocalizacaoImovelMock.build(to)).andReturn(getMapLocalizacao());
 		replay(dadosLocalizacaoImovelMock);
 
 	}

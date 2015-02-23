@@ -46,7 +46,6 @@ public class PagamentoBOTest {
 		mockParametros();
 		
 		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaConta());
-		System.out.println(codigoDeBarra);
 		assertEquals("826500000003474000220027068586860006012015400034", codigoDeBarra);
 	}
 	
@@ -55,7 +54,6 @@ public class PagamentoBOTest {
 		mockParametros();
 		
 		String codigoDeBarra = pagamentoBO.obterCodigoBarra(getDadosParaDocumentoCobrancaImovel());
-		System.out.println(codigoDeBarra);
 		assertEquals("826900000009958000220185049297560069967276010055", codigoDeBarra);
 	}
 	

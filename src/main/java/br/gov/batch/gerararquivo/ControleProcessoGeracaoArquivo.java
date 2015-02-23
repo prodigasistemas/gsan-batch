@@ -1,18 +1,18 @@
-package br.gov.batch.gerardadosleitura;
+package br.gov.batch.gerararquivo;
 
 import javax.ejb.Singleton;
 
 @Singleton
-public class ControleProcessoRota {
+public class ControleProcessoGeracaoArquivo {
 	private final Integer limiteRotas = 3;
 	
     private Integer quantidadeRotas = 0;
-    
-    public synchronized void iniciaProcessamentoRota(){
+        
+    public synchronized void iniciaGeracaoArquivoRota(){
     	quantidadeRotas++;
     }
     
-    public synchronized void finalizaProcessamentoRota(){
+    public synchronized void finalizaGeracaoArquivoRota(){
     	quantidadeRotas--;
     }
     

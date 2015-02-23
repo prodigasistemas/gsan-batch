@@ -6,8 +6,13 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
+import br.gov.model.exception.CategoriasTarifaInexistente;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
@@ -15,6 +20,7 @@ import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 
 @Stateless
 public class ArquivoTextoTipo10 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo10.class);
 
 	@EJB
 	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
@@ -23,8 +29,15 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria());
+//        logger.info("Construcao da linha 10");
+	    
+		if (to.getIdsConsumoTarifaCategoria().isEmpty()){
+		    throw new CategoriasTarifaInexistente(to.getImovel().getId());
+		}
+		
+        List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria());
 
 		for (ConsumoTarifaFaixaTO faixaTO : listaConsumoTarifaFaixa) {
 			builder.append(TIPO_REGISTRO_10_FAIXA_CONSUMO);

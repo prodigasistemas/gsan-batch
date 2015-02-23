@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.ICategoria;
@@ -12,7 +14,6 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo02 extends ArquivoTexto {
-
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
@@ -20,6 +21,7 @@ public class ArquivoTextoTipo02 extends ArquivoTexto {
 		super();
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
 		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(to.getImovel().getId());
 

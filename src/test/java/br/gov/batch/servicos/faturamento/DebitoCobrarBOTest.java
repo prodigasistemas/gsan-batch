@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.cobranca.Parcelamento;
 import br.gov.model.faturamento.DebitoCobrar;
@@ -34,7 +33,7 @@ public class DebitoCobrarBOTest {
 	@Mock
 	private SistemaParametrosRepositorio parametrosMock;
 	
-	private Imovel imovel;
+	private Integer idImovel = 10;
 	
 	private int anoMesReferencia = 201403;
 	
@@ -42,14 +41,13 @@ public class DebitoCobrarBOTest {
 	
 	@Before
 	public void setup() {
-		imovel = new Imovel();
 		business = new DebitoCobrarBO();
 		parametros = new SistemaParametros();
 		parametros.setAnoMesFaturamento(anoMesReferencia);
 	}
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
-		expect(debitoCobrarEJBMock.debitosCobrarPorImovelComPendenciaESemRevisao(imovel))
+		expect(debitoCobrarEJBMock.debitosCobrarPorImovelComPendenciaESemRevisao(idImovel))
 		.andReturn(debitos);
 		expect(parametrosMock.getSistemaParametros())
 		.andReturn(parametros);
@@ -66,7 +64,7 @@ public class DebitoCobrarBOTest {
 		
 		preparaMocks(anoMesReferencia, debitos);
 		
-		assertEquals(1, business.debitosCobrarVigentes(imovel).size());
+		assertEquals(1, business.debitosCobrarVigentes(idImovel).size());
 	}
 
 	@Test
@@ -77,7 +75,7 @@ public class DebitoCobrarBOTest {
 		
 		preparaMocks(anoMesReferencia, debitos);
 		
-		assertEquals(1, business.debitosCobrarVigentes(imovel).size());
+		assertEquals(1, business.debitosCobrarVigentes(idImovel).size());
 	}
 	
 	@Test
@@ -89,7 +87,7 @@ public class DebitoCobrarBOTest {
 		
 		preparaMocks(anoMesReferencia, debitos);
 		
-		assertEquals(2, business.debitosCobrarVigentes(imovel).size());
+		assertEquals(2, business.debitosCobrarVigentes(idImovel).size());
 	}
 	
 	@Test
@@ -101,7 +99,7 @@ public class DebitoCobrarBOTest {
 		
 		preparaMocks(anoMesReferencia, debitos);
 		
-		assertEquals(2, business.debitosCobrarVigentes(imovel).size());
+		assertEquals(2, business.debitosCobrarVigentes(idImovel).size());
 	}
 
 	private DebitoCobrar debitoCobrarComDataParcelamentoVencido() {
