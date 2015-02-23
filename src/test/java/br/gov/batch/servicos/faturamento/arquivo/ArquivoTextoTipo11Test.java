@@ -28,17 +28,17 @@ public class ArquivoTextoTipo11Test {
 	@TestSubject
 	public ArquivoTextoTipo11 arquivo;
 
+	private int TAMANHO_LINHA = 1;
+
 	@Mock
 	public FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
-	
-	@Mock SistemaParametros sistemaParametrosMock;
 
 	private ArquivoTextoTO to;
 
 	@Before
 	public void setup() {
 		arquivo = new ArquivoTextoTipo11();
-		
+
 		to = new ArquivoTextoTO();
 		to.setSequenciaRota(1);
 
@@ -49,7 +49,7 @@ public class ArquivoTextoTipo11Test {
 		rota.setIndicadorAjusteConsumo(Short.valueOf("7"));
 		rota.setIndicadorTransmissaoOffline(Short.valueOf("6"));
 		to.setRota(rota);
-		
+
 		Imovel imovel = new Imovel();
 		Quadra quadra = new Quadra();
 		quadra.setRota(rota);
@@ -57,6 +57,24 @@ public class ArquivoTextoTipo11Test {
 		to.setImovel(imovel);
 
 		to.setAnoMesReferencia(201501);
+
+		SistemaParametros sistemaParametros = new SistemaParametros();
+		sistemaParametros.setCodigoEmpresaFebraban(Short.valueOf("9999"));
+		sistemaParametros.setAnoMesArrecadacao(201501);
+		sistemaParametros.setNumero0800Empresa("080084178111");
+		sistemaParametros.setCnpjEmpresa("603603603603");
+		sistemaParametros.setInscricaoEstadual("3231230532312305");
+		sistemaParametros.setValorMinimoEmissaoConta(BigDecimal.valueOf(1));
+		sistemaParametros.setPercentualToleranciaRateio(BigDecimal.valueOf(1));
+		sistemaParametros.setDecrementoMaximoConsumoRateio(1);
+		sistemaParametros.setIncrementoMaximoConsumoRateio(1);
+		sistemaParametros.setIndicadorTarifaCategoria(Short.valueOf("1"));
+		sistemaParametros.setVersaoCelular("CEL NOKIA");
+		sistemaParametros.setIndicadorBloqueioContaMobile(1);
+		sistemaParametros.setNumeroModuloDigitoVerificador(Short.valueOf("1"));
+		sistemaParametros.setNumeroDiasBloqueioCelular(3);
+
+		arquivo.setSistemaParametros(sistemaParametros);
 	}
 
 	@Test
@@ -64,33 +82,11 @@ public class ArquivoTextoTipo11Test {
 		carregarMocks();
 
 		String linha = arquivo.build(to);
-		int tamanhoLinha = linha.length();
-
-		assertTrue(tamanhoLinha >= 1);
+		assertTrue(linha.length() >= TAMANHO_LINHA);
 	}
 
 	public void carregarMocks() {
-		expect(faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(to.getRota(), FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(Long.valueOf(31));
+		expect(faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(to.getRota(), FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(Long.valueOf(31)).times(2);
 		replay(faturamentoAtividadeCronogramaBO);
-		
-		mockParametros();
-	}
-	
-	public void mockParametros() {
-		expect(sistemaParametrosMock.getCodigoEmpresaFebraban()).andReturn(Short.valueOf("9999"));
-		expect(sistemaParametrosMock.getAnoMesArrecadacao()).andReturn(201501);
-		expect(sistemaParametrosMock.getNumero0800Empresa()).andReturn("080084178111");
-		expect(sistemaParametrosMock.getCnpjEmpresa()).andReturn("603603603603");
-		expect(sistemaParametrosMock.getInscricaoEstadual()).andReturn("3231230532312305");
-		expect(sistemaParametrosMock.getValorMinimoEmissaoConta()).andReturn(BigDecimal.valueOf(1));
-		expect(sistemaParametrosMock.getPercentualToleranciaRateio()).andReturn(BigDecimal.valueOf(1));
-		expect(sistemaParametrosMock.getDecrementoMaximoConsumoRateio()).andReturn(1);
-		expect(sistemaParametrosMock.getIncrementoMaximoConsumoRateio()).andReturn(1);
-		expect(sistemaParametrosMock.getIndicadorTarifaCategoria()).andReturn(Short.valueOf("1"));
-		expect(sistemaParametrosMock.getVersaoCelular()).andReturn("CEL NOKIA");
-		expect(sistemaParametrosMock.getIndicadorBloqueioContaMobile()).andReturn(1);
-		expect(sistemaParametrosMock.getNumeroModuloDigitoVerificador()).andReturn(Short.valueOf("1")).times(2);
-		expect(sistemaParametrosMock.getNumeroDiasBloqueioCelular()).andReturn(3).times(4);
-		replay(sistemaParametrosMock);
 	}
 }

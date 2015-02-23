@@ -70,7 +70,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 	    
 	    dadosConsumo.put(33, new StringBuilder(Utilitarios.completaComZerosEsquerda(6, consumoBO.consumoNaoMedido(imovel.getId(), faturamentoGrupo.getAnoMesReferencia()))));
 	    dadosConsumo.put(25, new StringBuilder(Utilitarios.completaComZerosEsquerda(2, imovel.tarifaTipoCalculo())));
-	
+	    
 	    return dadosConsumo;
 	}
 	
@@ -146,20 +146,20 @@ public class ArquivoTextoTipo01DadosConsumo {
         BigDecimal percentualDeterminacaoBaixoConsumo = new BigDecimal(0);
         
         for (ICategoria categoria : categorias) {
+            consumoTotalReferenciaEstouroConsumo += categoria.getConsumoEstouro().intValue() * categoria.getQuantidadeEconomias().intValue();
+
             consumoTotalReferenciaAltoConsumo += categoria.getConsumoAlto().intValue() * categoria.getQuantidadeEconomias().intValue();
             
-            consumoTotalReferenciaEstouroConsumo += categoria.getConsumoEstouro().intValue() * categoria.getQuantidadeEconomias().intValue();
-            
-            consumoMaximoCobrancaEstouroConsumo += categoria.getNumeroConsumoMaximoEc().intValue() * categoria.getQuantidadeEconomias().intValue();
-            
             consumoTotalReferenciaBaixoConsumo += categoria.getMediaBaixoConsumo().intValue() * categoria.getQuantidadeEconomias().intValue();
+
+            consumoMaximoCobrancaEstouroConsumo += categoria.getNumeroConsumoMaximoEc().intValue() * categoria.getQuantidadeEconomias().intValue();
             
             if (maiorQuantidadeEconomia < categoria.getQuantidadeEconomias().intValue()) {
                 
                 maiorQuantidadeEconomia = categoria.getQuantidadeEconomias().intValue();
                 
-                vezesMediaAltoConsumo = categoria.getVezesMediaAltoConsumo();
                 vezesMediaEstouroConsumo = categoria.getVezesMediaEstouro();
+                vezesMediaAltoConsumo = categoria.getVezesMediaAltoConsumo();
                 percentualDeterminacaoBaixoConsumo = categoria.getPorcentagemMediaBaixoConsumo();
             }
         }

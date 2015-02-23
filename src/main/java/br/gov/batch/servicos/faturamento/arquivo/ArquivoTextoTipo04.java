@@ -40,7 +40,7 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 			if (colecaoDebitoCobradoDeParcelamento != null && !colecaoDebitoCobradoDeParcelamento.isEmpty()) {
 
 				for (ParcelaDebitoCobradoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
-					builder.append(TIPO_REGISTRO_04);
+					builder.append(TIPO_REGISTRO_04_PARCELAMENTO);
 					builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
 					builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
@@ -117,7 +117,7 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 			String anoMesAcumulado, BigDecimal valorPrestacaoAcumulado) {
 		
 		StringBuilder builder = new StringBuilder();
-		builder.append(TIPO_REGISTRO_04);
+		builder.append(TIPO_REGISTRO_04_PARCELAMENTO);
 		builder.append(completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
 
 		if (qtdAnoMesDistintos > 1) {

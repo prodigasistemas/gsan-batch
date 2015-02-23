@@ -98,7 +98,7 @@ public class ArquivoTextoTipo01 extends ArquivoTexto {
 	public String build(ArquivoTextoTO to) {
 		mapDados = new TreeMap<Integer, StringBuilder>();
 
-		builder.append(TIPO_REGISTRO_01);
+		builder.append(TIPO_REGISTRO_01_IMOVEL);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, String.valueOf(to.getImovel().getId())));
 
 		mapDados.putAll(dadosCobranca.build());

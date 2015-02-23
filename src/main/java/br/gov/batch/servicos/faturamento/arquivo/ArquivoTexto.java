@@ -13,21 +13,20 @@ import br.gov.servicos.faturamento.ContaRepositorio;
 @Stateless
 public abstract class ArquivoTexto {
 
-	// TODO - Renomear constantes com definições das linhas
-	protected static final String TIPO_REGISTRO_01 = "01";
-	protected static final String TIPO_REGISTRO_02 = "02";
-	protected static final String TIPO_REGISTRO_03 = "03";
-	protected static final String TIPO_REGISTRO_04 = "04";
-	protected static final String TIPO_REGISTRO_05 = "05";
-	protected static final String TIPO_REGISTRO_06 = "06";
-	protected static final String TIPO_REGISTRO_07 = "07";
-	protected static final String TIPO_REGISTRO_08 = "08";
-	protected static final String TIPO_REGISTRO_09 = "09";
-	protected static final String TIPO_REGISTRO_10 = "10";
-	protected static final String TIPO_REGISTRO_11 = "11";
-	protected static final String TIPO_REGISTRO_12 = "12";
-	protected static final String TIPO_REGISTRO_13 = "13";
-	protected static final String TIPO_REGISTRO_14 = "14";
+	protected static final String TIPO_REGISTRO_01_IMOVEL = "01";
+	protected static final String TIPO_REGISTRO_02_CATEGORIAS = "02";
+	protected static final String TIPO_REGISTRO_03_CONSUMO_HISTORICO = "03";
+	protected static final String TIPO_REGISTRO_04_PARCELAMENTO = "04";
+	protected static final String TIPO_REGISTRO_05_CREDITO = "05";
+	protected static final String TIPO_REGISTRO_06_IMPOSTOS = "06";
+	protected static final String TIPO_REGISTRO_07_COBRANCA = "07";
+	protected static final String TIPO_REGISTRO_08_MEDICAO = "08";
+	protected static final String TIPO_REGISTRO_09_TARIFA = "09";
+	protected static final String TIPO_REGISTRO_10_FAIXA_CONSUMO = "10";
+	protected static final String TIPO_REGISTRO_11_CODIGO_BARRAS = "11";
+	protected static final String TIPO_REGISTRO_12_ACAO_ANORMALIDADE = "12";
+	protected static final String TIPO_REGISTRO_13_ANORMALIDADE_CONSUMO = "13";
+	protected static final String TIPO_REGISTRO_14_ANORMALIDADE_LEITURA = "14";
 	
 	@EJB
 	private ContaRepositorio contaRepositorio;
@@ -62,9 +61,8 @@ public abstract class ArquivoTexto {
 	public void setArquivoTextoTO(ArquivoTextoTO arquivoTextoTO) {
 		this.to = arquivoTextoTO;
 	}
-	
-	public int getQuantidadeLinhas() {
-		String[] linhas = builder.toString().split(System.getProperty("line.separator"));
-		return linhas.length;
+
+	public void setSistemaParametros(SistemaParametros sistemaParametros) {
+		this.sistemaParametros = sistemaParametros;
 	}
 }

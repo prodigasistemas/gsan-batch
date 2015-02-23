@@ -1,5 +1,10 @@
 package br.gov.batch.servicos.faturamento;
 
+import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.obterQuantidadeLinhasTexto;
+import static br.gov.model.util.Utilitarios.quebraLinha;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,15 +28,20 @@ import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo12;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo13;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo14;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
+import br.gov.batch.servicos.micromedicao.MovimentoRoteiroEmpresaBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
+import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresaDivisao;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
+import br.gov.model.micromedicao.TipoServicoCelular;
+import br.gov.model.util.IOUtil;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelRepositorio;
+import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.cobranca.CobrancaDocumentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaDivisaoRepositorio;
@@ -55,6 +65,15 @@ public class GeradorArquivoTextoFaturamento {
 	@EJB
 	private CobrancaDocumentoRepositorio cobrancaDocumentoRepositorio;
 
+	@EJB
+	private MovimentoRoteiroEmpresaBO movimentoRoteiroEmpresaBO;
+	
+	@EJB
+	private ContaBO contaBO;
+
+	@EJB
+	private QuadraRepositorio quadraRepositorio;
+	
 	private ArquivoTextoTO to;
 	
 	public GeradorArquivoTextoFaturamento() {
@@ -70,8 +89,10 @@ public class GeradorArquivoTextoFaturamento {
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
 
 		List<Imovel> imoveisArquivo = new ArrayList<Imovel>();
-		
-		StringBuilder texto = new StringBuilder();
+
+		List<ArquivoTextoRoteiroEmpresaDivisao> divisoes = new ArrayList<ArquivoTextoRoteiroEmpresaDivisao>();
+
+		StringBuilder conteudo = new StringBuilder();
 
 		for (Imovel imovel : imoveis) {
 			if (imovel.isCondominio()) {
@@ -89,49 +110,138 @@ public class GeradorArquivoTextoFaturamento {
 
 					if (imovelMicroComConta) {
 						imoveisArquivo.add(imovel);
-						texto.append(texto.length() > 0 ? System.getProperty("line.separator") : "");
-						texto.append(gerarArquivoTexto(imovel, null, anoMesFaturamento, rota, grupoFaturamento, dataComando));
-						
-						imoveisCondominio.forEach(e -> {
-						    texto.append(System.getProperty("line.separator"))
-						        .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
-						    imoveisArquivo.add(e);
-						});
+						conteudo.append(conteudo.length() > 0 ? System.getProperty("line.separator") : "");
+						conteudo.append(gerarArquivoTexto(imovel, null, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+
+						for (Imovel micro : imoveisCondominio) {
+							conteudo.append(System.getProperty("line.separator"))
+							        .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+							imoveisArquivo.add(micro);
+						}
 					}
 				}
 			} else {
-//				carregarArquivo(imovel, anoMesReferencia, rota, faturamentoGrupo, dataComando);
-//
-//				int tamanhoArquivoRetorno = 0;
-//
-//				if (arquivoTexto.length() != 0) {
-//					arquivoTexto.append(System.getProperty("line.separator"));
-//				}
-//				tamanhoArquivoRetorno = getQuantidadeLinhas();
-//				tamanhoArquivo += tamanhoArquivoRetorno;
-//
-//				if (rota.getNumeroLimiteImoveis() != null && !rota.getNumeroLimiteImoveis().equals("")) {
-//
-//					if (arquivoTextoDivisao.length() != 0) {
-//						arquivoTextoDivisao.append(System.getProperty("line.separator"));
-//					}
-//
-//					if (arquivoTextoDivisao != null) {
-//						arquivoTextoDivisao.append(arquivoTexto);
-//						imoveisDivididos.add(imovel.getId());
-//						tamanhoArquivoDiv  += tamanhoArquivoRetorno;
-//					}
-//				}
-//
-//				if (tamanhoArquivoRetorno != 0) {
-//					imoveisArquivo.add(imovel);
-//				}
+				conteudo.append(conteudo.length() > 0 ? System.getProperty("line.separator") : "");
+				conteudo.append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+				imoveisArquivo.add(imovel);
 			}
-			
-			
-			
+
+			if (rota.existeLimiteImoveis()) {
+				if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
+					divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+					conteudo = new StringBuilder();
+					imoveisArquivo.clear();
+				}
+			}
 		}
+
+		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
+
+		ArquivoTextoRoteiroEmpresa roteiro = criarRoteiroArquivoTexto(rota, imoveis.get(0), grupoFaturamento, anoMesFaturamento, imoveisPreFaturados.size());
+
+		roteiro.setDivisoes(divisoes);
+
+		for (int i = 0; i < divisoes.size(); i++) {
+			divisoes.get(i).acrescentaSequencial(i + 1);
+			divisoes.get(i).setArquivoTextoRoteiroEmpresa(roteiro);
+		}
+
+		if (rota.existeLimiteImoveis()) {
+			divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+		}
+
+		arquivoRepositorio.salvar(roteiro);
+
+		if (rota.existeLimiteImoveis()) {
+			divisoes.forEach(e -> criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+		} else {
+			conteudo.append(gerarPassosFinais());
+			criarArquivo(roteiro.getNomeArquivo(), "", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
+		}
+
+		movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
 	}
+	
+	public ArquivoTextoRoteiroEmpresaDivisao criarRoteiroArquivoDividido(StringBuilder texto, Rota rota, Integer anoMesFaturamento, List<Imovel> imoveis){
+	    List<Integer> ids = new ArrayList<Integer>();
+	    imoveis.forEach(e -> ids.add(e.getId()));
+	    
+	    Integer qtdImoveisDivididos = contaRepositorio.obterQuantidadeContasPreFaturadaPorImoveis(anoMesFaturamento, ids);
+	    
+	    ArquivoTextoRoteiroEmpresaDivisao roteiro = new ArquivoTextoRoteiroEmpresaDivisao();
+	    
+	    texto.append(gerarPassosFinais());
+	    roteiro.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.DISPONIVEL);
+	    roteiro.setUltimaAlteracao(new Date());
+        roteiro.setQuantidadeImovel(qtdImoveisDivididos);
+        
+        if (rota.getLeiturista() != null) {
+            roteiro.setLeiturista(rota.getLeiturista());
+            roteiro.setNumeroImei(rota.getLeiturista().getNumeroImei());
+        }
+	    
+	    roteiro.setConteudoArquivo(new StringBuilder(obterQuantidadeLinhasTexto(texto)).append(quebraLinha).append(texto));
+	    
+	    return roteiro;
+	}
+	
+	public ArquivoTextoRoteiroEmpresa criarRoteiroArquivoTexto(Rota rota, Imovel imovel, FaturamentoGrupo faturamentoGrupo, Integer anoMesFaturamento, Integer qtdImoveisComContaPF){
+	    ArquivoTextoRoteiroEmpresa arquivo = new ArquivoTextoRoteiroEmpresa();
+	    
+	    StringBuilder nomeArquivo = new StringBuilder("G");
+	    nomeArquivo.append(completaComZerosEsquerda(3, faturamentoGrupo.getId()));
+
+	    if (rota.isAlternativa()) {
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getId()));
+	        arquivo.setLocalidade(rota.getSetorComercial().getLocalidade());
+	        arquivo.setCodigoSetorComercial1(rota.getSetorComercial().getCodigo());
+	    }else{
+	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getSetorComercial().getId()));
+	    }
+	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getId()));
+	    nomeArquivo.append(completaComZerosEsquerda(6, anoMesFaturamento));
+	    
+        arquivo.setAnoMesReferencia(anoMesFaturamento);
+        arquivo.setFaturamentoGrupo(faturamentoGrupo);
+        arquivo.setEmpresa(rota.getEmpresa());
+        arquivo.setRota(rota);
+        arquivo.setNumeroSequenciaLeitura(rota.getNumeroSequenciaLeitura());
+        
+        int[] intervalorNumeroQuadra = quadraRepositorio.obterIntervaloQuadrasPorRota(rota.getId());
+        
+        arquivo.setNumeroQuadraInicial1(intervalorNumeroQuadra[0]);
+        arquivo.setNumeroQuadraFinal1(intervalorNumeroQuadra[1]);
+
+        arquivo.setQuantidadeImovel(qtdImoveisComContaPF);
+        arquivo.setNomeArquivo(nomeArquivo.toString());
+
+        arquivo.setLeiturista(rota.getLeiturista());
+        arquivo.setCodigoLeiturista(rota.getLeiturista().getCodigoDDD());
+        arquivo.setNumeroFoneLeiturista(rota.getLeiturista().getNumeroFone());
+        
+        if (rota.getNumeroLimiteImoveis() == null) {
+            arquivo.setNumeroImei(rota.getLeiturista().getNumeroImei());
+        }
+        
+        if (rotaSoComImoveisInformativos(qtdImoveisComContaPF)) {
+            arquivo.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.TRANSMITIDO.getId());
+        } else{
+            arquivo.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.DISPONIVEL.getId());
+        }
+
+        arquivo.setUltimaAlteracao(new Date());
+
+        arquivo.setTipoServicoCelular(TipoServicoCelular.IMPRESSAO_SIMULTANEA.getId());
+
+	    return arquivo;
+	}
+	
+	private boolean rotaSoComImoveisInformativos(Integer qtdImoveisComContaPF) {
+        return qtdImoveisComContaPF > 0 ? false : true;
+    }
+
 
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
 		boolean retorno = true;
@@ -141,7 +251,7 @@ public class GeradorArquivoTextoFaturamento {
 		if (arquivo != null) {
 			if (arquivo.getSituacaoTransmissaoLeitura() == SituacaoTransmissaoLeitura.DISPONIVEL.getId()) {
 				arquivoDivisaoRepositorio.deletarPorArquivoTextoRoteiroEmpresa(arquivo.getId());
-				arquivoRepositorio.deletarPorId(arquivo.getId());
+				arquivoRepositorio.excluir(arquivo.getId());
 			} else {
 				retorno = false;
 			}
@@ -154,15 +264,15 @@ public class GeradorArquivoTextoFaturamento {
 		List<Imovel> imoveisConsulta = null;
 
 		if (rota.alternativa()) {
-			imoveisConsulta = imovelRepositorio.imoveisParaGerarArquivoTextoFaturamentoPorRotaAlternativa(rota.getId(), primeiroRegistro, quantidadeRegistros);
+			imoveisConsulta = imovelRepositorio.buscarImoveisParaGerarArquivoTextoFaturamentoPorRotaAlternativa(rota.getId(), primeiroRegistro, quantidadeRegistros);
 		} else {
-			imoveisConsulta = imovelRepositorio.imoveisParaGerarArquivoTextoFaturamento(rota.getId(), primeiroRegistro, quantidadeRegistros);
+			imoveisConsulta = imovelRepositorio.buscarImoveisParaGerarArquivoTextoFaturamento(rota.getId(), primeiroRegistro, quantidadeRegistros);
 		}
 
 		List<Imovel> imoveis = new ArrayList<Imovel>();
 
 		for (Imovel imovel : imoveisConsulta) {
-			if (imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()) {
+			if (contaBO.emitirConta(imovel) || imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()){
 				imoveis.add(imovel);
 			}
 		}
@@ -191,9 +301,7 @@ public class GeradorArquivoTextoFaturamento {
 	}
 
 	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
-
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
-
 		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 	}
 
@@ -240,9 +348,9 @@ public class GeradorArquivoTextoFaturamento {
 		return arquivoTexto;
 	}
 
-	private void gerarPassosFinais() {
+	private StringBuilder gerarPassosFinais() {
+	    
 	    StringBuilder arquivoTexto = new StringBuilder();
-		arquivoTexto.append(System.getProperty("line.separator"));
 		
 		ArquivoTexto arquivo = new ArquivoTextoTipo11();
 		arquivoTexto.append(arquivo.build(to));
@@ -255,5 +363,14 @@ public class GeradorArquivoTextoFaturamento {
 
 		arquivo = new ArquivoTextoTipo14();
 		arquivoTexto.append(arquivo.build(to));
+		
+		return arquivoTexto;
+	}
+	
+	private void criarArquivo(String nome, String caminho, String conteudo) {
+		File arquivo = new File(caminho + nome);
+		IOUtil.escreverArquivo(arquivo, conteudo);
+		IOUtil.comprimirParaGzip(arquivo);
+		arquivo.delete();
 	}
 }

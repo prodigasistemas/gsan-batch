@@ -10,7 +10,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
-import br.gov.servicos.to.AnormalidadeHistoricoConsumo;
+import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
 public class MensagemAnormalidadeContaBO {
     
@@ -27,7 +27,7 @@ public class MensagemAnormalidadeContaBO {
 
         String[] mensagemConta = null;
         
-        AnormalidadeHistoricoConsumo anormalidadeConsumo = 
+        AnormalidadeHistoricoConsumoTO anormalidadeConsumo = 
                 consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(imovel.getId(), LigacaoTipo.AGUA, anoMesReferencia);
         
         if (anormalidadeConsumo == null){

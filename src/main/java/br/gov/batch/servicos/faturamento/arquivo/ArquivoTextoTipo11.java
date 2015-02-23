@@ -20,17 +20,17 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
-	
+
 	public ArquivoTextoTipo11() {
 		super();
 	}
 
 	public String build(ArquivoTextoTO to) {
 		builder.append(System.getProperty("line.separator"));
-		
+
 		Rota rota = verificarRota(to.getImovel());
 
-		builder.append(TIPO_REGISTRO_11);
+		builder.append(TIPO_REGISTRO_11_CODIGO_BARRAS);
 		builder.append(Utilitarios.completaComZerosEsquerda(4, sistemaParametros.getCodigoEmpresaFebraban()));
 		builder.append(Utilitarios.formataData(Utilitarios.converteParaDataComUltimoDiaMes(sistemaParametros.getAnoMesArrecadacao()), FormatoData.ANO_MES_DIA));
 		builder.append(to.getAnoMesReferencia());
@@ -45,7 +45,7 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		buildDadosDaRota(rota);
 		builder.append(Utilitarios.completaComEspacosADireita(10, sistemaParametros.getVersaoCelular()));
 		builder.append(Utilitarios.completaComZerosEsquerda(1, sistemaParametros.getIndicadorBloqueioContaMobile()));
-		builder.append((rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()) : 
+		builder.append((rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()) :
 				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId()));
 		builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA)));
 		builder.append(Utilitarios.completaComEspacosADireita(2, (sistemaParametros.getNumeroModuloDigitoVerificador() != null 
@@ -74,12 +74,13 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 	}
 
 	private String getDiferencaDiasCronogramas(Rota rota) {
-		return Utilitarios.completaComZerosEsquerda(2, faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA));
+		return Utilitarios.completaComZerosEsquerda(2,
+				faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA));
 	}
 
 	private String getIndicadorSequencialLeitura(Rota rota) {
-		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()) :
-				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId());
+		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura())
+				: Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId());
 	}
 
 	private Rota verificarRota(Imovel imovel) {

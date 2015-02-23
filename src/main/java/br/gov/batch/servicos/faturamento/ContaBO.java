@@ -13,17 +13,21 @@ import br.gov.batch.servicos.faturamento.to.FaturamentoImovelTO;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaGeral;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 import br.gov.servicos.cadastro.ClienteRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ContaGeralRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
+import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.VencimentoContaTO;
@@ -55,6 +59,9 @@ public class ContaBO {
 	
 	@EJB
 	private LigacaoEsgotoRepositorio ligacaoEsgotoRepositorio;
+	
+	@EJB
+	private FaturamentoParametroRepositorio repositorioParametros;
 	
 	private SistemaParametros sistemaParametros;
 	
@@ -182,7 +189,7 @@ public class ContaBO {
 			contaTO.setDiaVencimentoAlternativo(imovel.getDiaVencimento());
 			contaTO.setIndicadorVencimentoMesSeguinte(imovel.getIndicadorVencimentoMesSeguinte());
 		} else {
-			Cliente cliente = clienteRepositorio.buscarClienteResponsavelPorImovel(imovel.getId());
+			Cliente cliente = clienteRepositorio.buscarClientePorImovel(imovel.getId(), ClienteRelacaoTipo.RESPONSAVEL);
 
 			if (cliente != null) {
 				if (cliente.existeDiaVencimento()) {
@@ -214,4 +221,28 @@ public class ContaBO {
 	public void setSistemaParametros(SistemaParametros sistemaParametros) {
 		this.sistemaParametros = sistemaParametros;
 	}
+	
+	public boolean emitirConta(Imovel imovel) {
+        boolean emitir = true;
+
+        boolean emitirFebraban = Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN));
+
+        if ((emitirFebraban && enviaConta(imovel.getImovelContaEnvio())) || enviaContaClienteResponsavelFinalGrupo(imovel.getImovelContaEnvio())) {
+            emitir = false;
+        }
+
+        return emitir;
+    }
+	
+	private boolean enviaConta(Integer envioConta) {
+        return envioConta != null
+                && (envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL
+                        || envioConta == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL
+                        || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE 
+                        || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL);
+    }
+	
+	private boolean enviaContaClienteResponsavelFinalGrupo(Integer envioConta) {
+        return envioConta != null && envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL_FINAL_GRUPO;
+    }
 }

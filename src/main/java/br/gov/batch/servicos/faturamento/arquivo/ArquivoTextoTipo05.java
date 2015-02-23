@@ -68,7 +68,7 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 	}
 
 	private void gerarDadosCreditosRealizados(Conta conta, Integer qtdAnoMesDistintos, String anoMesAcumulado, BigDecimal valorCreditoAcumulado) {
-		builder.append(TIPO_REGISTRO_05);
+		builder.append(TIPO_REGISTRO_05_CREDITO);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 		
 		if (qtdAnoMesDistintos > 1) {

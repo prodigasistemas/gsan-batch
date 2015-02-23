@@ -27,7 +27,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 		List<ConsumoTarifaFaixaTO> listaConsumoTarifaFaixa = consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria());
 
 		for (ConsumoTarifaFaixaTO faixaTO : listaConsumoTarifaFaixa) {
-			builder.append(TIPO_REGISTRO_10);
+			builder.append(TIPO_REGISTRO_10_FAIXA_CONSUMO);
 			builder.append(getIdConsumoTarifa(faixaTO.getIdConsumoTarifa()));
 			builder.append(getDataVigencia(faixaTO.getDataVigencia()));
 			builder.append(getIdCategoria(faixaTO.getIdCategoria()));
@@ -36,7 +36,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 			builder.append(getNumeroConsumoFaixaFim(faixaTO.getNumeroConsumoFaixaFim()));
 			builder.append(getValorConsumoTarifa(faixaTO.getValorConsumoTarifa()));
 			
-			if (getQuantidadeLinhas() < listaConsumoTarifaFaixa.size()) {
+			if (Utilitarios.obterQuantidadeLinhasTexto(builder) < listaConsumoTarifaFaixa.size()) {
 				builder.append(System.getProperty("line.separator"));
 			}
 		}

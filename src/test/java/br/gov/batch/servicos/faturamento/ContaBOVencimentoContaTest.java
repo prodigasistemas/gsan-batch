@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 
 import br.gov.model.Status;
 import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.SistemaParametros;
@@ -66,7 +67,7 @@ public class ContaBOVencimentoContaTest {
 	}
 	
 	private IExpectationSetters<Cliente> mountClienteRepositorioMock() {
-		return expect(clienteRepositorioMock.buscarClienteResponsavelPorImovel(1));
+		return expect(clienteRepositorioMock.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL));
 	}
 	
 	private IExpectationSetters<Short> mountSistemaParametrosRepositorioMock() {
@@ -193,7 +194,7 @@ public class ContaBOVencimentoContaTest {
 	@Test
 	public void semVencimentoAlternativoDebitoEmContaEEnvioPelosCorreios(){
 		Cliente cliente = new Cliente();
-		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId());
+		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL);
 		imovel.setIndicadorDebitoConta(Status.INATIVO.getId());
 		
 		mountClienteRepositorioMock().andReturn(cliente);

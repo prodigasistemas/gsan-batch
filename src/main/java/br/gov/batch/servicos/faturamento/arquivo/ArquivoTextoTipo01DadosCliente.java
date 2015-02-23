@@ -6,13 +6,12 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.faturamento.ContaBO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
-import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
@@ -25,6 +24,9 @@ public class ArquivoTextoTipo01DadosCliente {
 	
 	@EJB
     private FaturamentoParametroRepositorio repositorioParametros;
+	
+	@EJB
+	private ContaBO contaBO;
 	
 	private Map<Integer, StringBuilder> dadosCliente;
 	
@@ -116,7 +118,7 @@ public class ArquivoTextoTipo01DadosCliente {
 		
 		Short indicadorEmissaoConta = new Short("1");
 
-        boolean emitir = emitirConta(imovel.getImovelContaEnvio());
+        boolean emitir = contaBO.emitirConta(imovel);
 
         if (clienteResponsavel != null && !emitir) {
             indicadorEmissaoConta = new Short("2");
@@ -125,30 +127,6 @@ public class ArquivoTextoTipo01DadosCliente {
         builder.append(indicadorEmissaoConta.toString());
         
         dadosCliente.put(14, builder);
-    }
-	
-	public boolean emitirConta(Integer envioConta) {
-        boolean emitir = true;
-
-        boolean emitirFebraban = Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN));
-
-        if ((emitirFebraban && enviaConta(envioConta)) || enviaContaClienteResponsavelFinalGrupo(envioConta)) {
-            emitir = false;
-        }
-
-        return emitir;
-    }
-	
-	private boolean enviaConta(Integer envioConta) {
-        return envioConta != null
-                && (envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL.getId()
-                        || envioConta == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL.getId()
-                        || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE.getId() || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL
-                        .getId());
-    }
-	
-	private boolean enviaContaClienteResponsavelFinalGrupo(Integer envioConta) {
-        return envioConta != null && envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL_FINAL_GRUPO.getId();
     }
 	
 }

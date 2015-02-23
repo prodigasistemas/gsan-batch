@@ -57,7 +57,7 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 		
 		if (colecaoDadosTarifaCategoria != null && !colecaoDadosTarifaCategoria.isEmpty()) {
 			for (ConsumoTarifaCategoria dadosTarifaCategoria : colecaoDadosTarifaCategoria) {
-				builder.append(TIPO_REGISTRO_09);
+				builder.append(TIPO_REGISTRO_09_TARIFA);
 				builder.append(Utilitarios.completaComZerosEsquerda(2, dadosTarifaCategoria.getConsumoTarifaVigencia().getConsumoTarifa().getId()));
 				builder.append(Utilitarios.formataData(dadosTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia(), FormatoData.ANO_MES_DIA));
 				builder.append(Utilitarios.completaComZerosEsquerda(1, dadosTarifaCategoria.getCategoria().getId()));

@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SetorComercial;
@@ -64,7 +65,7 @@ public class ContaBOTest {
 		imovel.setQuadra(quadra);
 		
 		expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201405)).andReturn(null);
-		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1)).andReturn(new Cliente());
+		expect(clienteRepositorio.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL)).andReturn(new Cliente());
 		
 		replay(medicaoHistoricoRepositorio);
 		replay(clienteRepositorio);		

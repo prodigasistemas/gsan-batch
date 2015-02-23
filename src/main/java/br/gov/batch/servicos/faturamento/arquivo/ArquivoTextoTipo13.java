@@ -25,7 +25,7 @@ public class ArquivoTextoTipo13 extends ArquivoTexto {
 		List<ConsumoAnormalidade> listaConsumoAnormalidade = consumoAnormalidadeRepositorio.listarConsumoAnormalidadePor(Status.ATIVO.getId());
 
 		builder.append(System.getProperty("line.separator"));
-		builder.append(TIPO_REGISTRO_13);
+		builder.append(TIPO_REGISTRO_13_ANORMALIDADE_CONSUMO);
 		for (ConsumoAnormalidade consumoAnormalidade : listaConsumoAnormalidade) {
 			builder.append(Utilitarios.completaComZerosEsquerda(2, consumoAnormalidade.getId()));
 			builder.append(Utilitarios.completaComEspacosADireita(120, consumoAnormalidade.getMensagemConta()));

@@ -26,7 +26,7 @@ public class ArquivoTextoTipo03 extends ArquivoTexto {
 		Collection<ConsumoHistorico> colecaoConsumoHistorico = consumoHistoricoRepositorio.buscarUltimos6ConsumosAguaImovel(to.getImovel());
 
 		for (ConsumoHistorico consumoHistorico : colecaoConsumoHistorico) {
-			builder.append(TIPO_REGISTRO_03);
+			builder.append(TIPO_REGISTRO_03_CONSUMO_HISTORICO);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, to.getImovel().getId()));
 			builder.append(String.valueOf(consumoHistorico.getLigacaoTipo()));
 			builder.append(String.valueOf(consumoHistorico.getReferenciaFaturamento()));

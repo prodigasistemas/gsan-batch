@@ -15,12 +15,13 @@ import org.junit.runner.RunWith;
 import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoAnormalidadeAcaoBO;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.ImovelPerfil;
 import br.gov.model.micromedicao.ConsumoAnormalidade;
 import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
-import br.gov.servicos.to.AnormalidadeHistoricoConsumo;
+import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
 @RunWith(EasyMockRunner.class)
 public class MensagemAnormalidadeTest {
@@ -37,7 +38,7 @@ public class MensagemAnormalidadeTest {
     @Mock
     private ConsumoAnormalidadeAcaoBO consumoAnormalidadeAcaoBO;
     
-    private AnormalidadeHistoricoConsumo anormalidadeHistoricoConsumo;
+    private AnormalidadeHistoricoConsumoTO anormalidadeHistoricoConsumo;
     
     private Imovel imovel;
     
@@ -47,9 +48,10 @@ public class MensagemAnormalidadeTest {
     
     @Before
     public void init(){
-        anormalidadeHistoricoConsumo = new AnormalidadeHistoricoConsumo(1, ConsumoAnormalidade.BAIXO_CONSUMO, LigacaoTipo.AGUA.getId(), anoMesReferencia);
+        anormalidadeHistoricoConsumo = new AnormalidadeHistoricoConsumoTO(1, ConsumoAnormalidade.BAIXO_CONSUMO, LigacaoTipo.AGUA.getId(), anoMesReferencia);
         
         imovel = new Imovel(1);
+        imovel.setImovelPerfil(new ImovelPerfil(1));
         
         bo = new MensagemAnormalidadeContaBO();
         acao = new ConsumoAnormalidadeAcao();

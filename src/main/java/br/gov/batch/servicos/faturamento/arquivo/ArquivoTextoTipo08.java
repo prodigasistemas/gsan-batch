@@ -59,7 +59,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferencia);
 			medicaoHistorico = obterMedicaoHistorico(medicaoHistoricoAtual);
 
-			builder.append(TIPO_REGISTRO_08);
+			builder.append(TIPO_REGISTRO_08_MEDICAO);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, imovel.getId().toString()));
 			builder.append(hidrometroMedicaoHistorico.getMedicaoTipo().toString());
 			builder.append(Utilitarios.completaComEspacosADireita(11, hidrometro.getNumero()));

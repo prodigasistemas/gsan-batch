@@ -2,13 +2,11 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -107,40 +105,20 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	
     	Map<Integer, StringBuilder> mapDados = arquivo.build();
     	
-    	String linha = getLinha(mapDados);
-    	
-    	System.out.println(mapDados.get(13));
-    	System.out.println(mapDados.get(16));
-    	System.out.println(mapDados.get(17));
-    	System.out.println(mapDados.get(18));
-    	
-    	System.out.println(mapDados.get(19));
-    	System.out.println(mapDados.get(21));
-    	System.out.println(mapDados.get(22));
-    	System.out.println(mapDados.get(43));
-    	
-    	System.out.println(mapDados.get(44));
-    	System.out.println(mapDados.get(32));
-    	System.out.println(mapDados.get(33));
-    	System.out.println(mapDados.get(26));
-    	
     	assertNotNull(mapDados);
     	assertEquals(12, mapDados.keySet().size());
-    	assertEquals(linha, "      000010      000010000000030.00010000500000500000303.0 2.0 050.0000050000            000020");
-    }
-	
-	private String getLinha(Map<Integer, StringBuilder> mapDados) {
-    	StringBuilder builder = new StringBuilder();
-    	
-    	Collection<StringBuilder> dados = mapDados.values();
-    	
-    	Iterator<StringBuilder> it = dados.iterator();
-    	
-    	while (it.hasNext()) {
-    		builder.append(it.next());
-    	}
-    	
-    	return builder.toString();
+    	assertEquals("000020", mapDados.get(12).toString());
+    	assertEquals("      ", mapDados.get(15).toString());
+    	assertEquals("      ", mapDados.get(16).toString());
+    	assertEquals("000000", mapDados.get(17).toString());
+    	assertEquals("030.00", mapDados.get(18).toString());
+    	assertEquals("01", mapDados.get(20).toString());
+    	assertEquals("0000500000500000303.0 2.0 050.00000500", mapDados.get(21).toString());
+    	assertEquals("00", mapDados.get(25).toString());
+    	assertEquals("000010", mapDados.get(32).toString());
+    	assertEquals("000010", mapDados.get(33).toString());
+    	assertEquals("      ", mapDados.get(43).toString());
+    	assertEquals("      ", mapDados.get(44).toString());
     }
 	
 	public void carregarMocks() {
@@ -173,6 +151,5 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
     	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
     	replay(imovelSubcategoriaRepositorioMock);
-    	
     }
 }

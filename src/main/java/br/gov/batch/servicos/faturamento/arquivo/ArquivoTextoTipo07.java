@@ -55,7 +55,7 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 	}
 
 	private void buildLinha(CobrancaDocumentoItem item, Integer idImovel) {
-		builder.append(TIPO_REGISTRO_07);
+		builder.append(TIPO_REGISTRO_07_COBRANCA);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
 		builder.append(item.getContaGeral().getConta().getReferencia());
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(item.getValorItemCobrado())));
@@ -67,7 +67,7 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 	private void buildLinhaQuantidadeContasSuperior(List<CobrancaDocumentoItem> listaCobrancaDocumentoItem, Integer idImovel) {
 		VencimentoAnteriorTO to = calcularValorDataVencimentoAnterior(listaCobrancaDocumentoItem, quantidadeContas);
 
-		builder.append(TIPO_REGISTRO_07);
+		builder.append(TIPO_REGISTRO_07_COBRANCA);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
 		builder.append("DB.ATE");
 		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(to.getValorAnterior())));

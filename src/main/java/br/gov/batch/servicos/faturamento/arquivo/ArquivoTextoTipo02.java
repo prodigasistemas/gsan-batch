@@ -24,7 +24,7 @@ public class ArquivoTextoTipo02 extends ArquivoTexto {
 		Collection<ICategoria> colecaoCategorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(to.getImovel().getId());
 
 		for (ICategoria categoria : colecaoCategorias) {
-			builder.append(TIPO_REGISTRO_02);
+			builder.append(TIPO_REGISTRO_02_CATEGORIAS);
 			builder.append(Utilitarios.completaComZerosEsquerda(9, to.getImovel().getId()));
 			builder.append(getCodigoCategoriaOuSubcategoria(categoria));
 			builder.append(getDescricaoCategoriaOuSubcategoria(categoria));

@@ -8,7 +8,6 @@ import static org.junit.Assert.assertNotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,8 @@ import br.gov.model.cadastro.Subcategoria;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.util.FormatoData;
+import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @RunWith(EasyMockRunner.class)
@@ -144,7 +145,7 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
     	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
     	replay(imovelSubcategoriaRepositorioMock);
     	
-    	expect(faturamentoAtividadeCronogramaBOMock.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(new Date());
+    	expect(faturamentoAtividadeCronogramaBOMock.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(Utilitarios.converterStringParaData("2015-01-23", FormatoData.ANO_MES_DIA_SEPARADO));
     	replay(faturamentoAtividadeCronogramaBOMock);
     	
     	expect(faturamentoSituacaoBOMock.verificarParalisacaoFaturamentoAgua(imovel, faturamentoGrupo.getAnoMesReferencia())).andReturn(Status.ATIVO);
