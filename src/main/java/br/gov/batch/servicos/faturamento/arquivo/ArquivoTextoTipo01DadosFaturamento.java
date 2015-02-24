@@ -103,8 +103,8 @@ public class ArquivoTextoTipo01DadosFaturamento {
             builder.append(conta.getLigacaoAguaSituacao().getSituacaoFaturamento());
             builder.append(conta.getLigacaoEsgotoSituacao().getSituacaoFaturamento());
         } else {
-            builder.append(imovel.getLigacaoAguaSituacao().getId());
-            builder.append(imovel.getLigacaoEsgotoSituacao().getId());
+            builder.append(imovel.getLigacaoAguaSituacao().getSituacaoFaturamento());
+            builder.append(imovel.getLigacaoEsgotoSituacao().getSituacaoFaturamento());
         }
 
         dadosFaturamento.put(13, builder);

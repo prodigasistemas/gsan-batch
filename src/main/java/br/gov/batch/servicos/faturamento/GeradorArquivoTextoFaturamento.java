@@ -11,10 +11,15 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.jboss.logging.Logger;
+
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01DadosConta;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo02;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo03;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo04;
@@ -51,6 +56,9 @@ import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoFaturamento {
+    private static Logger logger = Logger.getLogger(GeradorArquivoTextoFaturamento.class);
+    
+    
 	@EJB
 	private ArquivoTextoRoteiroEmpresaDivisaoRepositorio arquivoDivisaoRepositorio;
 
@@ -142,12 +150,11 @@ public class GeradorArquivoTextoFaturamento {
 	    
 	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
-
-	    rota.getFaturamentoGrupo().getAnoMesReferencia();
-
+	    
 		final int quantidadeRegistros = 3000;
 		int primeiroRegistro = 0;
 
+		//TODO: Imoveis estao vindo repetidos. Testar isso!
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
 		
 		if (imoveis.isEmpty()){

@@ -189,7 +189,7 @@ public class ArquivoTextoTipo01DadosContaTest {
 		expect(quadraFaceRepositorioMock.obterPorID(1)).andReturn(quadraFace);
 		replay(quadraFaceRepositorioMock);
 
-		expect(qualidadeAguaRepositorioMock.buscarPorAnoMesELocalidadeESetorComFonteCaptacao(anyObject(), anyObject(), anyObject())).andReturn(obterQualidadeAgua());
+		expect(qualidadeAguaRepositorioMock.buscarSemFonteCaptacao(anyObject(), anyObject(), anyObject())).andReturn(obterQualidadeAgua());
 		replay(qualidadeAguaRepositorioMock);
 
 	}

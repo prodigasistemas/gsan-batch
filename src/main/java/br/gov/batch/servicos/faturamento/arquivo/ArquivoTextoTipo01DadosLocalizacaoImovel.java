@@ -40,7 +40,7 @@ public class ArquivoTextoTipo01DadosLocalizacaoImovel {
 		dadosLocalizacaoImovel.put(23, new StringBuilder(Utilitarios.completaComZerosEsquerda(7, rota.getCodigo())));
 		dadosLocalizacaoImovel.put(27, new StringBuilder(Utilitarios.completaComZerosEsquerda(9, imovel.getNumeroSequencialRota())));
 		dadosLocalizacaoImovel.put(4, new StringBuilder(Utilitarios.completaComEspacosADireita(17, imovel.getInscricaoFormatadaSemPonto())));
-		dadosLocalizacaoImovel.put(5, new StringBuilder(Utilitarios.completaComEspacosADireita(70, imovel.getEnderecoFormatadoAbreviado())));
+		dadosLocalizacaoImovel.put(5, new StringBuilder(Utilitarios.completaComEspacosADireita(70, imovel.getEnderecoFormatadoResumido())));
 		
 		escreverDadosLocalidade();
 	

@@ -3,6 +3,7 @@ package br.gov.batch.servicos.micromedicao;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
@@ -16,6 +17,7 @@ import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 
+@Stateless
 public class MovimentoRoteiroEmpresaBO {
 
 	@EJB
