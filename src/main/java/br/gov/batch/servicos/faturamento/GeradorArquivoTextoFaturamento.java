@@ -138,9 +138,9 @@ public class GeradorArquivoTextoFaturamento {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void gerar(Integer idRota, Date dataComando) {
-	    if (idRota != 697){
-	        return;
-	    }
+//	    if (idRota != 697){
+//	        return;
+//	    }
 	    
 	    Rota rota = rotaRepositorio.obterPorID(idRota);
 	    
@@ -168,6 +168,7 @@ public class GeradorArquivoTextoFaturamento {
 		StringBuilder conteudo = new StringBuilder();
 
 		for (Imovel imovel : imoveis) {
+//		    logger.info("INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -206,6 +207,7 @@ public class GeradorArquivoTextoFaturamento {
 		            imoveisArquivo.clear();
 		        }
 		    }
+//		    logger.info("FIM - Imovel processado id [" + imovel.getId() + "]");
 		}
 		
 		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
@@ -233,7 +235,7 @@ public class GeradorArquivoTextoFaturamento {
             criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
         }
         
-        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+//        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
 	}
 	
 	
@@ -324,6 +326,7 @@ public class GeradorArquivoTextoFaturamento {
     }
 
 
+	//TODO: Verificar no original onde essa chamada eh feita. Aqui nao usa
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
 		boolean retorno = true;
 
@@ -397,25 +400,45 @@ public class GeradorArquivoTextoFaturamento {
 
 		StringBuilder arquivoTexto = new StringBuilder();
 		
-//		arquivoTexto.append(tipo01.build(to));
+//		logger.info("INICIO - Linha 01");
+		arquivoTexto.append(tipo01.build(to));
+//		logger.info("FIM    - Linha 01");
 
+//		logger.info("INICIO - Linha 02");
 		arquivoTexto.append(tipo02.build(to));
+//		logger.info("FIM    - Linha 02");
 
+//		logger.info("INICIO - Linha 03");
 		arquivoTexto.append(tipo03.build(to));
+//		logger.info("FIM    - Linha 03");
 
+//		logger.info("INICIO - Linha 04");
 		arquivoTexto.append(tipo04.build(to));
+//		logger.info("FIM    - Linha 04");
 
+//		logger.info("INICIO - Linha 05");
 		arquivoTexto.append(tipo05.build(to));
+//		logger.info("FIM    - Linha 05");
 
+//		logger.info("INICIO - Linha 06");
 		arquivoTexto.append(tipo06.build(to));
+//		logger.info("FIM    - Linha 06");
 
+//		logger.info("INICIO - Linha 07");
 		arquivoTexto.append(tipo07.build(to));
+//		logger.info("FIM    - Linha 07");
 
+//		logger.info("INICIO - Linha 08");
 		arquivoTexto.append(tipo08.build(to));
+//		logger.info("FIM    - Linha 08");
 
+//		logger.info("INICIO - Linha 09");
 		arquivoTexto.append(tipo09.build(to));
+//		logger.info("FIM    - Linha 09");
 
+//		logger.info("INICIO - Linha 10");
 		arquivoTexto.append(tipo10.build(to));
+//		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;
 	}
