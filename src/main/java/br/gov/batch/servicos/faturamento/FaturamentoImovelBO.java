@@ -14,8 +14,10 @@ import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoTipoRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
@@ -65,6 +67,8 @@ public class FaturamentoImovelBO {
 	@EJB
 	private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
 	
+	@EJB
+	private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
 	@EJB
 	private ImovelRepositorio imovelRepositorio;
 	
@@ -133,10 +137,12 @@ public class FaturamentoImovelBO {
 			List<FaturamentoSituacaoHistorico> faturamentosSituacaoHistorico = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
 			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentosSituacaoHistorico.get(0);
 
+			FaturamentoSituacaoTipo tipo = faturamentoSituacaoTipoRepositorio.situacaoTipoDoImovel(imovel.getId());
+			
 			if ((faturamentoSituacaoHistorico != null 
 					&& anoMesFaturamento >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() 
 					&& anoMesFaturamento <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim())
-					&& imovel.paralisacaoFaturamento() 
+					&& tipo.paralisacaoFaturamentoAtivo()  
 					&& imovel.faturamentoAguaValido()) {
 				faturar = false;
 			}
