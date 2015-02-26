@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
@@ -16,6 +17,7 @@ import org.jboss.logging.Logger;
 public class BatchLogger {
 
 	@Inject
+    @JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")	
 	private JMSContext contexto;
 
 	@Resource(mappedName="java:global/jms/loggerProcessos")

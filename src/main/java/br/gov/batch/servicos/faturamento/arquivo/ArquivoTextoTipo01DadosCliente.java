@@ -8,6 +8,8 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.jboss.logging.Logger;
+
 import br.gov.batch.servicos.faturamento.ContaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Cliente;
@@ -22,6 +24,8 @@ import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo01DadosCliente {
+    
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo01DadosCliente.class);
 
 	@EJB
     private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
@@ -48,7 +52,7 @@ public class ArquivoTextoTipo01DadosCliente {
 		dadosCliente = new HashMap<Integer, StringBuilder>();
 		
 	    escreverNomeCliente();
-		escreverDadosClienteResonsavel();
+		escreverDadosClienteResponsavel();
 		escreverIndicadorEmissaoConta();
 		escreverCpfCnpjDoClienteUsuario();
 		
@@ -60,7 +64,7 @@ public class ArquivoTextoTipo01DadosCliente {
 		
 		if (imovel.getClienteImoveis().size() > 0) {
 	        ClienteImovel clienteImovel = imovel.getClienteImoveis().get(0);
-	
+	        
 	        if (clienteImovel.nomeParaConta()) {
 	            clienteNomeConta = clienteImovel.getCliente();
 	        }
@@ -81,7 +85,7 @@ public class ArquivoTextoTipo01DadosCliente {
 	    dadosCliente.put(2, builder);
 	}
 
-	private void escreverDadosClienteResonsavel() {
+	private void escreverDadosClienteResponsavel() {
 		StringBuilder builder = new StringBuilder();
 		
 		if (clienteResponsavel != null) {

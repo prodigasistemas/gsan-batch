@@ -4,7 +4,7 @@ import javax.ejb.Singleton;
 
 @Singleton
 public class ControleProcessoGeracaoArquivo {
-	private final Integer limiteRotas = 3;
+	private final Integer limiteRotas = 1;
 	
     private Integer quantidadeRotas = 0;
         

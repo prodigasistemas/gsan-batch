@@ -13,6 +13,8 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.jboss.logging.Logger;
+
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo02;
 import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo03;
@@ -50,6 +52,8 @@ import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoFaturamento {
+    private static Logger logger = Logger.getLogger(GeradorArquivoTextoFaturamento.class);
+    
 	@EJB
 	private ArquivoTextoRoteiroEmpresaDivisaoRepositorio arquivoDivisaoRepositorio;
 
@@ -127,12 +131,8 @@ public class GeradorArquivoTextoFaturamento {
 		to = new ArquivoTextoTO();
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void gerar(Integer idRota, Date dataComando) {
-	    if (idRota != 697){
-	        return;
-	    }
-	    
 	    Rota rota = rotaRepositorio.obterPorID(idRota);
 	    
 	    //TODO: Alterar no batch-manager para nao inserir rotas inativas
@@ -141,12 +141,13 @@ public class GeradorArquivoTextoFaturamento {
 	    
 	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
-
-	    rota.getFaturamentoGrupo().getAnoMesReferencia();
-
+	    
 		final int quantidadeRegistros = 3000;
 		int primeiroRegistro = 0;
 
+        logger.info("Rota: " + idRota + " - Pesquisa de imoveis para gerar o arquivo: ");
+
+		//TODO: Imoveis estao vindo repetidos. Testar isso!
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
 		
 		if (imoveis.isEmpty()){
@@ -159,7 +160,9 @@ public class GeradorArquivoTextoFaturamento {
 
 		StringBuilder conteudo = new StringBuilder();
 
+		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
+		    logger.info("Rota: " + idRota + "INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -175,18 +178,18 @@ public class GeradorArquivoTextoFaturamento {
 
 					if (imovelMicroComConta) {
 						imoveisArquivo.add(imovel);
-						conteudo.append(conteudo.length() > 0 ? System.getProperty("line.separator") : "");
+						conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
 						conteudo.append(gerarArquivoTexto(imovel, null, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 
 						for (Imovel micro : imoveisCondominio) {
-							conteudo.append(System.getProperty("line.separator"))
+							conteudo.append(quebraLinha)
 							     .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
 				}
 			} else {
-				conteudo.append(conteudo.length() > 0 ? System.getProperty("line.separator") : "");
+				conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
 				conteudo.append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 				imoveisArquivo.add(imovel);
 			}
@@ -198,7 +201,10 @@ public class GeradorArquivoTextoFaturamento {
 		            imoveisArquivo.clear();
 		        }
 		    }
+		    logger.info("Rota: " + idRota + "FIM - Imovel processado id [" + imovel.getId() + "]");
 		}
+		
+		logger.info("Rota: " + idRota + " - Imoveis lidos");
 		
 		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
 
@@ -217,6 +223,8 @@ public class GeradorArquivoTextoFaturamento {
         
         arquivoRepositorio.salvar(roteiro);
         
+        logger.info("Rota: " + idRota + " - Roteiro salvo");
+        
         if (rota.existeLimiteImoveis()){
             divisoes.forEach(e -> IOUtil.criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
@@ -225,7 +233,9 @@ public class GeradorArquivoTextoFaturamento {
             IOUtil.criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
         }
         
-        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+        logger.info("Rota: " + idRota + " - Arquivo criado");
+        
+//        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
 	}
 	
 	
@@ -316,6 +326,7 @@ public class GeradorArquivoTextoFaturamento {
     }
 
 
+	//TODO: Verificar no original onde essa chamada eh feita. Aqui nao usa
 	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
 		boolean retorno = true;
 
@@ -389,25 +400,45 @@ public class GeradorArquivoTextoFaturamento {
 
 		StringBuilder arquivoTexto = new StringBuilder();
 		
-//		arquivoTexto.append(tipo01.build(to));
+//		logger.info("INICIO - Linha 01");
+		arquivoTexto.append(tipo01.build(to));
+//		logger.info("FIM    - Linha 01");
 
+//		logger.info("INICIO - Linha 02");
 		arquivoTexto.append(tipo02.build(to));
+//		logger.info("FIM    - Linha 02");
 
+//		logger.info("INICIO - Linha 03");
 		arquivoTexto.append(tipo03.build(to));
+//		logger.info("FIM    - Linha 03");
 
+//		logger.info("INICIO - Linha 04");
 		arquivoTexto.append(tipo04.build(to));
+//		logger.info("FIM    - Linha 04");
 
+//		logger.info("INICIO - Linha 05");
 		arquivoTexto.append(tipo05.build(to));
+//		logger.info("FIM    - Linha 05");
 
+//		logger.info("INICIO - Linha 06");
 		arquivoTexto.append(tipo06.build(to));
+//		logger.info("FIM    - Linha 06");
 
+//		logger.info("INICIO - Linha 07");
 		arquivoTexto.append(tipo07.build(to));
+//		logger.info("FIM    - Linha 07");
 
+//		logger.info("INICIO - Linha 08");
 		arquivoTexto.append(tipo08.build(to));
+//		logger.info("FIM    - Linha 08");
 
+//		logger.info("INICIO - Linha 09");
 		arquivoTexto.append(tipo09.build(to));
+//		logger.info("FIM    - Linha 09");
 
+//		logger.info("INICIO - Linha 10");
 		arquivoTexto.append(tipo10.build(to));
+//		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;
 	}

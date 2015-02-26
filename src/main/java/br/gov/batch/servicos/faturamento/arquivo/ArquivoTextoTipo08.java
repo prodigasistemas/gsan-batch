@@ -13,7 +13,10 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.jboss.logging.Logger;
+
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
+import br.gov.batch.servicos.faturamento.GeradorArquivoTextoFaturamento;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.FaixaLeituraBO;
@@ -32,6 +35,7 @@ import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
 @Stateless
 public class ArquivoTextoTipo08 extends ArquivoTexto {
+    private static Logger logger = Logger.getLogger(ArquivoTextoTipo08.class);
 	@EJB
 	private FaixaLeituraBO faixaLeituraBO;
 
@@ -59,7 +63,10 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
+//	    logger.info("INICIO " + to.getIdImovel() + " - obter por id");
+	    
 		Imovel imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+//		logger.info("FIM " + to.getIdImovel() + " - obter por id");
 		Integer anoMesReferencia = to.getAnoMesReferencia();
 		
 		if (imovel.isFixo()){
@@ -67,19 +74,29 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		}
 		//TODO: Imovel 2731843 nao possui hidrometro de poco, como é registrado o historico de consumo para poço
 		
+		
+//		logger.info("INICIO " + to.getIdImovel() + " - buscarPorLigacaoAguaOuPoco");
+        MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferencia);
+//        logger.info("FIM " + to.getIdImovel() + " - buscarPorLigacaoAguaOuPoco");
+        
+        if (medicaoHistorico == null){
+            return builder.toString();
+        }
+
+//		logger.info("INICIO " + to.getIdImovel() + " - obterDadosTiposMedicao");
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = medicaoHistoricoBO.obterDadosTiposMedicao(imovel.getId(), anoMesReferencia);
-
+//		logger.info("FIM " + to.getIdImovel() + " - obterDadosTiposMedicao"); 
+		
 		for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : listaHidrometroMedicaoHistorico) {
+		
+		    
+//		    logger.info("INICIO " + to.getIdImovel() + " - getConsumoMedioHidrometro"); 
 			consumoMedio = getConsumoMedioHidrometro(imovel.getId(), hidrometroMedicaoHistorico.getMedicaoTipo(), anoMesReferencia);
-
+//			logger.info("FIM " + to.getIdImovel() + " - getConsumoMedioHidrometro");
+			
 			hidrometro   = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
-			MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferencia);
-			
-			if (medicaoHistorico == null){
-			    continue;
-			}
-			
+//			logger.info("INICIO " + to.getIdImovel() + " - buildLinha08");
 			builder.append(TIPO_REGISTRO_08_MEDICAO);
 			builder.append(completaComZerosEsquerda(9, imovel.getId()));
 			builder.append(hidrometroMedicaoHistorico.getMedicaoTipo());
@@ -90,7 +107,11 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			builder.append(completaComZerosEsquerda(7, medicaoHistorico.getLeituraAnteriorFaturamento()));
 			builder.append(getDataLeituraAnteriorFaturada(medicaoHistorico, hidrometroMedicaoHistorico.getDataInstalacao()));
 			builder.append(getSituacaoLeituraAtual(hidrometroMedicaoHistorico, medicaoHistorico));
+			
+			//logger.info("INICIO " + to.getIdImovel() + " - buildFaixaLeitura");
 			buildFaixaLeitura(imovel, medicaoHistorico);
+			//logger.info("FIM " + to.getIdImovel() + " - buildFaixaLeitura"); 
+			
 			builder.append(completaComZerosEsquerda(6, consumoMedio));
 			builder.append(completaTexto(20, hidrometroMedicaoHistorico.getDescricaoLocalInstalacao()));
 			builder.append(getLeituraAnteriorInformada(medicaoHistorico));
@@ -99,6 +120,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			builder.append(completaTexto(1, hidrometroMedicaoHistorico.getRateioTipo()));
 			builder.append(getLeituraInstalacaoHidrometro(hidrometroMedicaoHistorico.getNumeroLeituraInstalacao()));
 			builder.append(System.getProperty("line.separator"));
+//			logger.info("FIM " + to.getIdImovel() + " - buildLinha08");
 		}
 
 		return builder.toString();
