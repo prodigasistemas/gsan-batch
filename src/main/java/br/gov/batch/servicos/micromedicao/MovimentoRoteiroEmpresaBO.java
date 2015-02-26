@@ -44,13 +44,13 @@ public class MovimentoRoteiroEmpresaBO {
 	
 	public List<MovimentoRoteiroEmpresa> gerarMovimentoRoteiroEmpresa(List<Imovel> imoveis, Rota rota) {
 		repositorio.deletarPorRota(rota);
-		List<Imovel> imoveisParaProcessamento = verificarImoveisProcessadosEmMovimentoRoteiroEmpresa(imoveis, rota.getFaturamentoGrupo());
+		List<Imovel> imoveisParaProcessamento = verificarImoveisProcessados(imoveis, rota.getFaturamentoGrupo());
 		List<MovimentoRoteiroEmpresa> movimentos = repositorio.criarMovimentoRoteiroEmpresa(imoveisParaProcessamento, rota);
 		
 		return movimentos;
 	}
 	
-	private List<Imovel> verificarImoveisProcessadosEmMovimentoRoteiroEmpresa(List<Imovel> imoveis, FaturamentoGrupo faturamentoGrupo) {
+	private List<Imovel> verificarImoveisProcessados(List<Imovel> imoveis, FaturamentoGrupo faturamentoGrupo) {
 		List<Imovel> imoveisOutroGrupo = repositorio.pesquisarImoveisGeradosParaOutroGrupo(imoveis, faturamentoGrupo);
 		
 		if(!imoveisOutroGrupo.isEmpty()) {
