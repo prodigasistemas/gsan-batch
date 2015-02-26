@@ -6,21 +6,17 @@ import static br.gov.model.util.Utilitarios.formatarAnoMesParaMesAno;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.rmi.CORBA.Util;
 
 import br.gov.model.cadastro.Categoria;
-import br.gov.model.cadastro.Localidade;
 import br.gov.model.cadastro.Logradouro;
 import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
-import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.ServicoTipoCelular;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
 import br.gov.model.util.IOUtil;
@@ -45,119 +41,131 @@ public class GeradorArquivoTextoMicrocoletor {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-//	public void gerar(List<Rota> rotas, int referencia, int idGrupo) {
-//
-//		StringBuilder arquivoTxt = new StringBuilder();
-//
-//		MovimentoRoteiroEmpresa movimento = null;
-//
-//		int quantidadeImoveis = 0;
-//
-//		// PAGINAÇÃO DO ARQUIVO
-//		Integer numeroPaginacao = 1;
-//		Localidade localidadeAnterior = null;
-//		Integer codigoSetorComercialAnterior = null;
-//		Rota rotaAnterior = null;
-//		int qtdImoveisLocalidadeSetorRota = 0;
-//
-//		for (Rota rota : rotas) {
-//
-//			// CONTROLE DE PAGINAÇÃO DA PESQUISA
-//			int quantidadeRegistrosPesquisa = 1000;
-//			boolean flagTerminou = false;
-//
-//			while (!flagTerminou) {
-//
-//				List<MovimentoRoteiroEmpresa> movimentos = movimentoRepositorio.pesquisarMovimentoParaLeitura(rota.getId().intValue(), referencia);
-//
-//				if (movimentos != null && !movimentos.isEmpty()) {
-//					for (MovimentoRoteiroEmpresa movimento : movimentos) {
-//
-//						// QUANTIDADE TOTAL DE IMÓVEIS
-//						quantidadeImoveis += movimentos.size();
-//
-//						// CONTROLE DE PAGINAÇÃO DA PESQUISA
-//						if (movimentos.size() < quantidadeRegistrosPesquisa) {
-//							flagTerminou = true;
-//						}
-//
-//						boolean ligacaoAgua = false;
-//						boolean ligacaoPoco = false;
-//
-//						// cria uma string builder para adicionar no arquivo
-//						StringBuilder arquivoTxtLinha = new StringBuilder();
-//
-//						// QUANTIDADE DE IMOVEIS POR LOCALIDADE, SETOR E ROTA
-//						qtdImoveisLocalidadeSetorRota++;
-//
-//						// PAGINAÇÃO DO ARQUIVO
-//						if (localidadeAnterior == null) {
-//
-//							// CARREGANDO PELA PRIMEIRA VEZ AS INFORMAÇÕES DE
-//							// LOCALIDADE E SETOR ANTERIORES
-//							localidadeAnterior = movimento.getLocalidade();
-//							codigoSetorComercialAnterior = movimento.getSetorComercial().getCodigo();
-//							rotaAnterior = rota;
-//
-//						} else {
-//
-//							// QUEBRA DE LOCALIDADE
-//							if (!localidadeAnterior.getId().equals(movimento.getLocalidade().getId())) {
-//
-//								numeroPaginacao = 1;
-//								qtdImoveisLocalidadeSetorRota = 1;
-//							}
-//							// QUEBRA DE SETOR COMERCIAL
-//							else if (!codigoSetorComercialAnterior.equals(movimento.getSetorComercial().getCodigo())) {
-//
-//								numeroPaginacao = 1;
-//								qtdImoveisLocalidadeSetorRota = 1;
-//							}
-//							/*
-//							 * QUEBRA DE ROTA QUEBRA POR QUANTIDADE DE IMÓVEIS
-//							 * COM MESMA: LOCALIDADE, SETOR E ROTA
-//							 */
-//							else if (!rotaAnterior.getId().equals(rota.getId()) || qtdImoveisLocalidadeSetorRota > 12) {
-//
-//								numeroPaginacao++;
-//								qtdImoveisLocalidadeSetorRota = 1;
-//							}
-//						}
-//
-//						// GERANDO O ARQUIVO TXT
-//						adicionarLinhaTxt(arquivoTxt, arquivoTxtLinha, null, null, null, null, null, movimento, ligacaoAgua, ligacaoPoco, null, false,
-//								rota.getId(), null, referencia, numeroPaginacao);
-//
-//						/*
-//						 * PAGINAÇÃO DO ARQUIVO GUARDANDO AS INFORMAÇÕES DA
-//						 * LOCALIDADE ANTERIOR E DO SETOR COMERCIAL ANTERIOR
-//						 */
-//						localidadeAnterior = movimento.getLocalidade();
-//						codigoSetorComercialAnterior = movimento.getSetorComercial().getCodigo();
-//						rotaAnterior = rota;
-//					}
-//				} else {
-//
-//					flagTerminou = true;
-//				}
-//			}
-//		}
-//
-//		repositorioMicromedicao.atualizarFaturamentoAtividadeCronograma(idGrupo, referencia);
-//
-//		// INSERINDO NA BASE O ARQUIVO_TEXTO_ROTEIRO_EMPRESA
-//		if (arquivoTxt != null && arquivoTxt.length() != 0) {
-//
-//			String anoCom2Digitos = "" + Util.obterAno(movimento.getAnoMesMovimento());
-//			anoCom2Digitos = anoCom2Digitos.substring(2, 4);
-//
-//			String nomeArquivo = "cons" + anoCom2Digitos + Util.adicionarZerosEsquedaNumero(2, "" + Util.obterMes(movimento.getAnoMesMovimento())) + "."
-//					+ Util.adicionarZerosEsquedaNumero(3, movimento.getRota().getFaturamentoGrupo().getId().toString());
-//
-//			this.inserirArquivo(referencia, movimento, quantidadeImoveis, arquivoTxt, nomeArquivo);
-//		}
-//	}
-
+	// public void gerar(List<Rota> rotas, int referencia, int idGrupo) {
+	//
+	// StringBuilder arquivoTxt = new StringBuilder();
+	//
+	// MovimentoRoteiroEmpresa movimento = null;
+	//
+	// int quantidadeImoveis = 0;
+	//
+	// // PAGINAÇÃO DO ARQUIVO
+	// Integer numeroPaginacao = 1;
+	// Localidade localidadeAnterior = null;
+	// Integer codigoSetorComercialAnterior = null;
+	// Rota rotaAnterior = null;
+	// int qtdImoveisLocalidadeSetorRota = 0;
+	//
+	// for (Rota rota : rotas) {
+	//
+	// // CONTROLE DE PAGINAÇÃO DA PESQUISA
+	// int quantidadeRegistrosPesquisa = 1000;
+	// boolean flagTerminou = false;
+	//
+	// while (!flagTerminou) {
+	//
+	// List<MovimentoRoteiroEmpresa> movimentos =
+	// movimentoRepositorio.pesquisarMovimentoParaLeitura(rota.getId().intValue(),
+	// referencia);
+	//
+	// if (movimentos != null && !movimentos.isEmpty()) {
+	// for (MovimentoRoteiroEmpresa movimento : movimentos) {
+	//
+	// // QUANTIDADE TOTAL DE IMÓVEIS
+	// quantidadeImoveis += movimentos.size();
+	//
+	// // CONTROLE DE PAGINAÇÃO DA PESQUISA
+	// if (movimentos.size() < quantidadeRegistrosPesquisa) {
+	// flagTerminou = true;
+	// }
+	//
+	// boolean ligacaoAgua = false;
+	// boolean ligacaoPoco = false;
+	//
+	// // cria uma string builder para adicionar no arquivo
+	// StringBuilder arquivoTxtLinha = new StringBuilder();
+	//
+	// // QUANTIDADE DE IMOVEIS POR LOCALIDADE, SETOR E ROTA
+	// qtdImoveisLocalidadeSetorRota++;
+	//
+	// // PAGINAÇÃO DO ARQUIVO
+	// if (localidadeAnterior == null) {
+	//
+	// // CARREGANDO PELA PRIMEIRA VEZ AS INFORMAÇÕES DE
+	// // LOCALIDADE E SETOR ANTERIORES
+	// localidadeAnterior = movimento.getLocalidade();
+	// codigoSetorComercialAnterior = movimento.getSetorComercial().getCodigo();
+	// rotaAnterior = rota;
+	//
+	// } else {
+	//
+	// // QUEBRA DE LOCALIDADE
+	// if
+	// (!localidadeAnterior.getId().equals(movimento.getLocalidade().getId())) {
+	//
+	// numeroPaginacao = 1;
+	// qtdImoveisLocalidadeSetorRota = 1;
+	// }
+	// // QUEBRA DE SETOR COMERCIAL
+	// else if
+	// (!codigoSetorComercialAnterior.equals(movimento.getSetorComercial().getCodigo()))
+	// {
+	//
+	// numeroPaginacao = 1;
+	// qtdImoveisLocalidadeSetorRota = 1;
+	// }
+	// /*
+	// * QUEBRA DE ROTA QUEBRA POR QUANTIDADE DE IMÓVEIS
+	// * COM MESMA: LOCALIDADE, SETOR E ROTA
+	// */
+	// else if (!rotaAnterior.getId().equals(rota.getId()) ||
+	// qtdImoveisLocalidadeSetorRota > 12) {
+	//
+	// numeroPaginacao++;
+	// qtdImoveisLocalidadeSetorRota = 1;
+	// }
+	// }
+	//
+	// // GERANDO O ARQUIVO TXT
+	// adicionarLinhaTxt(arquivoTxt, arquivoTxtLinha, null, null, null, null,
+	// null, movimento, ligacaoAgua, ligacaoPoco, null, false,
+	// rota.getId(), null, referencia, numeroPaginacao);
+	//
+	// /*
+	// * PAGINAÇÃO DO ARQUIVO GUARDANDO AS INFORMAÇÕES DA
+	// * LOCALIDADE ANTERIOR E DO SETOR COMERCIAL ANTERIOR
+	// */
+	// localidadeAnterior = movimento.getLocalidade();
+	// codigoSetorComercialAnterior = movimento.getSetorComercial().getCodigo();
+	// rotaAnterior = rota;
+	// }
+	// } else {
+	//
+	// flagTerminou = true;
+	// }
+	// }
+	// }
+	//
+	// repositorioMicromedicao.atualizarFaturamentoAtividadeCronograma(idGrupo,
+	// referencia);
+	//
+	// // INSERINDO NA BASE O ARQUIVO_TEXTO_ROTEIRO_EMPRESA
+	// if (arquivoTxt != null && arquivoTxt.length() != 0) {
+	//
+	// String anoCom2Digitos = "" +
+	// Util.obterAno(movimento.getAnoMesMovimento());
+	// anoCom2Digitos = anoCom2Digitos.substring(2, 4);
+	//
+	// String nomeArquivo = "cons" + anoCom2Digitos +
+	// Util.adicionarZerosEsquedaNumero(2, "" +
+	// Util.obterMes(movimento.getAnoMesMovimento())) + "."
+	// + Util.adicionarZerosEsquedaNumero(3,
+	// movimento.getRota().getFaturamentoGrupo().getId().toString());
+	//
+	// this.inserirArquivo(referencia, movimento, quantidadeImoveis, arquivoTxt,
+	// nomeArquivo);
+	// }
+	// }
 	public void inserirArquivo(int referencia, MovimentoRoteiroEmpresa movimento, int quantidadeImoveis, StringBuilder texto, String nomeArquivo) {
 		ArquivoTextoRoteiroEmpresa roteiro = new ArquivoTextoRoteiroEmpresa();
 
@@ -198,23 +206,10 @@ public class GeradorArquivoTextoMicrocoletor {
 		return gerar;
 	}
 
-	private String adicionarLinhaTxt(
-			StringBuilder arquivoTxt,
-			Integer quantidadeRegistros,
-			Integer quantidadeMovimentoRoteiroEmpresa,
-			Integer quantidadeRegistrosFiscalizacao,
-			MovimentoRoteiroEmpresa movimento,
-			boolean ligacaoAgua,
-			boolean ligacaoPoco,
-			Integer idFaturamentoGrupoOld,
-			boolean headerArquivo,
-			Integer idRotaOld,
-			Calendar dataCalendar,
-			Integer anoMesCorrente,
-			Integer numeroPagina) {
+	private String adicionarLinhaTxt(MovimentoRoteiroEmpresa movimento, Integer numeroPagina) {
 
 		StringBuilder linha = new StringBuilder();
-		
+
 		linha.append(completaTexto(15, movimento.getImovel().getId()));
 		linha.append(completaComZerosEsquerda(3, movimento.getSetorComercial().getCodigo()));
 		linha.append(completaComZerosEsquerda(4, movimento.getRota().getCodigo()));
@@ -299,11 +294,9 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaTexto(4, ""));
 		linha.append(completaComZerosEsquerda(3, movimento.getCodigoQuadraFace().toString()));
 
-		// Registro Detalhe
-		arquivoTxt.append(linha);
-		arquivoTxt.append(System.getProperty("line.separator"));
+		return linha.toString();
 	}
-	
+
 	private Integer getConsumoMaximo(MovimentoRoteiroEmpresa movimento) {
 		if (movimento.getNumeroFaixaLeituraEsperadaFinal() != null) {
 			return movimento.getNumeroFaixaLeituraEsperadaFinal() - movimento.getNumeroLeituraAnterior();
@@ -311,7 +304,7 @@ public class GeradorArquivoTextoMicrocoletor {
 			return 0;
 		}
 	}
-	
+
 	private Integer getConsumoMinimo(MovimentoRoteiroEmpresa movimento) {
 		if (movimento.getNumeroFaixaLeituraEsperadaInicial() != null) {
 			return movimento.getNumeroFaixaLeituraEsperadaInicial() - movimento.getNumeroLeituraAnterior();
