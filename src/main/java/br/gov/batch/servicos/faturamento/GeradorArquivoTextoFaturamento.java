@@ -4,7 +4,6 @@ import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.obterQuantidadeLinhasTexto;
 import static br.gov.model.util.Utilitarios.quebraLinha;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -219,11 +218,11 @@ public class GeradorArquivoTextoFaturamento {
         arquivoRepositorio.salvar(roteiro);
         
         if (rota.existeLimiteImoveis()){
-            divisoes.forEach(e -> criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+            divisoes.forEach(e -> IOUtil.criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
-            criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
+            IOUtil.criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
         }
         
         movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
@@ -426,12 +425,5 @@ public class GeradorArquivoTextoFaturamento {
 		arquivoTexto.append(tipo14.build(to));
 		
 		return arquivoTexto;
-	}
-	
-	private void criarArquivo(String nome, String caminho, String conteudo) {
-		File arquivo = new File(caminho + nome);
-		IOUtil.escreverArquivo(arquivo, conteudo);
-		IOUtil.comprimirParaGzip(arquivo);
-		arquivo.delete();
 	}
 }
