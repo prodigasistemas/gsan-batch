@@ -139,6 +139,9 @@ public class GeradorArquivoTextoFaturamento {
 	    if (!rota.isAtiva())
 	        return;
 	    
+	    if (rota.getId() != 697)
+	    	return;
+
 	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
 	    
@@ -318,7 +321,7 @@ public class GeradorArquivoTextoFaturamento {
 
         arquivo.setUltimaAlteracao(new Date());
 
-        arquivo.setTipoServicoCelular(TipoServicoCelular.IMPRESSAO_SIMULTANEA.getId());
+        arquivo.setServicoTipoCelular(TipoServicoCelular.IMPRESSAO_SIMULTANEA.getId());
 
 	    return arquivo;
 	}
@@ -386,6 +389,13 @@ public class GeradorArquivoTextoFaturamento {
 		return imoveis;
 	}
 
+	public StringBuilder carregarCabecalhoArquivo(StringBuilder builder) {
+		builder.insert(0, Utilitarios.obterQuantidadeLinhasTexto(builder));
+		builder.append(System.getProperty("line.separator"));
+		
+		return builder;
+	}
+	
 	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
 		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);

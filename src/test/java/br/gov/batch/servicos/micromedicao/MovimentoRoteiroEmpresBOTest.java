@@ -85,6 +85,7 @@ public class MovimentoRoteiroEmpresBOTest {
 		assertTrue(movimentos.isEmpty());
 	}
 	
+	//TODO: Refazer teste
 	private void mockImoveisGerados() {
 		imoveisOutrosGrupos = new ArrayList<Imovel>();
 		
@@ -93,7 +94,8 @@ public class MovimentoRoteiroEmpresBOTest {
 		
 		repositorioMock.deletarPorRota(rota);
 		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
+		//TODO: nao existe mais esse metodo
+//		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
 		replay(repositorioMock);
 	}
 
@@ -110,6 +112,7 @@ public class MovimentoRoteiroEmpresBOTest {
 		return movimento;
 	}
 	
+	//TODO: Refazer teste
 	private void mockImoveisGeradosOutrosGrupos() {
 		imoveisOutrosGrupos = new ArrayList<Imovel>();
 		imoveisOutrosGrupos.add(imovel);
@@ -118,7 +121,7 @@ public class MovimentoRoteiroEmpresBOTest {
 		
 		repositorioMock.deletarPorRota(rota);
 		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
+        //TODO: nao existe mais esse metodo
 		replay(repositorioMock);
 	}
 }

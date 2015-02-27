@@ -72,8 +72,8 @@ public class MovimentoRoteiroEmpresaBO {
 
             movimento.setLocalidade(imovel.getLocalidade());
             movimento.setNomeLocalidade(imovel.getLocalidade().getDescricao());
-            movimento.setNumeroLoteImovel(completaComZerosEsquerda(4, imovel.getLote()));
-            movimento.setNumeroSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
+            movimento.setLoteImovel(completaComZerosEsquerda(4, imovel.getLote()));
+            movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
             movimento.setImovelPerfil(imovel.getImovelPerfil());
             
             
@@ -85,10 +85,8 @@ public class MovimentoRoteiroEmpresaBO {
             
             if (imovel.pertenceARotaAlternativa()) {
                 movimento.setCodigoSetorComercial(imovel.getRotaAlternativa().getSetorComercial().getCodigo());
-                movimento.setSetorComercial(imovel.getRotaAlternativa().getSetorComercial());
             } else {
                 movimento.setCodigoSetorComercial(imovel.getSetorComercial().getCodigo());
-                movimento.setSetorComercial(imovel.getSetorComercial());
             }
             
 //            movimento.setRota(rota);
@@ -115,7 +113,7 @@ public class MovimentoRoteiroEmpresaBO {
             movimento.setCodigoSetorComercial(rota.getSetorComercial().getCodigo());
             movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
             movimento.setLoteImovel(imovel.getLote() != null ? imovel.getLote().toString() : "");
-            movimento.setSubLoteImovel(imovel.getSubLote() != null ? imovel.getSubLote().toString() : "");
+            movimento.setSubloteImovel(imovel.getSubLote() != null ? imovel.getSubLote().toString() : "");
             movimento.setImovelPerfil(imovel.getImovelPerfil());
             movimento.setUltimaAlteracao(new Date());
             movimento.setLeituraTipo(LeituraTipo.LEITURA_E_ENTRADA_SIMULTANEA.getId());

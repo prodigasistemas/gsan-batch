@@ -94,7 +94,7 @@ public class ArquivoTextoTipo01DadosConsumo {
 		StringBuilder builder = new StringBuilder();
 		
 		if (imovel.getLigacaoAgua() != null) {
-            builder.append(Utilitarios.completaComZerosEsquerda(6, imovel.getLigacaoAgua().getConsumoMinimoAgua()));
+            builder.append(Utilitarios.completaComEspacosADireita(6, imovel.getLigacaoAgua().getConsumoMinimoAgua()));
         } else {
             builder.append(Utilitarios.completaComEspacosADireita(6, ""));
         }
