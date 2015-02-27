@@ -233,6 +233,8 @@ public class GeradorArquivoTextoFaturamento {
         }else{
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
+            
+            logger.info("Qtd de linhas: " + obterQuantidadeLinhasTexto(conteudo));
             IOUtil.criarArquivo(roteiro.getNomeArquivo(), "/temp/", new StringBuilder(obterQuantidadeLinhasTexto(conteudo)).append(quebraLinha).append(conteudo).toString());
         }
         
