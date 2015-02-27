@@ -235,7 +235,9 @@ public class GeradorArquivoTextoFaturamento {
         
         logger.info("Rota: " + idRota + " - Arquivo criado");
         
-//        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+        movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+        
+        logger.info("Rota: " + idRota + " - Movimento registrado.");
 	}
 	
 	

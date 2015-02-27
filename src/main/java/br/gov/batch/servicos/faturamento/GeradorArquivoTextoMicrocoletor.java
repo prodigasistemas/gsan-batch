@@ -4,31 +4,35 @@ import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
 import static br.gov.model.util.Utilitarios.formatarAnoMesParaMesAno;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import br.gov.batch.servicos.micromedicao.MovimentoRoteiroEmpresaBO;
 import br.gov.model.cadastro.Categoria;
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Logradouro;
 import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
+import br.gov.model.micromedicao.LeituraTipo;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
+import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.ServicoTipoCelular;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
 import br.gov.model.util.IOUtil;
 import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
-import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoMicrocoletor {
 
 	@EJB
-	private MovimentoRoteiroEmpresaRepositorio movimentoRepositorio;
+	private MovimentoRoteiroEmpresaBO movimentoBO;
 
 	@EJB
 	private ArquivoTextoRoteiroEmpresaRepositorio roteiroRepositorio;
@@ -41,7 +45,13 @@ public class GeradorArquivoTextoMicrocoletor {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	// public void gerar(List<Rota> rotas, int referencia, int idGrupo) {
+	public void gerar(Rota rota, int referencia, int idGrupo) {
+	    
+	    List<Imovel> imoveis = new ArrayList<Imovel>();
+	    
+	    movimentoBO.criarMovimentoRoteiroEmpresa(imoveis, referencia, LeituraTipo.findById(rota.getLeituraTipo()));
+	    
+	}
 	//
 	// StringBuilder arquivoTxt = new StringBuilder();
 	//
@@ -205,21 +215,21 @@ public class GeradorArquivoTextoMicrocoletor {
 
 		return gerar;
 	}
-
+	
 	private String adicionarLinhaTxt(MovimentoRoteiroEmpresa movimento, Integer numeroPagina) {
 
 		StringBuilder linha = new StringBuilder();
 
-		linha.append(completaTexto(15, movimento.getImovel().getId()));
-		linha.append(completaComZerosEsquerda(3, movimento.getSetorComercial().getCodigo()));
+//		linha.append(completaTexto(15, movimento.getImovel().getId()));
+//		linha.append(completaComZerosEsquerda(3, movimento.getSetorComercial().getCodigo()));
 		linha.append(completaComZerosEsquerda(4, movimento.getRota().getCodigo()));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(2, ""));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(2, ""));
-		linha.append(completaComZerosEsquerda(6, movimento.getNumeroLoteImovel()));
-		linha.append(completaTexto(15, movimento.getImovel().getId()));
+//		linha.append(completaComZerosEsquerda(6, movimento.getNumeroLoteImovel()));
+//		linha.append(completaTexto(15, movimento.getImovel().getId()));
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaTexto(12, movimento.getNumeroHidrometro()));
 		linha.append(completaTexto(15, movimento.getLigacaoAguaSituacao().getDescricao()));
