@@ -183,7 +183,7 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaTexto(2, ""));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(2, ""));
-		linha.append(completaComZerosEsquerda(6, movimento.getNumeroLoteImovel()));
+		linha.append(completaComZerosEsquerda(6, movimento.getLoteImovel()));
 		linha.append(completaTexto(15, movimento.getImovel().getId()));
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaTexto(12, movimento.getNumeroHidrometro()));
@@ -220,8 +220,8 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaComZerosEsquerda(3, ""));
 		linha.append(completaComZerosEsquerda(4, movimento.getNumeroQuadra()));
-		linha.append(completaComZerosEsquerda(4, movimento.getNumeroLoteImovel()));
-		linha.append(completaComZerosEsquerda(3, movimento.getNumeroSubloteImovel()));
+		linha.append(completaComZerosEsquerda(4, movimento.getLoteImovel()));
+		linha.append(completaComZerosEsquerda(3, movimento.getSubloteImovel()));
 		linha.append(completaTexto(19, ""));
 		linha.append(completaTexto(212, ""));
 		linha.append("A01");
