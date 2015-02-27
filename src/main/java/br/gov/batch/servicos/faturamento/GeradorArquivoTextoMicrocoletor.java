@@ -194,8 +194,6 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaTexto(2, ""));
 		linha.append(completaComZerosEsquerda(6, movimento.getLoteImovel()));
 		linha.append(completaTexto(15, movimento.getImovel().getId()));
-		linha.append(completaComZerosEsquerda(6, movimento.getLoteImovel()));
-		linha.append(completaTexto(15, movimento.getImovel().getId()));
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaTexto(12, movimento.getNumeroHidrometro()));
 		linha.append(completaTexto(15, movimento.getLigacaoAguaSituacao().getDescricao()));
@@ -263,10 +261,12 @@ public class GeradorArquivoTextoMicrocoletor {
 	}
 
 	private String getMedicaoTipo(Integer medicao) {
-		if (medicao.intValue() == MedicaoTipo.LIGACAO_AGUA.getId()) {
-			return "SO AGUA";
-		} else if (medicao.intValue() == MedicaoTipo.POCO.getId()) {
-			return "SO ESGOTO";
+		if (medicao != null) {
+			if (medicao.intValue() == MedicaoTipo.LIGACAO_AGUA.getId()) {
+				return "SO AGUA";
+			} else {
+				return "SO ESGOTO";
+			}
 		} else {
 			return "";
 		}
