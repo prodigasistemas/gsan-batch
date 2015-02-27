@@ -30,7 +30,7 @@ public class ArquivoTextoTipo14 extends ArquivoTexto {
 	public String build(ArquivoTextoTO to) {
 //        logger.info("Construcao da linha 14");
 	    
-		List<LeituraAnormalidade> leituraAnormalidades = repositorio.listarLeituraAnormalidadePor(to.getIdLeituraAnormalidade(), Status.ATIVO.getId());
+		List<LeituraAnormalidade> leituraAnormalidades = repositorio.listarLeituraAnormalidadeImpressaoSimultanea(Status.ATIVO.getId());
 
 		builder.append(System.getProperty("line.separator"));
 		builder.append(TIPO_REGISTRO_14_ANORMALIDADE_LEITURA);

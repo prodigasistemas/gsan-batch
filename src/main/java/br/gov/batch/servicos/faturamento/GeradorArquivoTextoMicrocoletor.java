@@ -173,7 +173,7 @@ public class GeradorArquivoTextoMicrocoletor {
 		roteiro.setFaturamentoGrupo(movimento.getFaturamentoGrupo());
 		roteiro.setEmpresa(movimento.getEmpresa());
 		roteiro.setLocalidade(movimento.getLocalidade());
-		roteiro.setCodigoSetorComercial1(movimento.getSetorComercial().getCodigo());
+		roteiro.setCodigoSetorComercial1(movimento.getCodigoSetorComercial());
 
 		int[] intervaloQuadras = quadraRepositorio.obterIntervaloQuadrasPorRota(movimento.getRota().getId());
 		roteiro.setNumeroQuadraInicial1(intervaloQuadras[0]);
@@ -211,14 +211,14 @@ public class GeradorArquivoTextoMicrocoletor {
 		StringBuilder linha = new StringBuilder();
 
 		linha.append(completaTexto(15, movimento.getImovel().getId()));
-		linha.append(completaComZerosEsquerda(3, movimento.getSetorComercial().getCodigo()));
+		linha.append(completaComZerosEsquerda(3, movimento.getCodigoSetorComercial()));
 		linha.append(completaComZerosEsquerda(4, movimento.getRota().getCodigo()));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(2, ""));
 		linha.append(completaTexto(3, ""));
 		linha.append(completaTexto(2, ""));
-		linha.append(completaComZerosEsquerda(6, movimento.getNumeroLoteImovel()));
+		linha.append(completaComZerosEsquerda(6, movimento.getLoteImovel()));
 		linha.append(completaTexto(15, movimento.getImovel().getId()));
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaTexto(12, movimento.getNumeroHidrometro()));
@@ -282,8 +282,8 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaComZerosEsquerda(3, ""));
 		linha.append(completaComZerosEsquerda(4, movimento.getNumeroQuadra()));
-		linha.append(completaComZerosEsquerda(4, movimento.getNumeroLoteImovel()));
-		linha.append(completaComZerosEsquerda(3, movimento.getNumeroSubloteImovel()));
+		linha.append(completaComZerosEsquerda(4, movimento.getLoteImovel()));
+		linha.append(completaComZerosEsquerda(3, movimento.getSubloteImovel()));
 		linha.append(completaTexto(19, ""));
 		linha.append(completaTexto(212, ""));
 		linha.append("A01");

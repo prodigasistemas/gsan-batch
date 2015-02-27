@@ -44,7 +44,7 @@ public class MensagemContaBO {
         String[] mensagem = new String[]{"", "", ""};
         if (debitoImovelBO.existeDebitoImovel(consultaTO)){
             String dataVencimentoFinalString = Utilitarios.formataData(consultaTO.getVencimentoFinal());
-            mensagem[0] = "SR. USUÁRIO: EM  " + dataVencimentoFinalString + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
+            mensagem[0] = "SR. USUARIO: EM  " + dataVencimentoFinalString + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
                     + parametros.getNomeAbreviadoEmpresa() + ".";
             mensagem[1] = "COMPARECA A UM DOS NOSSOS POSTOS DE ATENDIMENTO PARA REGULARIZAR SUA SITUACAO.EVITE O CORTE.";
             mensagem[2] = "CASO O SEU DEBITO TENHA SIDO PAGO APOS A DATA INDICADA,DESCONSIDERE ESTE AVISO.";

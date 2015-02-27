@@ -1,7 +1,9 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -62,18 +64,20 @@ public class ArquivoTextoTipo01DadosCliente {
 	private void escreverNomeCliente() {
 		StringBuilder builder = new StringBuilder();
 		
-		if (imovel.getClienteImoveis().size() > 0) {
-	        ClienteImovel clienteImovel = imovel.getClienteImoveis().get(0);
-	        
-	        if (clienteImovel.nomeParaConta()) {
-	            clienteNomeConta = clienteImovel.getCliente();
-	        }
-	
-	        if (clienteImovel.getClienteRelacaoTipo().getId() == ClienteRelacaoTipo.USUARIO.intValue()) {
-	            clienteUsuario = clienteImovel.getCliente();
-	        } else {
-	            clienteResponsavel = clienteImovel.getCliente();
-	        }
+		List<ClienteImovel> clientesAtivos = imovel.getClienteImoveis().stream()
+												.filter(c -> c.getDataFimRelacao() == null)
+												.collect(Collectors.toList());
+		
+		for(ClienteImovel clienteImovel : clientesAtivos) {
+			if (clienteImovel.nomeParaConta()) {
+				clienteNomeConta = clienteImovel.getCliente();
+			}
+			
+			if (clienteImovel.getClienteRelacaoTipo().getId() == ClienteRelacaoTipo.USUARIO.intValue()) {
+				clienteUsuario = clienteImovel.getCliente();
+			} else {
+				clienteResponsavel = clienteImovel.getCliente();
+			}
 	    }
 	
 		if (clienteUsuario != null) {
