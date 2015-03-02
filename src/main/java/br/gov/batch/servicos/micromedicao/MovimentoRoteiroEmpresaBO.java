@@ -126,7 +126,7 @@ public class MovimentoRoteiroEmpresaBO {
             movimento.setComplementoEndereco(imovel.getComplementoEndereco());
             movimento.setNomeBairro(imovel.getLogradouroBairro().getBairro().getNome());
             
-            movimento.isResidencial();   movimento.setQuantidadeEconomias(imovelSubcategoriaBO.);
+//            movimento.isResidencial();   movimento.setQuantidadeEconomias(imovelSubcategoriaBO.);
             movimento.isComercial();    movimento.setQuantidadeEconomias(null);
             movimento.isIndustrial();   movimento.setQuantidadeEconomias(null);
             movimento.isPublico();      movimento.setQuantidadeEconomias(null);

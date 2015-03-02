@@ -1,5 +1,8 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
+import static br.gov.model.util.Utilitarios.completaTexto;
+
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -36,6 +39,7 @@ import br.gov.model.faturamento.QualidadeAguaPadrao;
 import br.gov.model.operacional.FonteCaptacao;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 import br.gov.servicos.faturamento.QuadraFaceRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
@@ -64,6 +68,9 @@ public class ArquivoTextoTipo01DadosContaTest {
 
 	@Mock
 	private QuadraFaceRepositorio quadraFaceRepositorioMock;
+	
+    @Mock
+    private ImovelRepositorio repositorioImovel;
 
 	private Imovel imovel;
 	private QuadraFace quadraFace;
@@ -98,7 +105,7 @@ public class ArquivoTextoTipo01DadosContaTest {
 		
 		arquivoTextoTO = new ArquivoTextoTO();
 		arquivoTextoTO.setConta(conta);
-		arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setIdImovel(imovel.getId());
 		arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
 		arquivoTextoTO.setAnoMesReferencia(201501);
 	}
@@ -109,36 +116,21 @@ public class ArquivoTextoTipo01DadosContaTest {
 
 		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 
-		StringBuilder linhaValida = new StringBuilder();
+		StringBuilder mensagem = new StringBuilder();
 
-		linhaValida.append("20150123201501232015011999999999MENSAGEM EM CONTA - 1                                              ")
-				   .append("                                 MENSAGEM EM CONTA - 2                                                    ")
-				   .append("                           MENSAGEM EM CONTA - 3                                                          ")
-				   .append("                     MENSAGEM QUITACAO ANUAL DE DEBITOS                                                       ")
-				   .append("                                                                                                              ")
-				   .append("                                                                                                              ")
-				   .append("                                                                                                              ")
-				   .append("                                                                                                                 ");
-
-		String linha = getLinha(mapDados);
+		mensagem.append(completaComEspacosADireita(100, "MENSAGEM EM CONTA - 1"))
+		    .append(completaComEspacosADireita(100, "MENSAGEM EM CONTA - 2"))
+		    .append(completaComEspacosADireita(100, "MENSAGEM EM CONTA - 3"));
 
 		assertNotNull(mapDados);
 		assertEquals(7, mapDados.keySet().size());
-		assertEquals(linha, linhaValida.toString());
-	}
-
-	private String getLinha(Map<Integer, StringBuilder> mapDados) {
-		StringBuilder builder = new StringBuilder();
-
-		Collection<StringBuilder> dados = mapDados.values();
-
-		Iterator<StringBuilder> it = dados.iterator();
-
-		while (it.hasNext()) {
-			builder.append(it.next());
-		}
-
-		return builder.toString();
+		assertEquals("2015012320150123", mapDados.get(3).toString());
+		assertEquals("2015011", mapDados.get(6).toString());
+		assertEquals("999999999", mapDados.get(24).toString());
+		assertEquals(mensagem.toString(), mapDados.get(28).toString());
+		assertEquals(completaComEspacosADireita(120, "MENSAGEM QUITACAO ANUAL DE DEBITOS"), mapDados.get(29).toString());
+		assertEquals(completaTexto(200, ""), mapDados.get(30).toString());
+		assertEquals(completaTexto(212, ""), mapDados.get(31).toString());
 	}
 
 	private String[] obterMensagem() {
@@ -191,7 +183,8 @@ public class ArquivoTextoTipo01DadosContaTest {
 
 		expect(qualidadeAguaRepositorioMock.buscarSemFonteCaptacao(anyObject(), anyObject(), anyObject())).andReturn(obterQualidadeAgua());
 		replay(qualidadeAguaRepositorioMock);
-
+		
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
 	}
-
 }

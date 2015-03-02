@@ -1,6 +1,8 @@
 package br.gov.batch.servicos.micromedicao;
 
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +22,7 @@ import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
 import br.gov.model.cadastro.Quadra;
+import br.gov.model.cadastro.SetorComercial;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
@@ -49,8 +52,10 @@ public class MovimentoRoteiroEmpresBOTest {
 		grupo = new FaturamentoGrupo();
 		grupo.setAnoMesReferencia(201501);
 		
+		SetorComercial setor = new SetorComercial();
 		rota = new Rota(1);
 		rota.setFaturamentoGrupo(grupo);
+		rota.setSetorComercial(setor);
 		
 		Quadra quadra = new Quadra(1);
 		quadra.setRota(rota);
@@ -85,20 +90,6 @@ public class MovimentoRoteiroEmpresBOTest {
 		assertTrue(movimentos.isEmpty());
 	}
 	
-	//TODO: Refazer teste
-	private void mockImoveisGerados() {
-		imoveisOutrosGrupos = new ArrayList<Imovel>();
-		
-		movimentosInseridos = new ArrayList<MovimentoRoteiroEmpresa>();
-		movimentosInseridos.add(getMovimento());
-		
-		repositorioMock.deletarPorRota(rota);
-		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		//TODO: nao existe mais esse metodo
-//		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
-		replay(repositorioMock);
-	}
-
 	private MovimentoRoteiroEmpresa getMovimento() {
 		MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
 		movimento.setAnoMesMovimento(rota.getFaturamentoGrupo().getAnoMesReferencia());
@@ -112,7 +103,6 @@ public class MovimentoRoteiroEmpresBOTest {
 		return movimento;
 	}
 	
-	//TODO: Refazer teste
 	private void mockImoveisGeradosOutrosGrupos() {
 		imoveisOutrosGrupos = new ArrayList<Imovel>();
 		imoveisOutrosGrupos.add(imovel);
@@ -121,7 +111,19 @@ public class MovimentoRoteiroEmpresBOTest {
 		
 		repositorioMock.deletarPorRota(rota);
 		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-        //TODO: nao existe mais esse metodo
 		replay(repositorioMock);
 	}
+
+    private void mockImoveisGerados() {
+        imoveisOutrosGrupos = new ArrayList<Imovel>();
+        
+        movimentosInseridos = new ArrayList<MovimentoRoteiroEmpresa>();
+        movimentosInseridos.add(getMovimento());
+        
+        repositorioMock.deletarPorRota(rota);
+        expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
+        repositorioMock.salvar(anyObject());
+        expectLastCall().times(1);
+        replay(repositorioMock);
+    }	
 }
