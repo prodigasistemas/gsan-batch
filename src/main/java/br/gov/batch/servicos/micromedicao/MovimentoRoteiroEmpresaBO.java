@@ -9,11 +9,20 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
+import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
+import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
+import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.LeituraTipo;
+import br.gov.model.micromedicao.MedicaoHistorico;
+import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
+import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ClienteRepositorio;
 import br.gov.servicos.cadastro.ImovelRepositorio;
@@ -21,6 +30,8 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
+import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
+import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
 @Stateless
 public class MovimentoRoteiroEmpresaBO {
@@ -46,18 +57,29 @@ public class MovimentoRoteiroEmpresaBO {
 	@EJB
 	private ConsumoHistoricoRepositorio consumoHistoricoRepositorio;
 	
+	@EJB
+	private MedicaoHistoricoBO medicaoHistoricoBO;
+	
+	@EJB
+	private FaixaLeituraBO faixaLeituraBO;
+	
+	@EJB
+	private AguaEsgotoBO aguaEsgotoBO;
+	
+	@EJB
+	private ImovelSubcategoriaBO imovelSubcategoriaBO;
 	
 	public List<MovimentoRoteiroEmpresa> gerarMovimentoRoteiroEmpresa(List<Imovel> imoveis, Rota rota) {
 		repositorio.deletarPorRota(rota);
 		
 		List<Imovel> imoveisParaProcessamento = verificarImoveisProcessados(imoveis, rota.getFaturamentoGrupo());
 		
-		List<MovimentoRoteiroEmpresa> movimentos = criarMovimentoRoteiroEmpresa(imoveisParaProcessamento, rota);
+		List<MovimentoRoteiroEmpresa> movimentos = criarMovimentoRoteiroEmpresaImpressaoSimultanea(imoveisParaProcessamento, rota);
 		
 		return movimentos;
 	}
 	
-	public void criarMovimentoRoteiroEmpresa(List<Imovel> imoveis, Integer anoMesCorrente, LeituraTipo tipoLeitura) {
+	public void criarMovimentoRoteiroEmpresaMicrocoletor(List<Imovel> imoveis, Integer anoMesCorrente, LeituraTipo tipoLeitura) {
 	    for (Imovel imovel : imoveis) {
 	        MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
 	        
@@ -85,16 +107,56 @@ public class MovimentoRoteiroEmpresaBO {
             
             if (imovel.pertenceARotaAlternativa()) {
                 movimento.setCodigoSetorComercial(imovel.getRotaAlternativa().getSetorComercial().getCodigo());
+                movimento.setRota(imovel.getRotaAlternativa());
             } else {
                 movimento.setCodigoSetorComercial(imovel.getSetorComercial().getCodigo());
+                movimento.setRota(imovel.getQuadra().getRota());
             }
             
-//            movimento.setRota(rota);
-	        
+            movimento.setNumeroHidrometro(imovel.getHidrometroInstalacaoHistorico().getHidrometro().getNumero());
+            movimento.setLigacaoAguaSituacao(imovel.getLigacaoAguaSituacao());
+           
+            Cliente usuario = imovel.getCliente(ClienteRelacaoTipo.USUARIO);
+            
+            if (usuario != null) {
+            	movimento.setNomeCliente(usuario.getNome());
+            }
+            movimento.setLogradouro(imovel.getLogradouroCep().getLogradouro());
+            
+            movimento.setComplementoEndereco(imovel.getComplementoEndereco());
+            movimento.setNomeBairro(imovel.getLogradouroBairro().getBairro().getNome());
+            
+            movimento.isResidencial();   movimento.setQuantidadeEconomias(imovelSubcategoriaBO.);
+            movimento.isComercial();    movimento.setQuantidadeEconomias(null);
+            movimento.isIndustrial();   movimento.setQuantidadeEconomias(null);
+            movimento.isPublico();      movimento.setQuantidadeEconomias(null);
+            
+            Integer referenciaAnterior = Utilitarios.reduzirMeses(anoMesCorrente, 1);
+            MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referenciaAnterior);
+            
+            movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
+            movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
+            
+            VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), anoMesCorrente, MedicaoTipo.LIGACAO_AGUA.getId());
+            Hidrometro hidrometro = hidrometroInstalacaoRepositorio.dadosHidrometroInstaladoAgua(imovel.getId());
+            		
+            FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, volumeMedioAguaEsgotoTO.getConsumoMedio(), medicao);
+            
+            movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
+            movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
+            
+            movimento.setNumeroConsumoMedio(null);
+            movimento.setNumeroMoradores(imovel.getNumeroMorador().intValue());
+            movimento.setAnoMesMovimento(anoMesCorrente);
+            movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
+            movimento.setFaturamentoGrupo(imovel.getQuadra().getRota().getFaturamentoGrupo());
+            movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
+            movimento.setEmpresa(imovel.getQuadra().getRota().getEmpresa());
+            
         }
 	}
 	
-    public List<MovimentoRoteiroEmpresa> criarMovimentoRoteiroEmpresa(List<Imovel> imoveis, Rota rota) {
+    public List<MovimentoRoteiroEmpresa> criarMovimentoRoteiroEmpresaImpressaoSimultanea(List<Imovel> imoveis, Rota rota) {
 
         List<MovimentoRoteiroEmpresa> movimentos = new ArrayList<MovimentoRoteiroEmpresa>();
         
