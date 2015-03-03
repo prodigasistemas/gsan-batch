@@ -27,6 +27,7 @@ import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
 @RunWith(EasyMockRunner.class)
@@ -40,6 +41,9 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 
 	@Mock
 	private PagamentoBO pagamentoBOMock;
+	
+    @Mock
+    private ImovelRepositorio repositorioImovel;
 
 	private Imovel imovel;
 	private CobrancaDocumento cobrancaDocumento;
@@ -61,7 +65,7 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 		arquivo = new ArquivoTextoTipo01DadosCobranca();
 		
 		arquivoTextoTO = new ArquivoTextoTO();
-		arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setIdImovel(imovel.getId());
 		arquivoTextoTO.setCobrancaDocumento(cobrancaDocumento);
 	}
 
@@ -91,6 +95,9 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 	}
 
 	private void carregarMocks() {
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
+	    
 		DadosBancariosTO to = new DadosBancariosTO();
 		to.setCodigoAgencia("00000");
 		to.setDescricaoBanco("BANCO DO BRASIL");

@@ -2,9 +2,9 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.converteAnoMesParaMesAnoSemBarra;
 import static br.gov.model.util.Utilitarios.formataData;
 import static br.gov.model.util.Utilitarios.reduzirMeses;
-import static br.gov.model.util.Utilitarios.converteAnoMesParaMesAnoSemBarra;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,6 @@ import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo01DadosConta {
-    
     private static Logger logger = Logger.getLogger(ArquivoTextoTipo01DadosConta.class);
 
 	private Map<Integer, StringBuilder> dadosConta;
@@ -196,7 +195,7 @@ public class ArquivoTextoTipo01DadosConta {
 	private void preencherQualidadeAgua(QualidadeAgua qualidadeAgua) {
 		StringBuilder builder = new StringBuilder();
 		
-		if(qualidadeAgua!=null){
+		if(qualidadeAgua != null){
 			builder.append(completaComEspacosADireita(6, converteAnoMesParaMesAnoSemBarra(qualidadeAgua.getAnoMesReferencia())));
 			builder.append(completaComEspacosADireita(5, qualidadeAgua.getNumeroCloroResidual()));
 			builder.append(completaComEspacosADireita(5, qualidadeAgua.getNumeroIndiceTurbidez()));

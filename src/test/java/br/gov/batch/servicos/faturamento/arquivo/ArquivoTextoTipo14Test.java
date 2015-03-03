@@ -78,6 +78,7 @@ public class ArquivoTextoTipo14Test {
 
 	private void carregarMocks() {
 		expect(repositorio.listarLeituraAnormalidadePor(1, Status.ATIVO.getId())).andReturn(lista);
+		expect(repositorio.listarLeituraAnormalidadeImpressaoSimultanea(Status.ATIVO.getId())).andReturn(lista);
 		replay(repositorio);
 	}
 }
