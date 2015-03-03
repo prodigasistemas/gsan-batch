@@ -3,6 +3,7 @@ package br.gov.batch.servicos.micromedicao;
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
+import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Hidrometro;
@@ -31,7 +33,6 @@ import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
-import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
 @Stateless
 public class MovimentoRoteiroEmpresaBO {
@@ -80,80 +81,83 @@ public class MovimentoRoteiroEmpresaBO {
 	}
 	
 	public void criarMovimentoRoteiroEmpresaMicrocoletor(List<Imovel> imoveis, Integer anoMesCorrente, LeituraTipo tipoLeitura) {
-	    for (Imovel imovel : imoveis) {
-	        MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
-	        
+	   
+		for (Imovel imovel : imoveis) {
+	    	
+	    	Cliente usuario = imovel.getCliente(ClienteRelacaoTipo.USUARIO);
+	    	Collection<ICategoria> categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
+	    	MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), Utilitarios.reduzirMeses(anoMesCorrente, 1));
+	    	
+	    	VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), anoMesCorrente, MedicaoTipo.LIGACAO_AGUA.getId());
+	    	Hidrometro hidrometro = hidrometroInstalacaoRepositorio.dadosHidrometroInstaladoAgua(imovel.getId());
+	    	FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, volumeMedioAguaEsgotoTO.getConsumoMedio(), medicao);
+
+	    	MovimentoRoteiroEmpresa movimento = buildMovimento(imovel);
+	    	
 	        movimento.setLeituraTipo(tipoLeitura.getId());
 	        movimento.setAnoMesMovimento(anoMesCorrente);
-	        movimento.setImovel(imovel);
-            movimento.setImovelPerfil(imovel.getImovelPerfil());
-            
-            if (imovel.getQuadraFace() != null) {
-                movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
-            }
-
-            movimento.setLocalidade(imovel.getLocalidade());
-            movimento.setNomeLocalidade(imovel.getLocalidade().getDescricao());
-            movimento.setLoteImovel(completaComZerosEsquerda(4, imovel.getLote()));
-            movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
-            movimento.setImovelPerfil(imovel.getImovelPerfil());
-            
-            
-            if(imovel.existeHidrometroAgua()){
-                movimento.setMedicaoTipo(imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico().iterator().next().getMedicaoTipo());
-            }else if (imovel.existeHidrometroPoco()){
-                movimento.setMedicaoTipo(imovel.getHidrometroInstalacaoHistorico().getMedicaoTipo());
-            }
-            
-            if (imovel.pertenceARotaAlternativa()) {
-                movimento.setCodigoSetorComercial(imovel.getRotaAlternativa().getSetorComercial().getCodigo());
-                movimento.setRota(imovel.getRotaAlternativa());
-            } else {
-                movimento.setCodigoSetorComercial(imovel.getSetorComercial().getCodigo());
-                movimento.setRota(imovel.getQuadra().getRota());
-            }
-            
-            movimento.setNumeroHidrometro(imovel.getHidrometroInstalacaoHistorico().getHidrometro().getNumero());
-            movimento.setLigacaoAguaSituacao(imovel.getLigacaoAguaSituacao());
-           
-            Cliente usuario = imovel.getCliente(ClienteRelacaoTipo.USUARIO);
+            movimento.setDescricaoAbreviadaCategoriaImovel(categoria.iterator().next().getCategoriaDescricao());
+            movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
+            movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
+            movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
+            movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
+            movimento.setNumeroConsumoMedio(null);
+            movimento.setAnoMesMovimento(anoMesCorrente);
             
             if (usuario != null) {
             	movimento.setNomeCliente(usuario.getNome());
             }
-            movimento.setLogradouro(imovel.getLogradouroCep().getLogradouro());
-            
-            movimento.setComplementoEndereco(imovel.getComplementoEndereco());
-            movimento.setNomeBairro(imovel.getLogradouroBairro().getBairro().getNome());
-            
-            movimento.isResidencial();   movimento.setQuantidadeEconomias(imovelSubcategoriaBO.);
-            movimento.isComercial();    movimento.setQuantidadeEconomias(null);
-            movimento.isIndustrial();   movimento.setQuantidadeEconomias(null);
-            movimento.isPublico();      movimento.setQuantidadeEconomias(null);
-            
-            Integer referenciaAnterior = Utilitarios.reduzirMeses(anoMesCorrente, 1);
-            MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referenciaAnterior);
-            
-            movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
-            movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
-            
-            VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), anoMesCorrente, MedicaoTipo.LIGACAO_AGUA.getId());
-            Hidrometro hidrometro = hidrometroInstalacaoRepositorio.dadosHidrometroInstaladoAgua(imovel.getId());
-            		
-            FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, volumeMedioAguaEsgotoTO.getConsumoMedio(), medicao);
-            
-            movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
-            movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
-            
-            movimento.setNumeroConsumoMedio(null);
-            movimento.setNumeroMoradores(imovel.getNumeroMorador().intValue());
-            movimento.setAnoMesMovimento(anoMesCorrente);
-            movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
-            movimento.setFaturamentoGrupo(imovel.getQuadra().getRota().getFaturamentoGrupo());
-            movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
-            movimento.setEmpresa(imovel.getQuadra().getRota().getEmpresa());
-            
         }
+	}
+	
+	private MovimentoRoteiroEmpresa buildMovimento(Imovel imovel) {
+		MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
+		
+        movimento.setNumeroMoradores(imovel.getNumeroMorador().intValue());
+        movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
+        movimento.setFaturamentoGrupo(imovel.getQuadra().getRota().getFaturamentoGrupo());
+        movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
+        movimento.setEmpresa(imovel.getQuadra().getRota().getEmpresa());
+        movimento.setImovel(imovel);
+        movimento.setImovelPerfil(imovel.getImovelPerfil());
+        movimento.setLocalidade(imovel.getLocalidade());
+        movimento.setNomeLocalidade(imovel.getLocalidade().getDescricao());
+        movimento.setGerenciaRegional(imovel.getLocalidade().getGerenciaRegional());
+
+        movimento.setLoteImovel(completaComZerosEsquerda(4, imovel.getLote()));
+        movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
+
+        movimento.setImovelPerfil(imovel.getImovelPerfil());
+        movimento.setNumeroHidrometro(imovel.getHidrometroInstalacaoHistorico().getHidrometro().getNumero());
+        
+        movimento.setLigacaoAguaSituacao(imovel.getLigacaoAguaSituacao());
+        movimento.setLigacaoEsgotoSituacao(imovel.getLigacaoEsgotoSituacao());
+        
+        movimento.setComplementoEndereco(imovel.getComplementoEndereco());
+        movimento.setLogradouro(imovel.getLogradouroCep().getLogradouro());
+        movimento.setNomeBairro(imovel.getLogradouroBairro().getBairro().getNome());
+
+        movimento.setUltimaAlteracao(new Date());
+        
+        if (imovel.getQuadraFace() != null) {
+        	movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
+        }
+        
+        if(imovel.existeHidrometroAgua()){
+            movimento.setMedicaoTipo(imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico().iterator().next().getMedicaoTipo());
+        }else if (imovel.existeHidrometroPoco()){
+            movimento.setMedicaoTipo(imovel.getHidrometroInstalacaoHistorico().getMedicaoTipo());
+        }
+        
+        if (imovel.pertenceARotaAlternativa()) {
+            movimento.setCodigoSetorComercial(imovel.getRotaAlternativa().getSetorComercial().getCodigo());
+            movimento.setRota(imovel.getRotaAlternativa());
+        } else {
+            movimento.setCodigoSetorComercial(imovel.getSetorComercial().getCodigo());
+            movimento.setRota(imovel.getQuadra().getRota());
+        }
+        
+		return movimento;
 	}
 	
     public List<MovimentoRoteiroEmpresa> criarMovimentoRoteiroEmpresaImpressaoSimultanea(List<Imovel> imoveis, Rota rota) {
@@ -161,23 +165,13 @@ public class MovimentoRoteiroEmpresaBO {
         List<MovimentoRoteiroEmpresa> movimentos = new ArrayList<MovimentoRoteiroEmpresa>();
         
         for (Imovel imovel : imoveis) {
-            MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
+            MovimentoRoteiroEmpresa movimento = buildMovimento(imovel);
             
             movimento.setAnoMesMovimento(rota.getFaturamentoGrupo().getAnoMesReferencia());
-            movimento.setImovel(imovel);
             movimento.setFaturamentoGrupo(rota.getFaturamentoGrupo());
-            movimento.setLocalidade(imovel.getLocalidade());
-            movimento.setGerenciaRegional(imovel.getLocalidade().getGerenciaRegional());
-            movimento.setLigacaoAguaSituacao(imovel.getLigacaoAguaSituacao());
-            movimento.setLigacaoEsgotoSituacao(imovel.getLigacaoEsgotoSituacao());
             movimento.setRota(rota);
             movimento.setEmpresa(rota.getEmpresa());
             movimento.setCodigoSetorComercial(rota.getSetorComercial().getCodigo());
-            movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
-            movimento.setLoteImovel(imovel.getLote() != null ? imovel.getLote().toString() : "");
-            movimento.setSubloteImovel(imovel.getSubLote() != null ? imovel.getSubLote().toString() : "");
-            movimento.setImovelPerfil(imovel.getImovelPerfil());
-            movimento.setUltimaAlteracao(new Date());
             movimento.setLeituraTipo(LeituraTipo.LEITURA_E_ENTRADA_SIMULTANEA.getId());
             
             repositorio.salvar(movimento);
