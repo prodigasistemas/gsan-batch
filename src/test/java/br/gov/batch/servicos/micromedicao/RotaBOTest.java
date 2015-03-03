@@ -95,21 +95,21 @@ public class RotaBOTest {
 	}
 
 	@Test
-	public void imoveisParaArquivoConvencionalComRotaAlternativa() {
+	public void imoveisParaLeituraComRotaAlternativa() {
 		carregarRotaAlternativaMock(true);
 		carregarImoveisComRotaAlternativaMock();
 
-		List<Imovel> imoveis = rotaBO.imoveisParaArquivoConvencional(1);
+		List<Imovel> imoveis = rotaBO.imoveisParaLeitura(1, 1, 10);
 
 		assertEquals(4, imoveis.size());
 	}
 
 	@Test
-	public void imoveisParaArquivoConvencionalSemRotaAlternativa() {
+	public void imoveisParaLeituraSemRotaAlternativa() {
 		carregarRotaAlternativaMock(false);
 		carregarImoveisSemRotaAlternativaMock();
 
-		List<Imovel> imoveis = rotaBO.imoveisParaArquivoConvencional(1);
+		List<Imovel> imoveis = rotaBO.imoveisParaLeitura(1, 1, 10);
 
 		assertEquals(4, imoveis.size());
 	}
@@ -120,12 +120,12 @@ public class RotaBOTest {
 	}
 
 	private void carregarImoveisComRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaArquivoConvencionalComRotaAlternativa(1)).andReturn(imoveis);
+		expect(imovelRepositorioMock.imoveisParaLeituraComRotaAlternativa(1)).andReturn(imoveis);
 		replay(imovelRepositorioMock);
 	}
 
 	private void carregarImoveisSemRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaArquivoConvencionalSemRotaAlternativa(1)).andReturn(imoveis);
+		expect(imovelRepositorioMock.imoveisParaLeituraSemRotaAlternativa(1)).andReturn(imoveis);
 		replay(imovelRepositorioMock);
 	}
 }
