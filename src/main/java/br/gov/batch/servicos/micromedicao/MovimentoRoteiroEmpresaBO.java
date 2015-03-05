@@ -19,6 +19,7 @@ import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Hidrometro;
+import br.gov.model.micromedicao.HidrometroInstalacaoHistorico;
 import br.gov.model.micromedicao.LeituraTipo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.MedicaoTipo;
@@ -92,19 +93,24 @@ public class MovimentoRoteiroEmpresaBO {
 
 		movimento.setLeituraTipo(tipoLeitura);
 		movimento.setAnoMesMovimento(anoMesCorrente);
-		movimento.setDescricaoAbreviadaCategoriaImovel(categoria.iterator().next().getCategoriaDescricao());
-		movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
-		movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
+		movimento.setDescricaoAbreviadaCategoriaImovel(categoria.iterator().next().getCategoriaDescricaoAbreviada());
+		if (medicao != null){
+			movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
+			movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada() != null ? medicao.getLeituraAnormalidadeInformada().getId() : null);
+		}
 		movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
 		movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
 		movimento.setNumeroConsumoMedio(null);
 		movimento.setAnoMesMovimento(anoMesCorrente);
 		movimento.setNomeCliente(usuario != null ? usuario.getNome() : null);
+		
+		repositorio.salvar(movimento);
 	}
 
 	private MovimentoRoteiroEmpresa buildMovimento(Imovel imovel) {
 		MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
-		movimento.setNumeroMoradores(imovel.getNumeroMorador().intValue());
+
+		movimento.setNumeroMoradores(imovel.getNumeroMorador() != null ? imovel.getNumeroMorador().intValue() : null);
 		movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
 		movimento.setFaturamentoGrupo(imovel.getQuadra().getRota().getFaturamentoGrupo());
 		movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());
@@ -119,7 +125,6 @@ public class MovimentoRoteiroEmpresaBO {
 		movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
 
 		movimento.setImovelPerfil(imovel.getImovelPerfil());
-		movimento.setNumeroHidrometro(imovel.getHidrometroInstalacaoHistorico().getHidrometro().getNumero());
 
 		movimento.setLigacaoAguaSituacao(imovel.getLigacaoAguaSituacao());
 		movimento.setLigacaoEsgotoSituacao(imovel.getLigacaoEsgotoSituacao());
@@ -133,9 +138,12 @@ public class MovimentoRoteiroEmpresaBO {
 		movimento.setCodigoQuadraFace(imovel.getQuadraFace() != null ? imovel.getQuadraFace().getNumeroQuadraFace() : null);
 
 		if (imovel.existeHidrometroAgua()) {
-			movimento.setMedicaoTipo(imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico().iterator().next().getMedicaoTipo());
+			HidrometroInstalacaoHistorico instalacao = imovel.getLigacaoAgua().getHidrometroInstalacoesHistorico().iterator().next();
+			movimento.setMedicaoTipo(instalacao.getMedicaoTipo());
+			movimento.setNumeroHidrometro(instalacao.getHidrometro().getNumero());
 		} else if (imovel.existeHidrometroPoco()) {
 			movimento.setMedicaoTipo(imovel.getHidrometroInstalacaoHistorico().getMedicaoTipo());
+			movimento.setNumeroHidrometro(imovel.getHidrometroInstalacaoHistorico().getHidrometro().getNumero());
 		}
 
 		if (imovel.pertenceARotaAlternativa()) {

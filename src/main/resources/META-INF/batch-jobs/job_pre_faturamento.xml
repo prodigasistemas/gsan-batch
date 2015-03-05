@@ -4,6 +4,7 @@
 	</listeners>
 <!-- 
 	<step id="carregarRotas" next="gerarArquivo">
+	<step id="carregarRotas" >
 		<chunk item-count="1">
 			<reader ref="carregarRotas"/>
 			<processor ref="iniciaProcessamentoRota" />
