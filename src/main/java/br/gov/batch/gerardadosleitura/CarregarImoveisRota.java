@@ -14,7 +14,6 @@ import javax.inject.Named;
 import br.gov.batch.servicos.micromedicao.RotaBO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
-import br.gov.servicos.cadastro.ImovelRepositorio;
 
 @Named
 public class CarregarImoveisRota extends AbstractItemReader {

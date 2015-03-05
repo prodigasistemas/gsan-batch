@@ -2,7 +2,7 @@
 	<listeners>
 		<listener ref="preFaturamentoJobListener"/>
 	</listeners>
-<!-- 
+
 	<step id="carregarRotas" next="gerarArquivo">
 		<chunk item-count="1">
 			<reader ref="carregarRotas"/>
@@ -10,8 +10,8 @@
 			<writer ref="dummyItemWriter" />
 		</chunk>
 	</step>
- -->
-
+ 
+<!--
 	<step id="gerarArquivo">
 		<chunk item-count="1">
 			<reader ref="lerRotasParaArquivo"/>
@@ -19,4 +19,5 @@
 			<writer ref="dummyItemWriter" />
 		</chunk>
 	</step>
+ -->
 </job>
