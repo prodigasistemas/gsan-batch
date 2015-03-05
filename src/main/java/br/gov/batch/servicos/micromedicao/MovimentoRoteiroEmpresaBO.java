@@ -113,7 +113,7 @@ public class MovimentoRoteiroEmpresaBO {
 	private MovimentoRoteiroEmpresa buildMovimento(Imovel imovel) {
 		MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
 		
-        movimento.setNumeroMoradores(imovel.getNumeroMorador().intValue());
+        movimento.setNumeroMoradores(new Integer(imovel.getNumeroMorador()));
         movimento.setNumeroQuadra(imovel.getQuadra().getNumeroQuadra());
         movimento.setFaturamentoGrupo(imovel.getQuadra().getRota().getFaturamentoGrupo());
         movimento.setCodigoQuadraFace(imovel.getQuadraFace().getNumeroQuadraFace());

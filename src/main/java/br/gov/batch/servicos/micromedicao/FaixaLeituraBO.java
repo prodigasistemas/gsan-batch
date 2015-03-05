@@ -61,14 +61,14 @@ public class FaixaLeituraBO {
 		if (hidrometro == null) {
 			return new FaixaLeituraTO(0, 0);
 		} else {
-			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
+			
+			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAtualFaturamento());
 
 			if (isGerarFaixaNormal(imovel)) {
 				return faixaLeituraEsperada;
 			} else {
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
-						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
-				
+						medicaoHistorico.getLeituraAtualFaturamento(),medicaoHistorico, true, hidrometro);
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
 					return faixaLeituraFalsa;
 				} else {

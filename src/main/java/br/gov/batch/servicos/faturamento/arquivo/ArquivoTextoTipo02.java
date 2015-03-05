@@ -2,6 +2,7 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
+import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.util.Collection;
@@ -63,25 +64,25 @@ public class ArquivoTextoTipo02 extends ArquivoTexto {
 
 	private String getSubcategoriaDescricaoAbreviada(ICategoria categoria) {
 		if (sistemaParametros.indicadorTarifaCategoria()) {
-			return completaTexto(3, categoria.getSubcategoriaDescricaoAbreviada());
+			return completaTexto(20, categoria.getSubcategoriaDescricaoAbreviada());
 		} else {
-			return completaTexto(3, categoria.getCategoria().getCategoriaDescricaoAbreviada());
+			return completaTexto(20, categoria.getCategoria().getCategoriaDescricaoAbreviada());
 		}
 	}
 
 	private String getCodigoCategoriaOuSubcategoria(ICategoria categoria) {
 		if (sistemaParametros.indicadorTarifaCategoria()) {
-			return completaTexto(3, categoria.getId().toString());
+			return completaTexto(1, categoria.getId().toString());
 		} else {
-			return completaTexto(3, categoria.getCategoria().getId().toString());
+			return completaTexto(1, categoria.getCategoria().getId().toString());
 		}
 	}
 
 	private String getDescricaoCategoriaOuSubcategoria(ICategoria categoria) {
 		if (sistemaParametros.indicadorTarifaCategoria()) {
-			return completaTexto(15, categoria.getCategoriaDescricao());
+			return completaComEspacosADireita(15, categoria.getCategoriaDescricao());
 		} else {
-			return completaTexto(15, categoria.getSubcategoriaDescricao());
+			return completaComEspacosADireita(15, categoria.getSubcategoriaDescricao());
 		}
 	}
 

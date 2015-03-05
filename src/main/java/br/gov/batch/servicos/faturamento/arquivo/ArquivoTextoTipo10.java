@@ -83,7 +83,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 
 	private String getIdSubcategoria(Integer idSubcategoria) {
 		if (!sistemaParametros.indicadorTarifaCategoria() && idSubcategoria != null) {
-			return Utilitarios.completaComZerosEsquerda(3, idSubcategoria);
+			return Utilitarios.completaTexto(3, idSubcategoria);
 		} else {
 			return Utilitarios.completaTexto(3, "");
 		}
