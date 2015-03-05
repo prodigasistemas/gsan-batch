@@ -61,7 +61,6 @@ public class FaixaLeituraBO {
 		if (hidrometro == null) {
 			return new FaixaLeituraTO(0, 0);
 		} else {
-			
 			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAtualFaturamento());
 
 			if (isGerarFaixaNormal(imovel)) {
