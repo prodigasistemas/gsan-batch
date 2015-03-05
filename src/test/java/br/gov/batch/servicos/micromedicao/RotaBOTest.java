@@ -120,12 +120,12 @@ public class RotaBOTest {
 	}
 
 	private void carregarImoveisComRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaLeituraComRotaAlternativa(1)).andReturn(imoveis);
+		expect(imovelRepositorioMock.imoveisParaLeituraComRotaAlternativa(1, 1, 10)).andReturn(imoveis);
 		replay(imovelRepositorioMock);
 	}
 
 	private void carregarImoveisSemRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaLeituraSemRotaAlternativa(1)).andReturn(imoveis);
+		expect(imovelRepositorioMock.imoveisParaLeituraSemRotaAlternativa(1, 1, 10)).andReturn(imoveis);
 		replay(imovelRepositorioMock);
 	}
 }

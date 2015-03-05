@@ -108,7 +108,7 @@ public class MovimentoRoteiroEmpresaBOTest {
 	public void testarGerarMovimentoRoteiroEmpresa() {
 		mockImoveisGerados();
 		
-		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimentoRoteiroEmpresa(imoveis, rota);
+		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimento(imoveis, rota);
 		assertNotNull(movimentos);
 	}
 	
@@ -116,7 +116,7 @@ public class MovimentoRoteiroEmpresaBOTest {
 	public void testarNaoGerarMovimentoRoteiroEmpresa() {
 		mockImoveisGeradosOutrosGrupos();
 		
-		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimentoRoteiroEmpresa(imoveis, rota);
+		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimento(imoveis, rota);
 		
 		assertNotNull(movimentos);
 		assertTrue(movimentos.isEmpty());

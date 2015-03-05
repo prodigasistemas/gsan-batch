@@ -70,38 +70,36 @@ public class MovimentoRoteiroEmpresaBO {
 	@EJB
 	private ImovelSubcategoriaBO imovelSubcategoriaBO;
 
-	public List<MovimentoRoteiroEmpresa> gerarMovimentoRoteiroEmpresa(List<Imovel> imoveis, Rota rota) {
+	public List<MovimentoRoteiroEmpresa> gerarMovimento(List<Imovel> imoveis, Rota rota) {
 		repositorio.deletarPorRota(rota);
 
 		List<Imovel> imoveisParaProcessamento = verificarImoveisProcessados(imoveis, rota.getFaturamentoGrupo());
 
-		return criarMovimentoRoteiroEmpresaParaImpressaoSimultanea(imoveisParaProcessamento, rota);
+		return criarMovimentoParaImpressaoSimultanea(imoveisParaProcessamento, rota);
 	}
 
-	public void criarMovimentoRoteiroEmpresaParaLeitura(List<Imovel> imoveis, Integer anoMesCorrente, LeituraTipo tipoLeitura) {
+	public void criarMovimentoParaLeitura(Imovel imovel, Integer anoMesCorrente, Integer tipoLeitura) {
+		Cliente usuario = imovel.getCliente(ClienteRelacaoTipo.USUARIO);
+		Collection<ICategoria> categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
+		MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), Utilitarios.reduzirMeses(anoMesCorrente, 1));
 
-		for (Imovel imovel : imoveis) {
-			Cliente usuario = imovel.getCliente(ClienteRelacaoTipo.USUARIO);
-			Collection<ICategoria> categoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(imovel.getId());
-			MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), Utilitarios.reduzirMeses(anoMesCorrente, 1));
+		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), anoMesCorrente,
+				MedicaoTipo.LIGACAO_AGUA.getId());
+		Hidrometro hidrometro = hidrometroInstalacaoRepositorio.dadosHidrometroInstaladoAgua(imovel.getId());
+		FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, volumeMedioAguaEsgotoTO.getConsumoMedio(), medicao);
 
-			VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(imovel.getId(), anoMesCorrente, MedicaoTipo.LIGACAO_AGUA.getId());
-			Hidrometro hidrometro = hidrometroInstalacaoRepositorio.dadosHidrometroInstaladoAgua(imovel.getId());
-			FaixaLeituraTO faixaLeitura = faixaLeituraBO.obterDadosFaixaLeitura(imovel, hidrometro, volumeMedioAguaEsgotoTO.getConsumoMedio(), medicao);
+		MovimentoRoteiroEmpresa movimento = buildMovimento(imovel);
 
-			MovimentoRoteiroEmpresa movimento = buildMovimento(imovel);
-
-			movimento.setLeituraTipo(tipoLeitura.getId());
-			movimento.setAnoMesMovimento(anoMesCorrente);
-			movimento.setDescricaoAbreviadaCategoriaImovel(categoria.iterator().next().getCategoriaDescricao());
-			movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
-			movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
-			movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
-			movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
-			movimento.setNumeroConsumoMedio(null);
-			movimento.setAnoMesMovimento(anoMesCorrente);
-			movimento.setNomeCliente(usuario != null ? usuario.getNome() : null);
-		}
+		movimento.setLeituraTipo(tipoLeitura);
+		movimento.setAnoMesMovimento(anoMesCorrente);
+		movimento.setDescricaoAbreviadaCategoriaImovel(categoria.iterator().next().getCategoriaDescricao());
+		movimento.setNumeroLeituraAnterior(medicao.getLeituraAtualFaturamento());
+		movimento.setCodigoAnormalidadeAnterior(medicao.getLeituraAnormalidadeInformada().getId());
+		movimento.setNumeroFaixaLeituraEsperadaInicial(faixaLeitura.getFaixaSuperior());
+		movimento.setNumeroFaixaLeituraEsperadaFinal(faixaLeitura.getFaixaInferior());
+		movimento.setNumeroConsumoMedio(null);
+		movimento.setAnoMesMovimento(anoMesCorrente);
+		movimento.setNomeCliente(usuario != null ? usuario.getNome() : null);
 	}
 
 	private MovimentoRoteiroEmpresa buildMovimento(Imovel imovel) {
@@ -152,7 +150,7 @@ public class MovimentoRoteiroEmpresaBO {
 		return movimento;
 	}
 
-	public List<MovimentoRoteiroEmpresa> criarMovimentoRoteiroEmpresaParaImpressaoSimultanea(List<Imovel> imoveis, Rota rota) {
+	public List<MovimentoRoteiroEmpresa> criarMovimentoParaImpressaoSimultanea(List<Imovel> imoveis, Rota rota) {
 
 		List<MovimentoRoteiroEmpresa> movimentos = new ArrayList<MovimentoRoteiroEmpresa>();
 

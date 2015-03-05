@@ -47,9 +47,9 @@ public class RotaBO {
 		List<Imovel> imoveisConsulta = null;
 
 		if (rotaRepositorio.isRotaAlternativa(idRota)) {
-			imoveisConsulta = imovelRepositorio.imoveisParaLeituraComRotaAlternativa(idRota);
+			imoveisConsulta = imovelRepositorio.imoveisParaLeituraComRotaAlternativa(idRota, firstItem, numItems);
 		} else {
-			imoveisConsulta = imovelRepositorio.imoveisParaLeituraSemRotaAlternativa(idRota);
+			imoveisConsulta = imovelRepositorio.imoveisParaLeituraSemRotaAlternativa(idRota, firstItem, numItems);
 		}
 
 		List<Imovel> imoveis = new ArrayList<Imovel>();
