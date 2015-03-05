@@ -1,6 +1,32 @@
 <job id="job_gerar_arquivo_microcoletor" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<!-- 
 	<listeners>
-		<listener ref="arquivoMicrocoletorJobListener"/>
+		<listener ref="gerarArquivoJobListener"/>
+	</listeners>
+	
+	<properties>
+		<property name="tam_particao" value="30" />
+	</properties>
+	
+	<step id="gerarArquivo">
+		<chunk>
+			<reader ref="carregarMovimentosMicrocoletor">
+				<properties>
+					<property name="primeiroItem" value="#{partitionPlan['primeiroItem']}" />
+					<property name="numItens" value="#{partitionPlan['numItens']}" />
+				</properties>
+			</reader>
+			<processor ref="gerarArquivoMicrocoletor" />
+			<writer ref="dummyItemWriter" />
+		</chunk>
+		<partition>
+			<mapper ref="particionadorMicrocoletor" />
+		</partition>
+	</step>
+ -->
+ 
+ 	<listeners>
+		<listener ref="gerarArquivoJobListener"/>
 	</listeners>
 	
 	<step id="gerarArquivo">
@@ -10,5 +36,6 @@
 			<writer ref="dummyItemWriter" />
 		</chunk>
 	</step>
+ 
 </job>
 

@@ -67,48 +67,39 @@ public class GeradorArquivoTextoMicrocoletor {
 		Integer codigoSetorComercialAnterior = null;
 		Rota rotaAnterior = null;
 
-		boolean flagTerminou = false;
-		while (!flagTerminou) {
-			List<MovimentoRoteiroEmpresa> movimentos = movimentoRepositorio.pesquisarMovimentoParaLeitura(rota.getId(), referencia);
-
-			if (movimentos != null && !movimentos.isEmpty()) {
-
-				for (int i = 0; i < movimentos.size(); i++) {
-					movimento = movimentos.get(i);
-
-					quantidadeImoveis += movimentos.size();
-
-					quantidadeImoveisLocalidadeSetorRota++;
-
-					// TODO - Refactoring!!!
-					if (localidadeAnterior == null) {
-						localidadeAnterior = movimento.getLocalidade();
-						codigoSetorComercialAnterior = movimento.getCodigoSetorComercial();
-						rotaAnterior = rota;
-					} else {
-						if (!localidadeAnterior.getId().equals(movimento.getLocalidade().getId())) {
-							pagina = 1;
-							quantidadeImoveisLocalidadeSetorRota = 1;
-
-						} else if (!codigoSetorComercialAnterior.equals(movimento.getCodigoSetorComercial())) {
-							pagina = 1;
-							quantidadeImoveisLocalidadeSetorRota = 1;
-
-						} else if (!rotaAnterior.getId().equals(rota.getId()) || quantidadeImoveisLocalidadeSetorRota > 12) {
-							pagina++;
-							quantidadeImoveisLocalidadeSetorRota = 1;
-						}
-					}
-
-					localidadeAnterior = movimento.getLocalidade();
-					codigoSetorComercialAnterior = movimento.getCodigoSetorComercial();
-					rotaAnterior = rota;
-
-					arquivoTexto.append(adicionarLinha(movimento, pagina));
-				}
+		List<MovimentoRoteiroEmpresa> movimentos = movimentoRepositorio.pesquisarMovimentoParaLeitura(idRota, referencia, 0, 0);
+		for (int i = 0; i < movimentos.size(); i++) {
+			movimento = movimentos.get(i);
+			
+			quantidadeImoveis += movimentos.size();
+			
+			quantidadeImoveisLocalidadeSetorRota++;
+			
+			// TODO - Refactoring!!!
+			if (localidadeAnterior == null) {
+				localidadeAnterior = movimento.getLocalidade();
+				codigoSetorComercialAnterior = movimento.getCodigoSetorComercial();
+				rotaAnterior = rota;
 			} else {
-				flagTerminou = true;
+				if (!localidadeAnterior.getId().equals(movimento.getLocalidade().getId())) {
+					pagina = 1;
+					quantidadeImoveisLocalidadeSetorRota = 1;
+					
+				} else if (!codigoSetorComercialAnterior.equals(movimento.getCodigoSetorComercial())) {
+					pagina = 1;
+					quantidadeImoveisLocalidadeSetorRota = 1;
+					
+				} else if (!rotaAnterior.getId().equals(rota.getId()) || quantidadeImoveisLocalidadeSetorRota > 12) {
+					pagina++;
+					quantidadeImoveisLocalidadeSetorRota = 1;
+				}
 			}
+			
+			localidadeAnterior = movimento.getLocalidade();
+			codigoSetorComercialAnterior = movimento.getCodigoSetorComercial();
+			rotaAnterior = rota;
+			
+			arquivoTexto.append(adicionarLinha(movimento, pagina));
 		}
 
 		faturamentoAtividadeCronogramaRepositorio.atualizarFaturamentoAtividadeCronograma(rota.getFaturamentoGrupo().getId(), referencia);
@@ -123,8 +114,11 @@ public class GeradorArquivoTextoMicrocoletor {
 		String ano = extrairAno(movimento.getAnoMesMovimento()).toString().substring(2, 4);
 		String mes = completaComZerosEsquerda(2, extrairMes(movimento.getAnoMesMovimento()));
 		String grupo = completaComZerosEsquerda(3, movimento.getRota().getFaturamentoGrupo().getId());
+		String local = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getLocalidade().getId());
+		String setor = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getId());
+		String rota  = completaComZerosEsquerda(3, movimento.getRota().getCodigo());
 
-		return "cons" + ano + mes + "." + grupo;
+		return "cons" + ano + mes + "." + grupo + "." + local + "." + setor + "." + rota;
 	}
 
 	public void inserirRoteiro(MovimentoRoteiroEmpresa movimento, int referencia, int quantidadeImoveis, StringBuilder texto) {
@@ -149,7 +143,7 @@ public class GeradorArquivoTextoMicrocoletor {
 		roteiro.setNomeArquivo(nomeArquivo);
 
 		// TODO: Recuperar caminho por parametros
-		IOUtil.criarArquivo(nomeArquivo, "/temp/", texto.toString());
+		IOUtil.criarArquivo(nomeArquivo, "/tmp/", texto.toString());
 
 		roteiroRepositorio.salvar(roteiro);
 	}
@@ -198,8 +192,8 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaComZerosEsquerda(4, ""));
 		linha.append(completaComZerosEsquerda(8, movimento.getNumeroLeituraAnterior()));
 		linha.append(completaComZerosEsquerda(4, movimento.getCodigoAnormalidadeAnterior()));
-		linha.append(completaComZerosEsquerda(5, calcularConsumoMinimo(movimento)));
-		linha.append(completaComZerosEsquerda(5, calcularConsumoMaximo(movimento)));
+		linha.append(completaComZerosEsquerda(5, movimento.calcularConsumoMinimo()));
+		linha.append(completaComZerosEsquerda(5, movimento.calcularConsumoMaximo()));
 		linha.append(completaComZerosEsquerda(5, movimento.getNumeroConsumoMedio()));
 		linha.append(completaTexto(60, ""));
 		linha.append(completaComZerosEsquerda(2, movimento.getNumeroMoradores()));
@@ -230,22 +224,6 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaComZerosEsquerda(3, movimento.getCodigoQuadraFace()));
 
 		return linha.toString();
-	}
-
-	private Integer calcularConsumoMaximo(MovimentoRoteiroEmpresa movimento) {
-		if (movimento.getNumeroFaixaLeituraEsperadaFinal() != null) {
-			return movimento.getNumeroFaixaLeituraEsperadaFinal() - movimento.getNumeroLeituraAnterior();
-		} else {
-			return 0;
-		}
-	}
-
-	private Integer calcularConsumoMinimo(MovimentoRoteiroEmpresa movimento) {
-		if (movimento.getNumeroFaixaLeituraEsperadaInicial() != null) {
-			return movimento.getNumeroFaixaLeituraEsperadaInicial() - movimento.getNumeroLeituraAnterior();
-		} else {
-			return 0;
-		}
 	}
 
 	private String montarMedicaoTipo(Integer medicao) {
