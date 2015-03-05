@@ -55,10 +55,11 @@ public class FaixaLeituraBO {
 	     sistemaParametro = sistemaParametrosRepositorio.getSistemaParametros();
 	 }
 	
+	 //FIXME: Metodo confuso
 	 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	 public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
 		
-		if (hidrometro == null) {
+		if (hidrometro == null || medicaoHistorico == null) {
 			return new FaixaLeituraTO(0, 0);
 		} else {
 			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
@@ -78,7 +79,7 @@ public class FaixaLeituraBO {
 		}
 	}
 	
-	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media,MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
+	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media, MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
 
 		BigDecimal faixaInicial = null;
 		BigDecimal faixaFinal = null;
