@@ -113,7 +113,9 @@ public class AguaEsgotoBO {
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
 		int idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
 		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, categorias);
-		
+		if (idImovel.equals(new Integer("3570240"))) {
+        	System.out.println("Imóvel 3570240 -  mínimo: " + consumoMinimo );
+        }
 		return new VolumeMedioAguaEsgotoTO(consumoMinimo, 1);
 	}
 }

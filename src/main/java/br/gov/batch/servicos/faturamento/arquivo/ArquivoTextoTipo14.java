@@ -7,8 +7,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
 import br.gov.model.micromedicao.LeituraAnormalidade;
@@ -17,7 +15,6 @@ import br.gov.servicos.micromedicao.LeituraAnormalidadeRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo14 extends ArquivoTexto {
-    private static Logger logger = Logger.getLogger(ArquivoTextoTipo14.class);
 
 	@EJB
 	private LeituraAnormalidadeRepositorio repositorio;
@@ -28,13 +25,12 @@ public class ArquivoTextoTipo14 extends ArquivoTexto {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-//        logger.info("Construcao da linha 14");
 	    
 		List<LeituraAnormalidade> leituraAnormalidades = repositorio.listarLeituraAnormalidadeImpressaoSimultanea(Status.ATIVO.getId());
 
 		builder.append(System.getProperty("line.separator"));
-		builder.append(TIPO_REGISTRO_14_ANORMALIDADE_LEITURA);
 		for (LeituraAnormalidade leituraAnormalidade : leituraAnormalidades) {
+			builder.append(TIPO_REGISTRO_14_ANORMALIDADE_LEITURA);
 			builder.append(Utilitarios.completaComZerosEsquerda(3, leituraAnormalidade.getId()));
 			builder.append(Utilitarios.completaComEspacosADireita(25, leituraAnormalidade.getDescricao()));
 			builder.append(Utilitarios.completaComEspacosADireita(1, leituraAnormalidade.getIndicadorLeitura()));

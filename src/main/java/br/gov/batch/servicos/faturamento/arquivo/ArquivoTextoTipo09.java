@@ -82,7 +82,7 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 		if (sistemaParametros.indicadorTarifaCategoria()) {
 			builder.append(Utilitarios.completaTexto(3, ""));
 		} else {
-			builder.append(Utilitarios.completaComZerosEsquerda(3, dadosTarifa.getSubcategoria().getId()));
+			builder.append(Utilitarios.completaTexto(3, dadosTarifa.getSubcategoria().getId()));
 		}
 	}
 
