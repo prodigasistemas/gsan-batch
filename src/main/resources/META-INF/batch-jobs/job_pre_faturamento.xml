@@ -3,6 +3,7 @@
 		<listener ref="preFaturamentoJobListener"/>
 	</listeners>
 <!--
+ --> 
 	<step id="carregarRotas" next="gerarArquivo">
 		<chunk item-count="1">
 			<reader ref="carregarRotas"/>
@@ -11,7 +12,6 @@
 		</chunk>
 	</step>
 
- --> 
 	
 	<step id="gerarArquivo" next="agruparArquivosMicrocoletor">
 		<chunk item-count="1">
