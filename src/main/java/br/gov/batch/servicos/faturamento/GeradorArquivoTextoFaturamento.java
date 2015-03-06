@@ -229,11 +229,11 @@ public class GeradorArquivoTextoFaturamento {
         logger.info("Rota: " + idRota + " - Roteiro salvo");
         
         if (rota.existeLimiteImoveis()){
-            divisoes.forEach(e -> IOUtil.criarArquivoCompactado(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
-            IOUtil.criarArquivoCompactado(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
+            IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
         }
         
         logger.info("Rota: " + idRota + " - Arquivo criado");

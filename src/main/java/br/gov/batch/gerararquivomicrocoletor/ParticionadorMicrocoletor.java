@@ -1,4 +1,4 @@
-package br.gov.batch.microcoletor;
+package br.gov.batch.gerararquivomicrocoletor;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;

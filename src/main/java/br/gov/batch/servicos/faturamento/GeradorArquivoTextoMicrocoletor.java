@@ -6,7 +6,6 @@ import static br.gov.model.util.Utilitarios.extrairAno;
 import static br.gov.model.util.Utilitarios.extrairMes;
 import static br.gov.model.util.Utilitarios.formatarAnoMesParaMesAno;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -15,16 +14,11 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.cadastro.Localidade;
-import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
-import br.gov.model.micromedicao.ServicoTipoCelular;
-import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
 import br.gov.persistence.util.IOUtil;
-import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
-import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
 
@@ -33,12 +27,6 @@ public class GeradorArquivoTextoMicrocoletor {
 
 	@EJB
 	private MovimentoRoteiroEmpresaRepositorio movimentoRepositorio;
-
-	@EJB
-	private ArquivoTextoRoteiroEmpresaRepositorio roteiroRepositorio;
-
-	@EJB
-	private QuadraRepositorio quadraRepositorio;
 
 	@EJB
 	private FaturamentoAtividadeCronogramaRepositorio faturamentoAtividadeCronogramaRepositorio;
@@ -55,11 +43,10 @@ public class GeradorArquivoTextoMicrocoletor {
 		Rota rota = rotaRepositorio.obterPorID(idRota);
 		int referencia = rota.getFaturamentoGrupo().getAnoMesReferencia();
 
-		StringBuilder arquivoTexto = new StringBuilder();
+		StringBuilder texto = new StringBuilder();
 
 		MovimentoRoteiroEmpresa movimento = null;
 
-		int quantidadeImoveis = 0;
 		int pagina = 1;
 
 		int quantidadeImoveisLocalidadeSetorRota = 0;
@@ -70,11 +57,9 @@ public class GeradorArquivoTextoMicrocoletor {
 		List<MovimentoRoteiroEmpresa> movimentos = movimentoRepositorio.pesquisarMovimentoParaLeitura(idRota, referencia, 0, 0);
 		for (int i = 0; i < movimentos.size(); i++) {
 			movimento = movimentos.get(i);
-			
-			quantidadeImoveis += movimentos.size();
-			
+
 			quantidadeImoveisLocalidadeSetorRota++;
-			
+
 			// TODO - Refactoring!!!
 			if (localidadeAnterior == null) {
 				localidadeAnterior = movimento.getLocalidade();
@@ -84,84 +69,28 @@ public class GeradorArquivoTextoMicrocoletor {
 				if (!localidadeAnterior.getId().equals(movimento.getLocalidade().getId())) {
 					pagina = 1;
 					quantidadeImoveisLocalidadeSetorRota = 1;
-					
+
 				} else if (!codigoSetorComercialAnterior.equals(movimento.getCodigoSetorComercial())) {
 					pagina = 1;
 					quantidadeImoveisLocalidadeSetorRota = 1;
-					
+
 				} else if (!rotaAnterior.getId().equals(rota.getId()) || quantidadeImoveisLocalidadeSetorRota > 12) {
 					pagina++;
 					quantidadeImoveisLocalidadeSetorRota = 1;
 				}
 			}
-			
+
 			localidadeAnterior = movimento.getLocalidade();
 			codigoSetorComercialAnterior = movimento.getCodigoSetorComercial();
 			rotaAnterior = rota;
-			
-			arquivoTexto.append(adicionarLinha(movimento, pagina));
+
+			texto.append(adicionarLinha(movimento, pagina));
 		}
 
 		faturamentoAtividadeCronogramaRepositorio.atualizarFaturamentoAtividadeCronograma(rota.getFaturamentoGrupo().getId(), referencia);
 
-		if (arquivoTexto != null && arquivoTexto.length() > 0) {
-			if (liberarGeracaoArquivo(movimento, referencia))
-				inserirRoteiro(movimento, referencia, quantidadeImoveis, arquivoTexto);
-		}
-	}
-
-	private String montarNomeArquivo(MovimentoRoteiroEmpresa movimento) {
-		String ano = extrairAno(movimento.getAnoMesMovimento()).toString().substring(2, 4);
-		String mes = completaComZerosEsquerda(2, extrairMes(movimento.getAnoMesMovimento()));
-		String grupo = completaComZerosEsquerda(3, movimento.getRota().getFaturamentoGrupo().getId());
-
-		return "cons" + ano + mes + "." + grupo;
-	}
-
-	public void inserirRoteiro(MovimentoRoteiroEmpresa movimento, int referencia, int quantidadeImoveis, StringBuilder texto) {
-		ArquivoTextoRoteiroEmpresa roteiro = new ArquivoTextoRoteiroEmpresa();
-
-		roteiro.setAnoMesReferencia(referencia);
-		roteiro.setFaturamentoGrupo(movimento.getFaturamentoGrupo());
-		roteiro.setEmpresa(movimento.getEmpresa());
-		roteiro.setLocalidade(movimento.getLocalidade());
-		roteiro.setCodigoSetorComercial1(movimento.getCodigoSetorComercial());
-
-		int[] intervaloQuadras = quadraRepositorio.obterIntervaloQuadrasPorRota(movimento.getRota().getId());
-		roteiro.setNumeroQuadraInicial1(intervaloQuadras[0]);
-		roteiro.setNumeroQuadraFinal1(intervaloQuadras[1]);
-
-		roteiro.setQuantidadeImovel(quantidadeImoveis);
-		roteiro.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.LIBERADO.getId());
-		roteiro.setServicoTipoCelular(ServicoTipoCelular.LEITURA.getId());
-		roteiro.setUltimaAlteracao(new Date());
-
-		String nomeArquivo = montarNomeArquivo(movimento);
-        String local = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getLocalidade().getId());
-        String setor = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getId());
-        String rota  = completaComZerosEsquerda(3, movimento.getRota().getCodigo());
-        nomeArquivo += "." + local + "." + setor + "." + rota + ".txt";
-		roteiro.setNomeArquivo(nomeArquivo);
-
-		// TODO: Recuperar caminho por parametros
-		IOUtil.criarArquivoTexto(nomeArquivo, "/tmp/", texto.toString());
-
-		roteiroRepositorio.salvar(roteiro);
-	}
-
-	private boolean liberarGeracaoArquivo(MovimentoRoteiroEmpresa movimento, int referencia) {
-		boolean gerar = true;
-
-		ArquivoTextoRoteiroEmpresa arquivo = roteiroRepositorio.pesquisarPorGrupoEReferencia(referencia, movimento.getFaturamentoGrupo().getId());
-		if (arquivo != null && arquivo.getEmpresa().getId().intValue() == movimento.getEmpresa().getId().intValue()) {
-			if (arquivo.getSituacaoTransmissaoLeitura().intValue() == SituacaoTransmissaoLeitura.LIBERADO.getId()) {
-				roteiroRepositorio.excluir(arquivo.getId());
-			} else {
-				gerar = false;
-			}
-		}
-
-		return gerar;
+		if (movimento != null)
+			criarArquivo(movimento, texto);
 	}
 
 	private String adicionarLinha(MovimentoRoteiroEmpresa movimento, int pagina) {
@@ -180,7 +109,7 @@ public class GeradorArquivoTextoMicrocoletor {
 		linha.append(completaComZerosEsquerda(1, ""));
 		linha.append(completaTexto(12, movimento.getNumeroHidrometro()));
 		linha.append(completaTexto(15, movimento.getLigacaoAguaSituacao().getDescricao()));
-		linha.append(completaTexto(15, montarMedicaoTipo(movimento.getMedicaoTipo())));
+		linha.append(completaTexto(15, recuperarMedicaoTipo(movimento.getMedicaoTipo())));
 		linha.append(completaTexto(40, movimento.getNomeCliente()));
 		linha.append(completaTexto(40, movimento.getLogradouro() != null ? movimento.getLogradouro().getDescricaoFormatada().toString() : ""));
 		linha.append(completaTexto(6, movimento.getImovel().getNumeroImovel()));
@@ -227,7 +156,7 @@ public class GeradorArquivoTextoMicrocoletor {
 		return linha.toString();
 	}
 
-	private String montarMedicaoTipo(Integer medicao) {
+	private String recuperarMedicaoTipo(Integer medicao) {
 		if (medicao != null) {
 			if (medicao.intValue() == MedicaoTipo.LIGACAO_AGUA.getId()) {
 				return "SO AGUA";
@@ -237,5 +166,18 @@ public class GeradorArquivoTextoMicrocoletor {
 		} else {
 			return "";
 		}
+	}
+
+	private void criarArquivo(MovimentoRoteiroEmpresa movimento, StringBuilder texto) {
+		String ano = extrairAno(movimento.getAnoMesMovimento()).toString().substring(2, 4);
+		String mes = completaComZerosEsquerda(2, extrairMes(movimento.getAnoMesMovimento()));
+		String grupo = completaComZerosEsquerda(3, movimento.getRota().getFaturamentoGrupo().getId());
+		String local = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getLocalidade().getId());
+		String setor = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getId());
+		String rota = completaComZerosEsquerda(3, movimento.getRota().getCodigo());
+
+		String nomeArquivo = "cons" + ano + mes + "." + grupo + "." + local + "." + setor + "." + rota + ".txt";
+
+		IOUtil.criarArquivoTexto(nomeArquivo, "/tmp/", texto.toString());
 	}
 }

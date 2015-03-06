@@ -1,4 +1,4 @@
-package br.gov.batch.microcoletor;
+package br.gov.batch.gerararquivomicrocoletor;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
@@ -15,6 +15,7 @@ import br.gov.batch.util.BatchUtil;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 
+// FIXME: Apagar classe (apagar código comentado no job_gerar_arquivo_microcoletor)
 @Named
 public class CarregarMovimentosMicrocoletor extends AbstractItemReader {
 
