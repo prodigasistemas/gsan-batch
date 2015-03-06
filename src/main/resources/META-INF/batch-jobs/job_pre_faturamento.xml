@@ -11,19 +11,20 @@
 		</chunk>
 	</step>
 
-	<step id="gerarArquivo" next="agruparArquivos">
+ --> 
+	
+	<step id="gerarArquivo" next="agruparArquivosMicrocoletor">
 		<chunk item-count="1">
 			<reader ref="lerRotasParaArquivo"/>
 			<processor ref="iniciaGeracaoArquivoRota" />
 			<writer ref="dummyItemWriter" />
 		</chunk>
 	</step>
- --> 
 	
-	<step id="agruparArquivos">
+	<step id="agruparArquivosMicrocoletor">
 		<chunk item-count="1">
 			<reader ref="dummyItemReader"/>
-			<processor ref="agruparArquivos" />
+			<processor ref="agruparArquivosMicrocoletor" />
 			<writer ref="dummyItemWriter" />
 		</chunk>	
 	</step>  

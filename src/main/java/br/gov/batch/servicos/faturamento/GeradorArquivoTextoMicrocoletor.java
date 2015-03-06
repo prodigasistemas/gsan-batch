@@ -21,7 +21,7 @@ import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.ServicoTipoCelular;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
-import br.gov.model.util.IOUtil;
+import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
@@ -114,11 +114,8 @@ public class GeradorArquivoTextoMicrocoletor {
 		String ano = extrairAno(movimento.getAnoMesMovimento()).toString().substring(2, 4);
 		String mes = completaComZerosEsquerda(2, extrairMes(movimento.getAnoMesMovimento()));
 		String grupo = completaComZerosEsquerda(3, movimento.getRota().getFaturamentoGrupo().getId());
-		String local = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getLocalidade().getId());
-		String setor = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getId());
-		String rota  = completaComZerosEsquerda(3, movimento.getRota().getCodigo());
 
-		return "cons" + ano + mes + "." + grupo + "." + local + "." + setor + "." + rota;
+		return "cons" + ano + mes + "." + grupo;
 	}
 
 	public void inserirRoteiro(MovimentoRoteiroEmpresa movimento, int referencia, int quantidadeImoveis, StringBuilder texto) {
@@ -140,10 +137,14 @@ public class GeradorArquivoTextoMicrocoletor {
 		roteiro.setUltimaAlteracao(new Date());
 
 		String nomeArquivo = montarNomeArquivo(movimento);
+        String local = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getLocalidade().getId());
+        String setor = completaComZerosEsquerda(3, movimento.getRota().getSetorComercial().getId());
+        String rota  = completaComZerosEsquerda(3, movimento.getRota().getCodigo());
+        nomeArquivo += "." + local + "." + setor + "." + rota + ".txt";
 		roteiro.setNomeArquivo(nomeArquivo);
 
 		// TODO: Recuperar caminho por parametros
-		IOUtil.criarArquivo(nomeArquivo, "/tmp/", texto.toString());
+		IOUtil.criarArquivoTexto(nomeArquivo, "/tmp/", texto.toString());
 
 		roteiroRepositorio.salvar(roteiro);
 	}
