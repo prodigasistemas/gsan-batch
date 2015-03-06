@@ -31,6 +31,7 @@ import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.RateioTipo;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
@@ -65,6 +66,9 @@ public class ArquivoTextoTipo08Test {
 
 	@Mock
 	private MedicaoHistoricoRepositorio medicaoHistoricoMock;
+	
+    @Mock
+    private ImovelRepositorio repositorioImovel;
 
 	private ArquivoTextoTO to;
 	
@@ -103,7 +107,7 @@ public class ArquivoTextoTipo08Test {
 		imovel.setLigacaoAguaSituacao(situacao);
 
 		to = new ArquivoTextoTO();
-		to.setImovel(imovel);
+		to.setIdImovel(imovel.getId());
 		to.setAnoMesReferencia(referencia);
 		arquivo = new ArquivoTextoTipo08();
 	}
@@ -124,6 +128,9 @@ public class ArquivoTextoTipo08Test {
 	}
 
 	private void carregarMocks() {
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
+	    
 		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(1);
 		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(1);
 		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia)).andReturn(medicaoHistorico).times(1);

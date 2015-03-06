@@ -35,6 +35,7 @@ import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.util.FormatoData;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @RunWith(EasyMockRunner.class)
@@ -51,6 +52,9 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
 	
 	@Mock
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
+	
+    @Mock
+    private ImovelRepositorio repositorioImovel;
 	
 	private Imovel imovel;
 	private FaturamentoGrupo faturamentoGrupo;
@@ -85,7 +89,7 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
         arquivo = new ArquivoTextoTipo01DadosFaturamento();
         
         arquivoTextoTO = new ArquivoTextoTO();
-        arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setIdImovel(imovel.getId());
         arquivoTextoTO.setConta(conta);
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         arquivoTextoTO.setAnoMesReferencia(201501);
@@ -149,6 +153,9 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
 	public void carregarMocks() {
     	List<ICategoria> categorias = categoriasSetup(); 
     	List<ICategoria> subcategorias = subcategoriasSetup();
+    	
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
     	
     	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
     	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);

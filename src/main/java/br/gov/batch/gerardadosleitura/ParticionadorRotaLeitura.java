@@ -9,7 +9,7 @@ import br.gov.batch.servicos.micromedicao.RotaBO;
 import br.gov.batch.util.BatchUtil;
 
 @Named
-public class ParticionadorRota extends Particao {
+public class ParticionadorRotaLeitura extends Particao {
 
 	@EJB
     protected RotaBO rotaBO;
@@ -19,6 +19,6 @@ public class ParticionadorRota extends Particao {
 	
     public int totalItens(){
     	int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	return (int) rotaBO.totalImoveisParaPreFaturamento(idRota);
+    	return (int) rotaBO.totalImoveisParaLeitura(idRota);
     }
 }

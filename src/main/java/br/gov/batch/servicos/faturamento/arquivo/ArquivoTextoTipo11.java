@@ -7,8 +7,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.Status;
@@ -21,7 +19,6 @@ import br.gov.model.util.Utilitarios;
 
 @Stateless
 public class ArquivoTextoTipo11 extends ArquivoTexto {
-    private static Logger logger = Logger.getLogger(ArquivoTextoTipo11.class);
 
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
@@ -32,8 +29,6 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-//        logger.info("Construcao da linha 11");
-	    
 		builder.append(System.getProperty("line.separator"));
 
 		Rota rota = verificarRota(to.getImovel());
@@ -55,20 +50,12 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		builder.append(Utilitarios.completaComZerosEsquerda(1, sistemaParametros.getIndicadorBloqueioContaMobile()));
 		builder.append((rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()) :
 				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId()));
-		builder.append(Utilitarios.completaComZerosEsquerda(2, faturamentoAtividadeCronogramaBO.obterDiferencaDiasCronogramas(rota, FaturamentoAtividade.EFETUAR_LEITURA)));
-		builder.append(Utilitarios.completaComEspacosADireita(2, (sistemaParametros.getNumeroModuloDigitoVerificador() != null 
-				&& sistemaParametros.getNumeroModuloDigitoVerificador().compareTo(ConstantesSistema.MODULO_VERIFICADOR_11) == 0) ? 
-						ConstantesSistema.MODULO_VERIFICADOR_11 : ConstantesSistema.MODULO_VERIFICADOR_10));
-		builder.append(Utilitarios.formataData(Utilitarios.reduzirDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
-		builder.append(Utilitarios.formataData(Utilitarios.adicionarDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
-		builder.append(Utilitarios.completaComZerosEsquerda(4, (rota != null) ? rota.getId() : null));
-		builder.append(getIndicadorSequencialLeitura(rota));
 		builder.append(getDiferencaDiasCronogramas(rota));
 		builder.append(getModuloDigitoVerificador(sistemaParametros.getNumeroModuloDigitoVerificador()));
 		builder.append(Utilitarios.formataData(Utilitarios.reduzirDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.formataData(Utilitarios.adicionarDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.completaComZerosEsquerda(4, (rota != null) ? rota.getId() : null));
-		builder.append(Utilitarios.completaComZerosEsquerda(2, to.getSequenciaRota()));
+		builder.append(getIndicadorSequencialLeitura(rota));
 
 		return builder.toString();
 	}

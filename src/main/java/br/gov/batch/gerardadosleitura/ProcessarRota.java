@@ -15,6 +15,7 @@ import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronRotaRepositorio;
 import br.gov.servicos.to.CronogramaFaturamentoRotaTO;
 
+//TODO: Mudar o nome para ProcessarImovelRota
 @Named
 public class ProcessarRota implements ItemProcessor {
     @EJB

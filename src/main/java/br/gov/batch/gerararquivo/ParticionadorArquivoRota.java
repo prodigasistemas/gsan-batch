@@ -1,4 +1,4 @@
-package br.gov.batch.gerardadosleitura;
+package br.gov.batch.gerararquivo;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -9,7 +9,7 @@ import br.gov.batch.servicos.micromedicao.RotaBO;
 import br.gov.batch.util.BatchUtil;
 
 @Named
-public class ParticionadorRota extends Particao {
+public class ParticionadorArquivoRota extends Particao {
 
 	@EJB
     protected RotaBO rotaBO;

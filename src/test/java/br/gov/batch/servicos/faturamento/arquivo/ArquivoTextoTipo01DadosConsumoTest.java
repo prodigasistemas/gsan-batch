@@ -31,6 +31,7 @@ import br.gov.model.cadastro.Subcategoria;
 import br.gov.model.faturamento.ConsumoTarifa;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.LigacaoTipo;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
@@ -55,7 +56,11 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     @Mock
     private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
     
+    @Mock
+    private ImovelRepositorio repositorioImovel;
+    
 	private Imovel imovel;
+	
 	private FaturamentoGrupo faturamentoGrupo;
 	
 	private ArquivoTextoTO arquivoTextoTO;
@@ -72,7 +77,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
         arquivo = new ArquivoTextoTipo01DadosConsumo();
         
         arquivoTextoTO = new ArquivoTextoTO();
-        arquivoTextoTO.setImovel(imovel);
+        arquivoTextoTO.setIdImovel(imovel.getId());
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         
 	}
@@ -129,6 +134,9 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     }
 	
 	public void carregarMocks() {
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
+	    
     	DadosBancariosTO to = new DadosBancariosTO();
     	to.setCodigoAgencia("00000");
     	to.setDescricaoBanco("BANCO DO BRASIL");

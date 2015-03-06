@@ -1,13 +1,14 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
+import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.completaTexto;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +19,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.ContaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
+import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 
 @RunWith(EasyMockRunner.class)
@@ -34,21 +39,35 @@ public class ArquivoTextoTipo01DadosClienteTest {
 
 	@Mock
 	private FaturamentoParametroRepositorio repositorioParametros;
+	
+	@Mock
+	private ImovelRepositorio repositorioImovel;
+	
+	@Mock
+	private ClienteEnderecoRepositorio clienteEnderecoRepositorio;
+	
+	@Mock
+	private ContaBO contaBO;
+
+	private ArquivoTextoTO arquivoTextoTO;
 
 	private Imovel imovel;
 	
-	private ArquivoTextoTO arquivoTextoTO;
+	private Cliente clienteResponsavel;
+	
+	private String naoEmitirConta = "2";
 
 	@Before
 	public void setup() {
 		imovel = new Imovel(1234567);
 
 		Cliente clienteUsuario = new Cliente();
-		clienteUsuario.setNome("MARIA JOSÉ DA SILVA");
+		clienteUsuario.setNome("MARIA JOSE DA SILVA");
 		clienteUsuario.setCpf("11111111111");
 
-		Cliente clienteResponsavel = new Cliente();
-		clienteResponsavel.setNome("JOÃO ROBERTO SOUZA");
+		clienteResponsavel = new Cliente();
+		clienteResponsavel.setId(123124);
+		clienteResponsavel.setNome("JOAO ROBERTO SOUZA");
 		clienteResponsavel.setCpf("222.222.222-22");
 
 		ClienteImovel clienteImovelUsuario = new ClienteImovel();
@@ -66,12 +85,12 @@ public class ArquivoTextoTipo01DadosClienteTest {
 		clientesImovel.add(clienteImovelResponsavel);
 		imovel.setClienteImoveis(clientesImovel);
 
-		imovel.setImovelContaEnvio(1);
+		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL);
 
 		arquivo = new ArquivoTextoTipo01DadosCliente();
 		
 		arquivoTextoTO = new ArquivoTextoTO();
-		arquivoTextoTO.setImovel(imovel);
+		arquivoTextoTO.setIdImovel(imovel.getId());
 		
 	}
 
@@ -90,30 +109,34 @@ public class ArquivoTextoTipo01DadosClienteTest {
 		carregarMocks();
 
 		StringBuilder linhaValida = new StringBuilder();
-		linhaValida.append("MARIA JOSÉ DA SILVA           11111111111                                        ")
-				   .append("                                                                            1");
+		linhaValida.append("MARIA JOSE DA SILVA           11111111111                                        ")
+		    .append(completaComZerosEsquerda(9, clienteResponsavel.getId()))
+		    .append(completaComEspacosADireita(25, clienteResponsavel.getNome()))
+		    .append("                                                                            1");
 
 		Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
 
-		String linha = getLinha(mapDados);
+        StringBuilder trechoResponsavel = new StringBuilder();
+        trechoResponsavel.append(completaComZerosEsquerda(9, clienteResponsavel.getId()))
+            .append(completaComEspacosADireita(25, clienteResponsavel.getNome()))
+            .append(completaTexto(109-34, " "));
 
-		assertEquals(linha, linhaValida.toString());
-	}
-
-	private String getLinha(Map<Integer, StringBuilder> mapDados) {
-		StringBuilder builder = new StringBuilder();
-
-		Collection<StringBuilder> dados = mapDados.values();
-
-		Iterator<StringBuilder> iterator = dados.iterator();
-		while (iterator.hasNext()) {
-			builder.append(iterator.next());
-		}
-
-		return builder.toString();
+		assertEquals(completaComEspacosADireita(30, "MARIA JOSE DA SILVA"), mapDados.get(2).toString());
+		assertEquals(trechoResponsavel.toString(), mapDados.get(7).toString());
+		assertEquals(naoEmitirConta, mapDados.get(14).toString());
+		assertEquals(completaComEspacosADireita(18, "11111111111"), mapDados.get(35).toString());
 	}
 
 	private void carregarMocks() {
+	    expect(contaBO.emitirConta(imovel)).andReturn(Boolean.FALSE);
+	    replay(contaBO);
+	    
+	    expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+	    replay(repositorioImovel);
+	    
+	    expect(clienteEnderecoRepositorio.pesquisarEnderecoCliente(clienteResponsavel.getId())).andReturn(null);
+	    replay(clienteEnderecoRepositorio);
+	    
 		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true").times(2);
 		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false").times(2);
 		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).andReturn("false").times(2);

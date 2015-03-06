@@ -1,7 +1,13 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
+import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.completaTexto;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -17,7 +23,6 @@ import br.gov.model.cadastro.ClienteImovel;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.endereco.ClienteEndereco;
-import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
@@ -62,24 +67,26 @@ public class ArquivoTextoTipo01DadosCliente {
 	private void escreverNomeCliente() {
 		StringBuilder builder = new StringBuilder();
 		
-		if (imovel.getClienteImoveis().size() > 0) {
-	        ClienteImovel clienteImovel = imovel.getClienteImoveis().get(0);
-	        
-	        if (clienteImovel.nomeParaConta()) {
-	            clienteNomeConta = clienteImovel.getCliente();
-	        }
-	
-	        if (clienteImovel.getClienteRelacaoTipo().getId() == ClienteRelacaoTipo.USUARIO.intValue()) {
-	            clienteUsuario = clienteImovel.getCliente();
-	        } else {
-	            clienteResponsavel = clienteImovel.getCliente();
-	        }
+		List<ClienteImovel> clientesAtivos = imovel.getClienteImoveis().stream()
+												.filter(c -> c.getDataFimRelacao() == null)
+												.collect(Collectors.toList());
+		
+		for(ClienteImovel clienteImovel : clientesAtivos) {
+			if (clienteImovel.nomeParaConta()) {
+				clienteNomeConta = clienteImovel.getCliente();
+			}
+			
+			if (clienteImovel.getClienteRelacaoTipo().getId() == ClienteRelacaoTipo.USUARIO.intValue()) {
+				clienteUsuario = clienteImovel.getCliente();
+			} else {
+				clienteResponsavel = clienteImovel.getCliente();
+			}
 	    }
 	
 		if (clienteUsuario != null) {
-		    builder.append(Utilitarios.completaComEspacosADireita(30, clienteUsuario.getNome()));
+		    builder.append(completaComEspacosADireita(30, clienteUsuario.getNome()));
 		} else {
-		    builder.append(Utilitarios.completaComEspacosADireita(30, ""));
+		    builder.append(completaComEspacosADireita(30, ""));
 		}
 	    
 	    dadosCliente.put(2, builder);
@@ -90,24 +97,26 @@ public class ArquivoTextoTipo01DadosCliente {
 		
 		if (clienteResponsavel != null) {
 	        if (clienteNomeConta != null) {
-	            builder.append(Utilitarios.completaComZerosEsquerda(9, clienteNomeConta.getId()));
-	            builder.append(Utilitarios.completaComEspacosADireita(25, clienteNomeConta.getNome()));
+	            builder.append(completaComZerosEsquerda(9, clienteNomeConta.getId()));
+	            builder.append(completaComEspacosADireita(25, clienteNomeConta.getNome()));
 	        } else {
-	            builder.append(Utilitarios.completaComZerosEsquerda(9, clienteResponsavel.getId()));
-	            builder.append(Utilitarios.completaComEspacosADireita(25, clienteResponsavel.getNome()));
+	            builder.append(completaComZerosEsquerda(9, clienteResponsavel.getId()));
+	            builder.append(completaComEspacosADireita(25, clienteResponsavel.getNome()));
 	        }
 	
 	        if (imovel.enviarContaParaImovel()) {
-	            builder.append(Utilitarios.completaComEspacosADireita(75, imovel.getEnderecoFormatadoAbreviado()));
+	            builder.append(completaComEspacosADireita(75, imovel.getEnderecoFormatadoAbreviado()));
 	        } else {
 	            ClienteEndereco clienteEndereco = clienteEnderecoRepositorio.pesquisarEnderecoCliente(clienteResponsavel.getId());
 	
 	            if (clienteEndereco != null) {
-	                builder.append(Utilitarios.completaComEspacosADireita(75, clienteEndereco.getEnderecoFormatadoAbreviado().toString()));
+	                builder.append(completaComEspacosADireita(75, clienteEndereco.getEnderecoFormatadoAbreviado().toString()));
+	            }else{
+	                builder.append(completaTexto(75, ""));
 	            }
 	        }
 	    } else {
-	        builder.append(Utilitarios.completaComEspacosADireita(109, ""));
+	        builder.append(completaComEspacosADireita(109, ""));
 	    }
 		
 		dadosCliente.put(7, builder);
@@ -117,9 +126,9 @@ public class ArquivoTextoTipo01DadosCliente {
 		StringBuilder builder = new StringBuilder();
 		
 		if (clienteUsuario != null && !clienteUsuario.equals("")) {
-			builder.append(Utilitarios.completaComEspacosADireita(18, clienteUsuario.getCpfOuCnpj()));
+			builder.append(completaComEspacosADireita(18, clienteUsuario.getCpfOuCnpj()));
 		} else {
-			builder.append(Utilitarios.completaComEspacosADireita(18, ""));
+			builder.append(completaComEspacosADireita(18, ""));
 		}
 		
 		dadosCliente.put(35, builder);

@@ -1,6 +1,8 @@
 package br.gov.batch.servicos.micromedicao;
 
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -17,16 +19,24 @@ import org.junit.runner.RunWith;
 
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
+import br.gov.model.cadastro.Bairro;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Localidade;
+import br.gov.model.cadastro.Logradouro;
+import br.gov.model.cadastro.LogradouroBairro;
 import br.gov.model.cadastro.Quadra;
+import br.gov.model.cadastro.QuadraFace;
+import br.gov.model.cadastro.SetorComercial;
+import br.gov.model.cadastro.endereco.LogradouroCep;
 import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.Hidrometro;
+import br.gov.model.micromedicao.HidrometroInstalacaoHistorico;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 
 @RunWith(EasyMockRunner.class)
-public class MovimentoRoteiroEmpresBOTest {
+public class MovimentoRoteiroEmpresaBOTest {
 
 	@TestSubject
 	private MovimentoRoteiroEmpresaBO bo;
@@ -49,17 +59,44 @@ public class MovimentoRoteiroEmpresBOTest {
 		grupo = new FaturamentoGrupo();
 		grupo.setAnoMesReferencia(201501);
 		
+		SetorComercial setor = new SetorComercial();
+		setor.setCodigo(1);
 		rota = new Rota(1);
 		rota.setFaturamentoGrupo(grupo);
+		rota.setSetorComercial(setor);
 		
 		Quadra quadra = new Quadra(1);
 		quadra.setRota(rota);
+		quadra.setNumeroQuadra(1);
 		
 		imovel = new Imovel(1);
+		imovel.setSetorComercial(setor);
+		imovel.setNumeroMorador(Short.valueOf("2"));
 		imovel.setLocalidade(new Localidade(1));
 		imovel.setLigacaoAguaSituacao(new LigacaoAguaSituacao(LigacaoAguaSituacao.LIGADO));
 		imovel.setLigacaoEsgotoSituacao(new LigacaoEsgotoSituacao(LigacaoEsgotoSituacao.LIGADO));
 		imovel.setQuadra(quadra);
+		
+		QuadraFace quadraFace = new QuadraFace();
+		quadraFace.setNumeroQuadraFace(1);
+		imovel.setQuadraFace(quadraFace);
+		
+		HidrometroInstalacaoHistorico hidrometroInstalacaoHistorico = new HidrometroInstalacaoHistorico();
+		Hidrometro hidrometro = new Hidrometro();
+		hidrometro.setNumero("");
+		hidrometroInstalacaoHistorico.setHidrometro(hidrometro);
+		imovel.setHidrometroInstalacaoHistorico(hidrometroInstalacaoHistorico);
+		
+		LogradouroCep logradouroCep = new LogradouroCep();
+		Logradouro logradouro = new Logradouro();
+		logradouroCep.setLogradouro(logradouro);
+		imovel.setLogradouroCep(logradouroCep);
+		
+		LogradouroBairro logradouroBairro = new LogradouroBairro();
+		Bairro bairro = new Bairro();
+		bairro.setNome("");
+		logradouroBairro.setBairro(bairro);
+		imovel.setLogradouroBairro(logradouroBairro);
 		
 		imoveisOutrosGrupos = new ArrayList<Imovel>();
 		
@@ -71,7 +108,7 @@ public class MovimentoRoteiroEmpresBOTest {
 	public void testarGerarMovimentoRoteiroEmpresa() {
 		mockImoveisGerados();
 		
-		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimentoRoteiroEmpresa(imoveis, rota);
+		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimento(imoveis, rota);
 		assertNotNull(movimentos);
 	}
 	
@@ -79,24 +116,12 @@ public class MovimentoRoteiroEmpresBOTest {
 	public void testarNaoGerarMovimentoRoteiroEmpresa() {
 		mockImoveisGeradosOutrosGrupos();
 		
-		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimentoRoteiroEmpresa(imoveis, rota);
+		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimento(imoveis, rota);
 		
 		assertNotNull(movimentos);
 		assertTrue(movimentos.isEmpty());
 	}
 	
-	private void mockImoveisGerados() {
-		imoveisOutrosGrupos = new ArrayList<Imovel>();
-		
-		movimentosInseridos = new ArrayList<MovimentoRoteiroEmpresa>();
-		movimentosInseridos.add(getMovimento());
-		
-		repositorioMock.deletarPorRota(rota);
-		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
-		replay(repositorioMock);
-	}
-
 	private MovimentoRoteiroEmpresa getMovimento() {
 		MovimentoRoteiroEmpresa movimento = new MovimentoRoteiroEmpresa();
 		movimento.setAnoMesMovimento(rota.getFaturamentoGrupo().getAnoMesReferencia());
@@ -118,7 +143,19 @@ public class MovimentoRoteiroEmpresBOTest {
 		
 		repositorioMock.deletarPorRota(rota);
 		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		expect(repositorioMock.criarMovimentoRoteiroEmpresa(imoveis, rota)).andReturn(movimentosInseridos);
 		replay(repositorioMock);
 	}
+
+    private void mockImoveisGerados() {
+        imoveisOutrosGrupos = new ArrayList<Imovel>();
+        
+        movimentosInseridos = new ArrayList<MovimentoRoteiroEmpresa>();
+        movimentosInseridos.add(getMovimento());
+        
+        repositorioMock.deletarPorRota(rota);
+        expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
+        repositorioMock.salvar(anyObject());
+        expectLastCall().times(1);
+        replay(repositorioMock);
+    }	
 }

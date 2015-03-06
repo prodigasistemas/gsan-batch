@@ -27,6 +27,14 @@ public class RotaBO {
 		}
 	}
 
+	public long totalImoveisParaLeitura(int idRota) {
+		if (rotaRepositorio.isRotaAlternativa(idRota)) {
+			return imovelRepositorio.totalImoveisParaLeituraComRotaAlternativa(idRota);
+		} else {
+			return imovelRepositorio.totalImoveisParaLeituraSemRotaAlternativa(idRota);
+		}
+	}
+	
 	public List<Imovel> imoveisParaPreFaturamento(Integer idRota, int firstItem, int numItems) {
 		if (rotaRepositorio.isRotaAlternativa(idRota)) {
 			return imovelRepositorio.imoveisParaPreFaturamentoComRotaAlternativa(idRota, firstItem, numItems);
@@ -35,13 +43,13 @@ public class RotaBO {
 		}
 	}
 
-	public List<Imovel> imoveisParaArquivoConvencional(int idRota) {
+	public List<Imovel> imoveisParaLeitura(int idRota, int firstItem, int numItems) {
 		List<Imovel> imoveisConsulta = null;
 
 		if (rotaRepositorio.isRotaAlternativa(idRota)) {
-			imoveisConsulta = imovelRepositorio.imoveisParaArquivoConvencionalComRotaAlternativa(idRota);
+			imoveisConsulta = imovelRepositorio.imoveisParaLeituraComRotaAlternativa(idRota, firstItem, numItems);
 		} else {
-			imoveisConsulta = imovelRepositorio.imoveisParaArquivoConvencionalSemRotaAlternativa(idRota);
+			imoveisConsulta = imovelRepositorio.imoveisParaLeituraSemRotaAlternativa(idRota, firstItem, numItems);
 		}
 
 		List<Imovel> imoveis = new ArrayList<Imovel>();

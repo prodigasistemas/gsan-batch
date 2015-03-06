@@ -8,7 +8,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import br.gov.model.micromedicao.HidrometroInstalacaoHistorico;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
@@ -30,10 +29,9 @@ public class MedicaoHistoricoBO {
 
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = new ArrayList<>();
 
-		//List<HidrometroTO> dadosHidrometroInstalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
-		List<HidrometroInstalacaoHistorico> dadosHidrometroInstalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro2(idImovel);
+		List<HidrometroTO> dadosHidrometroInstalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
 
-		for (HidrometroInstalacaoHistorico hidrometroTO : dadosHidrometroInstalacao) {
+		for (HidrometroTO hidrometroTO : dadosHidrometroInstalacao) {
 			HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico = new HidrometroMedicaoHistoricoTO(hidrometroTO);
 			hidrometroMedicaoHistorico.setMedicaoHistorico(this.getMedicaoHistorico(idImovel, anoMesReferencia));
 

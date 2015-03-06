@@ -13,20 +13,20 @@ import br.gov.batch.util.BatchUtil;
 @Named
 public class GerarArquivoRota implements ItemProcessor {
 
-    @EJB
+	@EJB
 	private GeradorArquivoTextoFaturamento gerarArquivoBO;
-	
-    @Inject
-    private BatchUtil util;
-    
+
+	@Inject
+	private BatchUtil util;
+
 	public GerarArquivoRota() {
 	}
 
-    public Object processItem(Object param) throws Exception {
-    	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	    	
-    	gerarArquivoBO.gerar(idRota, new Date());
-    	
-        return param;
-    }
+	public Object processItem(Object param) throws Exception {
+		Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
+
+		gerarArquivoBO.gerar(idRota, new Date());
+
+		return param;
+	}
 }
