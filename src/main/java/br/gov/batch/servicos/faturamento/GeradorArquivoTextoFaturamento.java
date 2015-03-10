@@ -6,6 +6,7 @@ import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -139,9 +140,6 @@ public class GeradorArquivoTextoFaturamento {
 	    if (!rota.isAtiva())
 	        return;
 	    
-	    if (rota.getId() != 697)
-	    	return;
-
 	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
 	    
@@ -186,7 +184,7 @@ public class GeradorArquivoTextoFaturamento {
 
 						for (Imovel micro : imoveisCondominio) {
 							conteudo.append(quebraLinha)
-							     .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+							     .append(carregarArquivo(micro, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
@@ -199,7 +197,11 @@ public class GeradorArquivoTextoFaturamento {
 			
 		    if (rota.existeLimiteImoveis()) {
 		        if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
-		            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+		        	int sequenciaRota = divisoes.size() + 1;
+		        	to.setSequenciaRota(sequenciaRota);
+		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis);
+		        	divisao.acrescentaSequencial(sequenciaRota);
+		            divisoes.add(divisao);
 		            conteudo = new StringBuilder();
 		            imoveisArquivo.clear();
 		        }
@@ -231,6 +233,7 @@ public class GeradorArquivoTextoFaturamento {
         if (rota.existeLimiteImoveis()){
             divisoes.forEach(e -> IOUtil.criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
+        	to.setSequenciaRota(1);
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
             IOUtil.criarArquivo(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
@@ -415,7 +418,7 @@ public class GeradorArquivoTextoFaturamento {
 
 		CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
-
+		
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 		
 		to.setIdImovel(imovel.getId());
@@ -438,28 +441,28 @@ public class GeradorArquivoTextoFaturamento {
 //		arquivoTexto.append(tipo04.build(to));
 ////		logger.info("FIM    - Linha 04");
 //
-////		logger.info("INICIO - Linha 05");
-//		arquivoTexto.append(tipo05.build(to));
-////		logger.info("FIM    - Linha 05");
-//
-////		logger.info("INICIO - Linha 06");
-//		arquivoTexto.append(tipo06.build(to));
-////		logger.info("FIM    - Linha 06");
-//
-////		logger.info("INICIO - Linha 07");
-//		arquivoTexto.append(tipo07.build(to));
-////		logger.info("FIM    - Linha 07");
+//		logger.info("INICIO - Linha 05");
+		arquivoTexto.append(tipo05.build(to));
+//		logger.info("FIM    - Linha 05");
+
+//		logger.info("INICIO - Linha 06");
+		arquivoTexto.append(tipo06.build(to));
+//		logger.info("FIM    - Linha 06");
+
+//		logger.info("INICIO - Linha 07");
+		arquivoTexto.append(tipo07.build(to));
+//		logger.info("FIM    - Linha 07");
 
 //		logger.info("INICIO - Linha 08");
 //		arquivoTexto.append(tipo08.build(to));
 //		logger.info("FIM    - Linha 08");
 
 //		logger.info("INICIO - Linha 09");
-//		arquivoTexto.append(tipo09.build(to));
-////		logger.info("FIM    - Linha 09");
-//
-////		logger.info("INICIO - Linha 10");
-//		arquivoTexto.append(tipo10.build(to));
+		arquivoTexto.append(tipo09.build(to));
+//		logger.info("FIM    - Linha 09");
+
+//		logger.info("INICIO - Linha 10");
+		arquivoTexto.append(tipo10.build(to));
 ////		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;

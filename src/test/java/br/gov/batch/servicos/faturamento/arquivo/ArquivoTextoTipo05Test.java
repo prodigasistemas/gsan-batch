@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -80,6 +81,21 @@ public class ArquivoTextoTipo05Test {
 
 		assertNotNull(arquivo.build(to));
 	}
+	
+	@Test
+	public void arquivoTextoTipo05Linha() {
+		carregarMocks();
+		
+		String linha = arquivo.build(to);
+		
+		StringBuilder linhaCorreta = new StringBuilder("05000000001DEV PAGTOS DUPLICIDADE 01/2015 01/2015                                                    00000000002.001     ");
+		linhaCorreta.append(System.getProperty("line.separator"));
+		
+		assertNotNull(linha);
+		assertEquals(linhaCorreta.toString(), linha);
+	}
+	
+	     
 
 	public void carregarMocks() {
 		expect(faturamentoRepositorio.buscarCreditoRealizado(to.getConta())).andReturn(listaCreditoRealizadoTO);

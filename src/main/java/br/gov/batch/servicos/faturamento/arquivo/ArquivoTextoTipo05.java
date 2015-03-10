@@ -28,10 +28,15 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public String build(ArquivoTextoTO to) {
+	public String build2(ArquivoTextoTO to) {
 		Conta conta = to.getConta();
 		
 		if (conta != null) {
+			
+			if (conta.getImovel().getId().equals(new Integer(("3520471")))) {
+				System.out.println("oi...");
+			}
+			
 			creditoRealizadoAnterior = null;
 			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;
 			anoMesAcumulado = "";
@@ -44,11 +49,78 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 					if (!carregarParametros(creditoRealizado, valorCreditoAcumulado))
 						gerarDadosCreditosRealizados(conta, 1, "", creditoRealizadoAnterior.getValorCredito());
 				} else {
+					carregarParametros(creditoRealizado, valorCreditoAcumulado);
 					if (qtdAnoMesDistintos > 0)
 						gerarDadosCreditosRealizados(conta, qtdAnoMesDistintos, anoMesAcumulado, valorCreditoAcumulado);
 
 					qtdAnoMesDistintos = 0;
-					carregarParametros(creditoRealizado, valorCreditoAcumulado);
+				}
+			}
+			if (qtdAnoMesDistintos > 0)
+				gerarDadosCreditosRealizados(conta, qtdAnoMesDistintos, anoMesAcumulado, valorCreditoAcumulado);
+		}
+
+		return builder.toString();
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public String build(ArquivoTextoTO to) {
+		Conta conta = to.getConta();
+		
+		if (conta != null) {
+			
+			if (conta.getImovel().getId().equals(new Integer(("3520471")))) {
+				System.out.println("oi...");
+			}
+			
+			creditoRealizadoAnterior = null;
+			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;
+			anoMesAcumulado = "";
+			qtdAnoMesDistintos = 0;
+			
+			List<CreditoRealizadoTO> creditosRealizados = faturamentoRepositorio.buscarCreditoRealizado(conta);
+
+			for (CreditoRealizadoTO creditoRealizado : creditosRealizados) {
+				
+				if (creditoRealizadoAnterior == null) {
+					
+					creditoRealizadoAnterior = creditoRealizado;
+					
+					if (creditoRealizadoAnterior.getAnoMesReferenciaCredito() != null) {
+						valorCreditoAcumulado = creditoRealizadoAnterior.getValorCredito();
+						qtdAnoMesDistintos++;
+						anoMesAcumulado = Utilitarios.formatarAnoMesParaMesAno(creditoRealizadoAnterior.getAnoMesReferenciaCredito());
+					} else {
+						gerarDadosCreditosRealizados(conta, 1, "", creditoRealizadoAnterior.getValorCredito());
+					}
+
+				} else if (creditoRealizadoAnterior.getCreditoTipo().getId().equals(creditoRealizado.getCreditoTipo().getId())) {
+					
+					creditoRealizadoAnterior = creditoRealizado;
+
+					if (creditoRealizadoAnterior.getAnoMesReferenciaCredito() != null) {
+						valorCreditoAcumulado = valorCreditoAcumulado.add(creditoRealizado.getValorCredito());
+						qtdAnoMesDistintos++;
+						anoMesAcumulado = anoMesAcumulado + " "+ Utilitarios.formatarAnoMesParaMesAno(creditoRealizado.getAnoMesReferenciaCredito());
+					} else {
+						gerarDadosCreditosRealizados(conta, 1, "", creditoRealizadoAnterior.getValorCredito());
+					}
+				} else {
+
+					if (qtdAnoMesDistintos > 0) {
+						gerarDadosCreditosRealizados(conta, qtdAnoMesDistintos, anoMesAcumulado, valorCreditoAcumulado);
+					}
+
+					creditoRealizadoAnterior = creditoRealizado;
+					qtdAnoMesDistintos = 0;
+
+					if (creditoRealizadoAnterior.getAnoMesReferenciaCredito() != null) {
+						valorCreditoAcumulado = creditoRealizadoAnterior.getValorCredito();
+						qtdAnoMesDistintos = 1;
+						anoMesAcumulado = Utilitarios.formatarAnoMesParaMesAno(creditoRealizadoAnterior.getAnoMesReferenciaCredito());
+					} else {
+						gerarDadosCreditosRealizados(conta, 1, "", creditoRealizadoAnterior.getValorCredito());
+					}
 				}
 			}
 			if (qtdAnoMesDistintos > 0)
@@ -75,6 +147,7 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 		builder.append(TIPO_REGISTRO_05_CREDITO);
 		builder.append(Utilitarios.completaComZerosEsquerda(9, conta.getImovel().getId()));
 		
+		
 		String descricaoCredito = "";
 		String valorCredito = "";
 		if (qtdAnoMesDistintos > 1) {
@@ -85,13 +158,13 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
                     + ( anoMesAcumulado == null || anoMesAcumulado.equals("") 
                         ? " PARCELA " + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacaoCredito()
                           + "/" + Utilitarios.completaComZerosEsquerda(2, creditoRealizadoAnterior.getNumeroPrestacoesRestantes())) 
-                        : ""
+                        : " " + anoMesAcumulado
                       );
 		    valorCredito = Utilitarios.formatarBigDecimalComPonto(creditoRealizadoAnterior.getValorCredito());
 		}
 		
 		builder.append(Utilitarios.completaComEspacosADireita(90, descricaoCredito));
-		builder.append(Utilitarios.completaComEspacosADireita(14, valorCredito));
+		builder.append(Utilitarios.completaComZerosEsquerda(14, valorCredito));
 		
 		builder.append(Utilitarios.completaComEspacosADireita(6, creditoRealizadoAnterior.getCreditoTipo() != null ? (
 				(creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante() != null) ? creditoRealizadoAnterior.getCreditoTipo().getCodigoConstante() : 
