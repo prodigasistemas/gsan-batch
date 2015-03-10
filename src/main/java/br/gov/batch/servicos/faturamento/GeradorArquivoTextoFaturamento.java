@@ -6,7 +6,6 @@ import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -441,28 +440,28 @@ public class GeradorArquivoTextoFaturamento {
 //		arquivoTexto.append(tipo04.build(to));
 ////		logger.info("FIM    - Linha 04");
 //
-//		logger.info("INICIO - Linha 05");
-		arquivoTexto.append(tipo05.build(to));
-//		logger.info("FIM    - Linha 05");
-
-//		logger.info("INICIO - Linha 06");
-		arquivoTexto.append(tipo06.build(to));
-//		logger.info("FIM    - Linha 06");
-
-//		logger.info("INICIO - Linha 07");
-		arquivoTexto.append(tipo07.build(to));
-//		logger.info("FIM    - Linha 07");
+////		logger.info("INICIO - Linha 05");
+//		arquivoTexto.append(tipo05.build(to));
+////		logger.info("FIM    - Linha 05");
+//
+////		logger.info("INICIO - Linha 06");
+//		arquivoTexto.append(tipo06.build(to));
+////		logger.info("FIM    - Linha 06");
+//
+////		logger.info("INICIO - Linha 07");
+//		arquivoTexto.append(tipo07.build(to));
+////		logger.info("FIM    - Linha 07");
 
 //		logger.info("INICIO - Linha 08");
 //		arquivoTexto.append(tipo08.build(to));
 //		logger.info("FIM    - Linha 08");
 
 //		logger.info("INICIO - Linha 09");
-		arquivoTexto.append(tipo09.build(to));
-//		logger.info("FIM    - Linha 09");
-
-//		logger.info("INICIO - Linha 10");
-		arquivoTexto.append(tipo10.build(to));
+//		arquivoTexto.append(tipo09.build(to));
+////		logger.info("FIM    - Linha 09");
+//
+////		logger.info("INICIO - Linha 10");
+//		arquivoTexto.append(tipo10.build(to));
 ////		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;

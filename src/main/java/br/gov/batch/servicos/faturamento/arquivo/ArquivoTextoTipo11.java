@@ -54,7 +54,7 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		builder.append(Utilitarios.formataData(Utilitarios.reduzirDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.formataData(Utilitarios.adicionarDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.completaComZerosEsquerda(4, (rota != null) ? rota.getId() : null));
-		builder.append(Utilitarios.completaComZerosEsquerda(2, to.getSequenciaRota()));
+		builder.append(Utilitarios.completaComZerosEsquerda(2,to.getSequenciaRota()));
 
 		return builder.toString();
 	}

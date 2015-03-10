@@ -113,7 +113,6 @@ public class ConsumoBO {
             } else {
                 consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
             }
-
         }
         
         return consumoMinimoLigacao;
