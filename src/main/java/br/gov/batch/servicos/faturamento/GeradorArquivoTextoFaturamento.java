@@ -41,8 +41,8 @@ import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresaDivisao;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
 import br.gov.model.micromedicao.TipoServicoCelular;
-import br.gov.model.util.IOUtil;
 import br.gov.model.util.Utilitarios;
+import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.cobranca.CobrancaDocumentoRepositorio;
@@ -231,12 +231,12 @@ public class GeradorArquivoTextoFaturamento {
         logger.info("Rota: " + idRota + " - Roteiro salvo");
         
         if (rota.existeLimiteImoveis()){
-            divisoes.forEach(e -> IOUtil.criarArquivo(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
         	to.setSequenciaRota(1);
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
-            IOUtil.criarArquivo(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
+            IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
         }
         
         logger.info("Rota: " + idRota + " - Arquivo criado");

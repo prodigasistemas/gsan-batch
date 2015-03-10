@@ -1,4 +1,4 @@
-package br.gov.batch.microcoletor;
+package br.gov.batch.gerararquivomicrocoletor;
 
 import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
@@ -12,7 +12,7 @@ import br.gov.batch.util.BatchUtil;
 public class GerarArquivoMicrocoletor implements ItemProcessor {
 
     @EJB
-	private GeradorArquivoTextoMicrocoletor gerarArquivoMicrocoletorBO;
+	private GeradorArquivoTextoMicrocoletor geradorArquivoMicrocoletor;
 	
     @Inject
     private BatchUtil util;
@@ -23,7 +23,7 @@ public class GerarArquivoMicrocoletor implements ItemProcessor {
     public Object processItem(Object param) throws Exception {
     	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
     	
-    	gerarArquivoMicrocoletorBO.gerar(idRota);
+    	geradorArquivoMicrocoletor.gerar(idRota);
     	
         return param;
     }
