@@ -1,5 +1,7 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -7,9 +9,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.easymock.EasyMockRunner;
+import org.easymock.Mock;
 import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.GerenciaRegional;
@@ -20,11 +25,16 @@ import br.gov.model.cadastro.QuadraFace;
 import br.gov.model.cadastro.SetorComercial;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Rota;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 
+@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
 
 	@TestSubject
 	private ArquivoTextoTipo01DadosLocalizacaoImovel arquivo;
+	
+	@Mock
+	private ImovelRepositorio repositorioImovel;
 	
 	private Imovel imovel;
 	private Rota rota;
@@ -64,24 +74,26 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	
     	arquivoTextoTO = new ArquivoTextoTO();
     	arquivoTextoTO.setRota(rota);
-    	arquivoTextoTO.setImovel(imovel);
+    	arquivoTextoTO.setIdImovel(imovel.getId());
 	}
 	
 	@Test
     public void buildArquivoDadosCobranca() {
+	    carregarMocks();
+	    
     	Map<Integer, StringBuilder> mapDados = arquivo.build(arquivoTextoTO);
     	
     	String linha = getLinha(mapDados);
 
     	StringBuilder linhaValida = new StringBuilder();
-    	linhaValida.append("BELEM                    DESCRICAO DA LOCALIDADE  00100112340000000                                 ")
+    	linhaValida.append("BELEM                    DESCRICAO DA LOCALIDADE  00100012340000000                                 ")
     		       .append("                                     0010000001                                                            ")
     		       .append("          33224455   000000000");
 
     	
     	assertNotNull(mapDados);
     	assertEquals(8, mapDados.keySet().size());
-    	assertEquals(linha, linhaValida.toString());
+    	assertEquals(linhaValida.toString(), linha);
     }
     
     private String getLinha(Map<Integer, StringBuilder> mapDados) {
@@ -95,5 +107,10 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	}
     	
     	return builder.toString();
+    }
+    
+    public void carregarMocks() {
+        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
+        replay(repositorioImovel);
     }
 }

@@ -1,0 +1,24 @@
+<job id="job_processar_rota" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<listeners>
+		<listener ref="rotaJobListener"/>
+	</listeners>
+	<properties>
+		<property name="tam_particao" value="30" />
+	</properties>
+		
+	<step id="processarRotaLeitura">
+		<chunk>
+			<reader ref="carregarImoveisRotaLeitura">
+				<properties>
+					<property name="primeiroItem" value="#{partitionPlan['primeiroItem']}" />
+					<property name="numItens" value="#{partitionPlan['numItens']}" />
+				</properties>
+			</reader>
+			<processor ref="processarRotaLeitura" />
+			<writer ref="dummyItemWriter" />
+		</chunk>
+		<partition>
+			<mapper ref="particionadorRotaLeitura" />
+		</partition>
+	</step>
+</job>

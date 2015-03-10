@@ -97,7 +97,7 @@ public class MensagemContaTest {
         
         msg    = new String[3];
         
-        msg[0] = "SR. USUÁRIO: EM  " + dataVencimentoFinal + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
+        msg[0] = "SR. USUARIO: EM  " + dataVencimentoFinal + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
                 + sistemaParametros.getNomeAbreviadoEmpresa() + ".";
         msg[1] = "COMPARECA A UM DOS NOSSOS POSTOS DE ATENDIMENTO PARA REGULARIZAR SUA SITUACAO.EVITE O CORTE.";
         msg[2] = "CASO O SEU DEBITO TENHA SIDO PAGO APOS A DATA INDICADA,DESCONSIDERE ESTE AVISO.";
