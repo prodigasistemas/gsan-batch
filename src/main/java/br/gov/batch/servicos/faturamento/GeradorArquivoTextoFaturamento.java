@@ -429,40 +429,40 @@ public class GeradorArquivoTextoFaturamento {
 //		logger.info("FIM    - Linha 01");
 
 ////		logger.info("INICIO - Linha 02");
-//		arquivoTexto.append(tipo02.build(to));
+		arquivoTexto.append(tipo02.build(to));
 ////		logger.info("FIM    - Linha 02");
-//
+
 ////		logger.info("INICIO - Linha 03");
-//		arquivoTexto.append(tipo03.build(to));
+		arquivoTexto.append(tipo03.build(to));
 ////		logger.info("FIM    - Linha 03");
-//
+
 ////		logger.info("INICIO - Linha 04");
-//		arquivoTexto.append(tipo04.build(to));
+		arquivoTexto.append(tipo04.build(to));
 ////		logger.info("FIM    - Linha 04");
-//
+
 ////		logger.info("INICIO - Linha 05");
-//		arquivoTexto.append(tipo05.build(to));
+		arquivoTexto.append(tipo05.build(to));
 ////		logger.info("FIM    - Linha 05");
-//
+
 ////		logger.info("INICIO - Linha 06");
-//		arquivoTexto.append(tipo06.build(to));
+		arquivoTexto.append(tipo06.build(to));
 ////		logger.info("FIM    - Linha 06");
-//
+
 ////		logger.info("INICIO - Linha 07");
-//		arquivoTexto.append(tipo07.build(to));
+		arquivoTexto.append(tipo07.build(to));
 ////		logger.info("FIM    - Linha 07");
 
 //		logger.info("INICIO - Linha 08");
-//		arquivoTexto.append(tipo08.build(to));
+		arquivoTexto.append(tipo08.build(to));
 //		logger.info("FIM    - Linha 08");
 
 //		logger.info("INICIO - Linha 09");
-//		arquivoTexto.append(tipo09.build(to));
-////		logger.info("FIM    - Linha 09");
-//
-////		logger.info("INICIO - Linha 10");
-//		arquivoTexto.append(tipo10.build(to));
-////		logger.info("FIM    - Linha 10");
+		arquivoTexto.append(tipo09.build(to));
+//		logger.info("FIM    - Linha 09");
+
+//		logger.info("INICIO - Linha 10");
+		arquivoTexto.append(tipo10.build(to));
+//		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;
 	}
