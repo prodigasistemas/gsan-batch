@@ -55,6 +55,9 @@ public class RotaBO {
 		List<Imovel> imoveis = new ArrayList<Imovel>();
 
 		for (Imovel imovel : imoveisConsulta) {
+			if (imovel.getId().equals(new Integer("879100"))) {
+				System.out.println("Achei o imóvel faltando...");
+			}
 
 			if (!imovel.paralisarEmissaoContas()) {
 				if ((imovel.faturamentoAguaAtivo() && imovel.existeHidrometroAgua())

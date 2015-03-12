@@ -5,6 +5,10 @@
 <!--
  --> 
 	<step id="carregarRotas" next="gerarArquivo">
+		<properties>
+			<property name="javax.transaction.global.timeout" value="2400"/> 
+		</properties>
+	
 		<chunk item-count="1">
 			<reader ref="carregarRotas"/>
 			<processor ref="iniciaProcessamentoRota" />

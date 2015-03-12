@@ -31,6 +31,10 @@ public class DadosLeituraBO {
 	public void gerarDadosParaLeitura(DadosLeituraTO to) {
 		Rota rota = rotaRepositorio.obterPorID(to.getIdRota());
 		
+		if (to.getIdImovel().equals(new Integer("879100"))) {
+			System.out.println("Achei o imóvel faltando...");
+		}
+		
 		movimentoRoteiroEmpresaRepositorio.deletarPorReferenciaERota(to.getAnoMesFaturamento(), rota);
 		
 		if (!movimentoRoteiroEmpresaRepositorio.existeMovimentoParaGrupoDiferenteDoImovel(to.getIdImovel(), to.getIdGrupo(), to.getAnoMesFaturamento())) {

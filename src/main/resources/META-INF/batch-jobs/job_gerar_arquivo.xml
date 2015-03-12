@@ -4,6 +4,10 @@
 	</listeners>
 	
 	<step id="gerarArquivo">
+		<properties>
+			<property name="javax.transaction.global.timeout" value="2400"/> 
+		</properties>
+	
 		<chunk>
 			<reader ref="dummyItemReader"/>
 			<processor ref="gerarArquivoRota" />
