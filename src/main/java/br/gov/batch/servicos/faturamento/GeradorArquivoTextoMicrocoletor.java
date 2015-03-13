@@ -141,7 +141,6 @@ public class GeradorArquivoTextoMicrocoletor {
 		String cdRota = completaComZerosEsquerda(3, rota.getCodigo());
 
 		String nomeArquivo = "cons" + ano + mes + "." + grupo + "." + local + "." + setor + "." + cdRota + ".txt";
-
 		IOUtil.criarArquivoTexto(nomeArquivo, "/tmp/", texto.toString());
 	}
 }

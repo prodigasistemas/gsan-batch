@@ -48,14 +48,13 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 		buildDadosDaRota(rota);
 		builder.append(Utilitarios.completaComEspacosADireita(10, sistemaParametros.getVersaoCelular()));
 		builder.append(Utilitarios.completaComZerosEsquerda(1, sistemaParametros.getIndicadorBloqueioContaMobile()));
-		builder.append((rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura()) :
-				Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId()));
+		builder.append(getIndicadorSequencialLeitura(rota));
 		builder.append(getDiferencaDiasCronogramas(rota));
 		builder.append(getModuloDigitoVerificador(sistemaParametros.getNumeroModuloDigitoVerificador()));
 		builder.append(Utilitarios.formataData(Utilitarios.reduzirDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.formataData(Utilitarios.adicionarDias(new Date(), getDiasMobileBloqueio()), FormatoData.ANO_MES_DIA));
 		builder.append(Utilitarios.completaComZerosEsquerda(4, (rota != null) ? rota.getId() : null));
-		builder.append(getIndicadorSequencialLeitura(rota));
+		builder.append(Utilitarios.completaComZerosEsquerda(2,to.getSequenciaRota()));
 
 		return builder.toString();
 	}
@@ -74,8 +73,8 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 	}
 
 	private String getIndicadorSequencialLeitura(Rota rota) {
-		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura())
-				: Utilitarios.completaComZerosEsquerda(1, Status.INATIVO.getId());
+		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? Utilitarios.completaComZerosEsquerda(2, rota.getIndicadorSequencialLeitura())
+				: Utilitarios.completaComZerosEsquerda(2, Status.INATIVO.getId());
 	}
 
 	private Rota verificarRota(Imovel imovel) {

@@ -58,8 +58,6 @@ public class ArquivoTextoTipo01 extends ArquivoTexto {
 		
 		mapDados.putAll(dadosFaturamento.build(to));
 
-		Iterator<Integer> iteratorKeys = mapDados.keySet().iterator();
-
 		Iterator<StringBuilder> iterator = mapDados.values().iterator();
 
 		while (iterator.hasNext()) {

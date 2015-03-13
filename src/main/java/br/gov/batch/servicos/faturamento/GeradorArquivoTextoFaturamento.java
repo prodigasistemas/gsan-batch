@@ -179,7 +179,7 @@ public class GeradorArquivoTextoFaturamento {
 
 						for (Imovel micro : imoveisCondominio) {
 							conteudo.append(quebraLinha)
-							     .append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+							     .append(carregarArquivo(micro, anoMesFaturamento, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
@@ -192,7 +192,11 @@ public class GeradorArquivoTextoFaturamento {
 			
 		    if (rota.existeLimiteImoveis()) {
 		        if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
-		            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+		        	int sequenciaRota = divisoes.size() + 1;
+		        	to.setSequenciaRota(sequenciaRota);
+		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis);
+		        	divisao.acrescentaSequencial(sequenciaRota);
+		            divisoes.add(divisao);
 		            conteudo = new StringBuilder();
 		            imoveisArquivo.clear();
 		        }
@@ -224,6 +228,7 @@ public class GeradorArquivoTextoFaturamento {
         if (rota.existeLimiteImoveis()){
             divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
         }else{
+        	to.setSequenciaRota(1);
             conteudo.append(gerarPassosFinais());
             //TODO: Recuperar caminho  por parametros
             IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
@@ -408,11 +413,8 @@ public class GeradorArquivoTextoFaturamento {
 
 	public StringBuilder gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
-//	    logger.info("ANTES  - cobrancaDocumentoImpressaoSimultanea");
 	    CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
-//	    logger.info("DEPOIS - cobrancaDocumentoImpressaoSimultanea");
-
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 		
 		to.setIdImovel(imovel.getId());
