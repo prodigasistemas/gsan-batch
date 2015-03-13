@@ -1,7 +1,6 @@
 package br.gov.batch.servicos.micromedicao;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -60,18 +59,18 @@ public class HidrometroBO {
 		return dataLeitura;
 	}
 
+	//TODO: Pode trocar para recuperar de agua primeiro e depois de poço?
 	private Date obterDataInstalacaoHidrometro(Integer idImovel) {
-		List<HidrometroTO> dadosHidrometro = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
-
-		Date dataInstalacao = null;
-		if (dadosHidrometro.size() > 0) {
-			dataInstalacao = dadosHidrometro.get(0).getDataInstalacao();
+		HidrometroTO instalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(idImovel);
+		
+		if (instalacao == null) {
+		    instalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroPoco(idImovel);
 		}
 
-		return dataInstalacao;
+		return instalacao != null ? instalacao.getDataInstalacao() : null;
 	}
 
-	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
+	private Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
 	    MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(idImovel, anoMesReferencia);
 	    
 	    Date dataMedicao = null;

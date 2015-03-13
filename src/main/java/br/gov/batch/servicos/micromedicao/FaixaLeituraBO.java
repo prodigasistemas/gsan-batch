@@ -2,7 +2,6 @@ package br.gov.batch.servicos.micromedicao;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -112,26 +111,13 @@ public class FaixaLeituraBO {
 	private BigDecimal obterLeituraAnteriorParaCalculoFaixa(MedicaoHistorico medicaoHistorico, Integer leituraAnteriorPesquisada) {
 		BigDecimal leituraAnterior;
 		if (leituraAnteriorPesquisada == null) {
-			leituraAnterior = new BigDecimal(obterLeituraAnterior(medicaoHistorico));
+			leituraAnterior = new BigDecimal(medicaoHistorico.obterLeituraAnterior());
 		} else {
 			leituraAnterior = new BigDecimal(leituraAnteriorPesquisada);
 		}
 		return leituraAnterior;
 	}
-	
-	private int obterLeituraAnterior(MedicaoHistorico medicaoHistorico) {
-
-		if (medicaoHistorico.possuiLeituraInformada()) {
-			if (medicaoHistorico.getLeituraAnteriorInformada().intValue() == medicaoHistorico.getLeituraAtualInformada().intValue()) {
-				return medicaoHistorico.getLeituraAnteriorInformada();
-			} else {
-				return medicaoHistorico.getLeituraAnteriorFaturamento();
-			}
-		} else {
-			return medicaoHistorico.getLeituraAnteriorFaturamento();
-		}
-	}
-	
+		
 	private FaixaLeituraTO verificarViradaHidrometroFaixaEsperada(Hidrometro hidrometro, FaixaLeituraTO faixaLeitura) {
 
 		if (hidrometro != null && hidrometro.possuiNumeroDigitosLeitura()) {
@@ -188,7 +174,7 @@ public class FaixaLeituraBO {
 		BigDecimal percentualFaixaFalsaRota = imovel.getQuadra().getRota().getPercentualGeracaoFaixaFalsa();
 		BigDecimal percentualFaixaFalsaSistemaParametro = sistemaParametro.getPercentualFaixaFalsa();
 
-		Calendar dataCalendar = new GregorianCalendar();
+		Calendar dataCalendar = Calendar.getInstance();
 		int segundos = dataCalendar.get(Calendar.SECOND);
 
 		Integer somaImovelSegundo = imovel.getId() + segundos;

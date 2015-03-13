@@ -135,10 +135,6 @@ public class GeradorArquivoTextoFaturamento {
 	public void gerar(Integer idRota, Date dataComando) {
 	    Rota rota = rotaRepositorio.obterPorID(idRota);
 	    
-	    //TODO: Alterar no batch-manager para nao inserir rotas inativas
-	    if (!rota.isAtiva())
-	        return;
-	    
 	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
 	    
@@ -162,7 +158,7 @@ public class GeradorArquivoTextoFaturamento {
 
 		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
-		    //logger.info("Rota: " + idRota + "INICIO - Imovel para processamento id [" + imovel.getId() + "]");
+//		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -205,10 +201,10 @@ public class GeradorArquivoTextoFaturamento {
 		            imoveisArquivo.clear();
 		        }
 		    }
-		    logger.info("Rota: " + idRota + "FIM - Imovel processado id [" + imovel.getId() + "]");
+//		    logger.info("Rota: " + idRota + " FIM - Imovel processado id [" + imovel.getId() + "]");
 		}
 		
-		//logger.info("Rota: " + idRota + " - Imoveis lidos");
+		logger.info("Rota: " + idRota + " - Imoveis lidos");
 		
 		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
 
@@ -240,7 +236,7 @@ public class GeradorArquivoTextoFaturamento {
         
         logger.info("Rota: " + idRota + " - Arquivo criado");
         
-       // movimentoRoteiroEmpresaBO.gerarMovimentoRoteiroEmpresa(imoveisArquivo, rota);
+        movimentoRoteiroEmpresaBO.gerarMovimento(imoveisArquivo, rota);
         
         logger.info("Rota: " + idRota + " - Movimento registrado.");
 	}
@@ -409,60 +405,61 @@ public class GeradorArquivoTextoFaturamento {
 	}
 	
 	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+//	    logger.info("ANTES  - pesquisarContaArquivoTextoFaturamento");
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
+//		logger.info("DEPOIS - pesquisarContaArquivoTextoFaturamento");
 		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 	}
 
 	public StringBuilder gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
-		CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
+	    CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
-		
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 		
 		to.setIdImovel(imovel.getId());
 
 		StringBuilder arquivoTexto = new StringBuilder();
 		
-//		logger.info("INICIO - Linha 01");
+		logger.info("INICIO - Linha 01");
 		arquivoTexto.append(tipo01.build(to));
-//		logger.info("FIM    - Linha 01");
+		logger.info("FIM    - Linha 01");
 
-////		logger.info("INICIO - Linha 02");
-//		arquivoTexto.append(tipo02.build(to));
-////		logger.info("FIM    - Linha 02");
-//
-////		logger.info("INICIO - Linha 03");
-//		arquivoTexto.append(tipo03.build(to));
-////		logger.info("FIM    - Linha 03");
-//
-////		logger.info("INICIO - Linha 04");
-//		arquivoTexto.append(tipo04.build(to));
-////		logger.info("FIM    - Linha 04");
-//
-////		logger.info("INICIO - Linha 05");
-//		arquivoTexto.append(tipo05.build(to));
-////		logger.info("FIM    - Linha 05");
-//
-////		logger.info("INICIO - Linha 06");
-//		arquivoTexto.append(tipo06.build(to));
-////		logger.info("FIM    - Linha 06");
-//
-////		logger.info("INICIO - Linha 07");
-//		arquivoTexto.append(tipo07.build(to));
-////		logger.info("FIM    - Linha 07");
+		logger.info("INICIO - Linha 02");
+		arquivoTexto.append(tipo02.build(to));
+		logger.info("FIM    - Linha 02");
 
-//		logger.info("INICIO - Linha 08");
-//		arquivoTexto.append(tipo08.build(to));
-//		logger.info("FIM    - Linha 08");
+		logger.info("INICIO - Linha 03");
+		arquivoTexto.append(tipo03.build(to));
+		logger.info("FIM    - Linha 03");
 
-//		logger.info("INICIO - Linha 09");
-//		arquivoTexto.append(tipo09.build(to));
-////		logger.info("FIM    - Linha 09");
-//
-////		logger.info("INICIO - Linha 10");
-//		arquivoTexto.append(tipo10.build(to));
-////		logger.info("FIM    - Linha 10");
+		logger.info("INICIO - Linha 04");
+		arquivoTexto.append(tipo04.build(to));
+		logger.info("FIM    - Linha 04");
+
+		logger.info("INICIO - Linha 05");
+		arquivoTexto.append(tipo05.build(to));
+		logger.info("FIM    - Linha 05");
+
+		logger.info("INICIO - Linha 06");
+		arquivoTexto.append(tipo06.build(to));
+		logger.info("FIM    - Linha 06");
+
+		logger.info("INICIO - Linha 07");
+		arquivoTexto.append(tipo07.build(to));
+		logger.info("FIM    - Linha 07");
+
+		logger.info("INICIO - Linha 08");
+		arquivoTexto.append(tipo08.build(to));
+		logger.info("FIM    - Linha 08");
+
+		logger.info("INICIO - Linha 09");
+		arquivoTexto.append(tipo09.build(to));
+		logger.info("FIM    - Linha 09");
+
+		logger.info("INICIO - Linha 10");
+		arquivoTexto.append(tipo10.build(to));
+		logger.info("FIM    - Linha 10");
 		
 		return arquivoTexto;
 	}

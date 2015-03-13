@@ -53,7 +53,7 @@ public class ArquivoTextoTipo01DadosCliente {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
-	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.imovel = to.getImovel();
 		dadosCliente = new HashMap<Integer, StringBuilder>();
 		
 	    escreverNomeCliente();
