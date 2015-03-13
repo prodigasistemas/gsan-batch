@@ -1,5 +1,10 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
+import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.formataData;
+import static br.gov.model.util.Utilitarios.formatarBigDecimalComPonto;
+import static br.gov.model.util.Utilitarios.quebraLinha;
+
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -7,20 +12,15 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.jboss.logging.Logger;
-
 import br.gov.batch.servicos.cobranca.to.VencimentoAnteriorTO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cobranca.CobrancaDocumento;
 import br.gov.model.cobranca.CobrancaDocumentoItem;
 import br.gov.model.util.FormatoData;
-import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cobranca.CobrancaDocumentoItemRepositorio;
 
 @Stateless
 public class ArquivoTextoTipo07 extends ArquivoTexto {
-    private static Logger logger = Logger.getLogger(ArquivoTextoTipo07.class);
-
 	@EJB
 	private CobrancaDocumentoItemRepositorio cobrancaDocumentoItemRepositorio;
 
@@ -32,8 +32,6 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-//        logger.info("Construcao da linha 07");
-	    
 		CobrancaDocumento cobrancaDocumento = to.getCobrancaDocumento();
 		Integer idImovel = to.getImovel().getId();
 		
@@ -64,24 +62,24 @@ public class ArquivoTextoTipo07 extends ArquivoTexto {
 
 	private void buildLinha(CobrancaDocumentoItem item, Integer idImovel) {
 		builder.append(TIPO_REGISTRO_07_COBRANCA);
-		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
+		builder.append(completaComZerosEsquerda(9, idImovel));
 		builder.append(item.getContaGeral().getConta().getReferencia());
-		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(item.getValorItemCobrado())));
-		builder.append(Utilitarios.formataData(item.getContaGeral().getConta().getDataVencimentoConta(), FormatoData.ANO_MES_DIA));
-		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(item.getValorAcrescimos())));
-		builder.append(System.getProperty("line.separator"));
+		builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(item.getValorItemCobrado())));
+		builder.append(formataData(item.getContaGeral().getConta().getDataVencimentoConta(), FormatoData.ANO_MES_DIA));
+		builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(item.getValorAcrescimos())));
+		builder.append(quebraLinha);
 	}
 
 	private void buildLinhaQuantidadeContasSuperior(List<CobrancaDocumentoItem> listaCobrancaDocumentoItem, Integer idImovel) {
 		VencimentoAnteriorTO to = calcularValorDataVencimentoAnterior(listaCobrancaDocumentoItem, quantidadeContas);
 
 		builder.append(TIPO_REGISTRO_07_COBRANCA);
-		builder.append(Utilitarios.completaComZerosEsquerda(9, idImovel));
+		builder.append(completaComZerosEsquerda(9, idImovel));
 		builder.append("DB.ATE");
-		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(to.getValorAnterior())));
-		builder.append(Utilitarios.formataData(to.getDataVencimentoAnterior(), FormatoData.ANO_MES_DIA));
-		builder.append(Utilitarios.completaComZerosEsquerda(14, Utilitarios.formatarBigDecimalComPonto(to.getValorAcrescimosAnterior())));
-		builder.append(System.getProperty("line.separator"));
+		builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(to.getValorAnterior())));
+		builder.append(formataData(to.getDataVencimentoAnterior(), FormatoData.ANO_MES_DIA));
+		builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(to.getValorAcrescimosAnterior())));
+		builder.append(quebraLinha);
 	}
 
 	public VencimentoAnteriorTO calcularValorDataVencimentoAnterior(List<CobrancaDocumentoItem> listaItens, int quantidadeContas) {

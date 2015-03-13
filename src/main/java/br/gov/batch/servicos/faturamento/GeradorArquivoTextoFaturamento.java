@@ -158,7 +158,7 @@ public class GeradorArquivoTextoFaturamento {
 
 		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
-		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
+//		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -197,7 +197,7 @@ public class GeradorArquivoTextoFaturamento {
 		            imoveisArquivo.clear();
 		        }
 		    }
-		    logger.info("Rota: " + idRota + " FIM - Imovel processado id [" + imovel.getId() + "]");
+//		    logger.info("Rota: " + idRota + " FIM - Imovel processado id [" + imovel.getId() + "]");
 		}
 		
 		logger.info("Rota: " + idRota + " - Imoveis lidos");
@@ -400,18 +400,18 @@ public class GeradorArquivoTextoFaturamento {
 	}
 	
 	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
-	    logger.info("ANTES  - pesquisarContaArquivoTextoFaturamento");
+//	    logger.info("ANTES  - pesquisarContaArquivoTextoFaturamento");
 		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
-		logger.info("DEPOIS - pesquisarContaArquivoTextoFaturamento");
+//		logger.info("DEPOIS - pesquisarContaArquivoTextoFaturamento");
 		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
 	}
 
 	public StringBuilder gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
 
-	    logger.info("ANTES  - cobrancaDocumentoImpressaoSimultanea");
+//	    logger.info("ANTES  - cobrancaDocumentoImpressaoSimultanea");
 	    CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
 				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
-	    logger.info("DEPOIS - cobrancaDocumentoImpressaoSimultanea");
+//	    logger.info("DEPOIS - cobrancaDocumentoImpressaoSimultanea");
 
 		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
 		

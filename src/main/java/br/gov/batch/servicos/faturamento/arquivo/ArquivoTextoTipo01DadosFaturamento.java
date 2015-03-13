@@ -53,8 +53,8 @@ public class ArquivoTextoTipo01DadosFaturamento {
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
-	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
-	    this.conta = to.getConta();
+	    this.imovel = to.getImovel();
+	    this.conta  = to.getConta();
 	    this.faturamentoGrupo = to.getFaturamentoGrupo();
 	    this.anoMesReferencia = to.getAnoMesReferencia();
 

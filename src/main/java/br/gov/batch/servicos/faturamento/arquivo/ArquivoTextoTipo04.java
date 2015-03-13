@@ -5,6 +5,7 @@ import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
 import static br.gov.model.util.Utilitarios.formatarAnoMesParaMesAno;
 import static br.gov.model.util.Utilitarios.formatarBigDecimalComPonto;
+import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -43,15 +44,14 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 		if (conta != null) {
 			Collection<ParcelaDebitoCobradoTO> colecaoDebitoCobradoDeParcelamento = debitoCobradoRepositorio.pesquisarDebitoCobradoParcelamento(conta.getId());
 
-			if (colecaoDebitoCobradoDeParcelamento != null && !colecaoDebitoCobradoDeParcelamento.isEmpty()) {
-
+			if (!colecaoDebitoCobradoDeParcelamento.isEmpty()) {
 				for (ParcelaDebitoCobradoTO debitoParcelamento : colecaoDebitoCobradoDeParcelamento) {
 					builder.append(TIPO_REGISTRO_04_PARCELAMENTO);
 					builder.append(completaComZerosEsquerda(9, conta.getImovel().getId()));
 					builder.append(getDescricaoServicoParcelamento(debitoParcelamento));
 					builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(debitoParcelamento.getTotalPrestacao())));
 					builder.append(completaTexto(6, debitoParcelamento.getCodigoConstante()));
-					builder.append(System.getProperty("line.separator"));
+					builder.append(quebraLinha);
 				}
 			}
 

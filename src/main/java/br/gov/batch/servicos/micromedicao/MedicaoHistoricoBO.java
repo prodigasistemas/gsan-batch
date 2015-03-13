@@ -27,34 +27,30 @@ public class MedicaoHistoricoBO {
 	@EJB
 	private HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoHistoricoRepositorio;
 
-	//TODO: Pode adicionar mais de um hidrometro do mesmo tipo de ligacao
-	//TODO: Refactoring
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public List<HidrometroMedicaoHistoricoTO> obterDadosTiposMedicao(Integer idImovel, Integer anoMesReferencia) {
 
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = new ArrayList<>();
 
-		logger.info("LINHA 08 - ANTES  obterDadosTiposMedicao: dadosInstalacaoHidrometro");
-
 		HidrometroTO hidrometroTO = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(idImovel);
 		
 		if (hidrometroTO != null){
-		    HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico = new HidrometroMedicaoHistoricoTO(hidrometroTO);
-		    hidrometroMedicaoHistorico.setMedicaoHistorico(this.getMedicaoHistorico(idImovel, anoMesReferencia));
-		    listaHidrometroMedicaoHistorico.add(hidrometroMedicaoHistorico);
+		    listaHidrometroMedicaoHistorico.add(criaMedicaoHistorico(idImovel, anoMesReferencia, hidrometroTO));
 		}
 
 		hidrometroTO = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroPoco(idImovel);
 		if (hidrometroTO != null){
-		    HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico = new HidrometroMedicaoHistoricoTO(hidrometroTO);
-		    hidrometroMedicaoHistorico.setMedicaoHistorico(this.getMedicaoHistorico(idImovel, anoMesReferencia));
-		    listaHidrometroMedicaoHistorico.add(hidrometroMedicaoHistorico);
+		    listaHidrometroMedicaoHistorico.add(criaMedicaoHistorico(idImovel, anoMesReferencia, hidrometroTO));
 		}
 		
-		logger.info("LINHA 08 - DEPOIS obterDadosTiposMedicao: dadosInstalacaoHidrometro");
-
 		return listaHidrometroMedicaoHistorico;
 	}
+
+    private HidrometroMedicaoHistoricoTO criaMedicaoHistorico(Integer idImovel, Integer anoMesReferencia, HidrometroTO hidrometroTO) {
+        HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico = new HidrometroMedicaoHistoricoTO(hidrometroTO);
+        hidrometroMedicaoHistorico.setMedicaoHistorico(this.getMedicaoHistorico(idImovel, anoMesReferencia));
+        return hidrometroMedicaoHistorico;
+    }
 
 	public MedicaoHistorico getMedicaoHistorico(Integer idImovel, Integer anoMesReferencia) {
 		MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(idImovel, anoMesReferencia);

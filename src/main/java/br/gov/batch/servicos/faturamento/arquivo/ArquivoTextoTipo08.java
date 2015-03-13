@@ -68,18 +68,18 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 		    return builder.toString();
 		}
 		//TODO: Imovel 2731843 nao possui hidrometro de poco, como é registrado o historico de consumo para poço
-        logger.info("LINHA 08 - ANTES  buscarPorLigacaoAguaOuPoco");
+//        logger.info("LINHA 08 - ANTES  buscarPorLigacaoAguaOuPoco");
 		MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), reduzirMeses(anoMesReferencia, 1));
-		logger.info("LINHA 08 - DEPOIS buscarPorLigacaoAguaOuPoco");
-        logger.info("LINHA 08 - ANTES  obterDadosTiposMedicao");
+//		logger.info("LINHA 08 - DEPOIS buscarPorLigacaoAguaOuPoco");
+//        logger.info("LINHA 08 - ANTES  obterDadosTiposMedicao");
 		List<HidrometroMedicaoHistoricoTO> listaHidrometroMedicaoHistorico = medicaoHistoricoBO.obterDadosTiposMedicao(imovel.getId(), anoMesReferencia);
-		logger.info("LINHA 08 - DEPOIS obterDadosTiposMedicao");
+//		logger.info("LINHA 08 - DEPOIS obterDadosTiposMedicao");
 		
 		for (HidrometroMedicaoHistoricoTO hidrometroMedicaoHistorico : listaHidrometroMedicaoHistorico) {
 		    
-		    logger.info("LINHA 08 - ANTES  getConsumoMedioHidrometro");
+//		    logger.info("LINHA 08 - ANTES  getConsumoMedioHidrometro");
 			consumoMedio = getConsumoMedioHidrometro(imovel.getId(), hidrometroMedicaoHistorico.getMedicaoTipo(), anoMesReferencia);
-			logger.info("LINHA 08 - DEPOIS getConsumoMedioHidrometro");
+//			logger.info("LINHA 08 - DEPOIS getConsumoMedioHidrometro");
 			hidrometro   = getNumeroHidrometro(hidrometroMedicaoHistorico.getNumero());
 
 			builder.append(TIPO_REGISTRO_08_MEDICAO);
@@ -93,9 +93,9 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 			builder.append(getDataLeituraFaturada(medicaoHistorico, hidrometroMedicaoHistorico.getDataInstalacao()));
 	        builder.append(completaTexto(1, hidrometroMedicaoHistorico.getLeituraSituacaoAtual()));
 			
-			logger.info("LINHA 08 - ANTES  buildFaixaLeitura");
+//			logger.info("LINHA 08 - ANTES  buildFaixaLeitura");
 			buildFaixaLeitura(imovel, medicaoHistorico, hidrometroMedicaoHistorico);
-	        logger.info("LINHA 08 - DEPOIS buildFaixaLeitura");
+//	        logger.info("LINHA 08 - DEPOIS buildFaixaLeitura");
 			
 			builder.append(completaComZerosEsquerda(6, consumoMedio));
 			builder.append(completaComEspacosADireita(20, hidrometroMedicaoHistorico.getDescricaoLocalInstalacao()));

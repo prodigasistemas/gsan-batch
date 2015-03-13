@@ -29,7 +29,7 @@ public class ArquivoTextoTipo01DadosLocalizacaoImovel {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public Map<Integer, StringBuilder> build(ArquivoTextoTO to) {
-	    this.imovel = imovelRepositorio.obterPorID(to.getIdImovel());
+	    this.imovel = to.getImovel();
 	    this.rota   = to.getRota();
 		
 		dadosLocalizacaoImovel = new HashMap<Integer, StringBuilder>();
