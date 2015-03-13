@@ -109,6 +109,7 @@ public class MovimentoRoteiroEmpresaBO {
 		movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
 		movimento.setCategoriaPrincipal(new Categoria(categoriaPrincipal.getIdCategoria()));
 		movimento.setQuantidadeEconomias(categoriaPrincipal.getQuantidadeEconomias().shortValue());
+		movimento.setNumeroSequencialRota(imovel.getNumeroSequencialRota());
 		
 		String inscricao = imovel.getInscricaoFormatada();
 		movimento.setInscricaoImovel(inscricao);
