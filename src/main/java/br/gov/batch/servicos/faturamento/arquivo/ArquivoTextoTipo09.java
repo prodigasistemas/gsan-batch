@@ -181,11 +181,6 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 	    
 	    ConsumoTarifaCategoria tarifa = obterTarifaCategoriaVigente(tarifaTO, subcategoria);
 	    
-	    if (tarifa == null){
-	        Integer idSub = subcategoria.getSubcategoria() != null ? subcategoria.getSubcategoria().getId() : null;
-	        Integer idCat = subcategoria.getCategoria() != null ? subcategoria.getCategoria().getId() : null;
-	    }
-	    
 	    if (tarifa != null){
 	        boolean tarifaDiferente = true;
 	        

@@ -104,7 +104,7 @@ public class MovimentoRoteiroEmpresaBO {
 		movimento.setLocalidade(imovel.getLocalidade());
 		movimento.setNomeLocalidade(imovel.getLocalidade().getDescricao());
 		movimento.setGerenciaRegional(imovel.getLocalidade().getGerenciaRegional());
-		movimento.setEnderecoImovel(imovel.getEnderecoFormatadoAbreviado().toString());
+		movimento.setEnderecoImovel(imovel.getEnderecoFormatadoAbreviado().length() <= 100 ? imovel.getEnderecoFormatadoAbreviado().toString() : imovel.getEnderecoFormatadoAbreviado().substring(0, 99));
 		movimento.setLoteImovel(completaComZerosEsquerda(4, imovel.getLote()));
 		movimento.setSubloteImovel(completaComZerosEsquerda(3, imovel.getSubLote()));
 		movimento.setCategoriaPrincipal(new Categoria(categoriaPrincipal.getIdCategoria()));
