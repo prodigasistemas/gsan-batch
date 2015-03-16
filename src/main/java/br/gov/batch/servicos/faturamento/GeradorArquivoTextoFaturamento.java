@@ -159,7 +159,7 @@ public class GeradorArquivoTextoFaturamento {
 
 		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
-		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
+//		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -426,52 +426,52 @@ public class GeradorArquivoTextoFaturamento {
 		long ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo01.build(to));
 		long fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 01: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 01: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo02.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 02: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 02: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo03.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 03: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 03: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo04.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 04: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 04: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo05.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 05: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 05: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo06.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 06: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 06: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo07.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 07: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 07: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo08.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 08: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 08: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo09.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 09: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 09: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
 		ini = Calendar.getInstance().getTimeInMillis();
 		arquivoTexto.append(tipo10.build(to));
 		fim = Calendar.getInstance().getTimeInMillis();
-		logger.info("Linha 10: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+//		logger.info("Linha 10: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 		
 		return arquivoTexto;
 	}
