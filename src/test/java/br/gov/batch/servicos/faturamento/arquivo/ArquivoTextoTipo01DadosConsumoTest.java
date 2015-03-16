@@ -77,7 +77,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
         arquivo = new ArquivoTextoTipo01DadosConsumo();
         
         arquivoTextoTO = new ArquivoTextoTO();
-        arquivoTextoTO.setIdImovel(imovel.getId());
+        arquivoTextoTO.setImovel(imovel);
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         
 	}

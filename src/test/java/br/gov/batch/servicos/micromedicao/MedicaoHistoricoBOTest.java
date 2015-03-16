@@ -4,7 +4,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +76,8 @@ public class MedicaoHistoricoBOTest {
 	}
 	
 	private void mockHidrometroInstalacaoHistoricoRepositorio() {
-		expect(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometro(1)).andReturn(getListaHidrometro());
+		expect(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroAgua(1)).andReturn(getHidrometro());
+		expect(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroPoco(1)).andReturn(null);
 		replay(hidrometroInstalacaoHistoricoRepositorioMock);
 	}
 	
@@ -92,7 +92,7 @@ public class MedicaoHistoricoBOTest {
 		replay(medicaoHistoricoRepositorioMock);
 	}
 	
-	private List<HidrometroTO> getListaHidrometro() {
+	private HidrometroTO getHidrometro() {
 		HidrometroTO to = new HidrometroTO();
 		to.setNumero("123456");
 		to.setNumeroDigitosLeitura(Short.valueOf("1"));
@@ -103,10 +103,7 @@ public class MedicaoHistoricoBOTest {
 		to.setRateioTipo(0);
 		to.setMedicaoTipo(1);
 		
-		List<HidrometroTO> lista = new ArrayList<HidrometroTO>();
-		lista.add(to);
-		
-		return lista;
+		return to;
 	}
 	
 	private MedicaoHistorico getMedicaoHistorico() {

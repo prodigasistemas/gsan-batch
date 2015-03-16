@@ -118,7 +118,7 @@ public class MensagemContaTest {
         .append(dadosBancarios.getCodigoAgencia()).append("/")
         .append(dadosBancarios.getIdentificacaoClienteBanco());
         
-        msgAvisoDebitoVencimento = "AVISO:EM " + dataVencimentoFinal + " CONSTA DÉBITO SUJ.CORT. IGNORE CASO PAGO";
+        msgAvisoDebitoVencimento = "AVISO:EM " + dataVencimentoFinal + " CONSTA DEBITO SUJ.CORT. IGNORE CASO PAGO";
         
         bo = new MensagemContaBO();
     }

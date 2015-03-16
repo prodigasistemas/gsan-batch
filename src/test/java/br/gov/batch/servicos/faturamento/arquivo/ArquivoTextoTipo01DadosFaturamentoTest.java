@@ -89,7 +89,7 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
         arquivo = new ArquivoTextoTipo01DadosFaturamento();
         
         arquivoTextoTO = new ArquivoTextoTO();
-        arquivoTextoTO.setIdImovel(imovel.getId());
+        arquivoTextoTO.setImovel(imovel);
         arquivoTextoTO.setConta(conta);
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         arquivoTextoTO.setAnoMesReferencia(201501);

@@ -42,20 +42,20 @@ public class MensagemContaBO {
         ConsultaDebitoImovelTO consultaTO = montaConsultaDebitoImovel(imovel.getId(), anoMesFaturamento, parametros.getAnoMesArrecadacao());
 
         String[] mensagem = new String[]{"", "", ""};
-//        if (debitoImovelBO.existeDebitoImovel(consultaTO)){
-//            String dataVencimentoFinalString = Utilitarios.formataData(consultaTO.getVencimentoFinal());
-//            mensagem[0] = "SR. USUARIO: EM  " + dataVencimentoFinalString + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
-//                    + parametros.getNomeAbreviadoEmpresa() + ".";
-//            mensagem[1] = "COMPARECA A UM DOS NOSSOS POSTOS DE ATENDIMENTO PARA REGULARIZAR SUA SITUACAO.EVITE O CORTE.";
-//            mensagem[2] = "CASO O SEU DEBITO TENHA SIDO PAGO APOS A DATA INDICADA,DESCONSIDERE ESTE AVISO.";
-//        }else{
+        if (debitoImovelBO.existeDebitoImovel(consultaTO)){
+            String dataVencimentoFinalString = Utilitarios.formataData(consultaTO.getVencimentoFinal());
+            mensagem[0] = "SR. USUARIO: EM  " + dataVencimentoFinalString + ",    REGISTRAMOS QUE V.SA. ESTAVA EM DEBITO COM A "
+                    + parametros.getNomeAbreviadoEmpresa() + ".";
+            mensagem[1] = "COMPARECA A UM DOS NOSSOS POSTOS DE ATENDIMENTO PARA REGULARIZAR SUA SITUACAO.EVITE O CORTE.";
+            mensagem[2] = "CASO O SEU DEBITO TENHA SIDO PAGO APOS A DATA INDICADA,DESCONSIDERE ESTE AVISO.";
+        }else{
             
             String[] complemento = this.complementoMensagem(imovel, anoMesReferencia, idFaturamentoGrupo);
             
             mensagem[0] = complemento[0];
             mensagem[1] = complemento[1];
             mensagem[2] = complemento[2];
-//        }
+        }
         
         return mensagem;
     }

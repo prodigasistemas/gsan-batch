@@ -90,7 +90,7 @@ public class ArquivoTextoTipo01DadosClienteTest {
 		arquivo = new ArquivoTextoTipo01DadosCliente();
 		
 		arquivoTextoTO = new ArquivoTextoTO();
-		arquivoTextoTO.setIdImovel(imovel.getId());
+		arquivoTextoTO.setImovel(imovel);
 		
 	}
 

@@ -2,7 +2,6 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.completaTexto;
-
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -10,9 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +102,7 @@ public class ArquivoTextoTipo01DadosContaTest {
 		
 		arquivoTextoTO = new ArquivoTextoTO();
 		arquivoTextoTO.setConta(conta);
-        arquivoTextoTO.setIdImovel(imovel.getId());
+        arquivoTextoTO.setImovel(imovel);
 		arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
 		arquivoTextoTO.setAnoMesReferencia(201501);
 	}

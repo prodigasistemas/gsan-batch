@@ -1,7 +1,7 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
@@ -17,6 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
+import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.atendimentopublico.LigacaoEsgotoSituacao;
 import br.gov.model.cadastro.Bairro;
@@ -31,9 +33,14 @@ import br.gov.model.cadastro.endereco.LogradouroCep;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Hidrometro;
 import br.gov.model.micromedicao.HidrometroInstalacaoHistorico;
+import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
+import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
+import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
+import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
+import br.gov.servicos.to.CategoriaPrincipalTO;
 
 @RunWith(EasyMockRunner.class)
 public class MovimentoRoteiroEmpresaBOTest {
@@ -43,6 +50,21 @@ public class MovimentoRoteiroEmpresaBOTest {
 	
 	@Mock
 	private MovimentoRoteiroEmpresaRepositorio repositorioMock;
+	
+	@Mock
+	ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
+	
+	@Mock
+	MedicaoHistoricoBO medicaoHistoricoBOMock;
+	
+	@Mock
+	AguaEsgotoBO aguaEsgotoBOMock;
+	
+	@Mock
+	HidrometroInstalacaoHistoricoRepositorio hidrometroInstalacaoRepositorioMock;
+	
+	@Mock
+	FaixaLeituraBO faixaLeituraBOMock;
 	
 	private FaturamentoGrupo grupo;
 	private List<Imovel> imoveis;
@@ -89,7 +111,9 @@ public class MovimentoRoteiroEmpresaBOTest {
 		
 		LogradouroCep logradouroCep = new LogradouroCep();
 		Logradouro logradouro = new Logradouro();
+		logradouro.setNome("Almirante Barroso");
 		logradouroCep.setLogradouro(logradouro);
+		
 		imovel.setLogradouroCep(logradouroCep);
 		
 		LogradouroBairro logradouroBairro = new LogradouroBairro();
@@ -107,6 +131,7 @@ public class MovimentoRoteiroEmpresaBOTest {
 	@Test
 	public void testarGerarMovimentoRoteiroEmpresa() {
 		mockImoveisGerados();
+		mockBuild();
 		
 		List<MovimentoRoteiroEmpresa> movimentos = bo.gerarMovimento(imoveis, rota);
 		assertNotNull(movimentos);
@@ -158,4 +183,22 @@ public class MovimentoRoteiroEmpresaBOTest {
         expectLastCall().times(1);
         replay(repositorioMock);
     }	
+    
+    private void mockBuild() {
+    	CategoriaPrincipalTO categoria = new CategoriaPrincipalTO(Integer.valueOf(1), Long.valueOf(1));
+    	VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = new VolumeMedioAguaEsgotoTO(20, 6);
+    	
+    	expect(imovelSubcategoriaRepositorioMock.buscarCategoriaPrincipal(imovel.getId())).andReturn(categoria);
+    	expect(medicaoHistoricoBOMock.getMedicaoHistorico(imovel.getId(), 201412)).andReturn(null);
+    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), 201501, MedicaoTipo.LIGACAO_AGUA.getId())).andReturn(volumeMedioAguaEsgotoTO);    	
+    	
+    	expect(hidrometroInstalacaoRepositorioMock.dadosHidrometroInstaladoAgua(imovel.getId())).andReturn(null);
+    	expect(faixaLeituraBOMock.obterDadosFaixaLeitura(imovel, null, volumeMedioAguaEsgotoTO.getConsumoMedio(), null)).andReturn(new FaixaLeituraTO(0, 0));
+    	
+    	replay(imovelSubcategoriaRepositorioMock);
+    	replay(medicaoHistoricoBOMock);
+    	replay(aguaEsgotoBOMock);
+    	replay(hidrometroInstalacaoRepositorioMock);
+    	replay(faixaLeituraBOMock);
+    }
 }

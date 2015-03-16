@@ -107,9 +107,9 @@ public class ArquivoTextoTipo10Test {
 	private String getLinhaValida() {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("100120140901100100000000001000000000014.00");
+		builder.append("1001201409011  100000000001000000000014.00");
 		builder.append(System.getProperty("line.separator"));
-		builder.append("100320140220300300002100003000000000100.00");
+		builder.append("1003201402203  300002100003000000000100.00");
 		
 		return builder.toString();
 	}

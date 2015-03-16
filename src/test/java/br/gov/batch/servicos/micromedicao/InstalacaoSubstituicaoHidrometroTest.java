@@ -4,9 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import org.easymock.EasyMockRunner;
 import org.easymock.Mock;
@@ -44,7 +42,7 @@ public class InstalacaoSubstituicaoHidrometroTest {
     
     MedicaoHistorico medicaoHistoricoAtual;
     
-    List<HidrometroTO> dadosHidrometro;
+    HidrometroTO hidrometroTO;
     
     @Before
     public void init(){
@@ -55,8 +53,7 @@ public class InstalacaoSubstituicaoHidrometroTest {
         
         medicaoHistoricoAtual = new MedicaoHistorico();
         
-        dadosHidrometro = new ArrayList<HidrometroTO>();
-        HidrometroTO hidrometroTO = new HidrometroTO();
+        hidrometroTO = new HidrometroTO();
         
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, 2014);
@@ -64,7 +61,6 @@ public class InstalacaoSubstituicaoHidrometroTest {
         cal.set(Calendar.DAY_OF_MONTH, 1);
         
         hidrometroTO.setDataInstalacao(cal.getTime());
-        dadosHidrometro.add(hidrometroTO);
     }
 
     
@@ -104,7 +100,7 @@ public class InstalacaoSubstituicaoHidrometroTest {
         expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).andReturn(medicaoHistoricoAtual);
         replay(medicaoHistoricoRepositorio);
         
-        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(1)).andReturn(dadosHidrometro);
+        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).andReturn(hidrometroTO);
         replay(hidrometroInstalacaoHistoricoRepositorio);
     }
 
@@ -115,7 +111,7 @@ public class InstalacaoSubstituicaoHidrometroTest {
         expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).andReturn(null);
         replay(medicaoHistoricoRepositorio);
         
-        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(1)).andReturn(dadosHidrometro).times(2);
+        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).andReturn(hidrometroTO).times(2);
         replay(hidrometroInstalacaoHistoricoRepositorio);
         
         expect(medicaoHistoricoBO.getMedicaoHistorico(1, 201411)).andReturn(null);

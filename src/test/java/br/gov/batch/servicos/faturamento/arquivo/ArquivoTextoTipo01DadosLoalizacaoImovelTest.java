@@ -74,7 +74,7 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	
     	arquivoTextoTO = new ArquivoTextoTO();
     	arquivoTextoTO.setRota(rota);
-    	arquivoTextoTO.setIdImovel(imovel.getId());
+    	arquivoTextoTO.setImovel(imovel);
 	}
 	
 	@Test

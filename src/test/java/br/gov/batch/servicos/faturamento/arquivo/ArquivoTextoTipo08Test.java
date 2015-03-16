@@ -101,13 +101,14 @@ public class ArquivoTextoTipo08Test {
 		medicaoHistorico.setDataLeituraAnteriorFaturamento(new Date());
 		medicaoHistorico.setLeituraAnteriorInformada(new Integer(180));
 		medicaoHistorico.setDataLeituraAtualInformada(new Date());
+		medicaoHistorico.setAnoMesReferencia(201112);
 		
 		situacao = new LigacaoAguaSituacao();
 		situacao.setId(LigacaoAguaSituacao.POTENCIAL);
 		imovel.setLigacaoAguaSituacao(situacao);
 
 		to = new ArquivoTextoTO();
-		to.setIdImovel(imovel.getId());
+		to.setImovel(imovel);
 		to.setAnoMesReferencia(referencia);
 		arquivo = new ArquivoTextoTipo08();
 	}
@@ -131,11 +132,11 @@ public class ArquivoTextoTipo08Test {
         expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
         replay(repositorioImovel);
 	    
-		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(1);
-		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(1);
-		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(), referencia)).andReturn(medicaoHistorico).times(1);
-		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250));
-		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId())).andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(1);
+		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(2);
+		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(2);
+		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(),  201112)).andReturn(medicaoHistorico).times(2);
+		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250)).times(2);
+		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId())).andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(2);
 
 		replay(medicaoHistoricoBOMock);
 		replay(hidrometroBOMock);

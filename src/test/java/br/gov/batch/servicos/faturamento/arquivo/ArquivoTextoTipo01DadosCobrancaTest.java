@@ -65,7 +65,7 @@ public class ArquivoTextoTipo01DadosCobrancaTest {
 		arquivo = new ArquivoTextoTipo01DadosCobranca();
 		
 		arquivoTextoTO = new ArquivoTextoTO();
-        arquivoTextoTO.setIdImovel(imovel.getId());
+        arquivoTextoTO.setImovel(imovel);
 		arquivoTextoTO.setCobrancaDocumento(cobrancaDocumento);
 	}
 
