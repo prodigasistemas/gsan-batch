@@ -165,15 +165,17 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>cobertura-maven-plugin</artifactId>
-					<version>2.6</version>
+					<version>2.7</version>
 					<configuration>
 						<formats>
 							<format>html</format>
 						</formats>
 						<instrumentation>
+							<includes>
+								<include>br/gov/batch/servicos/**/*class</include>
+							</includes>
 							<excludes>
-								<exclude>br/gov/batch/exception/*.class</exclude>
-								<exclude>br/gov/batch/util/*.class</exclude>
+								<exclude>br/gov/batch/servicos/**/to/*.class</exclude>
 							</excludes>
 						</instrumentation>
 					</configuration>
