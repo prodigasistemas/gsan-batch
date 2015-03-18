@@ -33,10 +33,6 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 		
 		if (conta != null) {
 			
-			if (conta.getImovel().getId().equals(new Integer(("3520471")))) {
-				System.out.println("oi...");
-			}
-			
 			creditoRealizadoAnterior = null;
 			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;
 			anoMesAcumulado = "";
@@ -68,10 +64,6 @@ public class ArquivoTextoTipo05 extends ArquivoTexto {
 		Conta conta = to.getConta();
 		
 		if (conta != null) {
-			
-			if (conta.getImovel().getId().equals(new Integer(("3520471")))) {
-				System.out.println("oi...");
-			}
 			
 			creditoRealizadoAnterior = null;
 			BigDecimal valorCreditoAcumulado = BigDecimal.ZERO;

@@ -55,8 +55,8 @@ public class AguaEsgotoBOTest {
 		
 		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(1, 201408, 1);
 		
-		assertEquals(28, volumeMedioAguaEsgotoTO.getConsumoMedio().intValue());
-		assertEquals(7, volumeMedioAguaEsgotoTO.getQuantidadeMesesConsiderados().intValue());
+		assertEquals(27, volumeMedioAguaEsgotoTO.getConsumoMedio().intValue());
+		assertEquals(6, volumeMedioAguaEsgotoTO.getQuantidadeMesesConsiderados().intValue());
 	}
 	
 	@Test
@@ -85,24 +85,24 @@ public class AguaEsgotoBOTest {
 	}
 	
 	private void mockParametros() {
-		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(Short.valueOf("6"));
-		expect(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).andReturn(Short.valueOf("24"));
-		expect(sistemaParametrosMock.getIndicadorTarifaCategoria()).andReturn(Short.valueOf("1"));
+		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(Short.valueOf("6")).times(3);
+		expect(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).andReturn(Short.valueOf("24")).times(3);
+		expect(sistemaParametrosMock.getIndicadorTarifaCategoria()).andReturn(Short.valueOf("1")).times(3);
 		replay(sistemaParametrosMock);
 	}
 	
 	private void mockConsumoHistoricoSemMesRetroagido() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201401, 201407, 1)).andReturn(getListaConsumoHistoricoSemMesRetroagido());
+		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(getListaConsumoHistoricoSemMesRetroagido());
 		replay(consumoHistoricoRepositorioMock);
 	}
 	
 	private void mockConsumoHistoricoComMesRetroagido() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201401, 201407, 1)).andReturn(getListaConsumoHistoricoComMesRetroagido());
+		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(getListaConsumoHistoricoComMesRetroagido());
 		replay(consumoHistoricoRepositorioMock);
 	}
 	
 	private void mockConsumoHistoricoNulo() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201401, 201407, 1)).andReturn(null);
+		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(null);
 		replay(consumoHistoricoRepositorioMock);
 	}
 	

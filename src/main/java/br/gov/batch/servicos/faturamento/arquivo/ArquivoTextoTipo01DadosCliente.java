@@ -69,6 +69,7 @@ public class ArquivoTextoTipo01DadosCliente {
 		
 		List<ClienteImovel> clientesAtivos = imovel.getClienteImoveis().stream()
 												.filter(c -> c.getDataFimRelacao() == null)
+												.filter(c -> c.getClienteRelacaoTipo().getId().intValue() != ClienteRelacaoTipo.PROPRIETARIO.intValue())
 												.collect(Collectors.toList());
 		
 		for(ClienteImovel clienteImovel : clientesAtivos) {
