@@ -57,8 +57,10 @@ public class AguaEsgotoBO {
 
 		Integer dataFim = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 		Integer dataInicio = Utilitarios.reduzirMeses(dataFim, sistemaParametros.getMesesMediaConsumo());
+		Integer novaDataInicio = Utilitarios.reduzirMeses(dataInicio, sistemaParametros.getNumeroMesesMaximoCalculoMedia().intValue());
+		
 		List<ConsumoHistorico> listaConsumoHistorico = consumoHistoricoRepositorio.obterConsumoMedio(
-				idImovel, dataInicio, dataFim, idLigacaoTipo);
+				idImovel, novaDataInicio, dataFim, idLigacaoTipo);
 
 		if (listaConsumoHistorico != null && !listaConsumoHistorico.isEmpty()) {
 			return gerarVolumeMedioComConsumoHistorico(listaConsumoHistorico, dataInicio, dataFim);
@@ -74,8 +76,7 @@ public class AguaEsgotoBO {
 		ConsumoHistorico consumoHistorico = iterator.next();
 		int referencia = consumoHistorico.getReferenciaFaturamento();
 		int maximoDeMesesParaCalcularMedia = sistemaParametros.getNumeroMesesMaximoCalculoMedia().intValue();
-		int novaDataInicio = Utilitarios.reduzirMeses(dataInicio, maximoDeMesesParaCalcularMedia);
-		int quantidadeDeMeses = Utilitarios.obterQuantidadeMeses(dataFim, novaDataInicio);
+		int quantidadeDeMeses = Utilitarios.obterQuantidadeMeses(dataFim, dataInicio);
 
 		int quantidadeDeMesesConsiderados = 0;
 		int quantidadeDeMesesRetroagidos = 0;
@@ -83,7 +84,7 @@ public class AguaEsgotoBO {
 		int mediaConsumo = 0;
 		
 		while (quantidadeDeMesesRetroagidos <= maximoDeMesesParaCalcularMedia && quantidadeDeMesesConsiderados < quantidadeDeMeses) {
-			if (dataFim.equals(referencia)) {
+			if (dataFim.intValue() == referencia) {
 				consumo += consumoHistorico.getNumeroConsumoCalculoMedia();
 				quantidadeDeMesesConsiderados++;
 
