@@ -10,27 +10,22 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
 @Stateless
 public class EconomiasBO {
-    
-    @EJB
-    private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio; 
-    
-    public Integer quantidadeEconomiasVirtuais(Integer idImovel){
-        
-        Integer qtdEconomias = 0;
-        
-        Collection<ICategoria> colecaoSubcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
-        
-        for (ICategoria iCategoria : colecaoSubcategoria) {
-            if (iCategoria.getCategoria().getFatorEconomias() != null){
-                qtdEconomias += iCategoria.getCategoria().getFatorEconomias(); 
-            }
-            else{
-                qtdEconomias += iCategoria.getQuantidadeEconomias();
-            }
-            
-        }
-        return qtdEconomias;
-    }
-    
 
+	@EJB
+	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
+
+	public Integer quantidadeEconomiasVirtuais(Integer idImovel) {
+		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
+
+		Integer quantidadeEconomias = 0;
+		for (ICategoria subcategoria : subcategorias) {
+			if (subcategoria.getCategoria().getFatorEconomias() != null) {
+				quantidadeEconomias += subcategoria.getCategoria().getFatorEconomias();
+			} else {
+				quantidadeEconomias += subcategoria.getQuantidadeEconomias();
+			}
+		}
+		
+		return quantidadeEconomias;
+	}
 }
