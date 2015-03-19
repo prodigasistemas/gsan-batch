@@ -41,6 +41,7 @@ import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresaDivisao;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
 import br.gov.model.micromedicao.TipoServicoCelular;
+import br.gov.model.seguranca.SegurancaParametro.NOME_PARAMETRO_SEGURANCA;
 import br.gov.model.util.Utilitarios;
 import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.cadastro.ImovelRepositorio;
@@ -50,6 +51,7 @@ import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaDivisaoRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
+import br.gov.servicos.seguranca.SegurancaParametroRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoFaturamento {
@@ -125,6 +127,9 @@ public class GeradorArquivoTextoFaturamento {
     
     @EJB
     private RotaRepositorio rotaRepositorio;
+    
+    @EJB
+    private SegurancaParametroRepositorio segurancaParametroRepositorio;
 	
 	public GeradorArquivoTextoFaturamento() {
 		super();
@@ -136,7 +141,7 @@ public class GeradorArquivoTextoFaturamento {
 	public void gerar(Integer idRota, Date dataComando) {
 	    Rota rota = rotaRepositorio.obterPorID(idRota);
 	    
-	    Integer anoMesFaturamento = rota.getFaturamentoGrupo().getAnoMesReferencia();
+	    Integer anoMesReferencia = rota.getFaturamentoGrupo().getAnoMesReferencia();
 	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
 	    
 		final int quantidadeRegistros = 3000;
@@ -167,7 +172,7 @@ public class GeradorArquivoTextoFaturamento {
 					boolean imovelMicroComConta = false;
 
 					for (Imovel imovelCondominio : imoveisCondominio) {
-						if (contaRepositorio.existeContaPreFaturadaSemMovimento(imovelCondominio.getId(), anoMesFaturamento)) {
+						if (contaRepositorio.existeContaPreFaturadaSemMovimento(imovelCondominio.getId(), anoMesReferencia)) {
 							imovelMicroComConta = true;
 							break;
 						}
@@ -176,18 +181,18 @@ public class GeradorArquivoTextoFaturamento {
 					if (imovelMicroComConta) {
 						imoveisArquivo.add(imovel);
 						conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
-						conteudo.append(gerarArquivoTexto(imovel, null, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+						conteudo.append(gerarArquivoTexto(imovel, null, anoMesReferencia, rota, grupoFaturamento, dataComando));
 
 						for (Imovel micro : imoveisCondominio) {
 							conteudo.append(quebraLinha)
-							     .append(carregarArquivo(micro, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+							     .append(carregarArquivo(micro, anoMesReferencia, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
 				}
 			} else {
 				conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
-				conteudo.append(carregarArquivo(imovel, anoMesFaturamento, rota, grupoFaturamento, dataComando));
+				conteudo.append(carregarArquivo(imovel, anoMesReferencia, rota, grupoFaturamento, dataComando));
 				imoveisArquivo.add(imovel);
 			}
 			
@@ -195,7 +200,7 @@ public class GeradorArquivoTextoFaturamento {
 		        if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
 		        	int sequenciaRota = divisoes.size() + 1;
 		        	to.setSequenciaRota(sequenciaRota);
-		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis);
+		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis);
 		        	divisao.acrescentaSequencial(sequenciaRota);
 		            divisoes.add(divisao);
 		            conteudo = new StringBuilder();
@@ -207,9 +212,9 @@ public class GeradorArquivoTextoFaturamento {
 		
 		logger.info("Rota: " + idRota + " - Imoveis lidos");
 		
-		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesFaturamento, rota.getId());
+		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesReferencia, rota.getId());
 
-		ArquivoTextoRoteiroEmpresa roteiro = criarRoteiroArquivoTexto(rota, imoveis.get(0), grupoFaturamento, anoMesFaturamento, imoveisPreFaturados.size());
+		ArquivoTextoRoteiroEmpresa roteiro = criarRoteiroArquivoTexto(rota, imoveis.get(0), grupoFaturamento, anoMesReferencia, imoveisPreFaturados.size());
 		
 		roteiro.setDivisoes(divisoes);
 		
@@ -219,20 +224,22 @@ public class GeradorArquivoTextoFaturamento {
 		}
 		
         if (rota.existeLimiteImoveis()) {
-            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesFaturamento, imoveis));
+            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis));
         }
         
         arquivoRepositorio.salvar(roteiro);
         
         logger.info("Rota: " + idRota + " - Roteiro salvo");
         
+        String caminhoArquivos = segurancaParametroRepositorio.recuperaPeloNome(NOME_PARAMETRO_SEGURANCA.CAMINHO_ARQUIVOS);
+		String caminhoFinal = caminhoArquivos + grupoFaturamento.getId() + "/" + anoMesReferencia;
+        
         if (rota.existeLimiteImoveis()){
-            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), "", e.getConteudoArquivo().toString()));
+            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), caminhoFinal, e.getConteudoArquivo().toString()));
         }else{
         	to.setSequenciaRota(1);
             conteudo.append(gerarPassosFinais());
-            //TODO: Recuperar caminho  por parametros
-            IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), "/temp/", buildCabecalho(conteudo).toString());
+            IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), caminhoFinal, buildCabecalho(conteudo).toString());
         }
         
         logger.info("Rota: " + idRota + " - Arquivo criado");
@@ -244,7 +251,6 @@ public class GeradorArquivoTextoFaturamento {
 	
 	public StringBuilder buildCabecalho(StringBuilder conteudo) {
 		StringBuilder conteudoCompleto = new StringBuilder();
-		
 		conteudoCompleto.append(obterQuantidadeLinhasTexto(conteudo))
 						.append(quebraLinha)
 						.append(conteudo);

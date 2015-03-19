@@ -16,10 +16,12 @@ import javax.ejb.TransactionAttributeType;
 import br.gov.model.micromedicao.MedicaoTipo;
 import br.gov.model.micromedicao.MovimentoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
+import br.gov.model.seguranca.SegurancaParametro.NOME_PARAMETRO_SEGURANCA;
 import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
 import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
+import br.gov.servicos.seguranca.SegurancaParametroRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoMicrocoletor {
@@ -32,6 +34,9 @@ public class GeradorArquivoTextoMicrocoletor {
 
 	@EJB
 	private RotaRepositorio rotaRepositorio;
+
+	@EJB
+	private SegurancaParametroRepositorio segurancaParametroRepositorio;
 
 	public GeradorArquivoTextoMicrocoletor() {
 		super();
@@ -47,12 +52,12 @@ public class GeradorArquivoTextoMicrocoletor {
 		List<MovimentoRoteiroEmpresa> movimentos = movimentoRepositorio.pesquisarMovimentoParaLeitura(idRota, referencia, 0, 0);
 
 		for (MovimentoRoteiroEmpresa movimento : movimentos) {
-		    texto.append(adicionarLinha(movimento));
-        }
+			texto.append(adicionarLinha(movimento));
+		}
 
 		faturamentoAtividadeCronogramaRepositorio.atualizarFaturamentoAtividadeCronograma(rota.getFaturamentoGrupo().getId(), referencia);
 
-		if (!movimentos.isEmpty()){
+		if (!movimentos.isEmpty()) {
 			criarArquivo(referencia, rota, texto);
 		}
 	}
@@ -135,12 +140,16 @@ public class GeradorArquivoTextoMicrocoletor {
 	private void criarArquivo(Integer referencia, Rota rota, StringBuilder texto) {
 		String ano = extrairAno(referencia).toString().substring(2, 4);
 		String mes = completaComZerosEsquerda(2, extrairMes(referencia));
-		String grupo = completaComZerosEsquerda(3, rota.getFaturamentoGrupo().getId());
+		String grupo = rota.getFaturamentoGrupo().getId().toString();
 		String local = completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId());
 		String setor = completaComZerosEsquerda(3, rota.getSetorComercial().getId());
 		String cdRota = completaComZerosEsquerda(3, rota.getCodigo());
 
 		String nomeArquivo = "cons" + ano + mes + "." + grupo + "." + local + "." + setor + "." + cdRota + ".txt";
-		IOUtil.criarArquivoTexto(nomeArquivo, "/tmp/", texto.toString());
+
+		String caminhoArquivos = segurancaParametroRepositorio.recuperaPeloNome(NOME_PARAMETRO_SEGURANCA.CAMINHO_ARQUIVOS);
+		String caminhoFinal = caminhoArquivos + grupo + "/" + referencia;
+
+		IOUtil.criarArquivoTexto(nomeArquivo, caminhoFinal, texto.toString());
 	}
 }

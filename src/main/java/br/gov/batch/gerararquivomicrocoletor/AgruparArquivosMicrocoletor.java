@@ -30,10 +30,12 @@ import br.gov.model.micromedicao.LeituraTipo;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.ServicoTipoCelular;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
+import br.gov.model.seguranca.SegurancaParametro.NOME_PARAMETRO_SEGURANCA;
 import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.cadastro.QuadraRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
+import br.gov.servicos.seguranca.SegurancaParametroRepositorio;
 
 @Named
 public class AgruparArquivosMicrocoletor implements ItemProcessor {
@@ -43,42 +45,36 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 	private ArquivoTextoRoteiroEmpresaRepositorio roteiroRepositorio;
 
 	@EJB
-	private QuadraRepositorio quadraRepositorio;	
+	private QuadraRepositorio quadraRepositorio;
 
 	@Inject
 	private BatchUtil util;
-	
+
 	@EJB
 	private RotaRepositorio rotaRepositorio;
+
+	@EJB
+	private SegurancaParametroRepositorio segurancaParametroRepositorio;
 
 	private Integer anoMesReferencia;
 	private Integer idGrupo;
 	private String nomeArquivo;
 	private Integer idEmpresa;
-	
+
 	private Empresa empresa;
 
-	public AgruparArquivosMicrocoletor() {
-	}
-	
-	public static void main(String[] args) {
-		String t = "cons1512.000.111.222.333.txt";
-		System.out.println(t.substring(13, 16));
-		System.out.println(t.substring(17, 20));
-		System.out.println(t.substring(21, 24));
-	}
+	public AgruparArquivosMicrocoletor() {}
 
-	// FIXME: Parametrizar diretorio
-	//TODO: Refactoring
+	// TODO: Refactoring
 	public Object processItem(Object param) throws Exception {
 		anoMesReferencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
 		idGrupo = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
 		nomeArquivo = montarNomeArquivo();
-		
-		//TODO: Grupo microcoletor possui rotas atendidas por empresas diferentes
+
+		// TODO: Grupo microcoletor possui rotas atendidas por empresas diferentes
 		List<Rota> rotas = rotaRepositorio.obterPeloGrupoETipoLeitura(idGrupo, LeituraTipo.MICROCOLETOR);
-		
-		if (!rotas.isEmpty()){
+
+		if (!rotas.isEmpty()) {
 			empresa = rotas.get(0).getEmpresa();
 		}
 
@@ -86,7 +82,7 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 
 		String[] wildcards = new String[] { nomeArquivo + "*.txt" };
 
-		List<File> arquivos = Arrays.asList(arquivosFiltrados("/tmp", wildcards));
+		List<File> arquivos = Arrays.asList(arquivosFiltrados(recuperarCaminhoArquivos(), wildcards));
 
 		arquivos.sort(Comparator.naturalOrder());
 
@@ -102,7 +98,7 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 		int localidadeAnterior = -1;
 		int setorAnterior = -1;
 		int rotaAnterior = -1;
-		
+
 		for (File file : arquivos) {
 			FileReader reader = new FileReader(file);
 			BufferedReader b = new BufferedReader(reader);
@@ -110,7 +106,7 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 			localidade = Integer.valueOf(file.getName().substring(13, 16));
 			setor = Integer.valueOf(file.getName().substring(17, 20));
 			rota = Integer.valueOf(file.getName().substring(21, 24));
-			
+
 			if (localidadeAnterior != localidade) {
 				pagina = 1;
 				qtdLinhas = 1;
@@ -119,11 +115,11 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 				pagina = 1;
 				qtdLinhas = 1;
 
-			}else if (rotaAnterior != rota) {
+			} else if (rotaAnterior != rota) {
 				pagina++;
 				qtdLinhas = 1;
 			}
- 
+
 			while ((linha = b.readLine()) != null) {
 				linha = linha.substring(0, 643) + completaComZerosEsquerda(5, pagina) + linha.substring(648);
 				texto.append(linha).append(quebraLinha);
@@ -132,7 +128,7 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 					qtdLinhas = 1;
 				}
 			}
-			
+
 			localidadeAnterior = localidade;
 			setorAnterior = setor;
 			rotaAnterior = rota;
@@ -152,21 +148,24 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 
 	public void inserirRoteiro(StringBuilder texto) {
 		ArquivoTextoRoteiroEmpresa roteiro = new ArquivoTextoRoteiroEmpresa();
-
 		roteiro.setAnoMesReferencia(anoMesReferencia);
 		roteiro.setFaturamentoGrupo(new FaturamentoGrupo(idGrupo));
 		roteiro.setEmpresa(empresa);
-
 		roteiro.setQuantidadeImovel(obterQuantidadeLinhasTexto(texto));
 		roteiro.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.LIBERADO.getId());
 		roteiro.setServicoTipoCelular(ServicoTipoCelular.LEITURA.getId());
 		roteiro.setUltimaAlteracao(new Date());
-
 		roteiro.setNomeArquivo(nomeArquivo);
 
-		IOUtil.criarArquivoTextoCompactado(nomeArquivo, "/tmp/", texto.toString());
+		IOUtil.criarArquivoTextoCompactado(nomeArquivo, recuperarCaminhoArquivos(), texto.toString());
 
 		roteiroRepositorio.salvar(roteiro);
+	}
+
+	private String recuperarCaminhoArquivos() {
+		String caminhoArquivos = segurancaParametroRepositorio.recuperaPeloNome(NOME_PARAMETRO_SEGURANCA.CAMINHO_ARQUIVOS);
+
+		return caminhoArquivos + idGrupo + "/" + anoMesReferencia;
 	}
 
 	private boolean liberarGeracaoArquivo(Integer idEmpresa) {
