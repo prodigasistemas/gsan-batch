@@ -140,7 +140,7 @@ public class ArquivoTextoTipo08 extends ArquivoTexto {
 	}
 
 	private String appendLeituraInformada(MedicaoHistorico medicaoHistorico) {
-		return (medicaoHistorico != null) ? completaTexto(7, medicaoHistorico.getLeituraAtualInformada()) : completaTexto(7, " ");
+		return (medicaoHistorico != null && medicaoHistorico.getLeituraAtualInformada() != null) ? completaComZerosEsquerda(7, medicaoHistorico.getLeituraAtualInformada()) : completaTexto(7, " ");
 	}
 
 	private Integer getLeituraFaturada(MedicaoHistorico medicaoHistorico, HidrometroMedicaoHistoricoTO hidrometroTO) {
