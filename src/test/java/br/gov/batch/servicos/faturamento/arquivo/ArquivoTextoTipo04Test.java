@@ -93,7 +93,7 @@ public class ArquivoTextoTipo04Test {
 		String linha = arquivo.build(to);
 		assertTrue(linha.length() == TAMANHO_LINHA);
 	}
-
+	
 	private void carregarMocks() {
 		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoParcelamento(to.getConta().getId())).andReturn(debitosCobradosParcelamentos);
 		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoSemParcelamento(to.getConta().getId())).andReturn(debitosCobrados);

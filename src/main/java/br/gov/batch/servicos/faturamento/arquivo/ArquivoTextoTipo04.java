@@ -3,12 +3,15 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
+import static br.gov.model.util.Utilitarios.completaTextoADireita;
 import static br.gov.model.util.Utilitarios.formatarAnoMesParaMesAno;
 import static br.gov.model.util.Utilitarios.formatarBigDecimalComPonto;
 import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -25,10 +28,6 @@ import br.gov.servicos.to.ParcelaDebitoCobradoTO;
 public class ArquivoTextoTipo04 extends ArquivoTexto {
 	@EJB
 	private DebitoCobradoRepositorio debitoCobradoRepositorio;
-
-	private BigDecimal valorPrestacaoAcumulado;
-	private String anoMesAcumulado;
-	private Integer qtdAnoMesDistintos;
 
 	public ArquivoTextoTipo04() {
 		super();
@@ -54,101 +53,59 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 					builder.append(quebraLinha);
 				}
 			}
-
-			Collection<DebitoCobradoNaoParceladoTO> debitosCobradosNaoParcelados = debitoCobradoRepositorio.pesquisarDebitoCobradoSemParcelamento(conta.getId());
-
-			DebitoCobradoNaoParceladoTO debitoCobradoAnterior = null;
-
-			valorPrestacaoAcumulado = BigDecimal.ZERO;
-			anoMesAcumulado = "";
-			qtdAnoMesDistintos = 0;
-
-			for (DebitoCobradoNaoParceladoTO atual : debitosCobradosNaoParcelados) {
-
-				if (atual.possuiMesmoTipoDebitoAnterior(debitoCobradoAnterior)) {
-					buildLinhaOuAtualizaParametros(conta, debitoCobradoAnterior, atual, qtdAnoMesDistintos++);
-				} else {
-					if (qtdAnoMesDistintos > 0) {
-						adicionaLinha(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
-					}
-
-					qtdAnoMesDistintos = 0;
-
-					buildLinhaOuAtualizaParametros(conta, debitoCobradoAnterior, atual, 1);
-				}
-
-				debitoCobradoAnterior = atual;
-			}
-
-			if (qtdAnoMesDistintos > 0) {
-				adicionaLinha(conta, debitoCobradoAnterior, qtdAnoMesDistintos, anoMesAcumulado, valorPrestacaoAcumulado);
-			}
+			
+			builder.append(buildDebitoCobradoSemParcelamento(conta));
 		}
 
 		return builder.toString();
 	}
 
-	private void buildLinhaOuAtualizaParametros(Conta conta, DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual, int qtdAnoMesDistintos) {
-		if (atual.getAnoMesReferencia() != null) {
-			atualizaParametros(calculaValorPrestacao(anterior, atual), calculaAnoMes(anterior, atual), qtdAnoMesDistintos);
-		} else {
-			adicionaLinha(conta, atual, 1, "", atual.getValorPrestacao());
-		}
-	}
-
-	private BigDecimal calculaValorPrestacao(DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual) {
-		if (atual.possuiMesmoTipoDebitoAnterior(anterior)) {
-			return valorPrestacaoAcumulado.add(atual.getValorPrestacao());
-		}
-
-		return atual.getValorPrestacao();
-	}
-
-	private String calculaAnoMes(DebitoCobradoNaoParceladoTO anterior, DebitoCobradoNaoParceladoTO atual) {
-		String anoMes = formatarAnoMesParaMesAno(atual.getAnoMesReferencia());
-		return atual.possuiMesmoTipoDebitoAnterior(anterior) ? anoMesAcumulado + " " + anoMes : anoMes;
-	}
-
-	private void atualizaParametros(BigDecimal valorPrestacao, String anoMes, int qtdAnoMes) {
-		valorPrestacaoAcumulado = valorPrestacao;
-		qtdAnoMesDistintos = qtdAnoMes;
-		anoMesAcumulado = anoMes;
-	}
-
-	private void adicionaLinha(Conta conta, DebitoCobradoNaoParceladoTO debito, int qtdMeses, String anoMesAcumulado, BigDecimal valorPrestacao) {
-		builder.append(this.obterDadosServicosParcelamentos(conta, debito, qtdMeses, anoMesAcumulado, valorPrestacao));
-	}
-
-	public StringBuilder obterDadosServicosParcelamentos(Conta conta, DebitoCobradoNaoParceladoTO debito, Integer qtdAnoMesDistintos,
-			String anoMesAcumulado, BigDecimal valorPrestacaoAcumulado) {
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append(TIPO_REGISTRO_04_PARCELAMENTO);
-		builder.append(completaComZerosEsquerda(9, conta.getImovel().getId().toString()));
-
-		if (qtdAnoMesDistintos > 1) {
-			builder.append(completaTexto(90, debito.getDescricaoTipoDebito() + " " + anoMesAcumulado));
-			if (qtdAnoMesDistintos > 5) {
-				builder.append(" E OUTRAS");
-			}
-
-			builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(valorPrestacaoAcumulado)));
-		} else {
-			if (anoMesAcumulado == null || anoMesAcumulado.equals("")) {
-				builder.append(completaTexto(90, debito.getDescricaoTipoDebito() + " PARCELA "
-						+ completaComZerosEsquerda(3, String.valueOf(debito.getNumeroPrestacaoDebito())) + "/"
-						+ completaComZerosEsquerda(3, String.valueOf(debito.getTotalPrestacao()))));
-			} else {
-				builder.append(completaComEspacosADireita(90, debito.getDescricaoTipoDebito() + " " + anoMesAcumulado));
-			}
-
-			builder.append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(debito.getValorPrestacao())));
-		}
-
-		builder.append(completaTexto(6, debito.getConstanteTipoDebito()));
-		builder.append(System.getProperty("line.separator"));
-
-		return builder;
+	public StringBuilder buildDebitoCobradoSemParcelamento(Conta conta){
+	    Collection<DebitoCobradoNaoParceladoTO> debitosCobradosNaoParcelados = debitoCobradoRepositorio.pesquisarDebitoCobradoSemParcelamento(conta.getId());
+	    
+	    Map<Integer, ArquivoTextoTipo04DebitoCobradoSemParcelamento> linhas = new LinkedHashMap<Integer, ArquivoTextoTipo04DebitoCobradoSemParcelamento>();
+	    
+	    debitosCobradosNaoParcelados.forEach(e -> {
+	        ArquivoTextoTipo04DebitoCobradoSemParcelamento linha = linhas.get(e.getDebitoTipo());
+	        
+	        if (linha == null){
+	            linha = new ArquivoTextoTipo04DebitoCobradoSemParcelamento();
+	            linha.texto = new StringBuilder(e.getDescricaoTipoDebito()).append(" ");
+	            linha.constante = e.getConstanteTipoDebito();
+	            
+	            linhas.put(e.getDebitoTipo(), linha);
+	        }
+	        
+	        if (e.getAnoMesReferencia() == null){
+                linha.texto.append("PARCELA ")
+                    .append(completaComZerosEsquerda(3, e.getNumeroPrestacaoDebito()))
+                    .append("/")
+                    .append(completaComZerosEsquerda(3, e.getTotalPrestacao()));
+	        }else{
+	            if (linha.qtdMeses == 6){
+	                linha.texto.append("E OUTRAS");
+	            }else if (linha.qtdMeses < 6){
+	                linha.texto.append(formatarAnoMesParaMesAno(e.getAnoMesReferencia())).append(" ");
+	            }
+	        }
+	        
+	        linha.soma = linha.soma.add(e.getValorPrestacao());
+	        linha.qtdMeses++;
+	    });
+	    
+	    StringBuilder texto = new StringBuilder();
+	    
+	    for(ArquivoTextoTipo04DebitoCobradoSemParcelamento item: linhas.values()){
+	        texto
+	        .append(TIPO_REGISTRO_04_PARCELAMENTO)
+	        .append(completaComZerosEsquerda(9, conta.getImovel().getId().toString()))
+	        .append(completaTextoADireita(90, item.texto))
+	        .append(completaComZerosEsquerda(14, formatarBigDecimalComPonto(item.soma)))
+	        .append(completaTexto(6, item.constante))
+	        .append(quebraLinha);
+	    }
+	    
+	    return texto;
 	}
 
 	private String getDescricaoServicoParcelamento(ParcelaDebitoCobradoTO debito) {
@@ -159,5 +116,13 @@ public class ArquivoTextoTipo04 extends ArquivoTexto {
 		         .append(completaComZerosEsquerda(3, String.valueOf(debito.getTotalParcela())));
 
 		return completaComEspacosADireita(90, descricao.toString());
+	}
+	
+	class ArquivoTextoTipo04DebitoCobradoSemParcelamento{
+        Integer tipoDebito = -1;
+	    StringBuilder texto = new StringBuilder();
+	    BigDecimal soma = BigDecimal.ZERO;
+	    Integer constante;
+	    Integer qtdMeses = 1;
 	}
 }
