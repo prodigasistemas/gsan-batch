@@ -2,7 +2,6 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
-import static br.gov.model.util.Utilitarios.obterQuantidadeLinhasTexto;
 import static br.gov.model.util.Utilitarios.quebraLinha;
 
 import java.util.List;
@@ -44,10 +43,6 @@ public class ArquivoTextoTipo12 extends ArquivoTexto {
 			builder.append(completaTexto(120, acao.getDescricaoContaMensagemMes1()));
 			builder.append(completaTexto(120, acao.getDescricaoContaMensagemMes2()));
 			builder.append(completaTexto(120, acao.getDescricaoContaMensagemMes3()));
-
-			if (obterQuantidadeLinhasTexto(builder) < listaAcoes.size()) {
-				builder.append(System.getProperty("line.separator"));
-			}
 		}
 
 		return builder.toString();
