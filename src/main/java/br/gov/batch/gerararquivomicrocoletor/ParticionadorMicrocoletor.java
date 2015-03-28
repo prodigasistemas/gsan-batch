@@ -18,8 +18,8 @@ public class ParticionadorMicrocoletor extends Particao {
 	private BatchUtil util;
 
 	public int totalItens() {
-		int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-		int referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
+		int idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+		int referencia = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
 		return (int) repositorio.totalMovimentosParaLeitura(idRota, referencia);
 	}
 }

@@ -18,7 +18,7 @@ public class ParticionadorRotaLeitura extends Particao {
     private BatchUtil util;
 	
     public int totalItens(){
-    	int idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
+    	int idRota = Integer.valueOf(util.parametroDoJob("idRota"));
     	return (int) rotaBO.totalImoveisParaLeitura(idRota);
     }
 }

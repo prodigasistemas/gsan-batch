@@ -15,9 +15,8 @@ import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronRotaRepositorio;
 import br.gov.servicos.to.CronogramaFaturamentoRotaTO;
 
-//TODO: Mudar o nome para ProcessarImovelRota
 @Named
-public class ProcessarRota implements ItemProcessor {
+public class ProcessarImovelRota implements ItemProcessor {
     @EJB
     private ImovelRepositorio repositorio;
 
@@ -30,15 +29,15 @@ public class ProcessarRota implements ItemProcessor {
     @Inject
     private BatchUtil util;
     
-	public ProcessarRota() {
+	public ProcessarImovelRota() {
 	}
 
     public Imovel processItem(Object param) throws Exception {
     	Imovel imovel = (Imovel) param;
     	
-    	Integer idRota             = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
-    	Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
+    	Integer idRota             = Integer.valueOf(util.parametroDoJob("idRota"));
+    	Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
+    	Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
     	
         if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)){
             CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(idRota, idGrupoFaturamento, anoMesFaturamento);
@@ -56,7 +55,9 @@ public class ProcessarRota implements ItemProcessor {
             to.setAnoMesFaturamento(anoMesFaturamento);
             to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
             
-            faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
+            //faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
+            
+            Thread.sleep(5);
         }
         
         return imovel;

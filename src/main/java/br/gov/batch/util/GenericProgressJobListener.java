@@ -6,10 +6,8 @@ import javax.batch.api.listener.JobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.ejb.EJB;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
-import br.gov.batch.util.BatchUtil;
 import br.gov.model.batch.ProcessoIniciado;
 import br.gov.servicos.batch.ProcessoParametroRepositorio;
 import br.gov.servicos.batch.ProcessoRepositorio;
@@ -34,7 +32,7 @@ public abstract class GenericProgressJobListener implements JobListener{
     protected Properties parametros = null;
 
 	protected void updateJobProgress() {
-		Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
+		Integer idProcessoIniciado = Integer.valueOf(util.parametroDoJob("idProcessoIniciado"));
 		ProcessoIniciado processoIniciado = processoEJB.buscarProcessosIniciado(idProcessoIniciado);
 		
 		parametros = processoParametroEJB.buscarParametrosPorProcessoIniciado(processoIniciado);

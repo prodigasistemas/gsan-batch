@@ -27,9 +27,9 @@ public class ProcessarRotaLeitura implements ItemProcessor {
 
 		DadosLeituraTO to = new DadosLeituraTO();
 		to.setIdImovel(imovel.getId());
-		to.setIdRota(Integer.valueOf(util.parametroDoBatch("idRota")));
-		to.setAnoMesFaturamento(Integer.valueOf(util.parametroDoBatch("anoMesFaturamento")));
-		to.setIdGrupo(Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento")));
+		to.setIdRota(Integer.valueOf(util.parametroDoJob("idRota")));
+		to.setAnoMesFaturamento(Integer.valueOf(util.parametroDoJob("anoMesFaturamento")));
+		to.setIdGrupo(Integer.valueOf(util.parametroDoJob("idGrupoFaturamento")));
 		
 		dadosLeituraBO.gerarDadosParaLeitura(to);
 

@@ -67,8 +67,8 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 
 	// TODO: Refactoring
 	public Object processItem(Object param) throws Exception {
-		anoMesReferencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
-		idGrupo = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
+		anoMesReferencia = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
+		idGrupo = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
 		nomeArquivo = montarNomeArquivo();
 
 		// TODO: Grupo microcoletor possui rotas atendidas por empresas diferentes

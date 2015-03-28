@@ -8,8 +8,6 @@ import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
-import br.gov.model.batch.ProcessoIniciado;
-import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
 
 @Named
@@ -29,26 +27,13 @@ public class PreFaturamentoJobListener implements JobListener{
     
 	@Override
 	public void beforeJob() throws Exception {
-    	long execId = jobCtx.getExecutionId();
-    	
-    	Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
+    	Integer idProcessoIniciado = Integer.valueOf(util.parametroDoJob("idProcessoIniciado"));
 		
-        processoRepositorio.iniciaExecucaoProcesso(idProcessoIniciado, execId);
+        processoRepositorio.iniciaExecucaoProcesso(idProcessoIniciado);
         
-        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Inicio da execução do [%s]", execId, jobCtx.getJobName()));
+        logger.info(util.parametroDoJob("idProcessoIniciado"), String.format("Inicio da execução do [%s]", jobCtx.getJobName()));
 	}
 
 	public void afterJob() throws Exception {
-		Integer idProcessoIniciado = Integer.valueOf(util.parametroDoBatch("idProcessoIniciado"));
-		
-		ProcessoIniciado processo = processoRepositorio.buscarProcessoIniciadoPorId(idProcessoIniciado);
-		
-		if (processo.emProcessamento()){
-			processoRepositorio.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.CONCLUIDO);
-		}
-		
-		long execId = jobCtx.getExecutionId();
-
-		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Fim da execução do [%s]", execId, jobCtx.getJobName()));
 	}
 }

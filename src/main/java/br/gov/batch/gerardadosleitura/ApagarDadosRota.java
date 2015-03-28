@@ -95,11 +95,11 @@ public class ApagarDadosRota implements Batchlet{
     protected JobContext jobCtx;
 	
 	public String process() throws Exception {
-    	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-    	Integer referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
-    	Integer grupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
+    	Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+    	Integer referencia = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
+    	Integer grupoFaturamento = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
     	
-    	logger.info(util.parametroDoBatch("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
+    	logger.info(util.parametroDoJob("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
     	
     	Rota rota = rotaRepositorio.obterPorID(idRota);
     	

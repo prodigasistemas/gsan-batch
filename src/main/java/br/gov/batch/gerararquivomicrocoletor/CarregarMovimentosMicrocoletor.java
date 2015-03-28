@@ -42,8 +42,8 @@ public class CarregarMovimentosMicrocoletor extends AbstractItemReader {
 		int firstItem = firstItem0;
 		int numItems = numItems0 - (firstItem - firstItem0);
 
-		Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
-		Integer referencia = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
+		Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+		Integer referencia = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
 
 		List<MovimentoRoteiroEmpresa> lista = movimentoRoteiroEmpresaRepositorio.pesquisarMovimentoParaLeitura(idRota, referencia, firstItem, numItems);
 

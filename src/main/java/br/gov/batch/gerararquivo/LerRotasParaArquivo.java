@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
+import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
 import br.gov.batch.util.BatchUtil;
 
 @Named
@@ -22,28 +23,31 @@ public class LerRotasParaArquivo extends AbstractItemReader {
     private BatchUtil util;
         
     @Inject
-    private ControleProcessoGeracaoArquivo controle;
+    private ControleExecucaoAtividade controle;
 
     private Queue<String> rotas = new ArrayDeque<String>();
 
     public void  open(Serializable ckpt) throws Exception {
-        String[]  ids =  util.parametroDoBatch("idsRota").replaceAll("\"", "").split(",");
+        String[]  ids =  util.parametroDoJob("idsRota").replaceAll("\"", "").split(",");
         
     	for (String id : ids) {
 			rotas.add(id.trim());
 		}
+
+    	logger.info(util.parametroDoJob("idProcessoIniciado"), String.format("Gerando arquivos para o grupo [ %s ] com rotas [ %s ].", util.parametroDoJob("idGrupoFaturamento"), util.parametroDoJob("idsRota")));
     }
 
     public String readItem() throws Exception {
-    	while (controle.emProcessamento()){
-    		Thread.sleep(500);
-    	}
+        while (controle.atingiuLimiteProcessamento(Integer.valueOf(util.parametroDoJob("idControleAtividade")))){
+            Thread.sleep(500);
+        }
     	
-    	if (!rotas.isEmpty()){
-    		String rota = rotas.poll();
-    		logger.info(util.parametroDoBatch("idProcessoIniciado"), "Gerando arquivo para rota: " + rota);
-    		return rota;
-    	}
-    	return null;
+        String rota = rotas.poll();
+        
+        if (rota != null){
+            logger.info(util.parametroDoJob("idProcessoIniciado"), "Gerando arquivo para rota: " + rota);
+        }
+        
+        return rota;
     }
 }

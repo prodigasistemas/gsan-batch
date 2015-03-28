@@ -23,9 +23,12 @@ public class GerarArquivoRota implements ItemProcessor {
 	}
 
 	public Object processItem(Object param) throws Exception {
-		Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
+		Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+		
 
-		gerarArquivoBO.gerar(idRota, new Date());
+		//gerarArquivoBO.gerar(idRota, new Date());
+		
+		Thread.sleep(50);
 
 		return param;
 	}

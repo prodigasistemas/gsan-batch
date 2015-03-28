@@ -16,7 +16,7 @@ public class DummyRotaReader extends AbstractItemReader {
     private String rota = null;
         
     public void  open(Serializable ckpt) throws Exception {
-        rota = util.parametroDoBatch("idRota");
+        rota = util.parametroDoJob("idRota");
     }
 
     public String readItem() throws Exception {

@@ -13,9 +13,13 @@ public class BatchUtil {
 	@Inject
 	protected JobContext jobCtx;
 
-	public String parametroDoBatch(String nomeParametro) {
-		long execId = jobCtx.getExecutionId();
-		Properties jobParams = BatchRuntime.getJobOperator().getParameters(execId);
-		return jobParams.getProperty(nomeParametro);
+	public String parametroDoJob(String nomeParametro) {
+		return parametrosDoJob().getProperty(nomeParametro);
+	}
+	
+	public Properties parametrosDoJob() {
+	    long execId = jobCtx.getExecutionId();
+	    Properties jobParams = BatchRuntime.getJobOperator().getParameters(execId);
+	    return jobParams;
 	}
 }

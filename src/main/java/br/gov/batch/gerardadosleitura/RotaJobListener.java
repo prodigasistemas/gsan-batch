@@ -9,20 +9,21 @@ import br.gov.batch.util.GenericProgressJobListener;
 public class RotaJobListener extends GenericProgressJobListener{
 	
 	@Inject
-	private ControleProcessoRota controle;
+	private ControleExecucaoAtividade controle;
 	
 	public void beforeJob() throws Exception {
     	long execId = jobCtx.getExecutionId();
     	
-        logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Inicio do processamento da rota: %s", execId, util.parametroDoBatch("idRota")));
+        logger.info(util.parametroDoJob("idProcessoIniciado"), String.format("[executionId: %s] - Inicio do processamento da rota: %s", execId, util.parametroDoJob("idRota")));
 	}
 
 	public void afterJob() throws Exception {
 		long execId = jobCtx.getExecutionId();
-		logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("[executionId: %s] - Fim do processamento da rota: %s", execId, util.parametroDoBatch("idRota")));
+		logger.info(util.parametroDoJob("idProcessoIniciado"), String.format("[executionId: %s] - Fim do processamento da rota: %s", execId, util.parametroDoJob("idRota")));
+		
+		controle.finalizaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
 		
 		updateJobProgress();
-		controle.finalizaProcessamentoRota();
 	}
 
     public int totalSteps() {

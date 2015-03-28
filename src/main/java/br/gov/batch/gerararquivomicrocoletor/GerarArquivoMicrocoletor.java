@@ -21,7 +21,7 @@ public class GerarArquivoMicrocoletor implements ItemProcessor {
 	}
 
     public Object processItem(Object param) throws Exception {
-    	Integer idRota = Integer.valueOf(util.parametroDoBatch("idRota"));
+    	Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
     	
     	geradorArquivoMicrocoletor.gerar(idRota);
     	

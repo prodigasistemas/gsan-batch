@@ -10,11 +10,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
+import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.batch.ProcessoIniciado;
 import br.gov.model.micromedicao.LeituraTipo;
 import br.gov.model.micromedicao.Rota;
-import br.gov.servicos.batch.ProcessoRepositorio;
+import br.gov.servicos.batch.ProcessoIniciadoRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Named
@@ -29,30 +30,32 @@ public class IniciaGeracaoArquivoRota implements ItemProcessor {
 	@Inject
 	private BatchUtil util;
 
-	@Inject
-	private ControleProcessoGeracaoArquivo controle;
+    @Inject
+    private ControleExecucaoAtividade controle;
+
 
 	@Inject
-	private ProcessoRepositorio processoRepositorio;
-
+	private ProcessoIniciadoRepositorio processoRepositorio;
+	
 	public IniciaGeracaoArquivoRota() {
 	}
 
 	public Object processItem(Object param) throws Exception {
 
-		ProcessoIniciado processo = processoRepositorio.buscarProcessoIniciadoPorId(Integer.valueOf(util.parametroDoBatch("idProcessoIniciado")));
+		ProcessoIniciado processo = processoRepositorio.obterPorID(Integer.valueOf(util.parametroDoJob("idProcessoIniciado")));
 
 		if (!processo.emProcessamento()) {
-			logger.info(util.parametroDoBatch("idProcessoIniciado"), String.format("Geracao de arquivo CANCELADA para a rota %s.", param));
+			logger.info(util.parametroDoJob("idProcessoIniciado"), String.format("Geracao de arquivo CANCELADA para a rota %s.", param));
 		} else {
 			String idRota = String.valueOf(param);
 			Rota rota = rotaRepositorio.obterPorID(Integer.valueOf(idRota));
 
 			Properties processoParametros = new Properties();
 			processoParametros.put("idRota", idRota);
-			processoParametros.put("anoMesFaturamento", util.parametroDoBatch("anoMesFaturamento"));
-			processoParametros.put("idProcessoIniciado", util.parametroDoBatch("idProcessoIniciado"));
-			processoParametros.put("idGrupoFaturamento", util.parametroDoBatch("idGrupoFaturamento"));
+			processoParametros.put("anoMesFaturamento", util.parametroDoJob("anoMesFaturamento"));
+			processoParametros.put("idProcessoIniciado", util.parametroDoJob("idProcessoIniciado"));
+			processoParametros.put("idGrupoFaturamento", util.parametroDoJob("idGrupoFaturamento"));
+            processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
 
 			JobOperator jo = BatchRuntime.getJobOperator();
 
@@ -65,7 +68,7 @@ public class IniciaGeracaoArquivoRota implements ItemProcessor {
 
 			logger.logBackgroud(String.format("[executionId: %s] - Rota [%s] marcada para geracao de arquivos. ", executionRota, param));
 
-			controle.iniciaGeracaoArquivoRota();
+			controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
 		}
 
 		return param;
