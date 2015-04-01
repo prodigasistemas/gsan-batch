@@ -12,6 +12,8 @@ import javax.inject.Named;
 import br.gov.batch.BatchLogger;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.model.faturamento.FaturamentoGrupo;
+import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
 import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoMovimentoRepositorio;
 import br.gov.servicos.cadastro.ClienteContaRepositorio;
@@ -29,6 +31,8 @@ import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.faturamento.DebitoCobradoCategoriaRepositorio;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
 import br.gov.servicos.faturamento.DebitoCobrarRepositorio;
+import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaDivisaoRepositorio;
+import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
 
 @Named
@@ -86,6 +90,12 @@ public class ApagarDadosRota implements Batchlet{
 	private ContaImpressaoRepositorio contaImpressaoRepositorio;
 	
 	@EJB
+	private ArquivoTextoRoteiroEmpresaRepositorio arquivoRepositorio;
+	
+	@EJB
+	private ArquivoTextoRoteiroEmpresaDivisaoRepositorio arquivoDivisaoRepositorio; 
+
+	@EJB
 	private RotaRepositorio rotaRepositorio;
 	
     @Inject
@@ -102,6 +112,8 @@ public class ApagarDadosRota implements Batchlet{
     	logger.info(util.parametroDoBatch("idProcessoIniciado"), "Exclusao de dados prefaturados para a rota: " + idRota);
     	
     	Rota rota = rotaRepositorio.obterPorID(idRota);
+    	
+    	this.apagarArquivoDaRota(rota, grupoFaturamento, referencia);
     	
     	List<Integer> idsContas  = new ArrayList<Integer>();
     	List<Integer> idsImoveis = new ArrayList<Integer>();
@@ -140,6 +152,19 @@ public class ApagarDadosRota implements Batchlet{
     	}
 		
 		return null;
+	}
+	
+	private void apagarArquivoDaRota(Rota rota, Integer idGrupoFaturamento, Integer referencia) {
+		FaturamentoGrupo grupo = new FaturamentoGrupo(idGrupoFaturamento);
+		grupo.setAnoMesReferencia(referencia);
+		rota.setFaturamentoGrupo(grupo);
+		
+		ArquivoTextoRoteiroEmpresa arquivo = arquivoRepositorio.pesquisarPorRotaEReferencia(rota.getId(), rota.getFaturamentoGrupo().getAnoMesReferencia());
+		
+		if (arquivo != null) {
+			arquivoRepositorio.excluir(arquivo.getId());
+			arquivoDivisaoRepositorio.deletarPorArquivoTextoRoteiroEmpresa(arquivo.getId());
+		}
 	}
 
 	public void stop() throws Exception {

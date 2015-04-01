@@ -2,7 +2,6 @@
 	<listeners>
 		<listener ref="preFaturamentoJobListener"/>
 	</listeners>
-<!-- 
 	<step id="carregarRotas" next="gerarArquivo">
 		<properties>
 			<property name="javax.transaction.global.timeout" value="2400"/> 
@@ -15,8 +14,6 @@
 		</chunk>
 	</step>
 
- -->
- 
 	<step id="gerarArquivo" next="agruparArquivosMicrocoletor">
 		<properties>
 			<property name="javax.transaction.global.timeout" value="1200"/>

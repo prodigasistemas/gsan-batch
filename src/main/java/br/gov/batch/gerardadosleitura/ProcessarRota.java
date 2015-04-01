@@ -40,22 +40,20 @@ public class ProcessarRota implements ItemProcessor {
     	Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoBatch("idGrupoFaturamento"));
     	Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoBatch("anoMesFaturamento"));
     	
-        if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)){
-            CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(idRota, idGrupoFaturamento, anoMesFaturamento);
-            
-            Rota rota = new Rota();
-            rota.setId(idRota);
-            
-            FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo();
-            faturamentoGrupo.setId(idGrupoFaturamento);
-            
-            FaturamentoImovelTO to = new FaturamentoImovelTO();
-            to.setRota(rota);
-            to.setIdImovel(imovel.getId());
-            to.setFaturamentoGrupo(faturamentoGrupo);
-            to.setAnoMesFaturamento(anoMesFaturamento);
-            to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
-            
+    	CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(idRota, idGrupoFaturamento, anoMesFaturamento);
+    	FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo(idGrupoFaturamento);
+    	faturamentoGrupo.setAnoMesReferencia(anoMesFaturamento);
+    	
+    	Rota rota = new Rota(idRota);
+    	rota.setFaturamentoGrupo(faturamentoGrupo);
+
+    	if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)){
+    		FaturamentoImovelTO to = new FaturamentoImovelTO();
+    		to.setRota(rota);
+    		to.setFaturamentoGrupo(faturamentoGrupo);
+    		to.setAnoMesFaturamento(anoMesFaturamento);
+    		to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
+        	to.setIdImovel(imovel.getId());
             faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
         }
         
