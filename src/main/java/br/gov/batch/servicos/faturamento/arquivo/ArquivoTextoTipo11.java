@@ -82,8 +82,8 @@ public class ArquivoTextoTipo11 extends ArquivoTexto {
 	}
 
 	private String getIndicadorSequencialLeitura(Rota rota) {
-		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? completaComZerosEsquerda(2, rota.getIndicadorSequencialLeitura())
-				: completaComZerosEsquerda(2, Status.INATIVO.getId());
+		return (rota != null && rota.getIndicadorSequencialLeitura() != null) ? completaComZerosEsquerda(1, rota.getIndicadorSequencialLeitura())
+				: completaComZerosEsquerda(1, Status.INATIVO.getId());
 	}
 
 	private Rota verificarRota(Imovel imovel) {

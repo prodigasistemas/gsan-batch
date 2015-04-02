@@ -21,43 +21,43 @@ public class ProcessarImovelRota implements ItemProcessor {
     private ImovelRepositorio repositorio;
 
     @EJB
-	private FaturamentoImovelBO faturamentoImovelBO;
-	
-	@EJB
-	private FaturamentoAtividadeCronRotaRepositorio faturamentoAtividadeCronRotaRepositorio;
-	
+    private FaturamentoImovelBO faturamentoImovelBO;
+
+    @EJB
+    private FaturamentoAtividadeCronRotaRepositorio faturamentoAtividadeCronRotaRepositorio;
+
     @Inject
     private BatchUtil util;
-    
-	public ProcessarImovelRota() {
-	}
+
+    public ProcessarImovelRota() {
+    }
 
     public Imovel processItem(Object param) throws Exception {
-    	Imovel imovel = (Imovel) param;
-    	
-    	Integer idRota             = Integer.valueOf(util.parametroDoJob("idRota"));
-    	Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
-    	Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
-    	
-        if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)){
-            CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(idRota, idGrupoFaturamento, anoMesFaturamento);
-            
-            Rota rota = new Rota();
-            rota.setId(idRota);
-            
-            FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo();
-            faturamentoGrupo.setId(idGrupoFaturamento);
-            
-            FaturamentoImovelTO to = new FaturamentoImovelTO();
-            to.setRota(rota);
-            to.setIdImovel(imovel.getId());
-            to.setFaturamentoGrupo(faturamentoGrupo);
-            to.setAnoMesFaturamento(anoMesFaturamento);
-            to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
-            
-            //faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
-            
-            Thread.sleep(5);
+        Imovel imovel = (Imovel) param;
+
+        Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+        Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
+        Integer anoMesFaturamento = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
+
+        if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)) {
+            CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(
+                    idRota, idGrupoFaturamento, anoMesFaturamento);
+
+            FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo(idGrupoFaturamento);
+            faturamentoGrupo.setAnoMesReferencia(anoMesFaturamento);
+
+            Rota rota = new Rota(idRota);
+            rota.setFaturamentoGrupo(faturamentoGrupo);
+
+            if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)) {
+                FaturamentoImovelTO to = new FaturamentoImovelTO();
+                to.setRota(rota);
+                to.setFaturamentoGrupo(faturamentoGrupo);
+                to.setAnoMesFaturamento(anoMesFaturamento);
+                to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
+                to.setIdImovel(imovel.getId());
+                faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
+            }
         }
         
         return imovel;

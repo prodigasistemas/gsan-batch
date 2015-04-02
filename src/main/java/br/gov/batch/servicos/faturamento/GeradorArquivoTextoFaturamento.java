@@ -164,7 +164,6 @@ public class GeradorArquivoTextoFaturamento {
 
 		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
-//		    logger.info("Rota: " + idRota + " INICIO - Imovel para processamento id [" + imovel.getId() + "]");
 			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
@@ -185,7 +184,7 @@ public class GeradorArquivoTextoFaturamento {
 
 						for (Imovel micro : imoveisCondominio) {
 							conteudo.append(quebraLinha)
-							     .append(carregarArquivo(micro, anoMesReferencia, rota, grupoFaturamento, dataComando));
+									.append(carregarArquivo(micro, anoMesReferencia, rota, grupoFaturamento, dataComando));
 							imoveisArquivo.add(micro);
 						}
 					}
@@ -201,13 +200,11 @@ public class GeradorArquivoTextoFaturamento {
 		        	int sequenciaRota = divisoes.size() + 1;
 		        	to.setSequenciaRota(sequenciaRota);
 		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis);
-		        	divisao.acrescentaSequencial(sequenciaRota);
 		            divisoes.add(divisao);
 		            conteudo = new StringBuilder();
 		            imoveisArquivo.clear();
 		        }
 		    }
-//		    logger.info("Rota: " + idRota + " FIM - Imovel processado id [" + imovel.getId() + "]");
 		}
 		
 		logger.info("Rota: " + idRota + " - Imoveis lidos");
@@ -218,14 +215,15 @@ public class GeradorArquivoTextoFaturamento {
 		
 		roteiro.setDivisoes(divisoes);
 		
+		if (rota.existeLimiteImoveis()) {
+			divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis));
+		}
+
 		for (int i = 0; i < divisoes.size() ; i++){
 		    divisoes.get(i).acrescentaSequencial(i + 1);
 		    divisoes.get(i).setArquivoTextoRoteiroEmpresa(roteiro);
 		}
 		
-        if (rota.existeLimiteImoveis()) {
-            divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis));
-        }
         
         arquivoRepositorio.salvar(roteiro);
         
@@ -235,7 +233,7 @@ public class GeradorArquivoTextoFaturamento {
 		String caminhoFinal = caminhoArquivos + grupoFaturamento.getId() + "/" + anoMesReferencia;
         
         if (rota.existeLimiteImoveis()){
-            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), caminhoFinal, e.getConteudoArquivo().toString()));
+            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), caminhoFinal, buildCabecalho(e.getConteudoArquivo()).toString()));
         }else{
         	to.setSequenciaRota(1);
             conteudo.append(gerarPassosFinais());
@@ -251,6 +249,7 @@ public class GeradorArquivoTextoFaturamento {
 	
 	public StringBuilder buildCabecalho(StringBuilder conteudo) {
 		StringBuilder conteudoCompleto = new StringBuilder();
+		
 		conteudoCompleto.append(obterQuantidadeLinhasTexto(conteudo))
 						.append(quebraLinha)
 						.append(conteudo);
@@ -271,13 +270,14 @@ public class GeradorArquivoTextoFaturamento {
 	    roteiro.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.DISPONIVEL);
 	    roteiro.setUltimaAlteracao(new Date());
         roteiro.setQuantidadeImovel(qtdImoveisDivididos);
+        roteiro.setNomeArquivo(this.montarNomeArquivo(rota));
         
         if (rota.getLeiturista() != null) {
             roteiro.setLeiturista(rota.getLeiturista());
             roteiro.setNumeroImei(rota.getLeiturista().getNumeroImei());
         }
 	    
-	    roteiro.setConteudoArquivo(new StringBuilder(obterQuantidadeLinhasTexto(texto)).append(quebraLinha).append(texto));
+	    roteiro.setConteudoArquivo(new StringBuilder(texto));
 	    
 	    return roteiro;
 	}
@@ -285,26 +285,14 @@ public class GeradorArquivoTextoFaturamento {
 	public ArquivoTextoRoteiroEmpresa criarRoteiroArquivoTexto(Rota rota, Imovel imovel, FaturamentoGrupo faturamentoGrupo, Integer anoMesFaturamento, Integer qtdImoveisComContaPF){
 	    ArquivoTextoRoteiroEmpresa arquivo = new ArquivoTextoRoteiroEmpresa();
 	    
-	    StringBuilder nomeArquivo = new StringBuilder("G");
-	    nomeArquivo.append(completaComZerosEsquerda(3, faturamentoGrupo.getId()));
-
 	    //TODO: confirmar se a localidade para rota alternativa vem do imovel ou da rota
 	    if (rota.isAlternativa()) {
-	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
-	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
-	        
 	        arquivo.setLocalidade(rota.getSetorComercial().getLocalidade());
 	        arquivo.setCodigoSetorComercial1(rota.getSetorComercial().getCodigo());
 	    }else{
-	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getLocalidade().getId()));
-	        nomeArquivo.append(completaComZerosEsquerda(3, imovel.getSetorComercial().getCodigo()));
-	        
 	        arquivo.setLocalidade(imovel.getLocalidade());
 	        arquivo.setCodigoSetorComercial1(imovel.getSetorComercial().getCodigo());
 	    }
-	    
-	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getCodigo()));
-	    nomeArquivo.append(completaComZerosEsquerda(6, anoMesFaturamento));
 	    
         arquivo.setAnoMesReferencia(anoMesFaturamento);
         arquivo.setFaturamentoGrupo(faturamentoGrupo);
@@ -318,7 +306,7 @@ public class GeradorArquivoTextoFaturamento {
         arquivo.setNumeroQuadraFinal1(intervalorNumeroQuadra[1]);
 
         arquivo.setQuantidadeImovel(qtdImoveisComContaPF);
-        arquivo.setNomeArquivo(nomeArquivo.toString());
+        arquivo.setNomeArquivo(montarNomeArquivo(rota));
 
         arquivo.setLeiturista(rota.getLeiturista());
         arquivo.setCodigoLeiturista(rota.getLeiturista().getCodigoDDD());
@@ -339,6 +327,24 @@ public class GeradorArquivoTextoFaturamento {
         arquivo.setServicoTipoCelular(TipoServicoCelular.IMPRESSAO_SIMULTANEA.getId());
 
 	    return arquivo;
+	}
+	
+	public String montarNomeArquivo(Rota rota) {
+		StringBuilder nomeArquivo = new StringBuilder("G");
+	    nomeArquivo.append(completaComZerosEsquerda(3, rota.getFaturamentoGrupo().getId()));
+	    
+	    if (rota.isAlternativa()) {
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
+	    }else{
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
+	    }
+	    
+	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getCodigo()));
+	    nomeArquivo.append(completaComZerosEsquerda(6, rota.getFaturamentoGrupo().getAnoMesReferencia()));
+	    
+	    return nomeArquivo.toString();
 	}
 	
 	private boolean rotaSoComImoveisInformativos(Integer qtdImoveisComContaPF) {
