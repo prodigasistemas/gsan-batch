@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.to.DebitosContaTO;
@@ -35,18 +34,17 @@ public class DebitoCobradoBOTest {
 	@Mock
 	private DebitoCobradoCategoriaBO debitoCobradoCategoriaEJBMock;
 	
-	private Imovel imovel;
+	private Integer idImovel = 10;
 	
 	private int anoMesFaturamento = 201403;
 	
 	@Before
 	public void setup() {
-		imovel = new Imovel();
 		business = new DebitosContaBO();
 	}
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
-		expect(debitoCobrarEJBMock.debitosCobrarVigentes(imovel))
+		expect(debitoCobrarEJBMock.debitosCobrarVigentes(idImovel))
 									.andReturn(debitos);
 		replay(debitoCobrarEJBMock);
 		
@@ -69,7 +67,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(idImovel, anoMesFaturamento);
 		
 		assertEquals(7.25, to.getValorTotalDebito().doubleValue(), 0);
 	}
@@ -81,7 +79,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(idImovel, anoMesFaturamento);
 		
 		assertEquals(5.34, to.getValorTotalDebito().doubleValue(), 0);
 	}
@@ -93,7 +91,7 @@ public class DebitoCobradoBOTest {
 		
 		preparaMocks(anoMesFaturamento, debitos);
 		
-		DebitosContaTO to = business.gerarDebitosConta(imovel, anoMesFaturamento);
+		DebitosContaTO to = business.gerarDebitosConta(idImovel, anoMesFaturamento);
 		
 		DebitoCobrado debitoCobrado = to.getDebitosCobrados().get(0);
 		

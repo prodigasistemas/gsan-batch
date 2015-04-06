@@ -1,0 +1,13 @@
+<job id="job_gerar_arquivo_microcoletor" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+ 	<listeners>
+		<listener ref="gerarArquivoJobListener"/>
+	</listeners>
+	
+	<step id="gerarArquivo">
+		<chunk>
+			<reader ref="dummyItemReader"/>
+			<processor ref="gerarArquivoMicrocoletor" />
+			<writer ref="dummyItemWriter" />
+		</chunk>
+	</step>
+</job>

@@ -13,17 +13,22 @@ import br.gov.batch.servicos.faturamento.to.FaturamentoImovelTO;
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.ContaGeral;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
+import br.gov.model.faturamento.FaturamentoParametro.NOME_PARAMETRO_FATURAMENTO;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 import br.gov.servicos.cadastro.ClienteRepositorio;
+import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ContaGeralRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
+import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.VencimentoContaTO;
@@ -37,6 +42,9 @@ public class ContaBO {
 	
 	@EJB
 	private ClienteRepositorio clienteRepositorio;
+	
+	@EJB
+	private ImovelRepositorio imovelRepositorio;
 	
 	@EJB
 	private ContaGeralRepositorio contaGeralRepositorio;
@@ -56,6 +64,9 @@ public class ContaBO {
 	@EJB
 	private LigacaoEsgotoRepositorio ligacaoEsgotoRepositorio;
 	
+	@EJB
+	private FaturamentoParametroRepositorio repositorioParametros;
+	
 	private SistemaParametros sistemaParametros;
 	
 	@PostConstruct
@@ -63,7 +74,6 @@ public class ContaBO {
 		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 	}	
 
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public Conta gerarConta(FaturamentoImovelTO faturamentoTO, DebitosContaTO debitosContaTO, CreditosContaTO creditosContaTO, 
 							ImpostosDeduzidosContaTO impostosDeduzidosContaTO) throws Exception {
 		
@@ -71,7 +81,7 @@ public class ContaBO {
 		return gerarConta(gerarTO);
 	}
 	
-	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public Conta gerarConta(GerarContaTO to) throws Exception{
 		ContaGeral contaGeral = new ContaGeral();
 		contaGeral.setIndicadorHistorico(Status.INATIVO.getId());
@@ -80,7 +90,8 @@ public class ContaBO {
 		
 		conta.setNumeroBoleto(sequencialGeracaoBoleto(sistemaParametros.getValorContaFichaComp(), conta));
 		
-		Integer idConta = contaGeralRepositorio.salvar(contaGeral);
+		contaGeralRepositorio.salvar(contaGeral);
+		Integer idConta = contaGeral.getId();
 		conta.setId(idConta);
 		conta.setContaGeral(contaGeral);
 		
@@ -89,13 +100,16 @@ public class ContaBO {
 		return conta;
 	}
 	
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public GerarContaTO buildGerarContaTO(FaturamentoImovelTO faturamentoTO, 
 			DebitosContaTO gerarDebitoCobradoHelper, CreditosContaTO creditosContaTO,
-			ImpostosDeduzidosContaTO impostosDeduzidosTO) throws Exception {
+			ImpostosDeduzidosContaTO impostosDeduzidosTO) {
+	    
+	    Imovel imovel = imovelRepositorio.obterPorID(faturamentoTO.getIdImovel());
 		
 		GerarContaTO gerarTO = new GerarContaTO();
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
-		gerarTO.setImovel(faturamentoTO.getImovel());
+		gerarTO.setImovel(imovel);
 		gerarTO.setRota(faturamentoTO.getRota());
 		gerarTO.setDataVencimentoRota(faturamentoTO.getDataVencimentoConta());
 		gerarTO.setFaturamentoGrupo(faturamentoTO.getFaturamentoGrupo());
@@ -104,9 +118,9 @@ public class ContaBO {
 		gerarTO.setValorTotalDebitos(gerarDebitoCobradoHelper.getValorTotalDebito());
 		gerarTO.setValorTotalImposto(impostosDeduzidosTO.getValorTotalImposto());
 
-		LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(faturamentoTO.getImovel().getId());
+		LigacaoEsgoto ligacaoEsgoto = ligacaoEsgotoRepositorio.buscarLigacaoEsgotoPorIdImovel(faturamentoTO.getIdImovel());
 		if (ligacaoEsgoto != null){
-			gerarTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, faturamentoTO.getImovel()));
+			gerarTO.setPercentualEsgoto(this.verificarPercentualEsgotoAlternativo(ligacaoEsgoto, imovel));
 			gerarTO.setPercentualColeta(ligacaoEsgoto.valorPercentualAguaConsumidaColetada());
 		} else {
 			gerarTO.setPercentualEsgoto(BigDecimal.ZERO);
@@ -132,12 +146,13 @@ public class ContaBO {
 			.percentualColeta(to.getPercentualColeta())
 			.debitoCreditoSituacaoAtual(DebitoCreditoSituacao.PRE_FATURADA)
 			.faturamentoGrupo(to.getFaturamentoGrupo())
-			.leiturasFaturamento(medicaoHistoricoRepositorio.buscarPorImovelEReferencia(to.getImovel().getId(), to.getAnoMesFaturamento()))
+			.leiturasFaturamento(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(to.getImovel().getId(), to.getAnoMesFaturamento()))
 			.rota(to.getRota());
-		
+
 		return builder.build();
 	}
 	
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	private Integer sequencialGeracaoBoleto(BigDecimal valorContaFichaCompensacao, Conta conta) {
 		Integer sequencialContaBoleto = null;
 
@@ -182,7 +197,7 @@ public class ContaBO {
 			contaTO.setDiaVencimentoAlternativo(imovel.getDiaVencimento());
 			contaTO.setIndicadorVencimentoMesSeguinte(imovel.getIndicadorVencimentoMesSeguinte());
 		} else {
-			Cliente cliente = clienteRepositorio.buscarClienteResponsavelPorImovel(imovel.getId());
+			Cliente cliente = clienteRepositorio.buscarClientePorImovel(imovel.getId(), ClienteRelacaoTipo.RESPONSAVEL);
 
 			if (cliente != null) {
 				if (cliente.existeDiaVencimento()) {
@@ -198,10 +213,11 @@ public class ContaBO {
 		return contaTO;
 	}
 	
-	private BigDecimal verificarPercentualEsgotoAlternativo(LigacaoEsgoto ligacaoEsgoto, Imovel imovel) throws Exception {
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public BigDecimal verificarPercentualEsgotoAlternativo(LigacaoEsgoto ligacaoEsgoto, Imovel imovel) {
 
-		if (imovel.getLigacaoEsgotoSituacao().getSituacaoFaturamento().equals(Status.ATIVO) 
-				&& ligacaoEsgoto.getNumeroConsumoPercentualAlternativo().intValue() >= 0 
+		if (imovel.getLigacaoEsgotoSituacao().isSituacaoFaturamentoAtivo() 
+				&& ligacaoEsgoto.existeValorPercentualConsumoAlternativo() 
 				&& ligacaoEsgoto.getPercentualAlternativo() != null
 				&& ligacaoEsgoto.getPercentualAlternativo().compareTo(ligacaoEsgoto.getPercentual()) == -1) {
 			
@@ -214,4 +230,28 @@ public class ContaBO {
 	public void setSistemaParametros(SistemaParametros sistemaParametros) {
 		this.sistemaParametros = sistemaParametros;
 	}
+	
+	public boolean emitirConta(Imovel imovel) {
+        boolean emitir = true;
+
+        boolean emitirFebraban = Boolean.valueOf(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN));
+
+        if ((emitirFebraban && enviaConta(imovel.getImovelContaEnvio())) || enviaContaClienteResponsavelFinalGrupo(imovel.getImovelContaEnvio())) {
+            emitir = false;
+        }
+
+        return emitir;
+    }
+	
+	private boolean enviaConta(Integer envioConta) {
+        return envioConta != null
+                && (envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL
+                        || envioConta == ImovelContaEnvio.NAO_PAGAVEL_IMOVEL_PAGAVEL_RESPONSAVEL
+                        || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE 
+                        || envioConta == ImovelContaEnvio.ENVIAR_CONTA_BRAILLE_RESPONSAVEL);
+    }
+	
+	private boolean enviaContaClienteResponsavelFinalGrupo(Integer envioConta) {
+        return envioConta != null && envioConta == ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL_FINAL_GRUPO;
+    }
 }

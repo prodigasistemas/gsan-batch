@@ -71,7 +71,7 @@ public class ConsumoBO {
 
         BigDecimal areaConstruidaVirtual = areaConstruida.divide(new BigDecimal(qtdEconomiasVirtuais), 2, BigDecimal.ROUND_HALF_UP);
         
-        Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasSubcategoria(idImovel);
+        Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
         
         Integer consumoNaoMedido = 0;
         
@@ -105,15 +105,14 @@ public class ConsumoBO {
         
         ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
         
-        for (ICategoria economia : categorias) {
-            Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(economia, consumoTarifaVigencia.getIdVigencia());
+        for (ICategoria categoria : categorias) {
+            Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
             
-            if (economia.getFatorEconomias() != null) {
-                consumoMinimoLigacao += consumoMinimoTarifa * economia.getFatorEconomias().intValue();
+            if (categoria.getFatorEconomias() != null) {
+                consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
             } else {
-                consumoMinimoLigacao += consumoMinimoTarifa * economia.getQuantidadeEconomias();
+                consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
             }
-
         }
         
         return consumoMinimoLigacao;

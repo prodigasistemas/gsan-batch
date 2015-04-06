@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
@@ -34,8 +33,8 @@ public class DebitoCobrarBO {
 		parametros = sistemaParametrosRepositorio.getSistemaParametros();
 	}
 
-	public Collection<DebitoCobrar> debitosCobrarVigentes(Imovel imovel){
-		Collection<DebitoCobrar> lista = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
+	public Collection<DebitoCobrar> debitosCobrarVigentes(Integer idImovel){
+		Collection<DebitoCobrar> lista = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(idImovel);
 		
 		Integer anoMesFaturamento = parametros.getAnoMesFaturamento();
 		
@@ -50,9 +49,9 @@ public class DebitoCobrarBO {
 		return debitos;
 	}
 
-	public Collection<DebitoCobrar> debitosCobrarSemPagamentos(Imovel imovel) {
+	public Collection<DebitoCobrar> debitosCobrarSemPagamentos(Integer idImovel) {
 		Integer anoMesFaturamento = parametros.getAnoMesFaturamento();
-		Collection<DebitoCobrar> lista = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(imovel);
+		Collection<DebitoCobrar> lista = debitoCobrarRepositorio.debitosCobrarPorImovelComPendenciaESemRevisao(idImovel);
 		Collection<DebitoCobrar> debitos = new ArrayList<DebitoCobrar>();
 
 		for (DebitoCobrar debito : lista) {

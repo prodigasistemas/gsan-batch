@@ -19,7 +19,7 @@
 					<property name="numItens" value="#{partitionPlan['numItens']}" />
 				</properties>
 			</reader>
-			<processor ref="processarRota" />
+			<processor ref="processarImovelRota" />
 			<writer ref="dummyItemWriter" />
 		</chunk>
 		<partition>

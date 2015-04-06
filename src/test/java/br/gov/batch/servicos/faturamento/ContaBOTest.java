@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import br.gov.model.cadastro.Cliente;
+import br.gov.model.cadastro.ClienteRelacaoTipo;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
 import br.gov.model.cadastro.SetorComercial;
@@ -63,8 +64,8 @@ public class ContaBOTest {
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
 		
-		expect(medicaoHistoricoRepositorio.buscarPorImovelEReferencia(1, 201405)).andReturn(null);
-		expect(clienteRepositorio.buscarClienteResponsavelPorImovel(1)).andReturn(new Cliente());
+		expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201405)).andReturn(null);
+		expect(clienteRepositorio.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL)).andReturn(new Cliente());
 		
 		replay(medicaoHistoricoRepositorio);
 		replay(clienteRepositorio);		
@@ -127,7 +128,7 @@ public class ContaBOTest {
 		to.setPercentualColeta((short)56);
 		to.setPercentualEsgoto(new BigDecimal("5.60"));
 		to.setDataVencimentoRota(new Date());
-		
+
 		return to;
 	}
 }

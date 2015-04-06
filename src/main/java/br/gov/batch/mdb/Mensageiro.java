@@ -51,39 +51,4 @@ public class Mensageiro implements MessageListener {
             logger.error("Erro na inicializacao do batch: ", ex);
         }
     }
-    
-//    public void parar(Properties params)  {
-//    	JobOperator jo = BatchRuntime.getJobOperator();
-//    	String batchCancelar = params.getProperty("batchCancelar");
-//    	logger.info("Comando recebido para interromper batch: " + batchCancelar);
-//    	
-//    	if (jo.getJobNames().contains(batchCancelar)){
-//        	List<Long> execucoes = jo.getRunningExecutions(batchCancelar);
-//        	
-//        	if (execucoes.size() > 0 ){
-//        		String idProcessoIniciado = params.getProperty("idProcessoIniciado");
-//        		for (Long execId : execucoes) {
-//        			Properties parametros = jo.getParameters(execId);
-//        			if (parametros.getProperty("idProcessoIniciado", "").equals(idProcessoIniciado)){
-//        				List<Long> jobs = controle.pararExecucao(execId);
-//        				
-//        				for (Long job : jobs) {
-//        					jo.stop(job);
-//        					
-//        					logger.info(String.format("Job interrompido! Id da execucao: [%s] do job [%s]", job, batchCancelar));
-//						}
-//        				
-//        				jo.stop(execId);
-//        				
-//        				processoEJB.atualizaSituacaoProcesso(Integer.valueOf(idProcessoIniciado), ProcessoSituacao.CANCELADO);
-//        				
-//        				logger.info(String.format("Batch interrompido! Id da execucao: [%s] do job [%s]", execId, batchCancelar));
-//        			}
-//    			}
-//        	}
-//    	}else{
-//    		logger.info(String.format("Job [%s] nao possui execucoes.", batchCancelar));
-//    	}
-//    }    
-
 }

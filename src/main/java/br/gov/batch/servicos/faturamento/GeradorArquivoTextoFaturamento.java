@@ -1,75 +1,367 @@
 package br.gov.batch.servicos.faturamento;
 
+import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
+import static br.gov.model.util.Utilitarios.obterQuantidadeLinhasTexto;
+import static br.gov.model.util.Utilitarios.quebraLinha;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
+import org.jboss.logging.Logger;
+
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo01;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo02;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo03;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo04;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo05;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo06;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo07;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo08;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo09;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo10;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo11;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo12;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo13;
+import br.gov.batch.servicos.faturamento.arquivo.ArquivoTextoTipo14;
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
+import br.gov.batch.servicos.micromedicao.MovimentoRoteiroEmpresaBO;
 import br.gov.model.cadastro.Imovel;
+import br.gov.model.cobranca.CobrancaDocumento;
+import br.gov.model.faturamento.Conta;
+import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresa;
+import br.gov.model.micromedicao.ArquivoTextoRoteiroEmpresaDivisao;
 import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.SituacaoTransmissaoLeitura;
+import br.gov.model.micromedicao.TipoServicoCelular;
+import br.gov.model.seguranca.SegurancaParametro.NOME_PARAMETRO_SEGURANCA;
+import br.gov.model.util.Utilitarios;
+import br.gov.persistence.util.IOUtil;
 import br.gov.servicos.cadastro.ImovelRepositorio;
+import br.gov.servicos.cadastro.QuadraRepositorio;
+import br.gov.servicos.cobranca.CobrancaDocumentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaDivisaoRepositorio;
 import br.gov.servicos.micromedicao.ArquivoTextoRoteiroEmpresaRepositorio;
+import br.gov.servicos.micromedicao.RotaRepositorio;
+import br.gov.servicos.seguranca.SegurancaParametroRepositorio;
 
 @Stateless
 public class GeradorArquivoTextoFaturamento {
+    private static Logger logger = Logger.getLogger(GeradorArquivoTextoFaturamento.class);
+    
 	@EJB
 	private ArquivoTextoRoteiroEmpresaDivisaoRepositorio arquivoDivisaoRepositorio;
-	
+
 	@EJB
 	private ArquivoTextoRoteiroEmpresaRepositorio arquivoRepositorio;
-	
+
 	@EJB
 	private ImovelRepositorio imovelRepositorio;
-	
+
 	@EJB
 	private ContaRepositorio contaRepositorio;
+
+	@EJB
+	private CobrancaDocumentoRepositorio cobrancaDocumentoRepositorio;
+
+	@EJB
+	private MovimentoRoteiroEmpresaBO movimentoRoteiroEmpresaBO;
 	
+	@EJB
+	private ContaBO contaBO;
+
+	@EJB
+	private QuadraRepositorio quadraRepositorio;
 	
-	public void gerar(Rota rota, Integer anoMesFaturamento){
+	private ArquivoTextoTO to;
+	
+    @EJB
+	private ArquivoTextoTipo01 tipo01;
+    
+    @EJB
+    private ArquivoTextoTipo02 tipo02;
+    
+    @EJB
+    private ArquivoTextoTipo03 tipo03;
+
+    @EJB
+    private ArquivoTextoTipo04 tipo04;
+
+    @EJB
+    private ArquivoTextoTipo05 tipo05;
+
+    @EJB
+    private ArquivoTextoTipo06 tipo06;
+
+    @EJB
+    private ArquivoTextoTipo07 tipo07;
+
+    @EJB
+    private ArquivoTextoTipo08 tipo08;
+
+    @EJB
+    private ArquivoTextoTipo09 tipo09;
+
+    @EJB
+    private ArquivoTextoTipo10 tipo10;
+    
+    @EJB
+    private ArquivoTextoTipo11 tipo11;
+    
+    @EJB
+    private ArquivoTextoTipo12 tipo12;
+    
+    @EJB
+    private ArquivoTextoTipo13 tipo13;
+    
+    @EJB
+    private ArquivoTextoTipo14 tipo14;
+    
+    @EJB
+    private RotaRepositorio rotaRepositorio;
+    
+    @EJB
+    private SegurancaParametroRepositorio segurancaParametroRepositorio;
+	
+	public GeradorArquivoTextoFaturamento() {
+		super();
+
+		to = new ArquivoTextoTO();
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void gerar(Integer idRota, Date dataComando) {
+	    Rota rota = rotaRepositorio.obterPorID(idRota);
+	    
+	    Integer anoMesReferencia = rota.getFaturamentoGrupo().getAnoMesReferencia();
+	    FaturamentoGrupo grupoFaturamento = rota.getFaturamentoGrupo();
+	    
 		final int quantidadeRegistros = 3000;
 		int primeiroRegistro = 0;
-		
+
+        logger.info("Rota: " + idRota + " - Pesquisa de imoveis para gerar o arquivo: ");
+
+		//TODO: Imoveis estao vindo repetidos. Testar isso!
 		List<Imovel> imoveis = imoveisParaGerarArquivoTextoFaturamento(rota, primeiroRegistro, quantidadeRegistros);
 		
+		if (imoveis.isEmpty()){
+		    return;
+		}
+
 		List<Imovel> imoveisArquivo = new ArrayList<Imovel>();
-		
+
+		List<ArquivoTextoRoteiroEmpresaDivisao> divisoes = new ArrayList<ArquivoTextoRoteiroEmpresaDivisao>();
+
+		StringBuilder conteudo = new StringBuilder();
+
+		logger.info("Rota: " + idRota + " - Leitura de imoveis: " + imoveis.size());
 		for (Imovel imovel : imoveis) {
-			if (imovel.ehCondominio()) {
+			if (imovel.isCondominio()) {
 				if (imovel.existeHidrometro()) {
 					List<Imovel> imoveisCondominio = imoveisCondominioParaGerarArquivoTextoFaturamento(rota, imovel.getId());
-					
+
 					boolean imovelMicroComConta = false;
-					
 
 					for (Imovel imovelCondominio : imoveisCondominio) {
-						if (contaRepositorio.existeContaPreFaturada(imovelCondominio.getId(), anoMesFaturamento)){
+						if (contaRepositorio.existeContaPreFaturadaSemMovimento(imovelCondominio.getId(), anoMesReferencia)) {
 							imovelMicroComConta = true;
 							break;
 						}
 					}
-					
-					if (imovelMicroComConta){
+
+					if (imovelMicroComConta) {
 						imoveisArquivo.add(imovel);
+						conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
+						conteudo.append(gerarArquivoTexto(imovel, null, anoMesReferencia, rota, grupoFaturamento, dataComando));
+
+						for (Imovel micro : imoveisCondominio) {
+							conteudo.append(quebraLinha)
+									.append(carregarArquivo(micro, anoMesReferencia, rota, grupoFaturamento, dataComando));
+							imoveisArquivo.add(micro);
+						}
 					}
 				}
-			}			
+			} else {
+				conteudo.append(conteudo.length() > 0 ? quebraLinha : "");
+				conteudo.append(carregarArquivo(imovel, anoMesReferencia, rota, grupoFaturamento, dataComando));
+				imoveisArquivo.add(imovel);
+			}
+			
+		    if (rota.existeLimiteImoveis()) {
+		        if (imoveisArquivo.size() >= rota.getNumeroLimiteImoveis()) {
+		        	int sequenciaRota = divisoes.size() + 1;
+		        	to.setSequenciaRota(sequenciaRota);
+		        	ArquivoTextoRoteiroEmpresaDivisao divisao = criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis);
+		            divisoes.add(divisao);
+		            conteudo = new StringBuilder();
+		            imoveisArquivo.clear();
+		        }
+		    }
 		}
-	}
-
-	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia){
-		boolean retorno = true;
 		
-		ArquivoTextoRoteiroEmpresa arquivo = arquivoRepositorio.recuperaArquivoTextoRoteiroEmpresa(idRota, anoMesReferencia);
+		logger.info("Rota: " + idRota + " - Imoveis lidos");
+		
+		List<Imovel> imoveisPreFaturados = imovelRepositorio.obterImoveisComContasPreFaturadas(anoMesReferencia, rota.getId());
+
+		ArquivoTextoRoteiroEmpresa roteiro = criarRoteiroArquivoTexto(rota, imoveis.get(0), grupoFaturamento, anoMesReferencia, imoveisPreFaturados.size());
+		
+		roteiro.setDivisoes(divisoes);
+		
+		if (rota.existeLimiteImoveis()) {
+			divisoes.add(criarRoteiroArquivoDividido(conteudo, rota, anoMesReferencia, imoveis));
+		}
+
+		for (int i = 0; i < divisoes.size() ; i++){
+		    divisoes.get(i).acrescentaSequencial(i + 1);
+		    divisoes.get(i).setArquivoTextoRoteiroEmpresa(roteiro);
+		}
+		
+        
+        arquivoRepositorio.salvar(roteiro);
+        
+        logger.info("Rota: " + idRota + " - Roteiro salvo");
+        
+        String caminhoArquivos = segurancaParametroRepositorio.recuperaPeloNome(NOME_PARAMETRO_SEGURANCA.CAMINHO_ARQUIVOS);
+		String caminhoFinal = caminhoArquivos + grupoFaturamento.getId() + "/" + anoMesReferencia;
+        
+        if (rota.existeLimiteImoveis()){
+            divisoes.forEach(e -> IOUtil.criarArquivoTextoCompactado(e.getNomeArquivo(), caminhoFinal, buildCabecalho(e.getConteudoArquivo()).toString()));
+        }else{
+        	to.setSequenciaRota(1);
+            conteudo.append(gerarPassosFinais());
+            IOUtil.criarArquivoTextoCompactado(roteiro.getNomeArquivo(), caminhoFinal, buildCabecalho(conteudo).toString());
+        }
+        
+        logger.info("Rota: " + idRota + " - Arquivo criado");
+        
+        movimentoRoteiroEmpresaBO.gerarMovimento(imoveisArquivo, rota);
+        
+        logger.info("Rota: " + idRota + " - Movimento registrado.");
+	}
+	
+	public StringBuilder buildCabecalho(StringBuilder conteudo) {
+		StringBuilder conteudoCompleto = new StringBuilder();
+		
+		conteudoCompleto.append(obterQuantidadeLinhasTexto(conteudo))
+						.append(quebraLinha)
+						.append(conteudo);
+		
+		return conteudoCompleto;
+	}
+	
+	
+	public ArquivoTextoRoteiroEmpresaDivisao criarRoteiroArquivoDividido(StringBuilder texto, Rota rota, Integer anoMesFaturamento, List<Imovel> imoveis){
+	    List<Integer> ids = new ArrayList<Integer>();
+	    imoveis.forEach(e -> ids.add(e.getId()));
+	    
+	    Integer qtdImoveisDivididos = contaRepositorio.obterQuantidadeContasPreFaturadaPorImoveis(anoMesFaturamento, ids);
+	    
+	    ArquivoTextoRoteiroEmpresaDivisao roteiro = new ArquivoTextoRoteiroEmpresaDivisao();
+	    
+	    texto.append(gerarPassosFinais());
+	    roteiro.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.DISPONIVEL);
+	    roteiro.setUltimaAlteracao(new Date());
+        roteiro.setQuantidadeImovel(qtdImoveisDivididos);
+        roteiro.setNomeArquivo(this.montarNomeArquivo(rota));
+        
+        if (rota.getLeiturista() != null) {
+            roteiro.setLeiturista(rota.getLeiturista());
+            roteiro.setNumeroImei(rota.getLeiturista().getNumeroImei());
+        }
+	    
+	    roteiro.setConteudoArquivo(new StringBuilder(texto));
+	    
+	    return roteiro;
+	}
+	
+	public ArquivoTextoRoteiroEmpresa criarRoteiroArquivoTexto(Rota rota, Imovel imovel, FaturamentoGrupo faturamentoGrupo, Integer anoMesFaturamento, Integer qtdImoveisComContaPF){
+	    ArquivoTextoRoteiroEmpresa arquivo = new ArquivoTextoRoteiroEmpresa();
+	    
+	    //TODO: confirmar se a localidade para rota alternativa vem do imovel ou da rota
+	    if (rota.isAlternativa()) {
+	        arquivo.setLocalidade(rota.getSetorComercial().getLocalidade());
+	        arquivo.setCodigoSetorComercial1(rota.getSetorComercial().getCodigo());
+	    }else{
+	        arquivo.setLocalidade(imovel.getLocalidade());
+	        arquivo.setCodigoSetorComercial1(imovel.getSetorComercial().getCodigo());
+	    }
+	    
+        arquivo.setAnoMesReferencia(anoMesFaturamento);
+        arquivo.setFaturamentoGrupo(faturamentoGrupo);
+        arquivo.setEmpresa(rota.getEmpresa());
+        arquivo.setRota(rota);
+        arquivo.setNumeroSequenciaLeitura(rota.getNumeroSequenciaLeitura());
+        
+        int[] intervalorNumeroQuadra = quadraRepositorio.obterIntervaloQuadrasPorRota(rota.getId());
+        
+        arquivo.setNumeroQuadraInicial1(intervalorNumeroQuadra[0]);
+        arquivo.setNumeroQuadraFinal1(intervalorNumeroQuadra[1]);
+
+        arquivo.setQuantidadeImovel(qtdImoveisComContaPF);
+        arquivo.setNomeArquivo(montarNomeArquivo(rota));
+
+        arquivo.setLeiturista(rota.getLeiturista());
+        arquivo.setCodigoLeiturista(rota.getLeiturista().getCodigoDDD());
+        arquivo.setNumeroFoneLeiturista(rota.getLeiturista().getNumeroFone());
+        
+        if (rota.getNumeroLimiteImoveis() == null) {
+            arquivo.setNumeroImei(rota.getLeiturista().getNumeroImei());
+        }
+        
+        if (rotaSoComImoveisInformativos(qtdImoveisComContaPF)) {
+            arquivo.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.TRANSMITIDO.getId());
+        } else{
+            arquivo.setSituacaoTransmissaoLeitura(SituacaoTransmissaoLeitura.DISPONIVEL.getId());
+        }
+
+        arquivo.setUltimaAlteracao(new Date());
+
+        arquivo.setServicoTipoCelular(TipoServicoCelular.IMPRESSAO_SIMULTANEA.getId());
+
+	    return arquivo;
+	}
+	
+	public String montarNomeArquivo(Rota rota) {
+		StringBuilder nomeArquivo = new StringBuilder("G");
+	    nomeArquivo.append(completaComZerosEsquerda(3, rota.getFaturamentoGrupo().getId()));
+	    
+	    if (rota.isAlternativa()) {
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
+	    }else{
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getLocalidade().getId()));
+	        nomeArquivo.append(completaComZerosEsquerda(3, rota.getSetorComercial().getCodigo()));
+	    }
+	    
+	    nomeArquivo.append(completaComZerosEsquerda(4, rota.getCodigo()));
+	    nomeArquivo.append(completaComZerosEsquerda(6, rota.getFaturamentoGrupo().getAnoMesReferencia()));
+	    
+	    return nomeArquivo.toString();
+	}
+	
+	private boolean rotaSoComImoveisInformativos(Integer qtdImoveisComContaPF) {
+        return qtdImoveisComContaPF > 0 ? false : true;
+    }
+
+
+	//TODO: Verificar no original onde essa chamada eh feita. Aqui nao usa
+	public boolean existeArquivoTextoRota(Integer idRota, Integer anoMesReferencia) {
+		boolean retorno = true;
+
+		ArquivoTextoRoteiroEmpresa arquivo = arquivoRepositorio.pesquisarPorRotaEReferencia(idRota, anoMesReferencia);
 
 		if (arquivo != null) {
 			if (arquivo.getSituacaoTransmissaoLeitura() == SituacaoTransmissaoLeitura.DISPONIVEL.getId()) {
-				arquivoDivisaoRepositorio.deletaArquivoTextoRoteiroEmpresaDivisao(arquivo.getId());
-				arquivoRepositorio.deletaArquivoTextoRoteiroEmpresa(arquivo.getId());
+				arquivoDivisaoRepositorio.deletarPorArquivoTextoRoteiroEmpresa(arquivo.getId());
+				arquivoRepositorio.excluir(arquivo.getId());
 			} else {
 				retorno = false;
 			}
@@ -77,339 +369,137 @@ public class GeradorArquivoTextoFaturamento {
 
 		return retorno;
 	}
-	
-	public List<Imovel> imoveisParaGerarArquivoTextoFaturamento(Rota rota, int primeiroRegistro, int quantidadeRegistros){
+
+	public List<Imovel> imoveisParaGerarArquivoTextoFaturamento(Rota rota, int primeiroRegistro, int quantidadeRegistros) {
 		List<Imovel> imoveisConsulta = null;
-		
+
 		if (rota.alternativa()) {
-			imoveisConsulta = imovelRepositorio.imoveisParaGerarArquivoTextoFaturamentoPorRotaAlternativa(rota.getId(), primeiroRegistro, quantidadeRegistros);
-		}else{
-			imoveisConsulta = imovelRepositorio.imoveisParaGerarArquivoTextoFaturamento(rota.getId(), primeiroRegistro, quantidadeRegistros);
+			imoveisConsulta = imovelRepositorio.buscarImoveisParaGerarArquivoTextoFaturamentoPorRotaAlternativa(rota.getId(), primeiroRegistro, quantidadeRegistros);
+		} else {
+			imoveisConsulta = imovelRepositorio.buscarImoveisParaGerarArquivoTextoFaturamento(rota.getId(), primeiroRegistro, quantidadeRegistros);
 		}
 
 		List<Imovel> imoveis = new ArrayList<Imovel>();
-		
+
 		for (Imovel imovel : imoveisConsulta) {
-			if (imovel.pertenceACondominio() || imovel.ehCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()){
+			if (contaBO.emitirConta(imovel) || imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()){
 				imoveis.add(imovel);
 			}
 		}
-			
+
 		return imoveis;
 	}
-	
-	public List<Imovel> imoveisCondominioParaGerarArquivoTextoFaturamento(Rota rota, Integer idCondominio){
+
+	public List<Imovel> imoveisCondominioParaGerarArquivoTextoFaturamento(Rota rota, Integer idCondominio) {
 		List<Imovel> imoveisConsulta = null;
-		
+
 		if (rota.alternativa()) {
 			imoveisConsulta = imovelRepositorio.imoveisCondominioParaGerarArquivoTextoFaturamentoPorRotaAlternativa(idCondominio);
-		}else{
+		} else {
 			imoveisConsulta = imovelRepositorio.imoveisCondominioParaGerarArquivoTextoFaturamento(idCondominio);
 		}
 
 		List<Imovel> imoveis = new ArrayList<Imovel>();
-		
+
 		for (Imovel imovel : imoveisConsulta) {
-			if (imovel.pertenceACondominio() || imovel.ehCondominio() || imovel.existeHidrometroAgua() || imovel.existeHidrometroPoco()){
+			if (imovel.pertenceACondominio() || imovel.isCondominio() || imovel.existeHidrometro()) {
 				imoveis.add(imovel);
 			}
 		}
-			
+
 		return imoveis;
 	}
-	/*
-	public Object[] gerarArquivoTexto(Imovel imovel, Conta conta,
-			Integer anoMesReferencia, Rota rota,
-			FaturamentoGrupo faturamentoGrupo,
-			SistemaParametro sistemaParametro, Date dataComando)
-			throws ControladorException {
+
+	public StringBuilder carregarCabecalhoArquivo(StringBuilder builder) {
+		builder.insert(0, Utilitarios.obterQuantidadeLinhasTexto(builder));
+		builder.append(System.getProperty("line.separator"));
+		
+		return builder;
+	}
+	
+	public StringBuilder carregarArquivo(Imovel imovel, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+//	    logger.info("ANTES  - pesquisarContaArquivoTextoFaturamento");
+		Conta conta = contaRepositorio.pesquisarContaArquivoTextoFaturamento(imovel.getId(), anoMesReferencia, faturamentoGrupo.getId());
+//		logger.info("DEPOIS - pesquisarContaArquivoTextoFaturamento");
+		return gerarArquivoTexto(imovel, conta, anoMesReferencia, rota, faturamentoGrupo, dataComando);
+	}
+
+	public StringBuilder gerarArquivoTexto(Imovel imovel, Conta conta, Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo, Date dataComando) {
+
+	    CobrancaDocumento cobrancaDocumento = cobrancaDocumentoRepositorio.cobrancaDocumentoImpressaoSimultanea(
+				Utilitarios.reduzirDias(dataComando, 10), imovel.getId());
+		to = new ArquivoTextoTO(imovel, conta, anoMesReferencia, faturamentoGrupo, rota, cobrancaDocumento);
+		
+		to.setIdImovel(imovel.getId());
 
 		StringBuilder arquivoTexto = new StringBuilder();
+		
+		
+		long ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo01.build(to));
+		long fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 01: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		int quantidadeLinhas = 0;
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo02.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 02: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		Date dataEmissao = Util.subtrairNumeroDiasDeUmaData(dataComando, 10);
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo03.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 03: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		CobrancaDocumento cobrancaDocumento = null;
-		try {
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo04.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 04: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-			cobrancaDocumento = repositorioCobranca
-					.pesquisarCobrancaDocumentoImpressaoSimultanea(dataEmissao,
-							imovel.getId());
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo05.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 05: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		} catch (ErroRepositorioException ex) {
-			sessionContext.setRollbackOnly();
-			throw new ControladorException("erro.sistema", ex);
-		}
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo06.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 06: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		Object[] retorno = new Object[2];
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo07.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 07: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		 REGISTRO_TIPO_01
-		arquivoTexto.append(this.gerarArquivoTextoRegistroTipo01(imovel, conta,
-				anoMesReferencia, rota, faturamentoGrupo, sistemaParametro,
-				cobrancaDocumento));
-		quantidadeLinhas = quantidadeLinhas + 1;
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo08.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 08: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		 REGISTRO_TIPO_02
-		Object[] tipo2 = this.gerarArquivoTextoRegistroTipo02(imovel, conta,
-				sistemaParametro);
-		arquivoTexto.append(tipo2[0]);
-		int quantidadeTipo2 = (Integer) tipo2[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo2;
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo09.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 09: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
 
-		 REGISTRO_TIPO_03
-		Object[] tipo3 = this.gerarArquivoTextoRegistroTipo03(imovel,
-				anoMesReferencia);
-		arquivoTexto.append(tipo3[0]);
-		int quantidadeTipo3 = (Integer) tipo3[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo3;
-
-		 REGISTRO_TIPO_04
-		Object[] tipo4 = this.gerarArquivoTextoRegistroTipo04(conta);
-		arquivoTexto.append(tipo4[0]);
-		int quantidadeTipo4 = (Integer) tipo4[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo4;
-
-		 REGISTRO_TIPO_05
-		Object[] tipo5 = this.gerarArquivoTextoRegistroTipo05(conta);
-		arquivoTexto.append(tipo5[0]);
-		int quantidadeTipo5 = (Integer) tipo5[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo5;
-
-		 REGISTRO_TIPO_06
-		Object[] tipo6 = this.gerarArquivoTextoRegistroTipo06(conta);
-		arquivoTexto.append(tipo6[0]);
-		int quantidadeTipo6 = (Integer) tipo6[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo6;
-
-		 REGISTRO_TIPO_07
-		Object[] tipo7 = this.gerarArquivoTextoRegistroTipo07(imovel,
-				sistemaParametro, cobrancaDocumento);
-		arquivoTexto.append(tipo7[0]);
-		int quantidadeTipo7 = (Integer) tipo7[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo7;
-
-		 REGISTRO_TIPO_08
-		Object[] tipo8 = this.gerarArquivoTextoRegistroTipo08(imovel,
-				anoMesReferencia, sistemaParametro);
-		arquivoTexto.append(tipo8[0]);
-		int quantidadeTipo8 = (Integer) tipo8[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo8;
-
-		 Parte dos dados das tarifas e faixas
-		 REGISTRO_TIPO_09 e TIPO_10
-		Object[] registroTipo9e10 = gerarArquivoTextoRegistroDadosTarifa09(
-				imovel, sistemaParametro, anoMesReferencia, faturamentoGrupo);
-
-		arquivoTexto.append(registroTipo9e10[0]);
-		int quantidadeTipo9 = (Integer) registroTipo9e10[1];
-		quantidadeLinhas = quantidadeLinhas + quantidadeTipo9;
-
-		retorno[0] = arquivoTexto;
-		retorno[1] = quantidadeLinhas;
-
-		return retorno;
+		ini = Calendar.getInstance().getTimeInMillis();
+		arquivoTexto.append(tipo10.build(to));
+		fim = Calendar.getInstance().getTimeInMillis();
+//		logger.info("Linha 10: " + (fim - ini) + (fim - ini > 500 ? "*****" : ""));
+		
+		return arquivoTexto;
 	}
-	*/
-	
-	/*
-	
-	public StringBuilder gerarArquivoTextoRegistroTipo01(Imovel imovel,  Integer anoMesReferencia, Rota rota, FaturamentoGrupo faturamentoGrupo,
-			SistemaParametro sistemaParametro, CobrancaDocumento cobrancaDocumento) throws ControladorException {
 
-		StringBuilder arquivoTextoRegistroTipo01 = new StringBuilder();
+	private StringBuilder gerarPassosFinais() {
+	    
+	    StringBuilder arquivoTexto = new StringBuilder();
+		
+		arquivoTexto.append(tipo11.build(to));
+		
+		arquivoTexto.append(tipo12.build(to));
 
-		Cliente clienteUsuario = null;
-		Cliente clienteResponsavel = null;
+		arquivoTexto.append(tipo13.build(to));
 
-		Integer idGerenciaRegional = null;
-		Set colecaoClienteImovelOUConta = null;
-		String inscricaoImovel = null;
-		String idLigacaoAguaSituacao = null;
-		String idLigacaoEsgotoSituacao = null;
-		String idImovelPerfil = null;
-		Integer idLocalidade = null;
-		Integer idSetorComercial = null;
-		Integer idQuadraFace = null;
-		short indicadorParalisacaoFaturamentoAgua = 2;
-		short indicadorParalisacaoFaturamentoEsgoto = 2;
-
-		idGerenciaRegional = imovel.getLocalidade().getGerenciaRegional().getId();
-		idLocalidade = imovel.getLocalidade().getId();
-		if (imovel.getSetorComercial() != null) {
-			idSetorComercial = imovel.getSetorComercial().getId();
-		}
-
-		colecaoClienteImovelOUConta = imovel.getClienteImoveis();
-
-		if (imovel.getQuadraFace() != null) {
-			idQuadraFace = imovel.getQuadraFace().getId();
-		}
-
-		Integer consumoMinimoImovel = null;
-		consumoMinimoImovel = getControladorMicromedicao().obterConsumoMinimoLigacao(imovel, null);
-
-		if (consumoMinimoImovel != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "" + consumoMinimoImovel));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, ""));
-
-		}
-
-		int consumoMinimoNaoMedido = getControladorMicromedicao().obterConsumoNaoMedido(imovel);
-
-		arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6, "" + consumoMinimoNaoMedido));
-
-		if (cobrancaDocumento != null && !cobrancaDocumento.equals("")) {
-			 Documento de CobranÁa
-			arquivoTextoRegistroTipo01.append(Util.completaString(cobrancaDocumento.getId() + "", 9));
-
-			String representacaoNumericaCodBarra = "";
-			 ObtÈm a representaÁ„o numÈrica do
-			 cÛdigode
-			 barra
-			representacaoNumericaCodBarra = this.getControladorArrecadacao().obterRepresentacaoNumericaCodigoBarra(5, cobrancaDocumento.getValorDocumento(),
-					cobrancaDocumento.getLocalidade().getId(), cobrancaDocumento.getImovel().getId(), null, null, null, null,
-					String.valueOf(cobrancaDocumento.getNumeroSequenciaDocumento()), cobrancaDocumento.getDocumentoTipo().getId(), null, null, null);
-
-			 57. CÛdigo de Barras do Documento do CobranÁa
-			arquivoTextoRegistroTipo01.append(representacaoNumericaCodBarra);
-
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 57));
-		}
-
-		 CPF ou CNPJ do CLIENTE
-		String cpfCnpj = "";
-		if (clienteUsuario != null && !clienteUsuario.equals("")) {
-			if (clienteUsuario.getCpf() != null && !clienteUsuario.getCpf().equals("")) {
-				cpfCnpj = clienteUsuario.getCpf();
-			} else {
-				if (clienteUsuario.getCnpj() != null && !clienteUsuario.getCnpj().equals("")) {
-					cpfCnpj = clienteUsuario.getCnpj();
-				}
-			}
-		}
-		arquivoTextoRegistroTipo01.append(Util.completaString(cpfCnpj, 18));
-
-		 GERA AS COLUNAS DA SITUA«√O ESPECIAL DE FATURAMENTO
-		arquivoTextoRegistroTipo01.append(gerarDadosSituacaoEspecialFaturamento(imovel, faturamentoGrupo));
-
-		 DATA DE LEITURA ANTERIOR N√O MEDIDO
-
-		 DATA LEITURA ANTERIOR E DATA LEITURA ATUAL
-		Integer anoMesFaturamentoAnterior = Util.subtrairMesDoAnoMes(anoMesReferencia, 1);
-
-		Date dataLeituraAnteriorFaturamento = null;
-
-		dataLeituraAnteriorFaturamento = (Date) repositorioFaturamento.pesquisarFaturamentoAtividadeCronogramaDataPrevista(faturamentoGrupo.getId(),
-				FaturamentoAtividade.EFETUAR_LEITURA, anoMesFaturamentoAnterior);
-
-		if (dataLeituraAnteriorFaturamento == null || dataLeituraAnteriorFaturamento.equals("")) {
-			dataLeituraAnteriorFaturamento = Util.subtrairNumeroDiasDeUmaData(new Date(), 30);
-		}
-
-		arquivoTextoRegistroTipo01.append(Util.formatarDataAAAAMMDD(dataLeituraAnteriorFaturamento));
-
-		 INDICADOR ABASTECIMENTO
-		if (imovel.getLigacaoAguaSituacao() != null && !imovel.getLigacaoAguaSituacao().equals("")) {
-			arquivoTextoRegistroTipo01.append(Util.completaString(imovel.getLigacaoAguaSituacao().getIndicadorAbastecimento() + "", 1));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 1));
-		}
-
-		 verificar se o imÛvel È Sazonal
-		boolean imovelSazonal = false;
-
-		 [UC0108] - Obter Quantidade de Economias por Subcategoria
-		Collection colecaoCategoriaOUSubcategoria = this.getControladorImovel().obterQuantidadeEconomiasSubCategoria(imovel.getId());
-
-		Iterator itSubcategoria = colecaoCategoriaOUSubcategoria.iterator();
-
-		while (itSubcategoria.hasNext()) {
-
-			Subcategoria subcategoria = (Subcategoria) itSubcategoria.next();
-
-			if (subcategoria.getIndicadorSazonalidade().equals(ConstantesSistema.SIM)) {
-
-				imovelSazonal = true;
-				break;
-			}
-		}
-
-		if (imovelSazonal) {
-			arquivoTextoRegistroTipo01.append("1");
-		} else {
-			arquivoTextoRegistroTipo01.append("2");
-		}
-
-		if (imovel.getFaturamentoSituacaoTipo() != null && !imovel.getFaturamentoSituacaoTipo().equals("")) {
-			FiltroFaturamentoSituacaoHistorico filtroFaturamentoSituacaoHistorico = new FiltroFaturamentoSituacaoHistorico();
-			filtroFaturamentoSituacaoHistorico.adicionarParametro(new ParametroSimples(FiltroFaturamentoSituacaoHistorico.ID_IMOVEL, imovel.getId()));
-			filtroFaturamentoSituacaoHistorico.adicionarParametro(new ParametroNulo(FiltroFaturamentoSituacaoHistorico.ANO_MES_FATURAMENTO_RETIRADA));
-			Collection<FaturamentoSituacaoHistorico> colFiltroFaturamentoSituacaoHistorico = this.getControladorUtil().pesquisar(
-					filtroFaturamentoSituacaoHistorico, FaturamentoSituacaoHistorico.class.getName());
-
-			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = (FaturamentoSituacaoHistorico) Util
-					.retonarObjetoDeColecao(colFiltroFaturamentoSituacaoHistorico);
-
-			if ((faturamentoSituacaoHistorico != null
-					&& faturamentoGrupo.getAnoMesReferencia() >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() && faturamentoGrupo
-					.getAnoMesReferencia() <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim())) {
-
-				if (imovel.getFaturamentoSituacaoTipo().getIndicadorParalisacaoFaturamento() != null
-						&& imovel.getFaturamentoSituacaoTipo().getIndicadorParalisacaoFaturamento().equals(ConstantesSistema.INDICADOR_USO_ATIVO)
-						&& imovel.getFaturamentoSituacaoTipo().getIndicadorValidoAgua().equals(ConstantesSistema.INDICADOR_USO_ATIVO)) {
-
-					indicadorParalisacaoFaturamentoAgua = 1;
-				}
-
-				if (imovel.getFaturamentoSituacaoTipo().getIndicadorParalisacaoFaturamento() != null
-						&& imovel.getFaturamentoSituacaoTipo().getIndicadorParalisacaoFaturamento().equals(ConstantesSistema.INDICADOR_USO_ATIVO)
-						&& imovel.getFaturamentoSituacaoTipo().getIndicadorValidoEsgoto().equals(ConstantesSistema.INDICADOR_USO_ATIVO)) {
-
-					indicadorParalisacaoFaturamentoEsgoto = 1;
-				}
-
-			}
-		}
-
-		arquivoTextoRegistroTipo01.append("" + indicadorParalisacaoFaturamentoAgua);
-
-		arquivoTextoRegistroTipo01.append("" + indicadorParalisacaoFaturamentoEsgoto);
-
-		if (imovel.getCodigoDebitoAutomatico() != null && !imovel.getCodigoDebitoAutomatico().equals("")) {
-			arquivoTextoRegistroTipo01.append(Util.completaString("" + imovel.getCodigoDebitoAutomatico(), 9));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 9));
-		}
-
-		if (imovel.getLigacaoEsgoto() != null && imovel.getLigacaoEsgoto().getPercentualAlternativo() != null) {
-			arquivoTextoRegistroTipo01.append(Util.adicionarZerosEsquedaNumero(6,
-					Util.formatarBigDecimalComPonto(imovel.getLigacaoEsgoto().getPercentualAlternativo())));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 6));
-		}
-
-		if (imovel.getLigacaoEsgoto() != null && imovel.getLigacaoEsgoto().getNumeroConsumoPercentualAlternativo() != null) {
-			arquivoTextoRegistroTipo01
-					.append(Util.adicionarZerosEsquedaNumero(6, imovel.getLigacaoEsgoto().getNumeroConsumoPercentualAlternativo().toString()));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 6));
-		}
-
-		if (cobrancaDocumento != null) {
-			arquivoTextoRegistroTipo01.append(Util.formatarDataAAAAMMDD(cobrancaDocumento.getEmissao()));
-		} else {
-			arquivoTextoRegistroTipo01.append(Util.completaString("", 8));
-		}
-
-		int[] consumoMedioLigacaoEsgoto = this.getControladorMicromedicao().obterVolumeMedioAguaEsgoto(imovel.getId(), faturamentoGrupo.getAnoMesReferencia(),
-				LigacaoTipo.LIGACAO_ESGOTO, houveIntslacaoHidrometro);
-
-		arquivoTextoRegistroTipo01.append(System.getProperty("line.separator"));
-
-		return arquivoTextoRegistroTipo01;
-	}		
-	*/
+		arquivoTexto.append(tipo14.build(to));
+		
+		return arquivoTexto;
+	}
 }

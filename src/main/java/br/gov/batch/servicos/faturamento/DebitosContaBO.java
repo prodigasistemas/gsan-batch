@@ -9,7 +9,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.MergeProperties;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.model.faturamento.DebitoCobrarCategoria;
@@ -28,10 +27,10 @@ public class DebitosContaBO {
 	@EJB
 	private DebitoCobrarCategoriaBO debitoCobrarCategoriaBO;
 		
-	public DebitosContaTO gerarDebitosConta(Imovel imovel, int anoMesFaturamento){
+	public DebitosContaTO gerarDebitosConta(Integer idImovel, int anoMesFaturamento){
 		DebitosContaTO to = new DebitosContaTO();
 		
-		Collection<DebitoCobrar> colecaoDebitosACobrar = debitoCobrarBO.debitosCobrarVigentes(imovel);
+		Collection<DebitoCobrar> colecaoDebitosACobrar = debitoCobrarBO.debitosCobrarVigentes(idImovel);
 		
 		BigDecimal valorPrestacao = null;
 		
@@ -63,7 +62,7 @@ public class DebitosContaBO {
 			debitoCobrado.setAnoMesReferenciaDebito(debitoACobrar.getAnoMesReferenciaDebito());
 			debitoCobrado.setAnoMesCobrancaDebito(debitoACobrar.getAnoMesCobrancaDebito());
 			debitoCobrado.setNumeroPrestacao(debitoACobrar.getNumeroPrestacaoDebito());
-			debitoCobrado.setFinanciamentoTipo(debitoACobrar.getFinanciamentoTipo());
+			debitoCobrado.setTipoFinanciamento(debitoACobrar.getTipoFinanciamento());
 			debitoCobrado.setNumeroParcelaBonus(debitoACobrar.getNumeroParcelaBonus() != null ? debitoACobrar.getNumeroParcelaBonus() : 0);
 			debitoCobrado.setNumeroPrestacaoDebito((short) (debitoACobrar.getNumeroPrestacaoCobradas() + 1));
 			

@@ -6,21 +6,16 @@ import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
 import javax.batch.runtime.context.JobContext;
-import javax.ejb.EJB;
 import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
 import br.gov.batch.exception.ParticionamentoException;
-import br.gov.batch.servicos.micromedicao.RotaBO;
 
 public abstract class Particao implements PartitionMapper {
 	
 	private static Logger logger = Logger.getLogger(Particao.class);
 
-    @EJB
-    protected RotaBO rotaBO;
-    
     @Inject
     protected JobContext jobCtx;
     
@@ -64,9 +59,4 @@ public abstract class Particao implements PartitionMapper {
             }
         };
     }
-    
-    public static void main(String[] args) {
-		Integer t = 30 / 20;
-		System.out.println(t);
-	}
 }

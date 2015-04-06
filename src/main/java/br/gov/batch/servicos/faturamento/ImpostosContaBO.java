@@ -9,7 +9,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.model.cadastro.Cliente;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.ImpostoTipo;
 import br.gov.model.faturamento.ImpostoTipoAliquota;
 import br.gov.servicos.cadastro.ClienteRepositorio;
@@ -38,13 +37,13 @@ public class ImpostosContaBO {
 	
 	private ImpostoDeduzidoTO impostoDeduzidoTO = null;
 
-	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Imovel imovel, Integer anoMesReferencia, BigDecimal valorDebito, BigDecimal valorCredito) {
+	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Integer idImovel, Integer anoMesReferencia, BigDecimal valorDebito, BigDecimal valorCredito) {
 
 		ImpostosDeduzidosContaTO retorno = new ImpostosDeduzidosContaTO();
 
 		try {
 
-			Cliente clienteFederal = clienteRepositorio.buscarClienteFederalResponsavelPorImovel(imovel.getId());
+			Cliente clienteFederal = clienteRepositorio.buscarClienteFederalResponsavelPorImovel(idImovel);
 
 			if (clienteFederal == null){
 				retorno.setListaImpostosDeduzidos(null);

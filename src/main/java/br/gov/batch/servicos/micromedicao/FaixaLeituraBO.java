@@ -2,8 +2,13 @@ package br.gov.batch.servicos.micromedicao;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
@@ -15,6 +20,7 @@ import br.gov.model.micromedicao.Rota;
 import br.gov.model.micromedicao.StatusFaixaFalsa;
 import br.gov.model.micromedicao.StatusUsoFaixaFalsa;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
@@ -23,37 +29,45 @@ import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
+@Stateless
 public class FaixaLeituraBO {
 
-	// @Inject
 	private SistemaParametros sistemaParametro;
 		
-	// @EJB
-	private ConsumoTarifaRepositorio consumoTarifaRepositorio;
+	 @EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
+	 
+	 @EJB
+	 private ConsumoTarifaRepositorio consumoTarifaRepositorio;
 	
-	// @EJB
+	 @EJB
 	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
 	
-	// @EJB
+	 @EJB
 	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
 
-	// @EJB
+	 @EJB
 	private FaixaLeituraRepositorio faixaLeituraRepositorio;
+	 
+	 @PostConstruct
+	 public void init(){
+	     sistemaParametro = sistemaParametrosRepositorio.getSistemaParametros();
+	 }
 	
-	public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
+	 //FIXME: Metodo confuso
+	 @TransactionAttribute(TransactionAttributeType.REQUIRED)
+	 public FaixaLeituraTO obterDadosFaixaLeitura(Imovel imovel, Hidrometro hidrometro, Integer consumoMedioHidrometro, MedicaoHistorico medicaoHistorico) {
 		
-		if (hidrometro == null) {
+		if (hidrometro == null || medicaoHistorico == null) {
 			return new FaixaLeituraTO(0, 0);
 		} else {
-			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAnteriorFaturamento());
+			FaixaLeituraTO faixaLeituraEsperada = this.calcularFaixaLeituraEsperada(consumoMedioHidrometro, medicaoHistorico, hidrometro, medicaoHistorico.getLeituraAtualFaturamento());
 
 			if (isGerarFaixaNormal(imovel)) {
 				return faixaLeituraEsperada;
 			} else {
 				FaixaLeituraTO faixaLeituraFalsa = this.calcularFaixaLeituraFalsa(imovel, consumoMedioHidrometro.intValue(), 
-						medicaoHistorico.getLeituraAnteriorFaturamento(),medicaoHistorico, true, hidrometro);
-				
-				System.out.println(faixaLeituraFalsa.isHidrometroSelecionado());
+						medicaoHistorico.getLeituraAtualFaturamento(),medicaoHistorico, true, hidrometro);
 				if (faixaLeituraFalsa.isHidrometroSelecionado()) {
 					return faixaLeituraFalsa;
 				} else {
@@ -63,8 +77,7 @@ public class FaixaLeituraBO {
 		}
 	}
 	
-	// TESTED
-	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media,MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
+	public FaixaLeituraTO calcularFaixaLeituraEsperada(int media, MedicaoHistorico medicaoHistorico, Hidrometro hidrometro, Integer leituraAnteriorPesquisada) {
 
 		BigDecimal faixaInicial = null;
 		BigDecimal faixaFinal = null;
@@ -98,26 +111,13 @@ public class FaixaLeituraBO {
 	private BigDecimal obterLeituraAnteriorParaCalculoFaixa(MedicaoHistorico medicaoHistorico, Integer leituraAnteriorPesquisada) {
 		BigDecimal leituraAnterior;
 		if (leituraAnteriorPesquisada == null) {
-			leituraAnterior = new BigDecimal(obterLeituraAnterior(medicaoHistorico));
+			leituraAnterior = new BigDecimal(medicaoHistorico.obterLeituraAnterior());
 		} else {
 			leituraAnterior = new BigDecimal(leituraAnteriorPesquisada);
 		}
 		return leituraAnterior;
 	}
-	
-	private int obterLeituraAnterior(MedicaoHistorico medicaoHistorico) {
-
-		if (medicaoHistorico.possuiLeituraInformada()) {
-			if (medicaoHistorico.getLeituraAnteriorInformada().intValue() == medicaoHistorico.getLeituraAtualInformada().intValue()) {
-				return medicaoHistorico.getLeituraAnteriorInformada();
-			} else {
-				return medicaoHistorico.getLeituraAnteriorFaturamento();
-			}
-		} else {
-			return medicaoHistorico.getLeituraAnteriorFaturamento();
-		}
-	}
-	
+		
 	private FaixaLeituraTO verificarViradaHidrometroFaixaEsperada(Hidrometro hidrometro, FaixaLeituraTO faixaLeitura) {
 
 		if (hidrometro != null && hidrometro.possuiNumeroDigitosLeitura()) {
@@ -142,7 +142,6 @@ public class FaixaLeituraBO {
 		FaixaLeituraTO faixaLeitura = new FaixaLeituraTO();
 
 		BigDecimal multiplicaFaxaFalsa = obterFatorMultiplicacaoFaixaFalsa(imovel);
-System.out.println(multiplicaFaxaFalsa); 
 		Integer leituraAnteriorFalsa = null;
 
 		if (multiplicaFaxaFalsa != null) {
@@ -175,7 +174,7 @@ System.out.println(multiplicaFaxaFalsa);
 		BigDecimal percentualFaixaFalsaRota = imovel.getQuadra().getRota().getPercentualGeracaoFaixaFalsa();
 		BigDecimal percentualFaixaFalsaSistemaParametro = sistemaParametro.getPercentualFaixaFalsa();
 
-		Calendar dataCalendar = new GregorianCalendar();
+		Calendar dataCalendar = Calendar.getInstance();
 		int segundos = dataCalendar.get(Calendar.SECOND);
 
 		Integer somaImovelSegundo = imovel.getId() + segundos;

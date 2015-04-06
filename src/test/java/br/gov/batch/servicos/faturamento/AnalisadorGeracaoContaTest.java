@@ -292,7 +292,7 @@ public class AnalisadorGeracaoContaTest {
 
 
 	private void mockDebitosCobrarPorImovelComPendenciaESemRevisao(Collection<DebitoCobrar> debitosCobrar) {
-		expect(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel))
+		expect(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel.getId()))
 			.andReturn(debitosCobrar);
 		replay(debitoCobrarEJBMock);
 	}

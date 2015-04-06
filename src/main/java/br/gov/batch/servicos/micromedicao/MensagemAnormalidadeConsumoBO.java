@@ -12,7 +12,7 @@ import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
-import br.gov.servicos.to.AnormalidadeHistoricoConsumo;
+import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
 @Stateless
 public class MensagemAnormalidadeConsumoBO {
@@ -30,7 +30,7 @@ public class MensagemAnormalidadeConsumoBO {
 
 		String[] mensagemConta = null;
 
-		AnormalidadeHistoricoConsumo anormalidade = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.AGUA, anoMesReferencia);
+		AnormalidadeHistoricoConsumoTO anormalidade = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.AGUA, anoMesReferencia);
 		
 		if (anormalidade == null){
 			anormalidade = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.ESGOTO, anoMesReferencia);
@@ -41,7 +41,7 @@ public class MensagemAnormalidadeConsumoBO {
 				anormalidade.getIdAnormalidade() == ConsumoAnormalidade.ALTO_CONSUMO ||
 				anormalidade.getIdAnormalidade() == ConsumoAnormalidade.ESTOURO_CONSUMO){
 				
-				Collection<ICategoria> colecaoCategoria = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasCategoria(idImovel);
+				Collection<ICategoria> colecaoCategoria = imovelSubcategoriaRepositorio.buscarCategoria(idImovel);
 
 				Integer categoriaComMaisEconomias = null;
 				int maiorQuantidadeEconomia = 0;
@@ -61,7 +61,7 @@ public class MensagemAnormalidadeConsumoBO {
 
 					int anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
 
-					AnormalidadeHistoricoConsumo anormalidadeAnterior = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.AGUA, anoMesReferenciaAnterior, anormalidade.getIdAnormalidade());
+					AnormalidadeHistoricoConsumoTO anormalidadeAnterior = consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(idImovel, LigacaoTipo.AGUA, anoMesReferenciaAnterior, anormalidade.getIdAnormalidade());
 
 					if (anormalidadeAnterior == null) {
 						mensagemContaAnormalidade = consumoAnormalidadeAcao.getDescricaoContaMensagemMes1();

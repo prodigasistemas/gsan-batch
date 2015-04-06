@@ -1,7 +1,6 @@
 package br.gov.batch.servicos.micromedicao;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -43,45 +42,45 @@ public class HidrometroBO {
 	}
 
 	private Date obterDataLeituraAnterior(Integer idImovel) {
-		Date dataLeituraFaturada = null;
+		Date dataLeitura = null;
 
 		FaturamentoGrupo faturamentoGrupo = imovelBO.pesquisarFaturamentoGrupo(idImovel);
 
 		Integer anoMesReferencia = faturamentoGrupo.getAnoMesReferencia();
 
-		Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(anoMesReferencia, 1);
+		MedicaoHistorico medicaoAtual = medicaoHistoricoRepositorio.buscarPorLigacaoAgua(idImovel, anoMesReferencia);
 
-		MedicaoHistorico medicaoHistoricoAtual = medicaoHistoricoRepositorio.buscarPorImovelEReferencia(idImovel, anoMesReferencia);
-
-		if (medicaoHistoricoAtual != null) {
-			dataLeituraFaturada = medicaoHistoricoAtual.getDataLeituraAnteriorFaturamento();
+		if (medicaoAtual != null) {
+			dataLeitura = medicaoAtual.getDataLeituraAnteriorFaturamento();
 		} else {
-			dataLeituraFaturada = this.obterDataMedicao(idImovel, anoMesReferenciaAnterior);
+			dataLeitura = this.obterDataMedicao(idImovel, Utilitarios.reduzirMeses(anoMesReferencia, 1));
 		}
 
-		return dataLeituraFaturada;
+		return dataLeitura;
 	}
 
+	//TODO: Pode trocar para recuperar de agua primeiro e depois de poço?
 	private Date obterDataInstalacaoHidrometro(Integer idImovel) {
-		List<HidrometroTO> dadosHidrometro = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometro(idImovel);
-
-		Date dataInstalacao = null;
-		if (dadosHidrometro.size() > 0) {
-			dataInstalacao = dadosHidrometro.get(0).getDataInstalacao();
+		HidrometroTO instalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(idImovel);
+		
+		if (instalacao == null) {
+		    instalacao = hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroPoco(idImovel);
 		}
 
-		return dataInstalacao;
+		return instalacao != null ? instalacao.getDataInstalacao() : null;
 	}
 
-	public Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
-		Date dataMedicao = this.obterDataInstalacaoHidrometro(idImovel);
-
-		MedicaoHistorico medicaoHistoricoTO = medicaoHistoricoBO.getMedicaoHistorico(idImovel, anoMesReferencia);
-
-		if (medicaoHistoricoTO != null) {
-			dataMedicao = medicaoHistoricoTO.getDataLeituraAtualFaturamento();
-		}
+	private Date obterDataMedicao(Integer idImovel, Integer anoMesReferencia) {
+	    MedicaoHistorico medicao = medicaoHistoricoBO.getMedicaoHistorico(idImovel, anoMesReferencia);
+	    
+	    Date dataMedicao = null;
+	    if (medicao != null) {
+	        dataMedicao = medicao.getDataLeituraAtualFaturamento();
+	    }else{
+	        dataMedicao = this.obterDataInstalacaoHidrometro(idImovel);
+	    }
 
 		return dataMedicao;
 	}
+
 }

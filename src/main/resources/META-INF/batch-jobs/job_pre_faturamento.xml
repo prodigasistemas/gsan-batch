@@ -1,13 +1,6 @@
 <job id="job_pre_faturamento"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
-	<listeners>
-		<listener ref="preFaturamentoJobListener"/>
-	</listeners>
-
-	<step id="carregarRotas">
-		<chunk item-count="1">
-			<reader ref="carregarRotas"/>
-			<processor ref="iniciaProcessamentoRota" />
-			<writer ref="dummyItemWriter" />
-		</chunk>
-	</step>
+	<step id="iniciarProcessamento">
+		<batchlet ref="iniciarJob">
+		</batchlet>	
+	</step>	
 </job>

@@ -133,7 +133,7 @@ public class CreditosContaBOTest {
 		replay(sistemaParametrosRepositorioMock);
 		replay(creditoRealizarRepositorioMock);
 		
-		CreditosContaTO creditoRealizadoTORetorno = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
+		CreditosContaTO creditoRealizadoTORetorno = creditosContaBO.gerarCreditosConta(imovel.getId(), anoMesFaturamento);
 		
 		assertEquals(creditoRealizadoTO.getCreditosRealizar().size(), creditoRealizadoTORetorno.getCreditosRealizar().size());
 		assertEquals(creditoRealizadoTO.getMapValoresPorTipoCredito().size(), creditoRealizadoTORetorno.getMapValoresPorTipoCredito().size());

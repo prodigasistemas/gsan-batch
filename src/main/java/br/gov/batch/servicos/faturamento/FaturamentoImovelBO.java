@@ -14,8 +14,10 @@ import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
 import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
+import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
+import br.gov.servicos.faturamento.FaturamentoSituacaoTipoRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 import br.gov.servicos.to.DebitosContaTO;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
@@ -66,15 +68,16 @@ public class FaturamentoImovelBO {
 	private FaturamentoSituacaoRepositorio faturamentoSituacaoRepositorio;
 	
 	@EJB
+	private FaturamentoSituacaoTipoRepositorio faturamentoSituacaoTipoRepositorio;
+	@EJB
 	private ImovelRepositorio imovelRepositorio;
 	
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void preDeterminarFaturamentoImovel(FaturamentoImovelTO faturamentoTO) throws Exception {
-		Imovel parametroImovel = faturamentoTO.getImovel();
 		Integer anoMesFaturamento = faturamentoTO.getAnoMesFaturamento();
 		
-		Imovel imovel = imovelRepositorio.buscarPeloId(parametroImovel.getId());
+		Imovel imovel = imovelRepositorio.obterPorID(faturamentoTO.getIdImovel());
 		
 		boolean valoresAguaEsgotoZerados = false;
 		if (imovel.possuiLigacaoAguaAtiva() || imovel.possuiLigacaoEsgotoAtiva() || imovel.existeHidrometro()) {
@@ -82,15 +85,15 @@ public class FaturamentoImovelBO {
 		}
 		
 		if (analisadorGeracaoConta.verificarGeracaoConta(valoresAguaEsgotoZerados, anoMesFaturamento, imovel)) {
-			DebitosContaTO debitosContaTO = debitosContaBO.gerarDebitosConta(imovel, anoMesFaturamento);
-			CreditosContaTO creditosContaTO = creditosContaBO.gerarCreditosConta(imovel, anoMesFaturamento);
-			ImpostosDeduzidosContaTO impostosDeduzidosContaTO = impostosContaBO.gerarImpostosDeduzidosConta(imovel, anoMesFaturamento, 
+			DebitosContaTO debitosContaTO = debitosContaBO.gerarDebitosConta(imovel.getId(), anoMesFaturamento);
+			CreditosContaTO creditosContaTO = creditosContaBO.gerarCreditosConta(imovel.getId(), anoMesFaturamento);
+			ImpostosDeduzidosContaTO impostosDeduzidosContaTO = impostosContaBO.gerarImpostosDeduzidosConta(imovel.getId(), anoMesFaturamento, 
 																				debitosContaTO.getValorTotalDebito(), creditosContaTO.getValorTotalCreditos());
 
 			Conta conta = contaBO.gerarConta(faturamentoTO, debitosContaTO, creditosContaTO, impostosDeduzidosContaTO);
 
-			contaCategoriaBO.inserirContasCategoriaValoresZerados(imovel.getId(), conta);
-			clienteContaBO.inserirClienteContaComImoveisAtivos(imovel, conta);
+			contaCategoriaBO.inserirContasCategoriaValoresZerados(imovel.getId(), conta.getId());
+			clienteContaBO.inserirClienteContaComImoveisAtivos(imovel.getId(), conta);
 			contaImpostosDeduzidosBO.inserirContaImpostosDeduzidos(conta, impostosDeduzidosContaTO);
 
 			debitoCobradoBO.inserirDebitoCobrado(debitosContaTO, conta);
@@ -134,10 +137,12 @@ public class FaturamentoImovelBO {
 			List<FaturamentoSituacaoHistorico> faturamentosSituacaoHistorico = faturamentoSituacaoRepositorio.faturamentosHistoricoVigentesPorImovel(imovel.getId());
 			FaturamentoSituacaoHistorico faturamentoSituacaoHistorico = faturamentosSituacaoHistorico.get(0);
 
+			FaturamentoSituacaoTipo tipo = faturamentoSituacaoTipoRepositorio.situacaoTipoDoImovel(imovel.getId());
+			
 			if ((faturamentoSituacaoHistorico != null 
 					&& anoMesFaturamento >= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoInicio() 
 					&& anoMesFaturamento <= faturamentoSituacaoHistorico.getAnoMesFaturamentoSituacaoFim())
-					&& imovel.paralisacaoFaturamento() 
+					&& tipo.paralisacaoFaturamentoAtivo()  
 					&& imovel.faturamentoAguaValido()) {
 				faturar = false;
 			}

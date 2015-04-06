@@ -16,91 +16,87 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
-import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoTipo;
-import br.gov.model.financeiro.FinanciamentoTipo;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
-import br.gov.servicos.to.DebitoCobradoParcelamentoTO;
+import br.gov.servicos.to.DebitoCobradoNaoParceladoTO;
+import br.gov.servicos.to.ParcelaDebitoCobradoTO;
 
 @RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo04Test {
 
 	@TestSubject
-	private ArquivoTextoTipo04 arquivoTextoTipo04;
+	private ArquivoTextoTipo04 arquivo;
 	
-	private Imovel imovel;
-	private Conta conta;
-	
-	private DebitoCobradoParcelamentoTO debitoCobradoParcelamentoTO;
-	private DebitoCobrado debitoCobrado;
-	
-	private List<DebitoCobradoParcelamentoTO> debitosCobradosParcelamentos;
-	private List<DebitoCobrado> debitosCobrados;
+	private int TAMANHO_LINHA = 244;
 	
 	@Mock
 	private DebitoCobradoRepositorio debitoCobradoRepositorioMock;
+
+	private ParcelaDebitoCobradoTO debitoCobradoParcelamentoTO;
+	private DebitoCobradoNaoParceladoTO debitoCobrado;
+
+	private List<ParcelaDebitoCobradoTO> debitosCobradosParcelamentos;
+	private List<DebitoCobradoNaoParceladoTO> debitosCobrados;
+
+	private ArquivoTextoTO to;
 	
 	@Before
 	public void setup() {
-		imovel = new Imovel(1);
-		
-		debitoCobrado = new DebitoCobrado();
+		debitoCobrado = new DebitoCobradoNaoParceladoTO();
 
-		conta = new Conta(10);
-		conta.setImovel(imovel);
-		
 		DebitoTipo debitoTipo = new DebitoTipo(1);
 		debitoTipo.setDescricao("AGUA TRATADA");
 
-		debitoCobradoParcelamentoTO = new DebitoCobradoParcelamentoTO();
+		debitoCobradoParcelamentoTO = new ParcelaDebitoCobradoTO();
 		debitoCobradoParcelamentoTO.setCodigoConstante(null);
 		debitoCobradoParcelamentoTO.setNumeroPrestacaoDebito(Short.valueOf("1"));
 		debitoCobradoParcelamentoTO.setTotalParcela(Short.valueOf("10"));
 		debitoCobradoParcelamentoTO.setTotalPrestacao(new BigDecimal(5));
-		
-		debitosCobradosParcelamentos = new ArrayList<DebitoCobradoParcelamentoTO>();
+
+		debitosCobradosParcelamentos = new ArrayList<ParcelaDebitoCobradoTO>();
 		debitosCobradosParcelamentos.add(debitoCobradoParcelamentoTO);
-		
-		debitoCobrado.setConta(conta);
-		debitoCobrado.setFinanciamentoTipo(new FinanciamentoTipo(FinanciamentoTipo.SERVICO_NORMAL));
-		debitoCobrado.setAnoMesReferenciaDebito(201501);
+
+		debitoCobrado.setAnoMesReferencia(201501);
 		debitoCobrado.setValorPrestacao(new BigDecimal(5));
-		debitoCobrado.setNumeroPrestacao(Short.valueOf("10"));
+		debitoCobrado.setTotalPrestacao(Short.valueOf("10"));
 		debitoCobrado.setNumeroPrestacaoDebito(Short.valueOf("1"));
-		debitoCobrado.setNumeroParcelaBonus(Short.valueOf("0"));
-		debitoCobrado.setDebitoTipo(debitoTipo);
-		
-		debitosCobrados = new ArrayList<DebitoCobrado>();
+		debitoCobrado.setDebitoTipo(debitoTipo.getId());
+
+		debitosCobrados = new ArrayList<DebitoCobradoNaoParceladoTO>();
 		debitosCobrados.add(debitoCobrado);
-		
-		arquivoTextoTipo04 = new ArquivoTextoTipo04();
+		debitosCobrados.add(debitoCobrado);
+
+		to = new ArquivoTextoTO();
+		Imovel imovel = new Imovel(1);
+		to.setImovel(imovel);
+		Conta conta = new Conta(10);
+		conta.setImovel(imovel);
+		to.setConta(conta);
+		arquivo = new ArquivoTextoTipo04();
+		arquivo.setArquivoTextoTO(to);
 	}
-	
+
 	@Test
 	public void buildArquivoTextoTipo04() {
 		carregarMocks();
 		
-		assertNotNull(arquivoTextoTipo04.build(conta));
+		assertNotNull(arquivo.build(to));
 	}
-	
+
 	@Test
 	public void buildArquivoTextoTipo04TamanhoLinha() {
 		carregarMocks();
 		
-		String linha = arquivoTextoTipo04.build(conta);
-		int tamanhoLinha = linha.length();
-		
-		System.out.println(linha);
-		System.out.println(tamanhoLinha);
-		
-		assertTrue(tamanhoLinha == 244);
+		String linha = arquivo.build(to);
+		assertTrue(linha.length() == TAMANHO_LINHA);
 	}
 	
 	private void carregarMocks() {
-		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoParcelamento(conta)).andReturn(debitosCobradosParcelamentos);
-		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoNaoParcelamento(conta)).andReturn(debitosCobrados);
+		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoParcelamento(to.getConta().getId())).andReturn(debitosCobradosParcelamentos);
+		expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoSemParcelamento(to.getConta().getId())).andReturn(debitosCobrados);
 		replay(debitoCobradoRepositorioMock);
 	}
 

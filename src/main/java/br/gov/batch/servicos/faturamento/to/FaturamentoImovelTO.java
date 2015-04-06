@@ -12,7 +12,8 @@ import br.gov.model.micromedicao.Rota;
 public class FaturamentoImovelTO implements Serializable{
 	private static final long serialVersionUID = -8120350363915598518L;
 	
-	private Imovel imovel;
+//	private Imovel imovel;
+	private Integer idImovel;
 	private Date dataVencimentoConta;
 	private Rota rota;
 	private FaturamentoAtividadeCronogramaRota faturamentoAtivCronRota;
@@ -27,12 +28,19 @@ public class FaturamentoImovelTO implements Serializable{
 	public void setRota(Rota rota) {
 		this.rota = rota;
 	}
-	public Imovel getImovel() {
-		return imovel;
-	}
-	public void setImovel(Imovel imovel) {
-		this.imovel = imovel;
-	}
+	
+	public Integer getIdImovel() {
+        return idImovel;
+    }
+    public void setIdImovel(Integer idImovel) {
+        this.idImovel = idImovel;
+    }
+    //	public Imovel getImovel() {
+//		return imovel;
+//	}
+//	public void setImovel(Imovel imovel) {
+//		this.imovel = imovel;
+//	}
 	public FaturamentoAtividadeCronogramaRota getFaturamentoAtivCronRota() {
 		return faturamentoAtivCronRota;
 	}

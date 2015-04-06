@@ -10,7 +10,6 @@ import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cadastro.CategoriaBO;
 import br.gov.model.cadastro.Categoria;
-import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.CreditoRealizado;
 import br.gov.model.faturamento.CreditoRealizadoCategoria;
 import br.gov.model.faturamento.CreditoRealizar;
@@ -39,9 +38,9 @@ public class CreditosContaBO {
 	
 	private CreditosContaTO creditosConta;
 	
-	public CreditosContaTO gerarCreditosConta(Imovel imovel, Integer anoMesFaturamento) {
+	public CreditosContaTO gerarCreditosConta(Integer idImovel, Integer anoMesFaturamento) {
 
-		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(imovel, anoMesFaturamento);
+		Collection<CreditoRealizar> creditosRealizar = creditosRealizar(idImovel, anoMesFaturamento);
 		
 		return gerarCreditos(anoMesFaturamento, creditosRealizar);
 	}
@@ -146,16 +145,16 @@ public class CreditosContaBO {
 		return creditoRealizado;
 	}
 
-	private Collection<CreditoRealizar> creditosRealizar(Imovel imovel, Integer anoMesFaturamento) {
+	private Collection<CreditoRealizar> creditosRealizar(Integer idImovel, Integer anoMesFaturamento) {
 		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
-				imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
+		        idImovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
 		if (colecaoCreditosRealizar == null) {
 			colecaoCreditosRealizar = new ArrayList<CreditoRealizar>();
 		}
 
 		Collection<CreditoRealizar> colecaoCreditosRealizarNitrato = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
-				imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento);
+		        idImovel, DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento);
 
 		if (colecaoCreditosRealizarNitrato != null && !colecaoCreditosRealizarNitrato.isEmpty()) {
 			colecaoCreditosRealizar.addAll(colecaoCreditosRealizarNitrato);

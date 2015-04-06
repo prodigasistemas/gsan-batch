@@ -1,0 +1,18 @@
+<job id="job_gerar_arquivo" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<listeners>
+		<listener ref="gerarArquivoJobListener"/>
+	</listeners>
+	
+	<step id="gerarArquivo">
+		<properties>
+			<property name="javax.transaction.global.timeout" value="2400"/> 
+		</properties>
+	
+		<chunk>
+			<reader ref="dummyItemReader"/>
+			<processor ref="gerarArquivoRota" />
+			<writer ref="dummyItemWriter" />
+		</chunk>
+	</step>
+</job>
+

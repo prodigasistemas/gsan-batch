@@ -1,0 +1,10 @@
+<job id="job_finalizar_processamento"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="mudar_status_job_para_concluido">
+		<batchlet ref="alterarStatusJob">
+			<properties>
+				<property name="status" value="CONCLUIDO" />
+				<property name="atividade" value="FIM" />
+			</properties>		
+		</batchlet>
+	</step>
+</job>
