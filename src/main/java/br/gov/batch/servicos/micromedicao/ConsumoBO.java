@@ -22,100 +22,94 @@ import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 @Stateless
 public class ConsumoBO {
-    
-    @EJB
-    private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
-    @EJB
-    private ConsumoTarifaRepositorio consumoTarifaRepositorio;
-    
-    @EJB
-    private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
-    
-    @EJB
-    private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
-    
-    @EJB
-    private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
-    
-    @EJB
-    private EconomiasBO economiasBO;
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
-    @EJB
-    private ImovelBO imovelBO;
-    
-    @EJB
-    private ConsumoMinimoAreaRepositorio consumoMinimoAreaRepositorio;
-    
-    private SistemaParametros sistemaParametros;
+	@EJB
+	private ConsumoTarifaRepositorio consumoTarifaRepositorio;
 
-    @PostConstruct
-    public void init(){
-        sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
-    }
-    
-    
-    public int consumoNaoMedido(Integer idImovel, Integer anoMesReferencia) {
-        if (sistemaParametros.getIndicadorNaoMedidoTarifa() == Status.ATIVO.getId()){
-            return this.consumoMinimoLigacao(idImovel);
-        } else{
-            return this.obterConsumoNaoMedidoSemTarifa(idImovel, anoMesReferencia);
-        }
-        
-    }
-    
-    public int obterConsumoNaoMedidoSemTarifa(Integer idImovel, Integer anoMesReferencia) {
-        Integer qtdEconomiasVirtuais = economiasBO.quantidadeEconomiasVirtuais(idImovel);
+	@EJB
+	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
 
-        BigDecimal areaConstruida = imovelBO.verificarAreaConstruida(idImovel);
+	@EJB
+	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
-        BigDecimal areaConstruidaVirtual = areaConstruida.divide(new BigDecimal(qtdEconomiasVirtuais), 2, BigDecimal.ROUND_HALF_UP);
-        
-        Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
-        
-        Integer consumoNaoMedido = 0;
-        
-        for (ICategoria sub : subcategoria) {
-            Integer consumoMinimo = consumoMinimoAreaRepositorio.pesquisarConsumoMinimoArea(areaConstruidaVirtual, anoMesReferencia, null, sub.getId());
+	@EJB
+	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
 
-            if (sub.getCategoria().getFatorEconomias() != null) {
-                consumoNaoMedido += consumoMinimo * sub.getCategoria().getFatorEconomias();
-            } else {
-                consumoNaoMedido += consumoMinimo * sub.getQuantidadeEconomias();
-            }
-        }
-        
-        return consumoNaoMedido;
-    }
+	@EJB
+	private EconomiasBO economiasBO;
 
-    public Integer consumoMinimoLigacao(Integer idImovel) {
-        
-        Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
-        
-        Collection<ICategoria> economias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
-        
-        Integer consumoMinimoLigacao = this.obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, economias);
+	@EJB
+	private ImovelBO imovelBO;
 
-        return consumoMinimoLigacao;
-    }
+	@EJB
+	private ConsumoMinimoAreaRepositorio consumoMinimoAreaRepositorio;
 
-    public int obterConsumoMinimoLigacaoPorCategoria(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias){
-        
-        int consumoMinimoLigacao = 0;
-        
-        ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
-        
-        for (ICategoria categoria : categorias) {
-            Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
-            
-            if (categoria.getFatorEconomias() != null) {
-                consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
-            } else {
-                consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
-            }
-        }
-        
-        return consumoMinimoLigacao;
-    }
-    
+	private SistemaParametros sistemaParametros;
+
+	@PostConstruct
+	public void init() {
+		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+	}
+
+	public int consumoNaoMedido(Integer idImovel, Integer anoMesReferencia) {
+		if (sistemaParametros.getIndicadorNaoMedidoTarifa() == Status.ATIVO.getId()) {
+			return this.consumoMinimoLigacao(idImovel);
+		} else {
+			return this.obterConsumoNaoMedidoSemTarifa(idImovel, anoMesReferencia);
+		}
+	}
+
+	public int obterConsumoNaoMedidoSemTarifa(Integer idImovel, Integer anoMesReferencia) {
+		Integer qtdEconomiasVirtuais = economiasBO.quantidadeEconomiasVirtuais(idImovel);
+
+		BigDecimal areaConstruida = imovelBO.verificarAreaConstruida(idImovel);
+
+		BigDecimal areaConstruidaVirtual = areaConstruida.divide(new BigDecimal(qtdEconomiasVirtuais), 2, BigDecimal.ROUND_HALF_UP);
+
+		Collection<ICategoria> subcategoria = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
+
+		Integer consumoNaoMedido = 0;
+
+		for (ICategoria sub : subcategoria) {
+			Integer consumoMinimo = consumoMinimoAreaRepositorio.pesquisarConsumoMinimoArea(areaConstruidaVirtual, anoMesReferencia, null, sub.getId());
+
+			if (sub.getCategoria().getFatorEconomias() != null) {
+				consumoNaoMedido += consumoMinimo * sub.getCategoria().getFatorEconomias();
+			} else {
+				consumoNaoMedido += consumoMinimo * sub.getQuantidadeEconomias();
+			}
+		}
+
+		return consumoNaoMedido;
+	}
+
+	public Integer consumoMinimoLigacao(Integer idImovel) {
+		Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
+
+		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
+
+		return obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, categorias);
+	}
+
+	public int obterConsumoMinimoLigacaoPorCategoria(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias) {
+		int consumoMinimoLigacao = 0;
+
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
+
+		for (ICategoria categoria : categorias) {
+			Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
+
+			if (categoria.getFatorEconomias() != null) {
+				consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
+			} else {
+				consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
+			}
+		}
+
+		return consumoMinimoLigacao;
+	}
+
 }
