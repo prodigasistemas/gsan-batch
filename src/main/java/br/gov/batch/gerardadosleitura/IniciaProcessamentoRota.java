@@ -47,21 +47,22 @@ public class IniciaProcessamentoRota implements ItemProcessor {
 			String idRota = String.valueOf(param);
 			Rota rota = rotaRepositorio.obterPorID(Integer.valueOf(idRota));
 
-			Properties processoParametros = new Properties();
-			processoParametros.put("idProcessoIniciado", util.parametroDoJob("idProcessoIniciado"));
-			processoParametros.put("idRota", idRota);
-			processoParametros.put("anoMesFaturamento", util.parametroDoJob("anoMesFaturamento"));
-			processoParametros.put("idGrupoFaturamento", util.parametroDoJob("idGrupoFaturamento"));
-			processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
+            Properties processoParametros = new Properties();
+            processoParametros.put("idProcessoIniciado" , util.parametroDoJob("idProcessoIniciado"));
+            processoParametros.put("anoMesFaturamento"  , util.parametroDoJob("anoMesFaturamento"));
+            processoParametros.put("idGrupoFaturamento" , util.parametroDoJob("idGrupoFaturamento"));
+            processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
+            processoParametros.put("vencimentoContas"   , util.parametroDoJob("vencimentoContas"));
+            processoParametros.put("idRota"             , idRota);
 
 			JobOperator jo = BatchRuntime.getJobOperator();
 
 			Long executionRota = null;
 
 			if (rota.getLeituraTipo().intValue() == LeituraTipo.LEITURA_E_ENTRADA_SIMULTANEA.getId()) {
-				executionRota = jo.start("job_processar_rota", processoParametros);
+				executionRota = jo.start("job_processar_rota_leitura_entrada_simultanea", processoParametros);
 			} else {
-				executionRota = jo.start("job_processar_rota_leitura", processoParametros);
+				executionRota = jo.start("job_processar_rota_convencional", processoParametros);
 			}
 			
 			logger.logBackgroud(String.format("[executionId: %s] - Rota [%s] marcada para processamento. Tipo de leitura: " + LeituraTipo.findById(rota.getLeituraTipo()), executionRota, param));
