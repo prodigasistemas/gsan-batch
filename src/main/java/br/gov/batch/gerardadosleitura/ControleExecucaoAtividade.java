@@ -51,4 +51,8 @@ public class ControleExecucaoAtividade {
 	public synchronized Boolean execucaoConcluida(Integer idControle){
 	    return map.get(idControle).execucaoConcluida();
 	}
+	
+	public ControleExecucaoTO obterDadosExecucao(Integer idControle){
+	    return map.get(idControle);
+	}
 }

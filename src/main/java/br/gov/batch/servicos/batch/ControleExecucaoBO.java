@@ -15,7 +15,10 @@ public class ControleExecucaoBO {
     public ControleExecucaoTO criaExecucaoAtividade(Integer idControleAtividade){
         ControleProcessoAtividade controle = repositorio.obterPorID(idControleAtividade);
         
-        ControleExecucaoTO execucao = new ControleExecucaoTO(controle.getId(), controle.getTotalItens(), controle.getAtividade().getLimiteExecucao());
+        ControleExecucaoTO execucao = new ControleExecucaoTO(controle.getId()
+                , controle.getTotalItens()
+                , controle.getAtividade().getLimiteExecucao()
+                , controle.getAtividade().getDescricao());
         
         return execucao;
         

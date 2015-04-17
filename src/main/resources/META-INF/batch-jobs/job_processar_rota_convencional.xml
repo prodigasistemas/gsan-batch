@@ -1,12 +1,16 @@
-<job id="job_processar_rota" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="job_processar_rota_convencional" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
-		<listener ref="rotaJobListener"/>
+		<listener ref="controleExecucaoAtividadeJobListener"/>
 	</listeners>
 	<properties>
 		<property name="tam_particao" value="30" />
 	</properties>
 		
 	<step id="processarRotaLeitura">
+		<properties>
+			<property name="javax.transaction.global.timeout" value="2400"/> 
+		</properties>
+	
 		<chunk>
 			<reader ref="carregarImoveisRotaLeitura">
 				<properties>
