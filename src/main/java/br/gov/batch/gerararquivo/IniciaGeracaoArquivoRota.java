@@ -51,11 +51,12 @@ public class IniciaGeracaoArquivoRota implements ItemProcessor {
 			Rota rota = rotaRepositorio.obterPorID(Integer.valueOf(idRota));
 
 			Properties processoParametros = new Properties();
-			processoParametros.put("idRota", idRota);
-			processoParametros.put("anoMesFaturamento", util.parametroDoJob("anoMesFaturamento"));
-			processoParametros.put("idProcessoIniciado", util.parametroDoJob("idProcessoIniciado"));
-			processoParametros.put("idGrupoFaturamento", util.parametroDoJob("idGrupoFaturamento"));
-            processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
+			processoParametros.put("idProcessoIniciado" , util.parametroDoJob("idProcessoIniciado"));
+			processoParametros.put("anoMesFaturamento"  , util.parametroDoJob("anoMesFaturamento"));
+			processoParametros.put("idGrupoFaturamento" , util.parametroDoJob("idGrupoFaturamento"));
+			processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));			
+			processoParametros.put("vencimentoContas"   , util.parametroDoJob("vencimentoContas"));			
+			processoParametros.put("idRota"             , idRota);
 
 			JobOperator jo = BatchRuntime.getJobOperator();
 

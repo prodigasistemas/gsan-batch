@@ -11,9 +11,10 @@ import br.gov.batch.util.BatchUtil;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Rota;
+import br.gov.model.util.FormatoData;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronRotaRepositorio;
-import br.gov.servicos.to.CronogramaFaturamentoRotaTO;
+import static br.gov.model.util.Utilitarios.converterStringParaData;
 
 @Named
 public class ProcessarImovelRota implements ItemProcessor {
@@ -35,14 +36,12 @@ public class ProcessarImovelRota implements ItemProcessor {
     public Imovel processItem(Object param) throws Exception {
         Imovel imovel = (Imovel) param;
 
-        Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
+        Integer idRota             = Integer.valueOf(util.parametroDoJob("idRota"));
         Integer idGrupoFaturamento = Integer.valueOf(util.parametroDoJob("idGrupoFaturamento"));
-        Integer anoMesFaturamento = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
-
+        Integer anoMesFaturamento  = Integer.valueOf(util.parametroDoJob("anoMesFaturamento"));
+        String vencimento          = util.parametroDoJob("vencimentoContas");
+        
         if (!repositorio.existeContaImovel(imovel.getId(), anoMesFaturamento)) {
-            CronogramaFaturamentoRotaTO cronogramaFaturamentoRotaTO = faturamentoAtividadeCronRotaRepositorio.pesquisaFaturamentoAtividadeCronogramaRota(
-                    idRota, idGrupoFaturamento, anoMesFaturamento);
-
             FaturamentoGrupo faturamentoGrupo = new FaturamentoGrupo(idGrupoFaturamento);
             faturamentoGrupo.setAnoMesReferencia(anoMesFaturamento);
 
@@ -54,7 +53,7 @@ public class ProcessarImovelRota implements ItemProcessor {
                 to.setRota(rota);
                 to.setFaturamentoGrupo(faturamentoGrupo);
                 to.setAnoMesFaturamento(anoMesFaturamento);
-                to.setDataVencimentoConta(cronogramaFaturamentoRotaTO.getDataVencimentoConta());
+                to.setDataVencimentoConta(converterStringParaData(vencimento, FormatoData.DIA_MES_ANO));
                 to.setIdImovel(imovel.getId());
                 faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
             }

@@ -1,7 +1,5 @@
 package br.gov.batch.gerararquivo;
 
-import java.util.Date;
-
 import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Inject;
