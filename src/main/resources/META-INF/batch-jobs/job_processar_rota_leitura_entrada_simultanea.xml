@@ -1,8 +1,9 @@
 <job id="job_processar_rota_leitura_entrada_simultanea" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="controleExecucaoAtividadeJobListener"/>
+		<listener ref="errorJobListener"/>
 	</listeners>
-	
+
 	<properties>
 		<property name="tam_particao" value="30" />
 	</properties>

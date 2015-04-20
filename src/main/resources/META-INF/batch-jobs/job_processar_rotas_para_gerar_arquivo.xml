@@ -1,4 +1,8 @@
 <job id="job_processar_rotas_para_gerar_arquivo"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<listeners>
+		<listener ref="errorJobListener"/>
+	</listeners>
+
 	<step id="iniciar_atividade" next="processar_rotas">
 		<batchlet ref="iniciarAtividadeJob"/>
 	</step>

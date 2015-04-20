@@ -1,4 +1,8 @@
 <job id="job_agrupar_arquivos_microcoletor"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<listeners>
+		<listener ref="errorJobListener"/>
+	</listeners>
+	
 	<step id="agrupar_arquivos" next="finaliza_atividade">
 		<chunk item-count="1">
 			<reader ref="dummyItemReader"/>
