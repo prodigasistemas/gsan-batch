@@ -30,15 +30,16 @@ public class IniciarPrimeiraAtividade implements Batchlet{
     @EJB
     private ProcessoAtividadeBO atividadeBO;
     
-    
 	public String process() throws Exception {
 	    logger.info("Inicio do batch");
-
+	    
 	    Processo processo = processoBO.obterProcessoBatch(Integer.valueOf(util.parametroDoJob("idProcessoIniciado")));
 	    
 	    logger.info(processo.getDescricao());
 	    
-	    ProcessoAtividade atividade = processo.getAtividades().get(1);
+	    Integer posicaoAtividade = util.parametroDoJob("atividadeIniciada") != null ? Integer.valueOf(util.parametroDoJob("atividadeIniciada"))  - 1: 1;
+	    
+	    ProcessoAtividade atividade = processo.getAtividades().get(posicaoAtividade);
 	    
 	    logger.info("Nome atividade: "  + atividade.getNomeArquivoBatch());
 	    
