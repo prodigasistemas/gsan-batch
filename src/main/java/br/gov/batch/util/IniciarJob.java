@@ -38,8 +38,6 @@ public class IniciarJob implements Batchlet{
 	public String process() throws Exception {
 	    logger.info("Inicio do batch");
 
-	    repositorioControleAtividade.apagarAtividadesDeProcesso(Integer.valueOf(util.parametroDoJob("idProcessoIniciado")));
-	    
 	    Processo processo = processoBO.obterProcessoBatch(Integer.valueOf(util.parametroDoJob("idProcessoIniciado")));
 	    
 	    logger.info(processo.getDescricao());

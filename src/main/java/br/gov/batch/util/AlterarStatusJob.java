@@ -35,11 +35,15 @@ public class AlterarStatusJob implements Batchlet{
 	    
         Integer idProcessoIniciado = Integer.valueOf(util.parametroDoJob("idProcessoIniciado"));
         
-        repositorio.atualizaSituacaoProcesso(idProcessoIniciado, situacao);
-        
         Processo processo = repositorio.obterProcessoPeloIniciado(idProcessoIniciado);
         
         logger.info(util.parametroDoJob("idProcessoIniciado"), String.format(atividade + " da execução do [%s]", processo.getDescricao()));
+        
+        if (situacao == ProcessoSituacao.EM_PROCESSAMENTO) {
+            repositorio.iniciaExecucaoProcesso(idProcessoIniciado);
+        } else if (situacao == ProcessoSituacao.CONCLUIDO) {
+            repositorio.terminaExecucaoProcesso(idProcessoIniciado, situacao);
+        }
 	    	    
 		return null;
 	}
