@@ -37,7 +37,7 @@ public class ErrorJobListener implements JobListener{
             
             Processo processo = repositorio.obterProcessoPeloIniciado(idProcessoIniciado);
             
-            repositorio.atualizaSituacaoProcesso(idProcessoIniciado, ProcessoSituacao.CONCLUIDO_COM_ERRO);
+            repositorio.terminaExecucaoProcesso(idProcessoIniciado, ProcessoSituacao.CONCLUIDO_COM_ERRO);
             
             logger.error(util.parametroDoJob("idProcessoIniciado"), "Erro ao concluir processo: " + processo.getDescricao());
         }
