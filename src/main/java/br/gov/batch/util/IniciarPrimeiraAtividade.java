@@ -11,8 +11,10 @@ import javax.inject.Named;
 
 import org.jboss.logging.Logger;
 
+import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
 import br.gov.batch.servicos.batch.ProcessoAtividadeBO;
 import br.gov.batch.servicos.batch.ProcessoBatchBO;
+import br.gov.batch.to.ControleExecucaoTO;
 import br.gov.model.batch.ControleProcessoAtividade;
 import br.gov.model.batch.Processo;
 import br.gov.model.batch.ProcessoAtividade;
@@ -30,6 +32,9 @@ public class IniciarPrimeiraAtividade implements Batchlet{
     @EJB
     private ProcessoAtividadeBO atividadeBO;
     
+    @EJB
+    private ControleExecucaoAtividade controleExecucao;
+
 	public String process() throws Exception {
 	    logger.info("Inicio do batch");
 	    
@@ -43,12 +48,24 @@ public class IniciarPrimeiraAtividade implements Batchlet{
 	    
 	    logger.info("Nome atividade: "  + atividade.getNomeArquivoBatch());
 	    
-        String[]  ids =  util.parametroDoJob("idsRota").replaceAll("\"", "").split(",");
+        int totalItens = 1;
+        
+        if (atividade.isProcessaVariosItens()){
+            totalItens = util.parametroDoJob("idsRota").replaceAll("\"", "").split(",").length;
+        }
 
-        ControleProcessoAtividade controle = atividadeBO.cadastrarAtividade(Integer.valueOf(util.parametroDoJob("idProcessoIniciado"))
+        ControleProcessoAtividade controle = atividadeBO.prepararAtividade(Integer.valueOf(util.parametroDoJob("idProcessoIniciado"))
                 , atividade.getNomeArquivoBatch()
-                , ids.length);
+                , totalItens);
+        
+        ControleExecucaoTO to = new ControleExecucaoTO(controle.getId()
+                , controle.getTotalItens()
+                , controle.getAtividade().getLimiteExecucao()
+                , controle.getAtividade().getDescricao()
+                , controle.getAtividade().getNomeArquivoBatch());
 
+        
+        controleExecucao.cadastraExecucao(to);
         
         Properties properties = util.parametrosDoJob();
         properties.put("idControleAtividade", String.valueOf(controle.getId()));

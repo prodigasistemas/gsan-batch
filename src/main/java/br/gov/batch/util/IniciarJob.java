@@ -37,12 +37,16 @@ public class IniciarJob implements Batchlet{
     
 	public String process() throws Exception {
 	    logger.info("Inicio do batch");
+	    
+	    Integer idProcessoIniciado = Integer.valueOf(util.parametroDoJob("idProcessoIniciado"));
 
-	    Processo processo = processoBO.obterProcessoBatch(Integer.valueOf(util.parametroDoJob("idProcessoIniciado")));
+	    Processo processo = processoBO.obterProcessoBatch(idProcessoIniciado);
 	    
 	    logger.info(processo.getDescricao());
 	    
 	    ProcessoAtividade atividade = processo.getAtividades().get(0);
+	    
+	    atividadeBO.cadastrarAtividadesDoProcesso(idProcessoIniciado);
 	    
 	    logger.info("Nome atividade: "  + atividade.getNomeArquivoBatch());
 	    

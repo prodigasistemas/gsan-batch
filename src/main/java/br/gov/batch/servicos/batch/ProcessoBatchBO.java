@@ -1,16 +1,15 @@
 package br.gov.batch.servicos.batch;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.batch.to.ControleAtividadeTO;
+import br.gov.batch.to.ControleExecucaoTO;
 import br.gov.model.batch.ControleProcessoAtividade;
 import br.gov.model.batch.Processo;
 import br.gov.model.batch.ProcessoAtividade;
+import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ControleProcessoAtividadeRepositorio;
 import br.gov.servicos.batch.ProcessoIniciadoRepositorio;
 
@@ -33,30 +32,62 @@ public class ProcessoBatchBO {
         
         return processo;
     }
-
-    public ControleAtividadeTO iniciarProximaAtividadeBatch(Integer idProcessoIniciado, Integer idControleAtividade, Integer numeroItens) {
+    
+    public void finalizaAtividade(Integer idControleAtividade, ProcessoSituacao situacao) {
         ControleProcessoAtividade controleAtividade = repositorioControleAtividade.obterPorID(idControleAtividade);
+        controleAtividade.setSituacao((short) situacao.getId());
+        repositorioControleAtividade.atualizar(controleAtividade);
+    }
+    
+    public ControleExecucaoTO iniciarProximaAtividadeBatch(Integer idProcessoIniciado, Integer idControleAtividade, Integer numeroItens) {
+        ProcessoAtividade atividade = obterProximaAtividade(idControleAtividade);
         
-        final short ordem = controleAtividade.getAtividade().getOrdemExecucao();
+        ControleExecucaoTO to = null;
         
-        Processo processo = obterProcessoBatch(idProcessoIniciado);
-        
-        List<ProcessoAtividade> atividades = processo.getAtividades().stream()
-                .filter(e -> e.getOrdemExecucao().shortValue() > ordem)
-                .collect(Collectors.toList());
-        
-        ControleAtividadeTO to = null;
-        
-        if (!atividades.isEmpty()){
-            ControleProcessoAtividade controle = atividadeBO.cadastrarAtividade(idProcessoIniciado
-                    , atividades.get(0).getNomeArquivoBatch()
+        if (atividade != null){
+            ControleProcessoAtividade controle = atividadeBO.prepararAtividade(idProcessoIniciado
+                    , atividade.getNomeArquivoBatch()
                     , numeroItens);
             
             controle.getAtividade().getNomeArquivoBatch();
             
-            to = new ControleAtividadeTO(controle.getAtividade().getNomeArquivoBatch(), controle.getId());
+            to = new ControleExecucaoTO(controle.getId()
+                    , controle.getTotalItens()
+                    , controle.getAtividade().getLimiteExecucao()
+                    , controle.getAtividade().getDescricao()
+                    , controle.getAtividade().getNomeArquivoBatch());
         }
 
         return to;
+    }
+
+    public boolean continuaExecucao(Integer idProcessoIniciado, Integer idControleAtividade) {
+        ProcessoAtividade atividade = obterProximaAtividade(idControleAtividade); 
+        
+        ControleProcessoAtividade proximaAtividade = repositorioControleAtividade.obterExecucaoExistente(idProcessoIniciado, atividade.getId());
+        
+        return proximaAtividade.concluidaComErro() || proximaAtividade.execucaoCancelada() || proximaAtividade.emEspera();
+    }
+    
+    public boolean atividadeProcessaVariosItens(Integer idControleAtividade) {
+        ProcessoAtividade atividade = obterProximaAtividade(idControleAtividade); 
+
+        return atividade.isProcessaVariosItens();
+    }
+    
+    public ProcessoAtividade obterProximaAtividade(Integer idControleAtividade){
+        ControleProcessoAtividade controleAtividade = repositorioControleAtividade.obterPorID(idControleAtividade);
+        
+        final short ordem = controleAtividade.getAtividade().getOrdemExecucao();
+        
+        Processo processo = controleAtividade.getAtividade().getProcesso();
+        
+        processo.getAtividades().sort(Comparator.comparing(e -> e.getOrdemExecucao()));
+        
+        ProcessoAtividade atividade = processo.getAtividades().stream()
+                .filter(e -> e.getOrdemExecucao().shortValue() > ordem)
+                .findFirst().get();
+        
+        return atividade;
     }
 }

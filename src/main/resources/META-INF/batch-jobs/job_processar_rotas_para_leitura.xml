@@ -16,6 +16,6 @@
 	</step>
 
 	<step id="finaliza_atividade">
-		<batchlet ref="finalizarAtividadeJob"/>
+		<batchlet ref="finalizarAtividade"/>
 	</step>
 </job>

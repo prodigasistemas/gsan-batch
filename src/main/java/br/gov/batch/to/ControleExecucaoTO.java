@@ -3,21 +3,24 @@ package br.gov.batch.to;
 public class ControleExecucaoTO {
     private Integer idControle;
     
+    private String nomeArquivoBatch;
+    
     private String descAtividade;
     
     private Integer totalItens;
     
-    private Short maximoItens;
+    private Short maximoExecucoes;
     
     private Short itensEmExecucao = (short) 0;
     
     private Integer itensExecutados = new Integer(0);
 
-    public ControleExecucaoTO(Integer idControle, Integer totalItens, Short maximoItens, String descAtividade) {
+    public ControleExecucaoTO(Integer idControle, Integer totalItens, Short maximoExecucoes, String descAtividade, String nomeArquivo) {
         this.idControle = idControle;
         this.totalItens = totalItens;
-        this.maximoItens = maximoItens;
+        this.maximoExecucoes = maximoExecucoes;
         this.descAtividade = descAtividade;
+        this.nomeArquivoBatch = nomeArquivo;
     }
     
     public boolean execucaoConcluida(){
@@ -25,7 +28,7 @@ public class ControleExecucaoTO {
     }
     
     public boolean estaNoLimite(){
-        return maximoItens.shortValue() == itensEmExecucao.shortValue();
+        return maximoExecucoes.shortValue() == itensEmExecucao.shortValue();
     }
     
     public void finalizaItem(){
@@ -49,11 +52,11 @@ public class ControleExecucaoTO {
     public void setTotalItens(Integer totalItens) {
         this.totalItens = totalItens;
     }
-    public Short getMaximoItens() {
-        return maximoItens;
+    public Short getMaximoExecucoes() {
+        return maximoExecucoes;
     }
-    public void setMaximoItens(Short maximoItens) {
-        this.maximoItens = maximoItens;
+    public void setMaximoExecucoes(Short maximoItens) {
+        this.maximoExecucoes = maximoItens;
     }
     public Integer getItensExecutados() {
         return itensExecutados;
@@ -72,5 +75,15 @@ public class ControleExecucaoTO {
     }
     public void setDescAtividade(String descAtividade) {
         this.descAtividade = descAtividade;
+    }
+    public String getNomeArquivoBatch() {
+        return nomeArquivoBatch;
+    }
+    public void setNomeArquivoBatch(String nomeArquivoBatch) {
+        this.nomeArquivoBatch = nomeArquivoBatch;
+    }
+    public String toString() {
+        return "ControleExecucaoTO [idControle=" + idControle + ", descAtividade=" + descAtividade + ", totalItens=" + totalItens + ", maximoExecucoes="
+                + maximoExecucoes + ", itensEmExecucao=" + itensEmExecucao + ", itensExecutados=" + itensExecutados + "]";
     }
 }

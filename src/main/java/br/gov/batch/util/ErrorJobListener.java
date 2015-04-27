@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
+import br.gov.batch.servicos.batch.ProcessoBatchBO;
 import br.gov.model.batch.Processo;
 import br.gov.model.batch.ProcessoSituacao;
 import br.gov.servicos.batch.ProcessoRepositorio;
@@ -22,6 +23,9 @@ public class ErrorJobListener implements JobListener{
 
     @EJB
     private ProcessoRepositorio repositorio;
+    
+    @EJB
+    private ProcessoBatchBO processoBO;
     
     @Inject
     protected JobContext jobCtx;
@@ -39,6 +43,12 @@ public class ErrorJobListener implements JobListener{
             
             repositorio.terminaExecucaoProcesso(idProcessoIniciado, ProcessoSituacao.CONCLUIDO_COM_ERRO);
             
+            if (util.parametroDoJob("idControleAtividade") != null){
+                Integer idControleAtividade = Integer.valueOf(util.parametroDoJob("idControleAtividade"));
+                
+                processoBO.finalizaAtividade(idControleAtividade, ProcessoSituacao.CONCLUIDO_COM_ERRO);
+            }
+
             logger.error(util.parametroDoJob("idProcessoIniciado"), "Erro ao concluir processo: " + processo.getDescricao());
         }
     }

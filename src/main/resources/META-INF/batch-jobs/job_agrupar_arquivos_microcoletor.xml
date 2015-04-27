@@ -3,15 +3,23 @@
 		<listener ref="errorJobListener"/>
 	</listeners>
 	
+	<step id="iniciar_atividade" next="agrupar_arquivos">
+		<batchlet ref="iniciarAtividadeJob"/>
+	</step>
+	
 	<step id="agrupar_arquivos" next="finaliza_atividade">
 		<chunk item-count="1">
 			<reader ref="dummyItemReader"/>
 			<processor ref="agruparArquivosMicrocoletor" />
 			<writer ref="dummyItemWriter" />
-		</chunk>	
-	</step> 
-
+		</chunk>
+	</step>
+	
 	<step id="finaliza_atividade">
-		<batchlet ref="chamarProximaAtividadeJob"/>
+		<batchlet ref="finalizarAtividade">
+			<properties>
+				<property name="CONCLUIR" value="true" />
+			</properties>
+		</batchlet>
 	</step>
 </job>

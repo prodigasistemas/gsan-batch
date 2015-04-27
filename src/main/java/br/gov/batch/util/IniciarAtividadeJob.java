@@ -6,10 +6,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
-import br.gov.batch.servicos.batch.ControleExecucaoBO;
-import br.gov.batch.servicos.batch.ProcessoAtividadeBO;
-import br.gov.batch.servicos.batch.ProcessoBatchBO;
-import br.gov.batch.to.ControleExecucaoTO;
 
 @Named
 public class IniciarAtividadeJob implements Batchlet{
@@ -17,22 +13,10 @@ public class IniciarAtividadeJob implements Batchlet{
     private BatchUtil util;
     
     @EJB
-    private ProcessoBatchBO processoBO;
-    
-    @EJB
-    private ProcessoAtividadeBO atividadeBO;
-    
-    @EJB
     private ControleExecucaoAtividade controleExecucao;
     
-    @EJB
-    private ControleExecucaoBO controleBO;
-    
-    
     public String process() throws Exception {
-        ControleExecucaoTO execucao = controleBO.criaExecucaoAtividade(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
-        
-        controleExecucao.cadastraExecucao(execucao);
+        controleExecucao.iniciaExecucao(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
 
 		return null;
 	}

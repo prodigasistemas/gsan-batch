@@ -1,4 +1,8 @@
 <job id="job_finalizar_processamento"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<listeners>
+		<listener ref="errorJobListener"/>
+	</listeners>
+
 	<step id="mudar_status_job_para_concluido" next="apagar_parametros_temporarios">
 		<batchlet ref="alterarStatusJob">
 			<properties>

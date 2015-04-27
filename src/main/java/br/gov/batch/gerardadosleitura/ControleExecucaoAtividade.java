@@ -21,8 +21,10 @@ public class ControleExecucaoAtividade {
     
     public synchronized void cadastraExecucao(ControleExecucaoTO execucao){
         map.put(execucao.getIdControle(), execucao);
-        
-        ControleProcessoAtividade controle = repositorio.obterPorID(execucao.getIdControle());
+    }
+    
+    public synchronized void iniciaExecucao(Integer idControleExecucao){
+        ControleProcessoAtividade controle = repositorio.obterPorID(idControleExecucao);
         controle.setSituacao((short) ProcessoSituacao.EM_PROCESSAMENTO.getId());
         repositorio.atualizar(controle);
     }
