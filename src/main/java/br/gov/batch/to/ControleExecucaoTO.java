@@ -3,8 +3,6 @@ package br.gov.batch.to;
 public class ControleExecucaoTO {
     private Integer idControle;
     
-    private String nomeArquivoBatch;
-    
     private String descAtividade;
     
     private Integer totalItens;
@@ -15,12 +13,11 @@ public class ControleExecucaoTO {
     
     private Integer itensExecutados = new Integer(0);
 
-    public ControleExecucaoTO(Integer idControle, Integer totalItens, Short maximoExecucoes, String descAtividade, String nomeArquivo) {
+    public ControleExecucaoTO(Integer idControle, Integer totalItens, Short maximoExecucoes, String descAtividade) {
         this.idControle = idControle;
         this.totalItens = totalItens;
         this.maximoExecucoes = maximoExecucoes;
         this.descAtividade = descAtividade;
-        this.nomeArquivoBatch = nomeArquivo;
     }
     
     public boolean execucaoConcluida(){
@@ -75,12 +72,6 @@ public class ControleExecucaoTO {
     }
     public void setDescAtividade(String descAtividade) {
         this.descAtividade = descAtividade;
-    }
-    public String getNomeArquivoBatch() {
-        return nomeArquivoBatch;
-    }
-    public void setNomeArquivoBatch(String nomeArquivoBatch) {
-        this.nomeArquivoBatch = nomeArquivoBatch;
     }
     public String toString() {
         return "ControleExecucaoTO [idControle=" + idControle + ", descAtividade=" + descAtividade + ", totalItens=" + totalItens + ", maximoExecucoes="

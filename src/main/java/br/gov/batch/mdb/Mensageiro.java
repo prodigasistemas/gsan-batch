@@ -16,8 +16,8 @@ import javax.jms.ObjectMessage;
 
 import org.jboss.logging.Logger;
 
-import br.gov.model.batch.ProcessoIniciado;
 import br.gov.servicos.batch.ProcessoParametroRepositorio;
+import br.gov.servicos.to.MensagemAtividadeTO;
 
 @JMSDestinationDefinitions({
 	 @JMSDestinationDefinition(name = "java:global/jms/processosFila",
@@ -36,17 +36,22 @@ public class Mensageiro implements MessageListener {
 	@EJB
 	private ProcessoParametroRepositorio repositorio;
 	
-    public void onMessage(Message mensagem) {
+    public void onMessage(Message param) {
         try {
-        	ProcessoIniciado processo = (ProcessoIniciado) ((ObjectMessage) mensagem).getObject();
+            MensagemAtividadeTO mensagem = (MensagemAtividadeTO) ((ObjectMessage) param).getObject();
         	
-            logger.info("Processo recebido: " + processo);
+            logger.info(String.format("Processo [%s] - Atividade a ser iniciada [%s]"
+                    , mensagem.getNomeProcesso()
+                    , mensagem.getNomeAtividade()
+            ));
             
-            Properties processoParametros = repositorio.buscarParametrosPorProcessoIniciado(processo);
+            Properties processoParametros = repositorio.buscarParametrosPorProcessoIniciado(mensagem.getIdProcessoIniciado());
+            
+            processoParametros.put("idControleAtividade", String.valueOf(mensagem.getIdControleAtividade()));
             
             JobOperator jo = BatchRuntime.getJobOperator();
             
-            jo.start(processo.getProcesso().getNomeArquivoBatch(), processoParametros);
+            jo.start(mensagem.getNomeArquivo(), processoParametros);
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);
         }
