@@ -30,10 +30,10 @@ public class IniciaProcessamentoRota implements ItemProcessor {
 	private BatchUtil util;
 
 	@Inject
-	private ControleExecucaoAtividade controle;
-
-	@Inject
 	private ProcessoIniciadoRepositorio repositorio;
+	
+    @Inject
+    private ControleExecucaoAtividade controle;
 
 	public IniciaProcessamentoRota() {
 	}
@@ -51,22 +51,23 @@ public class IniciaProcessamentoRota implements ItemProcessor {
             processoParametros.put("idProcessoIniciado" , util.parametroDoJob("idProcessoIniciado"));
             processoParametros.put("anoMesFaturamento"  , util.parametroDoJob("anoMesFaturamento"));
             processoParametros.put("idGrupoFaturamento" , util.parametroDoJob("idGrupoFaturamento"));
-            processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
             processoParametros.put("vencimentoContas"   , util.parametroDoJob("vencimentoContas"));
+            processoParametros.put("idControleAtividade", util.parametroDoJob("idControleAtividade"));
             processoParametros.put("idRota"             , idRota);
 
 			JobOperator jo = BatchRuntime.getJobOperator();
 
 			Long executionRota = null;
-
+			
 			if (rota.getLeituraTipo().intValue() == LeituraTipo.LEITURA_E_ENTRADA_SIMULTANEA.getId()) {
 				executionRota = jo.start("job_processar_rota_leitura_entrada_simultanea", processoParametros);
 			} else {
 				executionRota = jo.start("job_processar_rota_convencional", processoParametros);
 			}
+
+			controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
 			
 			logger.logBackgroud(String.format("[executionId: %s] - Rota [%s] marcada para processamento. Tipo de leitura: " + LeituraTipo.findById(rota.getLeituraTipo()), executionRota, param));
-			controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
 		}
 
 		return param;

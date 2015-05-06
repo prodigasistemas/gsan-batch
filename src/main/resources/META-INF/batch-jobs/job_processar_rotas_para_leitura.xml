@@ -1,21 +1,14 @@
 <job id="job_processar_rotas_para_leitura"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="errorJobListener"/>
+		<listener ref="iniciaAtividadeJobListener"/>
 	</listeners>
 
-	<step id="iniciar_atividade" next="processar_rotas">
-		<batchlet ref="iniciarAtividadeJob"/>
-	</step>
-
-	<step id="processar_rotas" next="finaliza_atividade">
+	<step id="processar_rotas">
 		<chunk item-count="1">
 			<reader ref="carregarRotas"/>
 			<processor ref="iniciaProcessamentoRota" />
 			<writer ref="dummyItemWriter" />
 		</chunk>
-	</step>
-
-	<step id="finaliza_atividade">
-		<batchlet ref="finalizarAtividadeJob"/>
 	</step>
 </job>

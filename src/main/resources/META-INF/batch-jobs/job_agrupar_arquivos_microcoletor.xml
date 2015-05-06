@@ -1,17 +1,15 @@
 <job id="job_agrupar_arquivos_microcoletor"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
 		<listener ref="errorJobListener"/>
+		<listener ref="iniciaAtividadeJobListener"/>
+		<listener ref="finalizaAtividadeJobListener"/>
 	</listeners>
 	
-	<step id="agrupar_arquivos" next="finaliza_atividade">
+	<step id="agrupar_arquivos">
 		<chunk item-count="1">
 			<reader ref="dummyItemReader"/>
 			<processor ref="agruparArquivosMicrocoletor" />
 			<writer ref="dummyItemWriter" />
-		</chunk>	
-	</step> 
-
-	<step id="finaliza_atividade">
-		<batchlet ref="chamarProximaAtividadeJob"/>
+		</chunk>
 	</step>
 </job>
