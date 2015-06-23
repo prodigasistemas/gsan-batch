@@ -59,10 +59,10 @@ public class IniciaGeracaoArquivoRota implements ItemProcessor {
 			processoParametros.put("idRota"             , idRota);
 
 			JobOperator jo = BatchRuntime.getJobOperator();
-
+			
 			Long executionRota = null;
 			if (rota.getLeituraTipo().intValue() == LeituraTipo.LEITURA_E_ENTRADA_SIMULTANEA.getId()) {
-				executionRota = jo.start("job_gerar_arquivo", processoParametros);
+				executionRota = jo.start("job_gerar_arquivo_leitura_entrada_simultanea", processoParametros);
 			} else if (rota.getLeituraTipo().intValue() == LeituraTipo.MICROCOLETOR.getId()) {
 				executionRota = jo.start("job_gerar_arquivo_microcoletor", processoParametros);
 			}

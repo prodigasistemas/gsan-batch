@@ -1,6 +1,7 @@
-<job id="job_gerar_arquivo" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="job_gerar_arquivo_leitura_entrada_simultanea" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<listeners>
-		<listener ref="controleExecucaoAtividadeJobListener"/>
+		<listener ref="finalizaAtividadeJobListener"/>
+		<listener ref="errorJobListener"/>
 	</listeners>
 	
 	<step id="gerarArquivo">

@@ -1,9 +1,10 @@
 <job id="job_processar_rotas_para_gerar_arquivo"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
-	<step id="iniciar_atividade" next="processar_rotas">
-		<batchlet ref="iniciarAtividadeJob"/>
-	</step>
+	<listeners>
+		<listener ref="errorJobListener"/>
+		<listener ref="iniciaAtividadeJobListener"/>
+	</listeners>
 
-	<step id="processar_rotas" next="finaliza_atividade">
+	<step id="processar_rotas">
 		<properties>
 			<property name="javax.transaction.global.timeout" value="1200"/>
 		</properties>
@@ -12,9 +13,5 @@
 			<processor ref="iniciaGeracaoArquivoRota" />
 			<writer ref="dummyItemWriter" />
 		</chunk>
-	</step>
-
-	<step id="finaliza_atividade">
-		<batchlet ref="finalizarAtividadeJob"/>
 	</step>
 </job>

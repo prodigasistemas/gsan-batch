@@ -19,11 +19,12 @@ public class ControleExecucaoAtividade {
     @EJB
     private ControleProcessoAtividadeRepositorio repositorio;
     
-    public synchronized void cadastraExecucao(ControleExecucaoTO execucao){
+    public synchronized void iniciaExecucao(ControleExecucaoTO execucao){
         map.put(execucao.getIdControle(), execucao);
         
         ControleProcessoAtividade controle = repositorio.obterPorID(execucao.getIdControle());
         controle.setSituacao((short) ProcessoSituacao.EM_PROCESSAMENTO.getId());
+        controle.setItensProcessados(0);
         repositorio.atualizar(controle);
     }
     
@@ -39,6 +40,7 @@ public class ControleExecucaoAtividade {
     public synchronized void finalizaProcessamentoItem(Integer idControle){
         ControleExecucaoTO execucao = map.get(idControle);
         execucao.finalizaItem();
+        
         ControleProcessoAtividade controle = repositorio.obterPorID(idControle);
         controle.setItensProcessados(execucao.getItensExecutados());
         repositorio.atualizar(controle);

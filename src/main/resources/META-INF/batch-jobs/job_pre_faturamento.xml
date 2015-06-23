@@ -1,6 +1,0 @@
-<job id="job_pre_faturamento"  xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
-	<step id="iniciarProcessamento">
-		<batchlet ref="iniciarJob">
-		</batchlet>	
-	</step>	
-</job>
