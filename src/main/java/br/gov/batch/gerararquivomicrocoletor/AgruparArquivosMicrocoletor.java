@@ -73,9 +73,13 @@ public class AgruparArquivosMicrocoletor implements ItemProcessor {
 
 		// TODO: Grupo microcoletor possui rotas atendidas por empresas diferentes
 		List<Rota> rotas = rotaRepositorio.obterPeloGrupoETipoLeitura(idGrupo, LeituraTipo.MICROCOLETOR);
-
+		
 		if (!rotas.isEmpty()) {
 			empresa = rotas.get(0).getEmpresa();
+		}else{
+	        logger.info("Nao ha rotas para microcoletores");
+	        
+		    return param;
 		}
 
 		logger.info("Agrupando os arquivos de microcoletor para o grupo");
