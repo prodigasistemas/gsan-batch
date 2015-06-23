@@ -1,5 +1,7 @@
 package br.gov.batch.gerararquivo;
 
+import java.util.Date;
+
 import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -23,10 +25,8 @@ public class GerarArquivoRota implements ItemProcessor {
 	public Object processItem(Object param) throws Exception {
 		Integer idRota = Integer.valueOf(util.parametroDoJob("idRota"));
 		
-		//gerarArquivoBO.gerar(idRota, new Date());
+		gerarArquivoBO.gerar(idRota, new Date());
 		
-		Thread.sleep(50);
-
 		return param;
 	}
 }
