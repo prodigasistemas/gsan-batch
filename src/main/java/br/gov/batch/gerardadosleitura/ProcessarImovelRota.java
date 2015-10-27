@@ -56,8 +56,7 @@ public class ProcessarImovelRota implements ItemProcessor {
                 to.setDataVencimentoConta(converterStringParaData(vencimento, FormatoData.DIA_MES_ANO));
                 to.setIdImovel(imovel.getId());
                 
-                Thread.sleep(10);
-//                faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
+                faturamentoImovelBO.preDeterminarFaturamentoImovel(to);
             }
         }
         
