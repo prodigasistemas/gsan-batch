@@ -1,11 +1,73 @@
-#Adiciona o modulo do postgres no wildfly
+#!/bin/bash
 
-./jboss-cli.sh --connect --commands='module add --name=org.postgresql --resources=<caminho_arquivo>/<nome_arquivo>.jar --dependencies=javax.api'
+echo
+echo "======================================="
+echo "ATENCAO: O Wildfly deve estar iniciado!"
+echo "======================================="
+echo
 
-#Configura o driver
+if [ -z "$WILDFLY_HOME" ]; then
+  echo "Informe o caminho do wildfly"
+  read WILDFLY_HOME
+fi
 
-./jboss-cli.sh --connect --commands='./subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres", driver-module-name="org.postgresql", driver-xa-datasource-class-name="org.postgresql.xa.PGXADataSource")'
+if [ ! -d "$WILDFLY_HOME" ]; then
+  echo "O caminho $WILDFLY_HOME nao e um diretorio!"
+  exit 1
+fi
 
-#Cria o datasource
+if [ ! -e "$WILDFLY_HOME" ]; then
+  echo "O diretorio $WILDFLY_HOME nao foi encontrado!"
+  exit 1
+fi
 
-./jboss-cli.sh --connect --commands='./subsystem=datasources/data-source=GsanDS:add(jndi-name=java:/jboss/datasources/GsanDS,connection-url= jdbc:postgresql://<ip_server>:5432/<database>,  driver-name=postgres, user-name=<usuer> , password=<passowrd>)'
+export JBOSS_HOME=$WILDFLY_HOME
+
+echo "Informe o caminho com o nome do arquivo do driver jdbc do postgresql"
+read DRIVER_POSTGRESQL
+
+if [ ! -e "$DRIVER_POSTGRESQL" ]; then
+  echo "O arquivo $DRIVER_POSTGRESQL nao foi encontrado!"
+  exit 1
+fi
+
+echo "Informe o IP do servidor de banco de dados (padrao: localhost)"
+read SERVER_IP
+
+[ -z "$SERVER_IP" ] && SERVER_IP=localhost
+
+echo "Informe a porta do servidor de banco de dados (padrao: 5432)"
+read SERVER_PORT
+
+[ -z "$SERVER_PORT" ] && SERVER_PORT=5432
+
+echo "Informe o nome do usuario do servidor de banco de dados"
+read PG_USER
+
+if [ -z "$PG_USER" ]; then
+  echo "Informe o usuario de acesso ao banco de dados!"
+  exit 1
+fi
+
+echo "Informe a senha do usuario do servidor de banco de dados"
+read PG_PASSWORD
+
+if [ -z "$PG_PASSWORD" ]; then
+  echo "Informe a senha de acesso ao banco de dados!"
+  exit 1
+fi
+
+echo "> Adicionando o modulo do postgres no wildfly ..."
+
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --commands="module add --name=org.postgresql --resources=$DRIVER_POSTGRESQL --dependencies=javax.api"
+
+echo "> Configurando o driver ..."
+
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --commands='./subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres", driver-module-name="org.postgresql", driver-xa-datasource-class-name="org.postgresql.xa.PGXADataSource")'
+
+echo "> Criando o datasource ..."
+
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --commands="./subsystem=datasources/data-source=GsanDS:add(jndi-name=java:/jboss/datasources/GsanDS,connection-url=jdbc:postgresql://$SERVER_IP:$SERVER_PORT/<database>, driver-name=postgres, user-name=$PG_USER, password=$PG_PASSWORD)"
+
+echo "Operacao concluida com sucesso!"
+echo

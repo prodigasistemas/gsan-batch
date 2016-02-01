@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 
 if [ -z $1 ]; then
         echo "Precisa especificar qual arquivo ZIP sera implantado, exemplo: => sh deploy.sh gsan-operacional-1.0.0.war.zip"
