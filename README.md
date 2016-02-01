@@ -25,7 +25,7 @@ Configuração da aplicação Java:
 
   ```
   <datasource jndi-name="java:/jboss/datasources/GsanDS" pool-name="GsanDS" enabled="true">
-      <connection-url>jdbc:postgresql://IP:PORT/comercial</connection-url>
+      <connection-url>jdbc:postgresql://IP:PORT/BANCO</connection-url>
       <driver>postgres</driver>
       <security>
           <user-name>USER</user-name>
