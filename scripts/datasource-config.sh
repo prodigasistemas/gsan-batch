@@ -41,6 +41,11 @@ read SERVER_PORT
 
 [ -z "$SERVER_PORT" ] && SERVER_PORT=5432
 
+echo "Informe o nome do banco de dados (padrao: gsan_comercial)"
+read SERVER_DATABASE
+
+[ -z "$SERVER_DATABASE" ] && SERVER_DATABASE=gsan_comercial
+
 echo "Informe o nome do usuario do servidor de banco de dados"
 read PG_USER
 
@@ -67,7 +72,7 @@ $WILDFLY_HOME/bin/jboss-cli.sh --connect --commands='./subsystem=datasources/jdb
 
 echo "> Criando o datasource ..."
 
-$WILDFLY_HOME/bin/jboss-cli.sh --connect --commands="./subsystem=datasources/data-source=GsanDS:add(jndi-name=java:/jboss/datasources/GsanDS,connection-url=jdbc:postgresql://$SERVER_IP:$SERVER_PORT/<database>, driver-name=postgres, user-name=$PG_USER, password=$PG_PASSWORD)"
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --commands="./subsystem=datasources/data-source=GsanDS:add(jndi-name=java:/jboss/datasources/GsanDS,connection-url=jdbc:postgresql://$SERVER_IP:$SERVER_PORT/$SERVER_DATABASE, driver-name=postgres, user-name=$PG_USER, password=$PG_PASSWORD)"
 
 echo "Operacao concluida com sucesso!"
 echo
