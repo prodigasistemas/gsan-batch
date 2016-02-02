@@ -24,6 +24,12 @@ Configuração da aplicação Java:
 * Crie um datasource no arquivo standalone-full.xml com o jndi 'java:jboss/datasources/GsanDS' (o mesmo do persistence.xml)
 * Execute a aplicação com a versão full do wildfly (standalone-full.xml)
 
+**Execute o script interativo para realizar as operações automaticamente**
+
+``
+./scripts/datasource-config.sh
+``
+
 Passos de criação de um novo batch
 
 1. Criar um arquivo com o nome do batch na pasta resources/META-INF/batch-jobs/
