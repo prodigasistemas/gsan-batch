@@ -90,12 +90,9 @@ public class AguaEsgotoBO {
 				consumo += consumoHistorico.getNumeroConsumoCalculoMedia();
 				quantidadeDeMesesConsiderados++;
 
-				if (iterator.hasNext()) {
-					consumoHistorico = iterator.next();
-					referencia = consumoHistorico.getReferenciaFaturamento();
-				} else {
-					break;
-				}
+				if (!iterator.hasNext()) break; 
+				consumoHistorico = iterator.next();
+				referencia = consumoHistorico.getReferenciaFaturamento();
 			} else {
 				quantidadeDeMesesRetroagidos++;
 			}
