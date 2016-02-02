@@ -22,23 +22,13 @@ Configuração da aplicação Java:
 
 * Instale o driver do postgres no Wildfly (pode usar a lib armazenada na pasta migracoes/drivers do projeto gsan-persistence)
 * Crie um datasource no arquivo standalone-full.xml com o jndi 'java:jboss/datasources/GsanDS' (o mesmo do persistence.xml)
-
-  ```
-  <datasource jndi-name="java:/jboss/datasources/GsanDS" pool-name="GsanDS" enabled="true">
-      <connection-url>jdbc:postgresql://IP:PORT/BANCO</connection-url>
-      <driver>postgres</driver>
-      <security>
-          <user-name>USER</user-name>
-          <password>PASSWORD</password>
-      </security>
-  </datasource>
-  <drivers>
-      <driver name="postgres" module="org.postgresql">
-          <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-      </driver>
-  </drivers>
-  ```
 * Execute a aplicação com a versão full do wildfly (standalone-full.xml)
+
+**Execute o script interativo para realizar as operações automaticamente**
+
+``
+./scripts/datasource-config.sh
+``
 
 Passos de criação de um novo batch
 
