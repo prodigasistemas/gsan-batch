@@ -1,7 +1,5 @@
 package br.gov.batch.servicos.arrecadacao;
 
-import java.util.Date;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -26,19 +24,20 @@ public class DebitoAutomaticoMovimentoBO {
 		DebitoAutomatico debitoAutomatico = debitoAutomaticoRepositorio.obterDebitoAutomaticoPorImovel(imovel.getId());
 		
 		if (debitoAutomatico != null){
-			DebitoAutomaticoMovimento debitoAutomaticoMovimento = new DebitoAutomaticoMovimento();
-			debitoAutomaticoMovimento.setDebitoAutomatico(debitoAutomatico);
-			debitoAutomaticoMovimento.setDataVencimento(conta.getDataVencimentoConta());
-			debitoAutomaticoMovimento.setContaGeral(conta.getContaGeral());
-			debitoAutomaticoMovimento.setFaturamentoGrupo(faturamentoGrupo);
-			debitoAutomaticoMovimento.setProcessamento(new Date());
-			debitoAutomaticoMovimento.setEnvioBanco(null);
-			debitoAutomaticoMovimento.setRetornoBanco(null);
-			debitoAutomaticoMovimento.setUltimaAlteracao(new Date());
-			debitoAutomaticoMovimento.setNumeroSequenciaArquivoEnviado(null);
-			debitoAutomaticoMovimento.setNumeroSequenciaArquivoRecebido(null);
+			DebitoAutomaticoMovimento debitoAutomaticoMovimento = buildMovimentoDebitoAutomatico(conta, debitoAutomatico, faturamentoGrupo);
 			
 			debitoAutomaticoMovimentoRepositorio.inserir(debitoAutomaticoMovimento);
 		}
+	}
+	
+	public DebitoAutomaticoMovimento buildMovimentoDebitoAutomatico(Conta conta, DebitoAutomatico debitoAutomatico, FaturamentoGrupo faturamentoGrupo){
+	    return new DebitoAutomaticoMovimento(). new Builder()
+	            .debitoAutomatico(debitoAutomatico)
+	            .contaGeral(conta.getContaGeral())
+	            .faturamentoGrupo(faturamentoGrupo)
+	            .dataVencimento(conta.getDataVencimentoConta())
+	            .atualizaProcessamento()
+	            .atualizaUltimaAlteracao()
+	            .build();
 	}
 }

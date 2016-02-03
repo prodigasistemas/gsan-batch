@@ -28,7 +28,7 @@ public class ContaCategoriaBO {
 		contaCategoriaRepositorio.inserir(contasCategoria);
 	}
 	
-	private Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Integer idConta, Collection<ICategoria> colecaoCategorias) throws Exception {
+	public Collection<ContaCategoria> gerarContaCategoriaValoresZerados(Integer idConta, Collection<ICategoria> colecaoCategorias) throws Exception {
 		Collection<ContaCategoria> helper = new ArrayList<ContaCategoria>();
 		
 		ContaCategoria contaCategoria = null;
