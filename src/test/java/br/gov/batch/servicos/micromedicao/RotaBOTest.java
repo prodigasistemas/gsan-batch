@@ -187,7 +187,7 @@ public class RotaBOTest {
 		
 		long total = rotaBO.totalImoveisParaPreFaturamento(rota1.getId());
 		
-		assertEquals((long) totalImoveis, total);
+		assertEquals(totalImoveis, total);
 	}
 	
 	@Test
@@ -197,7 +197,7 @@ public class RotaBOTest {
 		
 		long total = rotaBO.totalImoveisParaPreFaturamento(rota1.getId());
 		
-		assertEquals((long) totalImoveis, total);
+		assertEquals(totalImoveis, total);
 	}
 	
 	@Test
@@ -207,7 +207,7 @@ public class RotaBOTest {
 		
 		long total = rotaBO.totalImoveisParaLeitura(rota1.getId());
 		
-		assertEquals((long) totalImoveis, total);
+		assertEquals(totalImoveis, total);
 	}
 	
 	@Test
@@ -217,7 +217,7 @@ public class RotaBOTest {
 		
 		long total = rotaBO.totalImoveisParaLeitura(rota1.getId());
 		
-		assertEquals((long) totalImoveis, total);
+		assertEquals(totalImoveis, total);
 	}
 
 	private void carregarRotaAlternativaMock(boolean rotaAlternativa) {
