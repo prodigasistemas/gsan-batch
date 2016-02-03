@@ -24,7 +24,7 @@ import br.gov.servicos.faturamento.ImpostoTipoRepositorio;
 import br.gov.servicos.to.ImpostosDeduzidosContaTO;
 
 @RunWith(EasyMockRunner.class)
-public class ImpostoContaBOTest {
+public class ImpostosContaBOTest {
 
 	@TestSubject
 	private ImpostosContaBO bo;
