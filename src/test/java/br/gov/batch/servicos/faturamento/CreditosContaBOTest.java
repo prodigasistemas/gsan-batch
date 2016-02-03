@@ -1,4 +1,4 @@
-package br.gov.faturamento.servicos;
+package br.gov.batch.servicos.faturamento;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
