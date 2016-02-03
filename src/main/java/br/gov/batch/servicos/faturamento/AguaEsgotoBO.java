@@ -61,12 +61,14 @@ public class AguaEsgotoBO {
 		
 		List<ConsumoHistorico> listaConsumoHistorico = consumoHistoricoRepositorio.obterConsumoMedio(
 				idImovel, novaDataInicio, dataFim, idLigacaoTipo);
-
-		if (listaConsumoHistorico != null && !listaConsumoHistorico.isEmpty()) {
-			return gerarVolumeMedioComConsumoHistorico(listaConsumoHistorico, dataInicio, dataFim);
-		} else {
-			return gerarVolumeMedioSemConsumoHistorico(idImovel);
-		}
+		
+		return gerarVolumeMedio(listaConsumoHistorico, dataInicio, dataFim, idImovel);
+	}
+	
+	private VolumeMedioAguaEsgotoTO gerarVolumeMedio(List<ConsumoHistorico> listaConsumoHistorico, Integer dataInicio, Integer dataFim, Integer idImovel){
+		if (listaConsumoHistorico == null || listaConsumoHistorico.isEmpty()) return gerarVolumeMedioSemConsumoHistorico(idImovel);
+		
+		return gerarVolumeMedioComConsumoHistorico(listaConsumoHistorico, dataInicio, dataFim);
 	}
 
 	private VolumeMedioAguaEsgotoTO gerarVolumeMedioComConsumoHistorico(List<ConsumoHistorico> listaConsumoHistorico,
@@ -88,12 +90,9 @@ public class AguaEsgotoBO {
 				consumo += consumoHistorico.getNumeroConsumoCalculoMedia();
 				quantidadeDeMesesConsiderados++;
 
-				if (iterator.hasNext()) {
-					consumoHistorico = iterator.next();
-					referencia = consumoHistorico.getReferenciaFaturamento();
-				} else {
-					break;
-				}
+				if (!iterator.hasNext()) break; 
+				consumoHistorico = iterator.next();
+				referencia = consumoHistorico.getReferenciaFaturamento();
 			} else {
 				quantidadeDeMesesRetroagidos++;
 			}
