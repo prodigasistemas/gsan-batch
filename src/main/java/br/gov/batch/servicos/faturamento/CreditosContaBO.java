@@ -14,7 +14,6 @@ import br.gov.model.faturamento.CreditoRealizado;
 import br.gov.model.faturamento.CreditoRealizadoCategoria;
 import br.gov.model.faturamento.CreditoRealizar;
 import br.gov.model.faturamento.CreditoRealizarCategoria;
-import br.gov.model.faturamento.CreditoTipo;
 import br.gov.model.faturamento.DebitoCreditoSituacao;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
@@ -57,13 +56,8 @@ public class CreditosContaBO {
 			creditosConta.somaValorTotalCreditos(valorCredito);
 
 			criarAtividadeGrupoFaturamento(creditoRealizar, valorCredito);
-
-			if (creditosConta.possuiCreditoTipo(creditoRealizar.getCreditoTipo())) {
-				BigDecimal valorTotal = somaValorCreditoTipoEValorCreditoParcelaMes(creditoRealizar.getCreditoTipo(), valorCredito);
-				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorTotal);
-			} else {
-				creditosConta.putValoresPorCreditoTipo(creditoRealizar.getCreditoTipo(), valorCredito);
-			}
+			
+			creditosConta.atualizarValorCredito(creditoRealizar.getCreditoTipo(), valorCredito);
 		}
 
 		return creditosConta;
@@ -107,7 +101,7 @@ public class CreditosContaBO {
 		return colecaoCreditosRealizadoCategoria;
 	}
 
-	private Collection<Categoria> obterColecaoCategorias(Integer idCreditoRealizar) {
+	public Collection<Categoria> obterColecaoCategorias(Integer idCreditoRealizar) {
 		Collection<CreditoRealizarCategoria> colecaoCreditoARealizarCategoria = creditoRealizarCategoriaRepositorio.buscarCreditoRealizarCategoria(idCreditoRealizar);
 
 		Iterator<CreditoRealizarCategoria> colecaoCreditoARealizarCategoriaIterator = colecaoCreditoARealizarCategoria.iterator();
@@ -123,29 +117,15 @@ public class CreditosContaBO {
 		return colecaoCategorias;
 	}
 
-	private CreditoRealizado criarCreditoRealizado(CreditoRealizar creditoRealizar, BigDecimal valorCredito) {
-		CreditoRealizado creditoRealizado = new CreditoRealizado();
-		creditoRealizado.setCreditoTipo(creditoRealizar.getCreditoTipo());
-		creditoRealizado.setCreditoRealizado(creditoRealizar.getGeracaoCredito());
-		creditoRealizado.setLancamentoItemContabil(creditoRealizar.getLancamentoItemContabil());
-		creditoRealizado.setLocalidade(creditoRealizar.getLocalidade());
-		creditoRealizado.setNumeroQuadra(creditoRealizar.getNumeroQuadra());
-		creditoRealizado.setCodigoSetorComercial(creditoRealizar.getCodigoSetorComercial());
-		creditoRealizado.setNumeroQuadra(creditoRealizar.getNumeroQuadra());
-		creditoRealizado.setNumeroLote(creditoRealizar.getNumeroLote());
-		creditoRealizado.setNumeroSublote(creditoRealizar.getNumeroSublote());
-		creditoRealizado.setAnoMesReferenciaCredito(creditoRealizar.getAnoMesReferenciaCredito());
-		creditoRealizado.setAnoMesCobrancaCredito(creditoRealizar.getAnoMesCobrancaCredito());
-		creditoRealizado.setValorCredito(valorCredito);
-		creditoRealizado.setCreditoOrigem(creditoRealizar.getCreditoOrigem());
-		creditoRealizado.setNumeroPrestacao(creditoRealizar.getNumeroPrestacaoCredito());
-		creditoRealizado.setNumeroParcelaBonus(creditoRealizar.getNumeroParcelaBonus());
-		creditoRealizado.setNumeroPrestacaoCredito(creditoRealizar.getNumeroPrestacaoRealizada());
-		creditoRealizado.setCreditoRealizarGeral(creditoRealizar.getCreditoRealizarGeral());
+	public CreditoRealizado criarCreditoRealizado(CreditoRealizar creditoRealizar, BigDecimal valorCredito) {
+		CreditoRealizado creditoRealizado = new CreditoRealizado().new Builder()
+		        .creditoRealizar(creditoRealizar)
+		        .valorCredito(valorCredito)
+		        .build();
 		return creditoRealizado;
 	}
 
-	private Collection<CreditoRealizar> creditosRealizar(Integer idImovel, Integer anoMesFaturamento) {
+	public Collection<CreditoRealizar> creditosRealizar(Integer idImovel, Integer anoMesFaturamento) {
 		Collection<CreditoRealizar> colecaoCreditosRealizar = creditoRealizarRepositorio.buscarCreditoRealizarPorImovel(
 		        idImovel, DebitoCreditoSituacao.NORMAL, anoMesFaturamento);
 
@@ -161,15 +141,5 @@ public class CreditosContaBO {
 		}
 
 		return colecaoCreditosRealizar;
-	}
-
-	public BigDecimal somaValorCreditoTipoEValorCreditoParcelaMes(CreditoTipo creditoTipo, BigDecimal valorCreditoParcelaMes) {
-		BigDecimal valorCreditoTipo = creditosConta.getValorCreditoTipo(creditoTipo);
-		
-		if (valorCreditoParcelaMes == null) {
-			valorCreditoParcelaMes = BigDecimal.ZERO;
-		}
-		
-		return valorCreditoTipo.add(valorCreditoParcelaMes);
 	}
 }

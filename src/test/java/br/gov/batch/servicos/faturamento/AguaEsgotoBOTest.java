@@ -71,9 +71,23 @@ public class AguaEsgotoBOTest {
 	}
 	
 	@Test
-	public void volumeMedioSemConsumoHistorico() {
+	public void volumeMedioComListaConsumoHistoricoNula() {
 		mockParametros();
 		mockConsumoHistoricoNulo();
+		mockCategoria();
+		mockConsumoTarifa();
+		mockConsumoMinimoPorLigacao();
+		
+		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(1, 201408, 1);
+		
+		assertEquals(30, volumeMedioAguaEsgotoTO.getConsumoMedio().intValue());
+		assertEquals(1, volumeMedioAguaEsgotoTO.getQuantidadeMesesConsiderados().intValue());
+	}
+	
+	@Test
+	public void volumeMedioComListaConsumoHistoricoVazia() {
+		mockParametros();
+		mockConsumoHistoricoVazio();
 		mockCategoria();
 		mockConsumoTarifa();
 		mockConsumoMinimoPorLigacao();
@@ -103,6 +117,11 @@ public class AguaEsgotoBOTest {
 	
 	private void mockConsumoHistoricoNulo() {
 		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(null);
+		replay(consumoHistoricoRepositorioMock);
+	}
+	
+	private void mockConsumoHistoricoVazio() {
+		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(new ArrayList<ConsumoHistorico>());
 		replay(consumoHistoricoRepositorioMock);
 	}
 	

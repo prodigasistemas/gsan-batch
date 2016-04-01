@@ -38,72 +38,64 @@ public class ImpostosContaBO {
 	private ImpostoDeduzidoTO impostoDeduzidoTO = null;
 
 	public ImpostosDeduzidosContaTO gerarImpostosDeduzidosConta(Integer idImovel, Integer anoMesReferencia, BigDecimal valorDebito, BigDecimal valorCredito) {
-
 		ImpostosDeduzidosContaTO retorno = new ImpostosDeduzidosContaTO();
 
-		try {
+		Cliente clienteFederal = clienteRepositorio.buscarClienteFederalResponsavelPorImovel(idImovel);
 
-			Cliente clienteFederal = clienteRepositorio.buscarClienteFederalResponsavelPorImovel(idImovel);
+		if (clienteFederal == null) {
+			retorno.setListaImpostosDeduzidos(null);
+			retorno.setValorTotalImposto(new BigDecimal("0.00"));
+			retorno.setValorBaseCalculo(new BigDecimal("0.00"));
 
-			if (clienteFederal == null){
-				retorno.setListaImpostosDeduzidos(null);
-				retorno.setValorTotalImposto(new BigDecimal("0.00"));
-				retorno.setValorBaseCalculo(new BigDecimal("0.00"));
-
-				return retorno;
-			}
-
-			inicializaValoresCalculo();
-
-			baseCalculo = new BigDecimal("0.00");
-
-			Iterator<ImpostoTipo> iteratorImpostoTipo = impostoTipoRepositorio.buscarImpostoTipoAtivos().iterator();
-
-			Collection<ImpostoDeduzidoTO> colecaoHelper = new ArrayList<ImpostoDeduzidoTO>();
-			ImpostoTipoAliquota impostoTipoAliquota = null;
-			ImpostoTipo impostoTipo = null;
-
-			while (iteratorImpostoTipo.hasNext()) {
-
-				impostoTipo = (ImpostoTipo) iteratorImpostoTipo.next();
-
-				impostoTipoAliquota = impostoTipoAliquotaRepositorio.buscarAliquotaImposto(impostoTipo.getId(), anoMesReferencia);
-
-				percetagemTotalAliquota = percetagemTotalAliquota.add(impostoTipoAliquota.getPercentualAliquota());
-
-				impostoDeduzidoTO = new ImpostoDeduzidoTO();
-
-				if (iteratorImpostoTipo.hasNext()) {
-					valorImpostoDeduzido = calculaValorImpostoDeduzido(impostoTipoAliquota, impostoTipoAliquota.getPercentualAliquota());
-
-					atualizaImpostoDeduzidoTO(impostoTipoAliquota);
-						
-					valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.add(valorImpostoDeduzido);
-				} else {
-					valorImpostoDeduzidoTotal = calculaValorImpostoDeduzido(impostoTipoAliquota, percetagemTotalAliquota);
-
-					valorImpostoDeduzido = valorImpostoDeduzidoTotal.subtract(valorImpostoDeduzidoFinal);
-
-					valorImpostoDeduzido = valorImpostoDeduzido.setScale(2, BigDecimal.ROUND_DOWN);
-						
-					atualizaImpostoDeduzidoTO(impostoTipoAliquota);
-					
-					valorImpostoDeduzidoFinal = valorImpostoDeduzidoTotal;
-				}
-
-				colecaoHelper.add(impostoDeduzidoTO);
-			}
-
-			retorno.setListaImpostosDeduzidos(colecaoHelper);
-
-			valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.setScale(2, BigDecimal.ROUND_DOWN);
-
-			retorno.setValorTotalImposto(valorImpostoDeduzidoFinal);
-			retorno.setValorBaseCalculo(baseCalculo);
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			return retorno;
 		}
+
+		inicializaValoresCalculo();
+
+		baseCalculo = new BigDecimal("0.00");
+
+		Iterator<ImpostoTipo> iteratorImpostoTipo = impostoTipoRepositorio.buscarImpostoTipoAtivos().iterator();
+
+		Collection<ImpostoDeduzidoTO> colecaoHelper = new ArrayList<ImpostoDeduzidoTO>();
+		ImpostoTipoAliquota impostoTipoAliquota = null;
+		ImpostoTipo impostoTipo = null;
+
+		while (iteratorImpostoTipo.hasNext()) {
+			impostoTipo = (ImpostoTipo) iteratorImpostoTipo.next();
+
+			impostoTipoAliquota = impostoTipoAliquotaRepositorio.buscarAliquotaImposto(impostoTipo.getId(), anoMesReferencia);
+
+			percetagemTotalAliquota = percetagemTotalAliquota.add(impostoTipoAliquota.getPercentualAliquota());
+
+			impostoDeduzidoTO = new ImpostoDeduzidoTO();
+
+			if (iteratorImpostoTipo.hasNext()) {
+				valorImpostoDeduzido = calculaValorImpostoDeduzido(impostoTipoAliquota, impostoTipoAliquota.getPercentualAliquota());
+
+				atualizaImpostoDeduzidoTO(impostoTipoAliquota);
+
+				valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.add(valorImpostoDeduzido);
+			} else {
+				valorImpostoDeduzidoTotal = calculaValorImpostoDeduzido(impostoTipoAliquota, percetagemTotalAliquota);
+
+				valorImpostoDeduzido = valorImpostoDeduzidoTotal.subtract(valorImpostoDeduzidoFinal);
+
+				valorImpostoDeduzido = valorImpostoDeduzido.setScale(2, BigDecimal.ROUND_DOWN);
+
+				atualizaImpostoDeduzidoTO(impostoTipoAliquota);
+
+				valorImpostoDeduzidoFinal = valorImpostoDeduzidoTotal;
+			}
+
+			colecaoHelper.add(impostoDeduzidoTO);
+		}
+
+		retorno.setListaImpostosDeduzidos(colecaoHelper);
+
+		valorImpostoDeduzidoFinal = valorImpostoDeduzidoFinal.setScale(2, BigDecimal.ROUND_DOWN);
+
+		retorno.setValorTotalImposto(valorImpostoDeduzidoFinal);
+		retorno.setValorBaseCalculo(baseCalculo);
 
 		return retorno;
 	}
@@ -131,13 +123,10 @@ public class ImpostosContaBO {
 	}
 
 	private static BigDecimal dividiArredondando(BigDecimal dividendo, BigDecimal divisor) {
+		BigDecimal resultado = new BigDecimal("0.00");
 
-		BigDecimal resultado = null;
-
-		if (dividendo != null && divisor != null) {
-
+		if (dividendo != null) {
 			resultado = dividendo.divide(divisor, 7, BigDecimal.ROUND_HALF_UP);
-
 		}
 
 		return resultado;

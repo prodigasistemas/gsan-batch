@@ -176,6 +176,7 @@
 							</includes>
 							<excludes>
 								<exclude>br/gov/batch/servicos/**/to/*.class</exclude>
+								<exclude>br/gov/batch/servicos/batch/*</exclude>
 							</excludes>
 						</instrumentation>
 					</configuration>

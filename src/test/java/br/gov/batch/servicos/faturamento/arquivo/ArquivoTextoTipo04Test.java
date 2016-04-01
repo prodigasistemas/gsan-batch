@@ -64,6 +64,7 @@ public class ArquivoTextoTipo04Test {
 		debitoCobrado.setTotalPrestacao(Short.valueOf("10"));
 		debitoCobrado.setNumeroPrestacaoDebito(Short.valueOf("1"));
 		debitoCobrado.setDebitoTipo(debitoTipo.getId());
+		debitoCobrado.setDescricaoTipoDebito("CONSUMO DE AGUA");
 
 		debitosCobrados = new ArrayList<DebitoCobradoNaoParceladoTO>();
 		debitosCobrados.add(debitoCobrado);
