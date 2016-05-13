@@ -1,21 +1,19 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.cobranca.parcelamento.ParcelamentoImovelBO;
 import br.gov.model.Status;
@@ -29,10 +27,9 @@ import br.gov.servicos.to.ConsultaDebitoImovelTO;
 import br.gov.servicos.to.ContaTO;
 import br.gov.servicos.to.GuiaPagamentoTO;
 
-@RunWith(EasyMockRunner.class)
 public class DebitoImovelBOTest {
 
-    @TestSubject
+    @InjectMocks
     private DebitoImovelBO bo;
 
     @Mock
@@ -67,6 +64,8 @@ public class DebitoImovelBOTest {
         bo = new DebitoImovelBO();
         parametros = new SistemaParametros();
         parametros.setAnoMesArrecadacao(201412);
+        
+        MockitoAnnotations.initMocks(this);
     }
     
     @Test
@@ -218,38 +217,31 @@ public class DebitoImovelBOTest {
     }
     
     private void mockPesquisaDeContas(List<ContaTO> contas){
-        expect(contaRepositorio.pesquisarContasImovel(to)).andReturn(contas);
-        replay(contaRepositorio);
+        when(contaRepositorio.pesquisarContasImovel(to)).thenReturn(contas);
     }
     
     private void mockImovelSemParcelamento(boolean possui){
-        expect(parcelamentoImovelBO.imovelSemParcelamento(1)).andReturn(possui);
-        replay(parcelamentoImovelBO);
+        when(parcelamentoImovelBO.imovelSemParcelamento(1)).thenReturn(possui);
     }
     
     private void mockSistemaParametros(SistemaParametros parametros){
-        expect(sistemaParametrosRepositorio.getSistemaParametros()).andReturn(parametros);
-        replay(sistemaParametrosRepositorio);
+        when(sistemaParametrosRepositorio.getSistemaParametros()).thenReturn(parametros);
     }
     
     private void mockContratoParcelamentoParaConta(boolean ativo){
-        expect(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaConta(1)).andReturn(ativo);
-        replay(contratoParcelamentoItemRepositorio);
+        when(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaConta(1)).thenReturn(ativo);
     }
     
     private void mockContratoParcelamentoParaGuia(boolean ativo){
-        expect(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaGuia(1)).andReturn(ativo);
-        replay(contratoParcelamentoItemRepositorio);
+        when(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaGuia(1)).thenReturn(ativo);
     }
     
     private void mockContratoParcelamentoParaGuiaEConta(boolean ativo){
-        expect(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaConta(1)).andReturn(ativo);
-        expect(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaGuia(1)).andReturn(ativo);
-        replay(contratoParcelamentoItemRepositorio);
+        when(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaConta(1)).thenReturn(ativo);
+        when(contratoParcelamentoItemRepositorio.existeContratoParcelamentoAtivoParaGuia(1)).thenReturn(ativo);
     }
     
     private void mockPesquisaDeGuias(List<GuiaPagamentoTO> guias){
-        expect(guiaPagamentoRepositorio.pesquisarGuiasPagamentoImovel(1, to.getVencimentoInicial(), to.getVencimentoFinal())).andReturn(guias);
-        replay(guiaPagamentoRepositorio);
+        when(guiaPagamentoRepositorio.pesquisarGuiasPagamentoImovel(1, to.getVencimentoInicial(), to.getVencimentoFinal())).thenReturn(guias);
     }
 }
