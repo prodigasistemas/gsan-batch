@@ -1,27 +1,24 @@
 package br.gov.batch.servicos.cadastro;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.ICategoria;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.to.ImovelSubcategoriaTO;
 
-@RunWith(EasyMockRunner.class)
 public class EconomiasBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private EconomiasBO economiasBO;
 
 	@Mock
@@ -40,6 +37,8 @@ public class EconomiasBOTest {
 
 		subcategoriaTO = new ImovelSubcategoriaTO(null, null, null, Long.valueOf("2"), null, null, null, null, null, null, null, null, null);
 		subcategorias.add(subcategoriaTO);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -50,7 +49,6 @@ public class EconomiasBOTest {
 	}
 
 	private void mockSubcategoria() {
-		expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(1)).andReturn(subcategorias);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarSubcategoria(1)).thenReturn(subcategorias);
 	}
 }
