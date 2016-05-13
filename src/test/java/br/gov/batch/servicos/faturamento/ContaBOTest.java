@@ -1,18 +1,16 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.Cliente;
 import br.gov.model.cadastro.ClienteRelacaoTipo;
@@ -25,10 +23,9 @@ import br.gov.servicos.cadastro.ClienteRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.GerarContaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ContaBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private ContaBO contaBO;
 	
 	@Mock
@@ -49,6 +46,8 @@ public class ContaBOTest {
 		sistemaParametros.setNumeroMesesValidadeConta((short) 5);
 		
 		contaBO.setSistemaParametros(sistemaParametros);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	private void preparaTeste(){
@@ -64,11 +63,8 @@ public class ContaBOTest {
 		imovel.setSetorComercial(setor);
 		imovel.setQuadra(quadra);
 		
-		expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201405)).andReturn(null);
-		expect(clienteRepositorio.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL)).andReturn(new Cliente());
-		
-		replay(medicaoHistoricoRepositorio);
-		replay(clienteRepositorio);		
+		when(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201405)).thenReturn(null);
+		when(clienteRepositorio.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL)).thenReturn(new Cliente());
 	}
 	
 	@Test
