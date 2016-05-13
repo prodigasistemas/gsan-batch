@@ -1,19 +1,17 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
@@ -30,10 +28,9 @@ import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class AnalisadorGeracaoContaTest {
 
-	@TestSubject
+	@InjectMocks
 	private AnalisadorGeracaoConta analisadorGeracaoConta;
 	
 	private Imovel imovel;
@@ -79,6 +76,8 @@ public class AnalisadorGeracaoContaTest {
 		esgotoNaoLigado.setId(LigacaoEsgotoSituacao.POTENCIAL);
 
 		analisadorGeracaoConta = new AnalisadorGeracaoConta();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 
@@ -213,7 +212,6 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
 		mockSistemaParametrosRepositorio();
-		replay(creditoRealizarEJBMock);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -232,7 +230,6 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
-		replay(creditoRealizarEJBMock);
 		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
@@ -252,7 +249,6 @@ public class AnalisadorGeracaoContaTest {
 		
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, false);
-		replay(creditoRealizarEJBMock);
 		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
@@ -268,20 +264,18 @@ public class AnalisadorGeracaoContaTest {
 	}
 	
 	private void mockPesquisarCreditoARealizar(Collection<CreditoRealizar> retorno) {
-		expect(creditoRealizarEJBMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
-			.andReturn(retorno);
+		when(creditoRealizarEJBMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+			.thenReturn(retorno);
 	}
 	
 	private void mockExisteCreditoComDevolucao(Collection<CreditoRealizar> creditosRealizar, boolean retorno) {
-		expect(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
-			.andReturn(retorno);
-		replay(devolucaoEJBMock);
+		when(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
+			.thenReturn(retorno);
 	}
 	
 	private void mockExisteDebitoSemPagamento(Collection<DebitoCobrar> debitosCobrar, boolean retorno) {
-		expect(pagamentoEJBMock.existeDebitoSemPagamento(debitosCobrar))
-			.andReturn(retorno);
-		replay(pagamentoEJBMock);
+		when(pagamentoEJBMock.existeDebitoSemPagamento(debitosCobrar))
+			.thenReturn(retorno);
 	}
 	
 	private void adicionaFaturamentoSituacaoTipoParaImovel(Status status) {
@@ -292,17 +286,15 @@ public class AnalisadorGeracaoContaTest {
 
 
 	private void mockDebitosCobrarPorImovelComPendenciaESemRevisao(Collection<DebitoCobrar> debitosCobrar) {
-		expect(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel.getId()))
-			.andReturn(debitosCobrar);
-		replay(debitoCobrarEJBMock);
+		when(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel.getId()))
+			.thenReturn(debitosCobrar);
 	}
 	
 	private void mockSistemaParametrosRepositorio() {
 		SistemaParametros sistemaParametros = new SistemaParametros();
 		sistemaParametros.setAnoMesFaturamento(anoMesFaturamento);
-		expect(sistemaParametrosRepositorioMock.getSistemaParametros())
-		.andReturn(sistemaParametros);
-		replay(sistemaParametrosRepositorioMock);
+		when(sistemaParametrosRepositorioMock.getSistemaParametros())
+		.thenReturn(sistemaParametros);
 	}
 	
 	private Collection<DebitoCobrar> buildCollectionDebitosCobrarVazio(boolean vazio){
