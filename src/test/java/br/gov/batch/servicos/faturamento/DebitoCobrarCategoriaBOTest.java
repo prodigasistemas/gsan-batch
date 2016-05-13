@@ -1,27 +1,24 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.faturamento.DebitoCobrarCategoria;
 import br.gov.servicos.faturamento.DebitoCobrarCategoriaRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class DebitoCobrarCategoriaBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private DebitoCobrarCategoriaBO business;
 	
 	@Mock
@@ -30,12 +27,12 @@ public class DebitoCobrarCategoriaBOTest {
 	@Before
 	public void setup() {
 		business = new DebitoCobrarCategoriaBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	protected void preparaMocks(List<DebitoCobrarCategoria> categorias) {
-		expect(mock.listaPeloDebitoCobrar(1))
-		.andReturn(categorias);
-		replay(mock);
+		when(mock.listaPeloDebitoCobrar(1)).thenReturn(categorias);
 	}
 	
 	@Test
