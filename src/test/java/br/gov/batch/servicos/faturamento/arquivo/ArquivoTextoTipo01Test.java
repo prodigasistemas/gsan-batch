@@ -1,28 +1,25 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01 arquivo;
 	
 	private int TAMANHO_LINHA = 1526;
@@ -59,6 +56,8 @@ public class ArquivoTextoTipo01Test {
 		
 		to = new ArquivoTextoTO();
 		to.setImovel(new Imovel(1234567));
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -80,24 +79,17 @@ public class ArquivoTextoTipo01Test {
 	}
 
 	public void carregarMocks() {
-		expect(dadosClienteMock.build(to)).andReturn(getMapCliente());
-		replay(dadosClienteMock);
+		when(dadosClienteMock.build(to)).thenReturn(getMapCliente());
 
-		expect(dadosCobrancaMock.build(to)).andReturn(getMapCobranca());
-		replay(dadosCobrancaMock);
+		when(dadosCobrancaMock.build(to)).thenReturn(getMapCobranca());
 
-		expect(dadosConsumoMock.build(to)).andReturn(getMapConsumo());
-		replay(dadosConsumoMock);
+		when(dadosConsumoMock.build(to)).thenReturn(getMapConsumo());
 
-		expect(dadosContaMock.build(to)).andReturn(getMapConta());
-		replay(dadosContaMock);
+		when(dadosContaMock.build(to)).thenReturn(getMapConta());
 
-		expect(dadosFaturamentoMock.build(to)).andReturn(getMapFaturamento());
-		replay(dadosFaturamentoMock);
+		when(dadosFaturamentoMock.build(to)).thenReturn(getMapFaturamento());
 
-		expect(dadosLocalizacaoImovelMock.build(to)).andReturn(getMapLocalizacao());
-		replay(dadosLocalizacaoImovelMock);
-
+		when(dadosLocalizacaoImovelMock.build(to)).thenReturn(getMapLocalizacao());
 	}
 
 	private String getLinhaValida() {
