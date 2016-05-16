@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
@@ -24,10 +22,9 @@ import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.model.micromedicao.LeituraAnormalidadeConsumo;
 import br.gov.servicos.micromedicao.ConsumoAnormalidadeAcaoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo12Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo12 arquivo;
 	
 	private int TAMANHO_LINHA = 386;
@@ -38,6 +35,8 @@ public class ArquivoTextoTipo12Test {
 	@Before
 	public void setup() {
 		arquivo = new ArquivoTextoTipo12();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -64,8 +63,7 @@ public class ArquivoTextoTipo12Test {
 	}
 	
 	private void carregarMock() {
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcaoAtivo()).andReturn(getAcoes());
-		replay(consumoAnormalidadeAcaoRepositorioMock);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcaoAtivo()).thenReturn(getAcoes());
 	}
 
 	private List<ConsumoAnormalidadeAcao> getAcoes() {
