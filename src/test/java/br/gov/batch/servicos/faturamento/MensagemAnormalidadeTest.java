@@ -1,16 +1,14 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.cadastro.ImovelSubcategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoAnormalidadeAcaoBO;
@@ -23,10 +21,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
-@RunWith(EasyMockRunner.class)
 public class MensagemAnormalidadeTest {
 
-    @TestSubject
+    @InjectMocks
     private MensagemAnormalidadeContaBO bo;
     
     @Mock
@@ -58,6 +55,8 @@ public class MensagemAnormalidadeTest {
         acao.setDescricaoContaMensagemMes1("ACAO 01");
         acao.setDescricaoContaMensagemMes2("ACAO 02");
         acao.setDescricaoContaMensagemMes3("ACAO 03");
+        
+        MockitoAnnotations.initMocks(this);
     }
     
     @Test
@@ -95,36 +94,30 @@ public class MensagemAnormalidadeTest {
     }
     
     public void mockSemAnormalidadeConsumo(){
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).andReturn(null);
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, anoMesReferencia)).andReturn(null);
-        replay(consumoHistoricoRepositorio);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).thenReturn(null);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, anoMesReferencia)).thenReturn(null);
     }
         
     public void mockComAnormalidadeAguaESemEsgotoReferenciaAnterior(){
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).andReturn(anormalidadeHistoricoConsumo);
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1))).andReturn(null);
-        replay(consumoHistoricoRepositorio);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).thenReturn(anormalidadeHistoricoConsumo);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1))).thenReturn(null);
     }
     
     public void mockComAnormalidadeAguaEComEsgotoReferenciaAnterior(){
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).andReturn(anormalidadeHistoricoConsumo);
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1))).andReturn(anormalidadeHistoricoConsumo);
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1), anormalidadeHistoricoConsumo.getIdAnormalidade())).andReturn(anormalidadeHistoricoConsumo);
-        replay(consumoHistoricoRepositorio);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).thenReturn(anormalidadeHistoricoConsumo);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1))).thenReturn(anormalidadeHistoricoConsumo);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.ESGOTO, Utilitarios.reduzirMeses(anoMesReferencia, 1), anormalidadeHistoricoConsumo.getIdAnormalidade())).thenReturn(anormalidadeHistoricoConsumo);
     }
     
     public void mockComAnormalidadeAgua(){
-        expect(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).andReturn(anormalidadeHistoricoConsumo);
-        replay(consumoHistoricoRepositorio);
+        when(consumoHistoricoRepositorio.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, anoMesReferencia)).thenReturn(anormalidadeHistoricoConsumo);
     }
     
     public void mockBuscaCategoria(){
-        expect(imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1)).andReturn(1);
-        replay(imovelSubcategoriaBO);
+        when(imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1)).thenReturn(1);
     }
     
     public void mockAcaoASerTomada(ConsumoAnormalidadeAcao acao){
-        expect(consumoAnormalidadeAcaoBO.acaoASerTomada(ConsumoAnormalidade.BAIXO_CONSUMO, 1, 1)).andReturn(acao);
-        replay(consumoAnormalidadeAcaoBO);
+        when(consumoAnormalidadeAcaoBO.acaoASerTomada(ConsumoAnormalidade.BAIXO_CONSUMO, 1, 1)).thenReturn(acao);
     }
 }
