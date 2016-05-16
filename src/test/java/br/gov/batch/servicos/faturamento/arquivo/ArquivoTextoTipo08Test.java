@@ -1,21 +1,19 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
@@ -36,10 +34,9 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo08Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo08 arquivo;
 
 	private int TAMANHO_LINHA = 120;
@@ -111,6 +108,8 @@ public class ArquivoTextoTipo08Test {
 		to.setImovel(imovel);
 		to.setAnoMesReferencia(referencia);
 		arquivo = new ArquivoTextoTipo08();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -129,19 +128,12 @@ public class ArquivoTextoTipo08Test {
 	}
 
 	private void carregarMocks() {
-        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-        replay(repositorioImovel);
+        when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
 	    
-		expect(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).andReturn(hidrometrosMedicaoHistoricoTO).times(2);
-		expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(houveInstalacaoOuSubstituicaoHidrometro).times(2);
-		expect(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(),  201112)).andReturn(medicaoHistorico).times(2);
-		expect(faixaLeituraBOMock.obterDadosFaixaLeitura(anyObject(), anyObject(), anyObject(), anyObject())).andReturn(new FaixaLeituraTO(230, 250)).times(2);
-		expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId())).andReturn(new VolumeMedioAguaEsgotoTO(20, 6)).times(2);
-
-		replay(medicaoHistoricoBOMock);
-		replay(hidrometroBOMock);
-		replay(aguaEsgotoBOMock);
-		replay(medicaoHistoricoMock);
-		replay(faixaLeituraBOMock);
+		when(medicaoHistoricoBOMock.obterDadosTiposMedicao(imovel.getId(), referencia)).thenReturn(hidrometrosMedicaoHistoricoTO);
+		when(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).thenReturn(houveInstalacaoOuSubstituicaoHidrometro);
+		when(medicaoHistoricoMock.buscarPorLigacaoAguaOuPoco(imovel.getId(),  201112)).thenReturn(medicaoHistorico);
+		when(faixaLeituraBOMock.obterDadosFaixaLeitura(any(), any(), any(), any())).thenReturn(new FaixaLeituraTO(230, 250));
+		when(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), referencia, ligacaoTipo.getId())).thenReturn(new VolumeMedioAguaEsgotoTO(20, 6));
 	}
 }
