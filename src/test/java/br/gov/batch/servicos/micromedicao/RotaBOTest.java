@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAgua;
@@ -28,10 +26,9 @@ import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.micromedicao.RotaRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class RotaBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private RotaBO rotaBO;
 
 	@Mock
@@ -138,6 +135,8 @@ public class RotaBOTest {
 		totalImoveis = imoveis.size();
 				
 		rota1 = new Rota(1);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -221,47 +220,38 @@ public class RotaBOTest {
 	}
 
 	private void carregarRotaAlternativaMock(boolean rotaAlternativa) {
-		expect(rotaRepositorioMock.isRotaAlternativa(1)).andReturn(rotaAlternativa);
-		replay(rotaRepositorioMock);
+		when(rotaRepositorioMock.isRotaAlternativa(1)).thenReturn(rotaAlternativa);
 	}
 
 	private void carregarImoveisParaLeituraComRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaLeituraComRotaAlternativa(1, 1, 10)).andReturn(imoveis);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.imoveisParaLeituraComRotaAlternativa(1, 1, 10)).thenReturn(imoveis);
 	}
 
 	private void carregarImoveisParaLeituraSemRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaLeituraSemRotaAlternativa(1, 1, 10)).andReturn(imoveis);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.imoveisParaLeituraSemRotaAlternativa(1, 1, 10)).thenReturn(imoveis);
 	}
 	
 	private void carregarImoveisParaPreFaturamentoComRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaPreFaturamentoComRotaAlternativa(1, 1, 10)).andReturn(imoveis);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.imoveisParaPreFaturamentoComRotaAlternativa(1, 1, 10)).thenReturn(imoveis);
 	}
 	
 	private void carregarImoveisParaPreFaturamentoSemRotaAlternativaMock() {
-		expect(imovelRepositorioMock.imoveisParaPreFaturamentoSemRotaAlternativa(1, 1, 10)).andReturn(imoveis);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.imoveisParaPreFaturamentoSemRotaAlternativa(1, 1, 10)).thenReturn(imoveis);
 	}
 	
 	private void carregarTotalImoveisParaPreFaturamentoComRotaAlternativaMock(int idRota) {
-		expect(imovelRepositorioMock.totalImoveisParaPreFaturamentoComRotaAlternativa(idRota)).andReturn((long) imoveis.size());
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.totalImoveisParaPreFaturamentoComRotaAlternativa(idRota)).thenReturn((long) imoveis.size());
 	}
 	
 	private void carregarTotalImoveisParaPreFaturamentoSemRotaAlternativaMock(int idRota) {
-		expect(imovelRepositorioMock.totalImoveisParaPreFaturamentoSemRotaAlternativa(idRota)).andReturn((long) imoveis.size());
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.totalImoveisParaPreFaturamentoSemRotaAlternativa(idRota)).thenReturn((long) imoveis.size());
 	}
 	
 	private void carregarTotalImoveisParaLeituraComRotaAlternativaMock(int idRota) {
-		expect(imovelRepositorioMock.totalImoveisParaLeituraComRotaAlternativa(idRota)).andReturn((long) imoveis.size());
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.totalImoveisParaLeituraComRotaAlternativa(idRota)).thenReturn((long) imoveis.size());
 	}
 	
 	private void carregarTotalImoveisParaLeituraSemRotaAlternativaMock(int idRota) {
-		expect(imovelRepositorioMock.totalImoveisParaLeituraSemRotaAlternativa(idRota)).andReturn((long) imoveis.size());
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.totalImoveisParaLeituraSemRotaAlternativa(idRota)).thenReturn((long) imoveis.size());
 	}
 }
