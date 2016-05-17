@@ -1,27 +1,24 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.ConsumoHistorico;
 
 
-@RunWith(EasyMockRunner.class)
 public class ConsumoHistoricoBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private ConsumoHistoricoBO consumoHistoricoBO;
 	
 	@Mock
@@ -30,6 +27,8 @@ public class ConsumoHistoricoBOTest {
 	@Before
 	public void setup(){
 		consumoHistoricoBO = new ConsumoHistoricoBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -61,9 +60,8 @@ public class ConsumoHistoricoBOTest {
 	}
 	
 	private void mockParametros() {
-		expect(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).andReturn(Short.valueOf("24"));
-		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(Short.valueOf("6"));
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).thenReturn(Short.valueOf("24"));
+		when(sistemaParametrosMock.getMesesMediaConsumo()).thenReturn(Short.valueOf("6"));
 	}
 	
 	private List<ConsumoHistorico> consumosSemCortes(){
