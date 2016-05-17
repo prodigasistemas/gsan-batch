@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
@@ -23,10 +21,9 @@ import br.gov.model.faturamento.ImpostoTipo;
 import br.gov.servicos.faturamento.ContaImpostosDeduzidosRepositorio;
 import br.gov.servicos.to.ContaImpostosDeduzidosTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo06Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo06 arquivo;
 
 	private int TAMANHO_LINHA = 34;
@@ -62,6 +59,8 @@ public class ArquivoTextoTipo06Test {
 		contaTO.setValorImposto(BigDecimal.valueOf(1));
 
 		lista.add(contaTO);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -80,7 +79,6 @@ public class ArquivoTextoTipo06Test {
 	}
 
 	public void carregarMocks() {
-		expect(contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(to.getConta().getId())).andReturn(lista);
-		replay(contaImpostosDeduzidosRepositorio);
+		when(contaImpostosDeduzidosRepositorio.pesquisarParmsContaImpostosDeduzidos(to.getConta().getId())).thenReturn(lista);
 	}
 }

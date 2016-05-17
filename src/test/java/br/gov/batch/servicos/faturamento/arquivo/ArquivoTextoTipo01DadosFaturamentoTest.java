@@ -1,9 +1,8 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,12 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
 import br.gov.batch.servicos.faturamento.FaturamentoSituacaoBO;
@@ -38,10 +36,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosFaturamentoTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01DadosFaturamento arquivo;
 	
 	@Mock
@@ -93,6 +90,8 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
         arquivoTextoTO.setConta(conta);
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         arquivoTextoTO.setAnoMesReferencia(201501);
+        
+        MockitoAnnotations.initMocks(this);
 	}
 	
 	private List<ICategoria> categoriasSetup() {
@@ -154,18 +153,14 @@ public class ArquivoTextoTipo01DadosFaturamentoTest {
     	List<ICategoria> categorias = categoriasSetup(); 
     	List<ICategoria> subcategorias = subcategoriasSetup();
     	
-        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-        replay(repositorioImovel);
+        when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
     	
-    	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
-    	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
-    	replay(imovelSubcategoriaRepositorioMock);
+    	when(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).thenReturn(categorias);
+    	when(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).thenReturn(subcategorias);
     	
-    	expect(faturamentoAtividadeCronogramaBOMock.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA)).andReturn(Utilitarios.converterStringParaData("2015-01-23", FormatoData.ANO_MES_DIA_SEPARADO));
-    	replay(faturamentoAtividadeCronogramaBOMock);
+    	when(faturamentoAtividadeCronogramaBOMock.obterDataPrevistaDoCronogramaAnterior(faturamentoGrupo, FaturamentoAtividade.EFETUAR_LEITURA)).thenReturn(Utilitarios.converterStringParaData("2015-01-23", FormatoData.ANO_MES_DIA_SEPARADO));
     	
-    	expect(faturamentoSituacaoBOMock.verificarParalisacaoFaturamentoAgua(imovel, faturamentoGrupo.getAnoMesReferencia())).andReturn(Status.ATIVO);
-    	expect(faturamentoSituacaoBOMock.verificarParalisacaoFaturamentoEsgoto(imovel, faturamentoGrupo.getAnoMesReferencia())).andReturn(Status.INATIVO);
-    	replay(faturamentoSituacaoBOMock);
+    	when(faturamentoSituacaoBOMock.verificarParalisacaoFaturamentoAgua(imovel, faturamentoGrupo.getAnoMesReferencia())).thenReturn(Status.ATIVO);
+    	when(faturamentoSituacaoBOMock.verificarParalisacaoFaturamentoEsgoto(imovel, faturamentoGrupo.getAnoMesReferencia())).thenReturn(Status.INATIVO);
     }
 }

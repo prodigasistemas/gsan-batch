@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +13,6 @@ import br.gov.model.cadastro.Categoria;
 
 public class CategoriaBOTest {
 
-	@TestSubject
 	private CategoriaBO categoriaBO;
 
 	@Before

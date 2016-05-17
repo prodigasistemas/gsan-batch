@@ -1,22 +1,20 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoAtividadeCronograma;
@@ -24,10 +22,9 @@ import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.faturamento.FaturamentoAtividadeCronogramaRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class FaturamentoAtividadeCronogramaBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private FaturamentoAtividadeCronogramaBO bo;
 	
 	@Mock
@@ -53,6 +50,8 @@ public class FaturamentoAtividadeCronogramaBOTest {
 		rota.setFaturamentoGrupo(faturamentoGrupo);
 	    
 		bo = new FaturamentoAtividadeCronogramaBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -104,13 +103,11 @@ public class FaturamentoAtividadeCronogramaBOTest {
 	}
 	
 	private void carregarMocks() {
-		expect(mock.buscarPorGrupoEAtividadeEReferencia(anyObject(), anyObject(), anyObject())).andReturn(faturamentoAtividadeCronograma).times(4);
-		replay(mock);
+		when(mock.buscarPorGrupoEAtividadeEReferencia(any(Integer.class), any(Integer.class), any(Integer.class))).thenReturn(faturamentoAtividadeCronograma);
 	}
 	
 	private void carregarMocks2() {
-		expect(mock.pesquisarFaturamentoAtividadeCronogramaDataPrevista(1, 1, 201501)).andReturn(dataAtual);
-		expect(mock.pesquisarFaturamentoAtividadeCronogramaDataPrevista(1, 1, 201412)).andReturn(dataAnterior);
-		replay(mock);
+		when(mock.pesquisarFaturamentoAtividadeCronogramaDataPrevista(1, 1, 201501)).thenReturn(dataAtual);
+		when(mock.pesquisarFaturamentoAtividadeCronogramaDataPrevista(1, 1, 201412)).thenReturn(dataAnterior);
 	}
 }

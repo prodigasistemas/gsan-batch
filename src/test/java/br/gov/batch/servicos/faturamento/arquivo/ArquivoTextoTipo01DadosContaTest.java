@@ -2,23 +2,21 @@ package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.completaTexto;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.ExtratoQuitacaoBO;
 import br.gov.batch.servicos.faturamento.MensagemContaBO;
@@ -42,10 +40,9 @@ import br.gov.servicos.faturamento.QuadraFaceRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaPadraoRepositorio;
 import br.gov.servicos.faturamento.QualidadeAguaRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosContaTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01DadosConta arquivo;
 
 	@Mock
@@ -105,6 +102,8 @@ public class ArquivoTextoTipo01DadosContaTest {
         arquivoTextoTO.setImovel(imovel);
 		arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
 		arquivoTextoTO.setAnoMesReferencia(201501);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -161,27 +160,20 @@ public class ArquivoTextoTipo01DadosContaTest {
 	public void carregarMocks() {
 		String[] mensagemConta = obterMensagem();
 
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true");
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false");
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).andReturn("false");
-		replay(repositorioParametros);
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).thenReturn("true");
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).thenReturn("false");
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).thenReturn("false");
 
-		expect(mensagemContaBOMock.obterMensagemConta3Partes(imovel, faturamentoGrupo.getAnoMesReferencia(), faturamentoGrupo.getId())).andReturn(mensagemConta);
-		replay(mensagemContaBOMock);
+		when(mensagemContaBOMock.obterMensagemConta3Partes(imovel, faturamentoGrupo.getAnoMesReferencia(), faturamentoGrupo.getId())).thenReturn(mensagemConta);
 
-		expect(extratoQuitacaoBOMock.obterMsgQuitacaoDebitos(imovel.getId(), faturamentoGrupo.getAnoMesReferencia())).andReturn("MENSAGEM QUITACAO ANUAL DE DEBITOS");
-		replay(extratoQuitacaoBOMock);
+		when(extratoQuitacaoBOMock.obterMsgQuitacaoDebitos(imovel.getId(), faturamentoGrupo.getAnoMesReferencia())).thenReturn("MENSAGEM QUITACAO ANUAL DE DEBITOS");
 
-		expect(qualidadeAguaPadraoRepositorioMock.obterLista()).andReturn(obterQualidadeAguaPadrao());
-		replay(qualidadeAguaPadraoRepositorioMock);
+		when(qualidadeAguaPadraoRepositorioMock.obterLista()).thenReturn(obterQualidadeAguaPadrao());
 
-		expect(quadraFaceRepositorioMock.obterPorID(1)).andReturn(quadraFace);
-		replay(quadraFaceRepositorioMock);
+		when(quadraFaceRepositorioMock.obterPorID(1)).thenReturn(quadraFace);
 
-		expect(qualidadeAguaRepositorioMock.buscarSemFonteCaptacao(anyObject(), anyObject(), anyObject())).andReturn(obterQualidadeAgua());
-		replay(qualidadeAguaRepositorioMock);
+		when(qualidadeAguaRepositorioMock.buscarSemFonteCaptacao(any(), any(), any())).thenReturn(obterQualidadeAgua());
 		
-        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-        replay(repositorioImovel);
+        when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
 	}
 }

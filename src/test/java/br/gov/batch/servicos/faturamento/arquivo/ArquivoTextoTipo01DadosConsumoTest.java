@@ -1,21 +1,19 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.EsgotoBO;
@@ -35,10 +33,9 @@ import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.to.DadosBancariosTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosConsumoTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01DadosConsumo arquivo;
 	
 	@Mock
@@ -80,6 +77,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
         arquivoTextoTO.setImovel(imovel);
         arquivoTextoTO.setFaturamentoGrupo(faturamentoGrupo);
         
+        MockitoAnnotations.initMocks(this);
 	}
 	
 	private List<ICategoria> categoriasSetUp() {
@@ -134,8 +132,7 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     }
 	
 	public void carregarMocks() {
-        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-        replay(repositorioImovel);
+        when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
 	    
     	DadosBancariosTO to = new DadosBancariosTO();
     	to.setCodigoAgencia("00000");
@@ -149,22 +146,17 @@ public class ArquivoTextoTipo01DadosConsumoTest {
     	boolean instalacaoOuSubstituicaoHidrometro = false;
     	BigDecimal percentualEsgotoAlternativo = new BigDecimal("30");
     	
-    	expect(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).andReturn(instalacaoOuSubstituicaoHidrometro);
-    	replay(hidrometroBOMock);
+    	when(hidrometroBOMock.houveInstalacaoOuSubstituicao(imovel.getId())).thenReturn(instalacaoOuSubstituicaoHidrometro);
     	
-    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId()))
-    		.andReturn(volumeMedioTO);
-    	replay(aguaEsgotoBOMock);
+    	when(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(),faturamentoGrupo.getAnoMesReferencia(), LigacaoTipo.AGUA.getId()))
+    		.thenReturn(volumeMedioTO);
     	
-    	expect(esgotoBOMock.percentualEsgotoAlternativo(imovel)).andReturn(percentualEsgotoAlternativo);
-    	replay(esgotoBOMock);
+    	when(esgotoBOMock.percentualEsgotoAlternativo(imovel)).thenReturn(percentualEsgotoAlternativo);
     	
-    	expect(consumoBOMock.consumoMinimoLigacao(imovel.getId())).andReturn(10);
-    	expect(consumoBOMock.consumoNaoMedido(imovel.getId(), faturamentoGrupo.getAnoMesReferencia())).andReturn(10);
-    	replay(consumoBOMock);
+    	when(consumoBOMock.consumoMinimoLigacao(imovel.getId())).thenReturn(10);
+    	when(consumoBOMock.consumoNaoMedido(imovel.getId(), faturamentoGrupo.getAnoMesReferencia())).thenReturn(10);
     	
-    	expect(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).andReturn(categorias);
-    	expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(subcategorias);
-    	replay(imovelSubcategoriaRepositorioMock);
+    	when(imovelSubcategoriaRepositorioMock.buscarCategoria(imovel.getId())).thenReturn(categorias);
+    	when(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).thenReturn(subcategorias);
     }
 }

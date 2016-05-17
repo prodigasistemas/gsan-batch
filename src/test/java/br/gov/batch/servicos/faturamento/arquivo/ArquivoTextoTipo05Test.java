@@ -1,21 +1,19 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
@@ -24,10 +22,9 @@ import br.gov.model.faturamento.CreditoTipo;
 import br.gov.servicos.faturamento.FaturamentoRepositorio;
 import br.gov.servicos.to.CreditoRealizadoTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo05Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo05 arquivo;
 	
 	private int TAMANHO_LINHA = 121;
@@ -65,6 +62,8 @@ public class ArquivoTextoTipo05Test {
 
 		listaCreditoRealizadoTO.add(creditoRealizadoTO);
 		listaCreditoRealizadoTO.add(creditoRealizadoTO);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -98,8 +97,7 @@ public class ArquivoTextoTipo05Test {
 	     
 
 	public void carregarMocks() {
-		expect(faturamentoRepositorio.buscarCreditoRealizado(to.getConta())).andReturn(listaCreditoRealizadoTO);
-		replay(faturamentoRepositorio);
+		when(faturamentoRepositorio.buscarCreditoRealizado(to.getConta())).thenReturn(listaCreditoRealizadoTO);
 	}
 
 }

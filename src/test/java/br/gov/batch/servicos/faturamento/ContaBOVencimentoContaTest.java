@@ -1,21 +1,19 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.IExpectationSetters;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.OngoingStubbing;
 
 import br.gov.model.Status;
 import br.gov.model.cadastro.Cliente;
@@ -25,10 +23,9 @@ import br.gov.model.cadastro.ImovelContaEnvio;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.servicos.cadastro.ClienteRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ContaBOVencimentoContaTest {
 	
-	@TestSubject
+	@InjectMocks
 	private ContaBO contaBO;
 	
 	@Mock
@@ -74,30 +71,26 @@ public class ContaBOVencimentoContaTest {
 		diaRotaAbril= cal.getTime();
 		
 		contaBO = new ContaBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
-	private void replayAll() {
-		replay(clienteRepositorioMock);
-		replay(sistemaParametrosMock);
+	private OngoingStubbing<Cliente> mountClienteRepositorioMock() {
+		return when(clienteRepositorioMock.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL));
 	}
 	
-	private IExpectationSetters<Cliente> mountClienteRepositorioMock() {
-		return expect(clienteRepositorioMock.buscarClientePorImovel(1, ClienteRelacaoTipo.RESPONSAVEL));
+	private OngoingStubbing<Short> mountSistemaParametrosRepositorioMock() {
+		return when(sistemaParametrosMock.getNumeroMinimoDiasEmissaoVencimento());
 	}
 	
-	private IExpectationSetters<Short> mountSistemaParametrosRepositorioMock() {
-		return expect(sistemaParametrosMock.getNumeroMinimoDiasEmissaoVencimento());
-	}
-	
-	private IExpectationSetters<Short> mountSistemaParametrosRepositorioDiasCorreiosMock() {
-		return expect(sistemaParametrosMock.getNumeroDiasAdicionaisCorreios());
+	private OngoingStubbing<Short> mountSistemaParametrosRepositorioDiasCorreiosMock() {
+		return when(sistemaParametrosMock.getNumeroDiasAdicionaisCorreios());
 	}
 	
 	@Test
 	public void semVencimentoAlternativo(){
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(null);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
 		
 		assertEquals(textoDia10MesSeguinte, format.format(contaBO.determinarVencimentoConta(imovel, dia15ProximoMes)));
 	}
@@ -105,9 +98,8 @@ public class ContaBOVencimentoContaTest {
 	@Test
 	public void vencimentoAlternativoImovelAntesVencerRota(){
 		imovel.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(null);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 3);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -118,9 +110,8 @@ public class ContaBOVencimentoContaTest {
 	@Test
 	public void vencimentoAlternativoImovelAposVencerRota(){
 		imovel.setDiaVencimento((short) 25);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(null);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -132,9 +123,8 @@ public class ContaBOVencimentoContaTest {
 	@Test
 	public void vencimentoAlternativoImovelComDiasParaEmissaoSuperiorAoVencimento(){
 		imovel.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 60);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(null);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 60);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -149,9 +139,8 @@ public class ContaBOVencimentoContaTest {
 		imovel.setDiaVencimento((short) 5);
 		imovel.setIndicadorEmissaoExtratoFaturamento((short) 2);
 		imovel.setIndicadorVencimentoMesSeguinte((short) 1);
-		mountClienteRepositorioMock().andReturn(null);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(null);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -165,9 +154,8 @@ public class ContaBOVencimentoContaTest {
 	public void vencimentoAlternativoCliente(){
 		Cliente cliente = new Cliente();
 		cliente.setDiaVencimento((short) 5);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 3);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 3);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -180,9 +168,8 @@ public class ContaBOVencimentoContaTest {
 		Cliente cliente = new Cliente();
 		cliente.setDiaVencimento((short) 5);
 		cliente.setIndicadorVencimentoMesSeguinte((short) 1);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -196,9 +183,8 @@ public class ContaBOVencimentoContaTest {
 	public void vencimentoAlternativoImovelPorEmissaoExtratoFaturamento(){
 		Cliente cliente = new Cliente();
 		imovel.setIndicadorEmissaoExtratoFaturamento((short) 1);
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -212,10 +198,9 @@ public class ContaBOVencimentoContaTest {
 		imovel.setImovelContaEnvio(ImovelContaEnvio.ENVIAR_CLIENTE_RESPONSAVEL);
 		imovel.setIndicadorDebitoConta(Status.INATIVO.getId());
 		
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		mountSistemaParametrosRepositorioDiasCorreiosMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
+		mountSistemaParametrosRepositorioDiasCorreiosMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dia15ProximoMes);
@@ -229,10 +214,9 @@ public class ContaBOVencimentoContaTest {
 		Cliente cliente = new Cliente();
 		imovel.setIndicadorEmissaoExtratoFaturamento((short)1);
 		
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		mountSistemaParametrosRepositorioDiasCorreiosMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
+		mountSistemaParametrosRepositorioDiasCorreiosMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(diaRotaMarco);
@@ -248,10 +232,9 @@ public class ContaBOVencimentoContaTest {
 		Cliente cliente = new Cliente();
 		imovel.setIndicadorEmissaoExtratoFaturamento((short)2);
 		
-		mountClienteRepositorioMock().andReturn(cliente);
-		mountSistemaParametrosRepositorioMock().andReturn((short) 10);
-		mountSistemaParametrosRepositorioDiasCorreiosMock().andReturn((short) 10);
-		replayAll();
+		mountClienteRepositorioMock().thenReturn(cliente);
+		mountSistemaParametrosRepositorioMock().thenReturn((short) 10);
+		mountSistemaParametrosRepositorioDiasCorreiosMock().thenReturn((short) 10);
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(diaRotaAbril);

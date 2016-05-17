@@ -1,21 +1,18 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.AguaEsgotoBO;
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
@@ -42,10 +39,9 @@ import br.gov.servicos.micromedicao.MovimentoRoteiroEmpresaRepositorio;
 import br.gov.servicos.micromedicao.to.FaixaLeituraTO;
 import br.gov.servicos.to.CategoriaPrincipalTO;
 
-@RunWith(EasyMockRunner.class)
 public class MovimentoRoteiroEmpresaBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private MovimentoRoteiroEmpresaBO bo;
 	
 	@Mock
@@ -126,6 +122,8 @@ public class MovimentoRoteiroEmpresaBOTest {
 		
 		imoveis = new ArrayList<Imovel>();
 		imoveis.add(imovel);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -167,8 +165,7 @@ public class MovimentoRoteiroEmpresaBOTest {
 		movimentosInseridos = new ArrayList<MovimentoRoteiroEmpresa>();
 		
 		repositorioMock.deletarPorRota(rota);
-		expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-		replay(repositorioMock);
+		when(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).thenReturn(imoveisOutrosGrupos);
 	}
 
     private void mockImoveisGerados() {
@@ -178,27 +175,19 @@ public class MovimentoRoteiroEmpresaBOTest {
         movimentosInseridos.add(getMovimento());
         
         repositorioMock.deletarPorRota(rota);
-        expect(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).andReturn(imoveisOutrosGrupos);
-        repositorioMock.salvar(anyObject());
-        expectLastCall().times(1);
-        replay(repositorioMock);
+        when(repositorioMock.pesquisarImoveisGeradosParaOutroGrupo(imoveis, grupo)).thenReturn(imoveisOutrosGrupos);
+        repositorioMock.salvar(any());
     }	
     
     private void mockBuild() {
     	CategoriaPrincipalTO categoria = new CategoriaPrincipalTO(Integer.valueOf(1), Long.valueOf(1));
     	VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = new VolumeMedioAguaEsgotoTO(20, 6);
     	
-    	expect(imovelSubcategoriaRepositorioMock.buscarCategoriaPrincipal(imovel.getId())).andReturn(categoria);
-    	expect(medicaoHistoricoBOMock.getMedicaoHistorico(imovel.getId(), 201412)).andReturn(null);
-    	expect(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), 201501, MedicaoTipo.LIGACAO_AGUA.getId())).andReturn(volumeMedioAguaEsgotoTO);    	
+    	when(imovelSubcategoriaRepositorioMock.buscarCategoriaPrincipal(imovel.getId())).thenReturn(categoria);
+    	when(medicaoHistoricoBOMock.getMedicaoHistorico(imovel.getId(), 201412)).thenReturn(null);
+    	when(aguaEsgotoBOMock.obterVolumeMedioAguaEsgoto(imovel.getId(), 201501, MedicaoTipo.LIGACAO_AGUA.getId())).thenReturn(volumeMedioAguaEsgotoTO);    	
     	
-    	expect(hidrometroInstalacaoRepositorioMock.dadosHidrometroInstaladoAgua(imovel.getId())).andReturn(null);
-    	expect(faixaLeituraBOMock.obterDadosFaixaLeitura(imovel, null, volumeMedioAguaEsgotoTO.getConsumoMedio(), null)).andReturn(new FaixaLeituraTO(0, 0));
-    	
-    	replay(imovelSubcategoriaRepositorioMock);
-    	replay(medicaoHistoricoBOMock);
-    	replay(aguaEsgotoBOMock);
-    	replay(hidrometroInstalacaoRepositorioMock);
-    	replay(faixaLeituraBOMock);
+    	when(hidrometroInstalacaoRepositorioMock.dadosHidrometroInstaladoAgua(imovel.getId())).thenReturn(null);
+    	when(faixaLeituraBOMock.obterDadosFaixaLeitura(imovel, null, volumeMedioAguaEsgotoTO.getConsumoMedio(), null)).thenReturn(new FaixaLeituraTO(0, 0));
     }
 }

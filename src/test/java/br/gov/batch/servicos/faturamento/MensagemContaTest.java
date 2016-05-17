@@ -1,15 +1,13 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.GerenciaRegional;
 import br.gov.model.cadastro.Imovel;
@@ -24,10 +22,9 @@ import br.gov.servicos.faturamento.ContaMensagemRepositorio;
 import br.gov.servicos.to.ConsultaDebitoImovelTO;
 import br.gov.servicos.to.DadosBancariosTO;
 
-@RunWith(EasyMockRunner.class)
 public class MensagemContaTest {
 
-    @TestSubject
+    @InjectMocks
     private MensagemContaBO bo;
     
     @Mock
@@ -121,6 +118,8 @@ public class MensagemContaTest {
         msgAvisoDebitoVencimento = "AVISO:EM " + dataVencimentoFinal + " CONSTA DEBITO SUJ.CORT. IGNORE CASO PAGO";
         
         bo = new MensagemContaBO();
+        
+        MockitoAnnotations.initMocks(this);
     }
     
     @Test
@@ -177,27 +176,22 @@ public class MensagemContaTest {
     }
     
     public void mockExisteDebito(boolean existe){
-        expect(debitoImovelBO.existeDebitoImovel(to)).andReturn(existe);
-        replay(debitoImovelBO);        
+        when(debitoImovelBO.existeDebitoImovel(to)).thenReturn(existe);
     }
 
     private void mockSistemaParametros(SistemaParametros parametros){
-        expect(sistemaParametrosRepositorio.getSistemaParametros()).andReturn(parametros);
-        replay(sistemaParametrosRepositorio);
+        when(sistemaParametrosRepositorio.getSistemaParametros()).thenReturn(parametros);
     }
     
     private void mockRecuperaMensagemConta(){
-        expect(contaMensagemRepositorio.recuperaMensagemConta(anoMesReferencia, null, null, null, null)).andReturn(contaMensagem);
-        replay(contaMensagemRepositorio);
+        when(contaMensagemRepositorio.recuperaMensagemConta(anoMesReferencia, null, null, null, null)).thenReturn(contaMensagem);
     }
     
     private void mockMensagemAnormalidade(String[] msg){
-        expect(mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia)).andReturn(msg);
-        replay(mensagemAnormalidadeContaBO);
+        when(mensagemAnormalidadeContaBO.obterMensagemAnormalidadeConsumo(imovel, anoMesReferencia)).thenReturn(msg);
     }
     
     private void mockDadosBancarios(){
-        expect(debitoAutomaticoRepositorio.dadosBancarios(imovel.getId())).andReturn(dadosBancarios);
-        replay(debitoAutomaticoRepositorio);
+        when(debitoAutomaticoRepositorio.dadosBancarios(imovel.getId())).thenReturn(dadosBancarios);
     }
 }

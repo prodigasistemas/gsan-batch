@@ -1,26 +1,23 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.atendimentopublico.LigacaoEsgoto;
 import br.gov.model.cadastro.Imovel;
 import br.gov.servicos.atendimentopublico.LigacaoEsgotoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class EsgotoBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private EsgotoBO esgotoBO;
 	
 	@Mock
@@ -32,6 +29,8 @@ public class EsgotoBOTest {
 	@Before
 	public void setup(){
 		esgotoBO = new EsgotoBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -43,14 +42,12 @@ public class EsgotoBOTest {
 	}
 
 	private void mockImovel() {
-		expect(imovel.getId()).andReturn(1);
-		expect(imovel.faturamentoEsgotoAtivo()).andReturn(true);
-		replay(imovel);
+		when(imovel.getId()).thenReturn(1);
+		when(imovel.faturamentoEsgotoAtivo()).thenReturn(true);
 	}
 	
 	private void mockRepositorio(){
-		expect(repositorio.buscarLigacaoEsgotoPorIdImovel(1)).andReturn(getLigacaoEsgoto());
-		replay(repositorio);
+		when(repositorio.buscarLigacaoEsgotoPorIdImovel(1)).thenReturn(getLigacaoEsgoto());
 	}
 	
 	private LigacaoEsgoto getLigacaoEsgoto(){

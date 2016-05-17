@@ -1,25 +1,22 @@
 package br.gov.batch.servicos.batch;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.to.ControleExecucaoTO;
 import br.gov.model.batch.ControleProcessoAtividade;
 import br.gov.model.batch.ProcessoAtividade;
 import br.gov.servicos.batch.ControleProcessoAtividadeRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ControleExecucaoBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private ControleExecucaoBO controleExecucaoBO;
 	
 	@Mock
@@ -34,6 +31,8 @@ public class ControleExecucaoBOTest {
 	@Before
 	public void setup() {
 		controleExecucaoBO = new ControleExecucaoBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -51,20 +50,17 @@ public class ControleExecucaoBOTest {
 	}
 	
 	private void mockRepositorio(){
-		expect(repositorioMock.obterPorID(1)).andReturn(controleProcessoAtividadeMock);
-		replay(repositorioMock);
+		when(repositorioMock.obterPorID(1)).thenReturn(controleProcessoAtividadeMock);
 	}
 	
 	private void mockControleProcessoAtividade(){
-		expect(controleProcessoAtividadeMock.getId()).andReturn(1);
-		expect(controleProcessoAtividadeMock.getTotalItens()).andReturn(10);
-		expect(controleProcessoAtividadeMock.getAtividade()).andReturn(processoAtividadeMock).times(2);
-		replay(controleProcessoAtividadeMock);
+		when(controleProcessoAtividadeMock.getId()).thenReturn(1);
+		when(controleProcessoAtividadeMock.getTotalItens()).thenReturn(10);
+		when(controleProcessoAtividadeMock.getAtividade()).thenReturn(processoAtividadeMock);
 	}
 	
 	private void mockProcessoAtividade(){
-		expect(processoAtividadeMock.getLimiteExecucao()).andReturn(Short.valueOf("6"));
-		expect(processoAtividadeMock.getDescricao()).andReturn("Alguma atividade");
-		replay(processoAtividadeMock);
+		when(processoAtividadeMock.getLimiteExecucao()).thenReturn(Short.valueOf("6"));
+		when(processoAtividadeMock.getDescricao()).thenReturn("Alguma atividade");
 	}
 }
