@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
 import static br.gov.model.util.Utilitarios.quebraLinha;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.Conta;
@@ -22,10 +20,9 @@ import br.gov.model.faturamento.DebitoTipo;
 import br.gov.servicos.faturamento.DebitoCobradoRepositorio;
 import br.gov.servicos.to.DebitoCobradoNaoParceladoTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo04DebitoCobradoSemParcelamentoTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo04 arquivo;
 	
 	@Mock
@@ -51,6 +48,8 @@ public class ArquivoTextoTipo04DebitoCobradoSemParcelamentoTest {
         conta.setImovel(imovel);
 	    
 		arquivo = new ArquivoTextoTipo04();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -266,7 +265,6 @@ public class ArquivoTextoTipo04DebitoCobradoSemParcelamentoTest {
     }
     
     private void carregarMocks(List<DebitoCobradoNaoParceladoTO> debitos) {
-        expect(debitoCobradoRepositorioMock.pesquisarDebitoCobradoSemParcelamento(conta.getId())).andReturn(debitos);
-        replay(debitoCobradoRepositorioMock);
+        when(debitoCobradoRepositorioMock.pesquisarDebitoCobradoSemParcelamento(conta.getId())).thenReturn(debitos);
     }
 }

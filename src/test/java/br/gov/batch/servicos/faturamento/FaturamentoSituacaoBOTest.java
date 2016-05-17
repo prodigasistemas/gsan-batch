@@ -1,18 +1,16 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.Status;
 import br.gov.model.cadastro.Imovel;
@@ -20,10 +18,9 @@ import br.gov.model.faturamento.FaturamentoSituacaoHistorico;
 import br.gov.model.faturamento.FaturamentoSituacaoTipo;
 import br.gov.servicos.faturamento.FaturamentoSituacaoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class FaturamentoSituacaoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private FaturamentoSituacaoBO bo;
 	
 	@Mock
@@ -45,6 +42,8 @@ public class FaturamentoSituacaoBOTest {
 		faturamentoSituacaoHistorico.setAnoMesFaturamentoSituacaoFim(201501);
 		
 		faturamentoSituacaoTipo = new FaturamentoSituacaoTipo();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -127,8 +126,6 @@ public class FaturamentoSituacaoBOTest {
 	
 	private void carregarMocks(FaturamentoSituacaoHistorico faturamentoSituacaoHistorico ) {
 		List<FaturamentoSituacaoHistorico> list = Arrays.asList(faturamentoSituacaoHistorico);
-		expect(faturamentoSituacaoRepositorioMock.faturamentosHistoricoVigentesPorImovel(imovel.getId())).andReturn(list);
-		
-		replay(faturamentoSituacaoRepositorioMock);
+		when(faturamentoSituacaoRepositorioMock.faturamentosHistoricoVigentesPorImovel(imovel.getId())).thenReturn(list);
 	}
 }

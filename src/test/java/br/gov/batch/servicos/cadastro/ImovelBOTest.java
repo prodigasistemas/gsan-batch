@@ -1,26 +1,23 @@
 package br.gov.batch.servicos.cadastro;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.to.AreaConstruidaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ImovelBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private ImovelBO imovelBO;
 
 	@Mock
@@ -29,6 +26,8 @@ public class ImovelBOTest {
 	@Before
 	public void setup() {
 		imovelBO = new ImovelBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -77,13 +76,11 @@ public class ImovelBOTest {
 	}
 
 	private void mockFaturamentoGrupo(FaturamentoGrupo grupoRotaAlternativa, FaturamentoGrupo grupo) {
-		expect(imovelRepositorioMock.pesquisarFaturamentoGrupoRotaAlternativa(1)).andReturn(grupoRotaAlternativa);
-		expect(imovelRepositorioMock.pesquisarFaturamentoGrupo(1)).andReturn(grupo);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.pesquisarFaturamentoGrupoRotaAlternativa(1)).thenReturn(grupoRotaAlternativa);
+		when(imovelRepositorioMock.pesquisarFaturamentoGrupo(1)).thenReturn(grupo);
 	}
 
 	private void mockAreaConstruida(AreaConstruidaTO to) {
-		expect(imovelRepositorioMock.dadosAreaConstruida(1)).andReturn(to);
-		replay(imovelRepositorioMock);
+		when(imovelRepositorioMock.dadosAreaConstruida(1)).thenReturn(to);
 	}
 }

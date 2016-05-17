@@ -82,11 +82,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>3.2</version>
-			<scope>test</scope>
-		</dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-all</artifactId>
+		    <version>1.10.19</version>
+		</dependency>		
 
 		<dependency>
 			<groupId>org.jboss.arquillian.junit</groupId>

@@ -1,18 +1,16 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.VolumeMedioAguaEsgotoTO;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
@@ -22,10 +20,9 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class AguaEsgotoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private AguaEsgotoBO aguaEsgotoBO;
 	
 	@Mock
@@ -46,6 +43,7 @@ public class AguaEsgotoBOTest {
 	@Before
 	public void setup() {
 		aguaEsgotoBO = new AguaEsgotoBO();
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -99,45 +97,37 @@ public class AguaEsgotoBOTest {
 	}
 	
 	private void mockParametros() {
-		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(Short.valueOf("6")).times(3);
-		expect(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).andReturn(Short.valueOf("24")).times(3);
-		expect(sistemaParametrosMock.getIndicadorTarifaCategoria()).andReturn(Short.valueOf("1")).times(3);
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.getMesesMediaConsumo()).thenReturn(Short.valueOf("6"));
+		when(sistemaParametrosMock.getNumeroMesesMaximoCalculoMedia()).thenReturn(Short.valueOf("24"));
+		when(sistemaParametrosMock.getIndicadorTarifaCategoria()).thenReturn(Short.valueOf("1"));
 	}
 	
 	private void mockConsumoHistoricoSemMesRetroagido() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(getListaConsumoHistoricoSemMesRetroagido());
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).thenReturn(getListaConsumoHistoricoSemMesRetroagido());
 	}
 	
 	private void mockConsumoHistoricoComMesRetroagido() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(getListaConsumoHistoricoComMesRetroagido());
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).thenReturn(getListaConsumoHistoricoComMesRetroagido());
 	}
 	
 	private void mockConsumoHistoricoNulo() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(null);
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).thenReturn(null);
 	}
 	
 	private void mockConsumoHistoricoVazio() {
-		expect(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).andReturn(new ArrayList<ConsumoHistorico>());
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.obterConsumoMedio(1, 201201, 201407, 1)).thenReturn(new ArrayList<ConsumoHistorico>());
 	}
 	
 	private void mockCategoria() {
-		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).andReturn(null);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(1)).thenReturn(null);
 	}
 	
 	private void mockConsumoTarifa() {
-		expect(consumoTarifaRepositorioMock.consumoTarifaDoImovel(1)).andReturn(1);
-		replay(consumoTarifaRepositorioMock);
+		when(consumoTarifaRepositorioMock.consumoTarifaDoImovel(1)).thenReturn(1);
 	}
 	
 	private void mockConsumoMinimoPorLigacao() {
-		expect(consumoBOMock.obterConsumoMinimoLigacaoPorCategoria(1, 1, null)).andReturn(30);
-		replay(consumoBOMock);
+		when(consumoBOMock.obterConsumoMinimoLigacaoPorCategoria(1, 1, null)).thenReturn(30);
 	}
 	
 	private List<ConsumoHistorico> getListaConsumoHistoricoSemMesRetroagido() {
