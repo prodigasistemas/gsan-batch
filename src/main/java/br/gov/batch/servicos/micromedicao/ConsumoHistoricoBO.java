@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -81,5 +82,9 @@ public class ConsumoHistoricoBO {
 		}
 
 		return mesesConsumo > 0 ? somaConsumo / mesesConsumo : 0;
+	}
+
+	public Integer getConsumoMes(Imovel imovel, Integer referenciaMes, LigacaoTipo agua) {
+		return null;
 	}
 }
