@@ -87,4 +87,8 @@ public class ConsumoHistoricoBO {
 	public Integer getConsumoMes(Imovel imovel, Integer referenciaMes, LigacaoTipo agua) {
 		return null;
 	}
+
+	public ConsumoHistorico getConsumoHistoricoPorReferencia(Imovel imovel, Integer referencia) {
+		return null;
+	}
 }

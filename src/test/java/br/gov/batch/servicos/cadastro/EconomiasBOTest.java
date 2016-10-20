@@ -45,7 +45,7 @@ public class EconomiasBOTest {
 	public void quantidadeEconomiasVirtuais() {
 		mockSubcategoria();
 
-		assertEquals(5, economiasBO.quantidadeEconomiasVirtuais(1).intValue());
+		assertEquals(5, economiasBO.getQuantidadeTotalEconomias(1).intValue());
 	}
 
 	private void mockSubcategoria() {

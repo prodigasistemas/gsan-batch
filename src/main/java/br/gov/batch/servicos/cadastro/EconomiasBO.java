@@ -14,7 +14,7 @@ public class EconomiasBO {
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
-	public Integer quantidadeEconomiasVirtuais(Integer idImovel) {
+	public Integer getQuantidadeTotalEconomias(Integer idImovel) {
 		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
 
 		Integer quantidadeEconomias = 0;

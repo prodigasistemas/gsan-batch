@@ -140,7 +140,7 @@ public class ConsumoBOTest {
 	}
 
 	private void mockQuantidadeEconomiasVirtuais() {
-		when(economiasBOMock.quantidadeEconomiasVirtuais(any())).thenReturn(2);
+		when(economiasBOMock.getQuantidadeTotalEconomias(any())).thenReturn(2);
 	}
 
 	private void mockAreaConstruida() {

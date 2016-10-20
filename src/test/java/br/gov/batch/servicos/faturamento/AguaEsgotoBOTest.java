@@ -127,7 +127,7 @@ public class AguaEsgotoBOTest {
 	}
 	
 	private void mockConsumoMinimoPorLigacao() {
-		when(consumoBOMock.obterConsumoMinimoLigacaoPorCategoria(1, 1, null)).thenReturn(30);
+		when(consumoBOMock.obterConsumoMinimoLigacaoCategorias(1, 1, null)).thenReturn(30);
 	}
 	
 	private List<ConsumoHistorico> getListaConsumoHistoricoSemMesRetroagido() {

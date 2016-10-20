@@ -63,7 +63,7 @@ public class ConsumoBO {
 	}
 
 	public int obterConsumoNaoMedidoSemTarifa(Integer idImovel, Integer anoMesReferencia) {
-		Integer qtdEconomiasVirtuais = economiasBO.quantidadeEconomiasVirtuais(idImovel);
+		Integer qtdEconomiasVirtuais = economiasBO.getQuantidadeTotalEconomias(idImovel);
 
 		BigDecimal areaConstruida = imovelBO.verificarAreaConstruida(idImovel);
 
@@ -91,25 +91,70 @@ public class ConsumoBO {
 
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
 
-		return obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, categorias);
+		return obterConsumoMinimoLigacaoCategorias(idImovel, idTarifa, categorias);
+	}
+	
+	public Integer valorMinimoTarifa(Integer idImovel) {
+		Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
+		
+		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
+		
+		return obterValorMinimoTarifaCategorias(idTarifa, categorias);
 	}
 
-	public int obterConsumoMinimoLigacaoPorCategoria(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias) {
+	private Integer obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
+		int valorMinimoTarifa = 0;
+		
+		for (ICategoria categoria : categorias) {
+			valorMinimoTarifa += obterValorMinimoTarifaPorCategoria(idTarifa, categoria);
+		}
+
+		return valorMinimoTarifa;
+	}
+
+	public int obterValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
+		int valorMinimoTarifa = getValorMinimoTarifaPorCategoria(idTarifa, categoria);
+
+		if (categoria.getFatorEconomias() != null) {
+			valorMinimoTarifa += valorMinimoTarifa * categoria.getFatorEconomias().intValue();
+		} else {
+			valorMinimoTarifa += valorMinimoTarifa * categoria.getQuantidadeEconomias();
+		}
+		return valorMinimoTarifa;
+	}
+
+
+	public int obterConsumoMinimoLigacaoCategorias(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias) {
 		int consumoMinimoLigacao = 0;
 
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
-
 		for (ICategoria categoria : categorias) {
-			Integer consumoMinimoTarifa = consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
-
-			if (categoria.getFatorEconomias() != null) {
-				consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
-			} else {
-				consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
-			}
+			consumoMinimoLigacao += obterConsumoMinimoLigacaoPorCategoria(consumoMinimoLigacao, idTarifa, categoria);
 		}
 
 		return consumoMinimoLigacao;
+	}
+
+	public int obterConsumoMinimoLigacaoPorCategoria(int consumoMinimoLigacao, Integer idTarifa, ICategoria categoria) {
+		Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(idTarifa, categoria);
+
+		if (categoria.getFatorEconomias() != null) {
+			consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
+		} else {
+			consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
+		}
+		return consumoMinimoLigacao;
+	}
+
+	public int getValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
+		
+		return consumoTarifaCategoriaRepositorio.valorMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
+	}
+
+	public int getConsumoMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
+		
+		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}
 
 }
