@@ -81,7 +81,9 @@ public class ConsumoImovelBO {
 		if(calculoExcessoImovel(consumoHistorico) > 0) {
 			consumoImovelTO.setConsumoExcedenteCategoria(calculoExcessoEconomia(consumoHistorico, qtdTotalEconomias));
 		} else {
-			consumoImovelTO.setConsumoExcedenteCategoria(consumoPorEconomia - numeroConsumoMinimo);	
+			int valor = consumoPorEconomia - numeroConsumoMinimo;
+			
+			consumoImovelTO.setConsumoExcedenteCategoria(valor > 0 ? valor : 0);	
 		}
 	}
 
