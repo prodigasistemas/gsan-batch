@@ -154,5 +154,20 @@ public class ConsumoImovelBOTest {
 		assertEquals(new Integer(10), list.get(1).getConsumoEconomiaCategoria());
 		assertEquals(new Integer(1), list.get(1).getConsumoExcedenteCategoria());
 	}
+	
+	@Test
+	public void addConsumoImovelTOUmaCategoriaUmaEconomiaConsumoMenorMinimo() {
+		when(economiasBOMock.getQuantidadeTotalEconomias(imovelMock.getId())).thenReturn(1);
+		when(consumoBOMock.consumoMinimoLigacao(imovelMock.getId())).thenReturn(10);
+		when(consumoHistoricoMock.getNumeroConsumoFaturadoMes()).thenReturn(9);
+		when(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(umaCategoria);
+		
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		List<ConsumoImovelTO> list = bo.getConsumoImoveisTO();
+		
+		assertEquals(1, list.size());
+		assertEquals(new Integer(9), list.get(0).getConsumoEconomiaCategoria());
+		assertEquals(new Integer(0), list.get(0).getConsumoExcedenteCategoria());
+	}
 
 }
