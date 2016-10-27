@@ -12,12 +12,12 @@ import javax.ejb.Stateless;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
-import br.gov.batch.servicos.faturamento.tarifa.ConsumoImovelBO;
+import br.gov.batch.servicos.faturamento.tarifa.ConsumoImovelCategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
 import br.gov.batch.util.Util;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
-import br.gov.model.faturamento.ConsumoImovelTO;
+import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
 import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -30,7 +30,7 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 public class ContratoMedicaoBO {
 	
 	@EJB
-	private ConsumoImovelBO consumoImovelBO;
+	private ConsumoImovelCategoriaBO consumoImovelBO;
 	
 	@EJB
 	private ConsumoHistoricoBO consumoHistoricoBO;
@@ -73,10 +73,10 @@ public class ContratoMedicaoBO {
 		List<ConsumoTarifaVigencia> tarifasVigentes = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(medicaoHistorico.getDataLeituraAnteriorFaturamento(), 
 																												medicaoHistorico.getDataLeituraAtualInformada());
 		
-		Map<ConsumoTarifaVigencia, List<ConsumoImovelTO>> consumoTarifaImoveisMap = new HashMap<ConsumoTarifaVigencia, List<ConsumoImovelTO>>();
+		Map<ConsumoTarifaVigencia, List<ConsumoImovelCategoriaTO>> consumoTarifaImoveisMap = new HashMap<ConsumoTarifaVigencia, List<ConsumoImovelCategoriaTO>>();
 		
 		for (ConsumoTarifaVigencia consumoTarifaVigencia : tarifasVigentes) {
-			List<ConsumoImovelTO> consumoImoveisTO = consumoImovelBO.distribuirConsumoPorCategoria(consumoHistorico, consumoTarifaVigencia);
+			List<ConsumoImovelCategoriaTO> consumoImoveisTO = consumoImovelBO.distribuirConsumoPorCategoria(consumoHistorico, consumoTarifaVigencia);
 			consumoTarifaImoveisMap.put(consumoTarifaVigencia, consumoImoveisTO);
 		}
 		
