@@ -2,22 +2,27 @@ package br.gov.batch.servicos.micromedicao;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import br.gov.batch.servicos.cadastro.EconomiasBO;
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.SistemaParametros;
+import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
+import br.gov.model.faturamento.ConsumoTarifaVigencia;
+import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoMinimoAreaRepositorio;
+import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
+import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 @Stateless
@@ -39,9 +44,6 @@ public class ConsumoBO {
 	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
 
 	@EJB
-	private EconomiasBO economiasBO;
-
-	@EJB
 	private ImovelBO imovelBO;
 
 	@EJB
@@ -61,9 +63,9 @@ public class ConsumoBO {
 			return this.obterConsumoNaoMedidoSemTarifa(idImovel, anoMesReferencia);
 		}
 	}
-
+	
 	public int obterConsumoNaoMedidoSemTarifa(Integer idImovel, Integer anoMesReferencia) {
-		Integer qtdEconomiasVirtuais = economiasBO.getQuantidadeTotalEconomias(idImovel);
+		Integer qtdEconomiasVirtuais = getQuantidadeTotalEconomias(idImovel);
 
 		BigDecimal areaConstruida = imovelBO.verificarAreaConstruida(idImovel);
 
@@ -94,7 +96,7 @@ public class ConsumoBO {
 		return obterConsumoMinimoLigacaoCategorias(idImovel, idTarifa, categorias);
 	}
 	
-	public Integer valorMinimoTarifa(Integer idImovel) {
+	public BigDecimal valorMinimoTarifa(Integer idImovel) {
 		Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
 		
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
@@ -102,23 +104,23 @@ public class ConsumoBO {
 		return obterValorMinimoTarifaCategorias(idTarifa, categorias);
 	}
 
-	private Integer obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
-		int valorMinimoTarifa = 0;
+	private BigDecimal obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
+		BigDecimal valorMinimoTarifa = BigDecimal.ZERO;
 		
 		for (ICategoria categoria : categorias) {
-			valorMinimoTarifa += obterValorMinimoTarifaPorCategoria(idTarifa, categoria);
+			valorMinimoTarifa.add(obterValorMinimoTarifaPorCategoria(idTarifa, categoria));
 		}
 
 		return valorMinimoTarifa;
 	}
 
-	public int obterValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
-		int valorMinimoTarifa = getValorMinimoTarifaPorCategoria(idTarifa, categoria);
+	public BigDecimal obterValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
+		BigDecimal valorMinimoTarifa = getValorMinimoTarifaPorCategoria(idTarifa, categoria);
 
 		if (categoria.getFatorEconomias() != null) {
-			valorMinimoTarifa += valorMinimoTarifa * categoria.getFatorEconomias().intValue();
+			valorMinimoTarifa.add(valorMinimoTarifa.multiply(new BigDecimal(categoria.getFatorEconomias())));
 		} else {
-			valorMinimoTarifa += valorMinimoTarifa * categoria.getQuantidadeEconomias();
+			valorMinimoTarifa.add(valorMinimoTarifa.multiply(new BigDecimal(categoria.getQuantidadeEconomias())));
 		}
 		return valorMinimoTarifa;
 	}
@@ -145,7 +147,7 @@ public class ConsumoBO {
 		return consumoMinimoLigacao;
 	}
 
-	public int getValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
+	public BigDecimal getValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
 		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
 		
 		return consumoTarifaCategoriaRepositorio.valorMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
@@ -157,4 +159,37 @@ public class ConsumoBO {
 		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}
 
+	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovel(Integer imovelId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Integer getQuantidadeTotalEconomias(Integer idImovel) {
+		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
+
+		Integer quantidadeEconomias = 0;
+		for (ICategoria subcategoria : subcategorias) {
+			quantidadeEconomias += getQuantidadeEconomiasPorCategoria(subcategoria);
+		}
+		
+		return quantidadeEconomias;
+	}
+
+	public Integer getQuantidadeEconomiasPorCategoria(ICategoria subcategoria) {
+		Integer quantidadeEconomias = 0;
+		if (subcategoria.getCategoria().getFatorEconomias() != null) {
+			quantidadeEconomias = subcategoria.getCategoria().getFatorEconomias().intValue();
+		} else {
+			quantidadeEconomias = subcategoria.getQuantidadeEconomias();
+		}
+		return quantidadeEconomias;
+	}
+	
+	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(ConsumoTarifaVigencia consumoTarifaVigencia, ICategoria categoria) {
+		return null;
+	}
+
+	public List<ConsumoTarifaFaixaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO, MedicaoHistorico medicaoHistorico) {
+		return null;
+	}
 }

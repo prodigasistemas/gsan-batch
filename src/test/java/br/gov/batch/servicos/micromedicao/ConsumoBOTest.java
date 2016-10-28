@@ -1,8 +1,8 @@
 package br.gov.batch.servicos.micromedicao;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import br.gov.batch.servicos.cadastro.EconomiasBO;
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.Categoria;
@@ -51,9 +50,6 @@ public class ConsumoBOTest {
 
 	@Mock
 	private ConsumoMinimoAreaRepositorio consumoMinimoAreaRepositorioMock;
-
-	@Mock
-	private EconomiasBO economiasBOMock;
 
 	@Mock
 	private ImovelBO imovelBOMock;
@@ -106,7 +102,6 @@ public class ConsumoBOTest {
 	@Test
 	public void consumoNaoMedidoSemTarifa() {
 		mockParametroInativo();
-		mockQuantidadeEconomiasVirtuais();
 		mockAreaConstruida();
 		mockSubcategorias();
 		mockConsumoMinimoArea();
@@ -137,10 +132,6 @@ public class ConsumoBOTest {
 	private void mockConsumoMinimoTarifa() {
 		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(10);
 		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(20);
-	}
-
-	private void mockQuantidadeEconomiasVirtuais() {
-		when(economiasBOMock.getQuantidadeTotalEconomias(any())).thenReturn(2);
 	}
 
 	private void mockAreaConstruida() {
