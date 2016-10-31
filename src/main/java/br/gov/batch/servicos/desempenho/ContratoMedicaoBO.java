@@ -69,11 +69,8 @@ public class ContratoMedicaoBO {
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		
 		for (ConsumoTarifaVigencia consumoTarifaVigencia : tarifasVigentes) {
-			List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = consumoImovelBO.getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico);
-
-			for (ConsumoImovelCategoriaTO to : consumoImoveisCategoriaTO) {
-				valorTotalConsumo = valorTotalConsumo.add(to.getValorConsumo());
-			}
+			BigDecimal valorConsumoVigencia = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, medicaoHistorico);
+			valorTotalConsumo = valorTotalConsumo.add(valorConsumoVigencia);
 		}
 		
 		return valorTotalConsumo;

@@ -112,7 +112,7 @@ public class ContratoMedicaoBOTest {
 		
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoAtualMock);
 		
-		setupConsumoImoveisCategoriaTOAtual(new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
 		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(imovelMock, referencia));
 	}
@@ -136,27 +136,13 @@ public class ContratoMedicaoBOTest {
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoMesZeroMock, 
 																													medicaoHistoricoAtualMock);
 		
-		setupConsumoImoveisCategoriaTOMesZero(new BigDecimal(8.40));
-		setupConsumoImoveisCategoriaTOAtual(new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoMesZeroMock, new BigDecimal(8.40));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
 		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, referencia));
 	}
 	
-	private void setupConsumoImoveisCategoriaTOMesZero(BigDecimal valor) {
-		when(consumoImovelCategoriaMesZeroMock.getValorConsumo()).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
-
-		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaMesZero = new ArrayList<ConsumoImovelCategoriaTO>();
-		consumoImoveisCategoriaMesZero.add(consumoImovelCategoriaMesZeroMock);
-
-		when(consumoImovelCategoriaBOMock.getConsumoImoveisCategoriaTO(consumoHistoricoMesZeroMock, medicaoHistoricoMesZeroMock)).thenReturn(consumoImoveisCategoriaMesZero);
-	}
-	
-	private void setupConsumoImoveisCategoriaTOAtual(BigDecimal valor) {
-		when(consumoImovelCategoriaAtualTOMock.getValorConsumo()).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
-
-		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaAtual = new ArrayList<ConsumoImovelCategoriaTO>();
-		consumoImoveisCategoriaAtual.add(consumoImovelCategoriaAtualTOMock);
-
-		when(consumoImovelCategoriaBOMock.getConsumoImoveisCategoriaTO(consumoHistoricoAtualMock, medicaoHistoricoAtualMock)).thenReturn(consumoImoveisCategoriaAtual);
+	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, BigDecimal valor) {
+		when(consumoImovelCategoriaBOMock.getValorTotalConsumoImovel(consumoHistorico, medicaoHistorico)).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
 	}
 }

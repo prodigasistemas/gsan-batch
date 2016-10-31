@@ -290,6 +290,21 @@ public class ConsumoImovelCategoriaBOTest {
 		assertEquals(new BigDecimal(112.92).setScale(2, BigDecimal.ROUND_HALF_UP), consumoImoveisCategoriaTO.get(1).getValorConsumo());
 	}
 	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void calcularValorTotalConsumoDuasCategoriaSeteEconomias() {
+		configurarImovelDuasCategoriasSeteEconomias();
+		
+		List<ConsumoTarifaFaixaTO> faixasResidenciais = mockarFaixasResidencial(1);
+		List<ConsumoTarifaFaixaTO> faixasComerciais = mockarFaixasComerciais();
+		
+		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixasResidenciais, faixasComerciais);
+		
+		BigDecimal valorConsumoTotal = bo.getValorTotalConsumoImovel(consumoHistoricoMock, medicaoHistoricoMock);
+		
+		assertEquals(new BigDecimal(208.92).setScale(2, BigDecimal.ROUND_HALF_UP), valorConsumoTotal);
+	}
+	
 	private void configurarImovelUmaCategoriaConsumoMenorMinimo() {
 		when(consumoBOMock.getQuantidadeTotalEconomias(imovelMock.getId())).thenReturn(1);
 		when(consumoBOMock.consumoMinimoLigacao(imovelMock.getId())).thenReturn(10);

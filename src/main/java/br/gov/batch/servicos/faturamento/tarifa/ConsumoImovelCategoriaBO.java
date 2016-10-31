@@ -1,5 +1,6 @@
 package br.gov.batch.servicos.faturamento.tarifa;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +53,17 @@ public class ConsumoImovelCategoriaBO {
 		}
 		
 		return getConsumoImoveisCategoriaTO();
+	}
+	
+	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
+		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico);
+		
+		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
+		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : consumoImoveisCategoria) {
+			valorTotalConsumo = valorTotalConsumo.add(consumoImovelCategoriaTO.getValorConsumo());
+		}
+		
+		return valorTotalConsumo;
 	}
 	
 	private List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO() {
