@@ -10,13 +10,9 @@ import javax.ejb.Stateless;
 import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
-import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
-import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.MedicaoHistorico;
-import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
-import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 
@@ -29,30 +25,45 @@ public class ConsumoImovelCategoriaBO {
 	@EJB 
 	private ConsumoBO consumoBO;
 	
-	@EJB
-	private ConsumoTarifaBO consumoTarifaBO;
-	
-	@EJB
-	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
-	
-	@EJB
-	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
-	
-	@EJB 
-	private SistemaParametros sistemaParametros;
-	
-	private Integer consumoPorEconomia;
+	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
+		initConsumoImoveisCategoriaTO();
+		
+		distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico);
+		distribuirConsumoPorFaixa(medicaoHistorico);
+		
+		return getConsumoImoveisCategoriaTO();		
+	}
 	
 	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorCategoria(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		Collection<ICategoria> categorias = consumoBO.buscarQuantidadeEconomiasPorImovel(consumoHistorico.getImovel().getId());
-		
-		initConsumoImoveisCategoriaTOList();
 		
 		for (ICategoria categoria : categorias) {
 			addConsumoImovelCategoriaTO(consumoHistorico, medicaoHistorico, categoria);
 		}	
 		
 		return getConsumoImoveisCategoriaTO();
+	}
+	
+	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorFaixa(MedicaoHistorico medicaoHistorico) {
+		carregarTarifasConsumoImovelCategoria(medicaoHistorico);
+		
+		for (ConsumoImovelCategoriaTO consumoImovel : getConsumoImoveisCategoriaTO()) {
+			distribuirConsumoFaixaPorCategoria(consumoImovel, medicaoHistorico);
+		}
+		
+		return getConsumoImoveisCategoriaTO();
+	}
+	
+	private List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO() {
+		if(consumoImoveisCategoriaTO == null) {
+			initConsumoImoveisCategoriaTO();
+		}
+		
+		return consumoImoveisCategoriaTO;
+	}
+	
+	private void initConsumoImoveisCategoriaTO() {
+		consumoImoveisCategoriaTO = new ArrayList<ConsumoImovelCategoriaTO>();
 	}
 	
 	private void addConsumoImovelCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico,  ICategoria categoria) {
@@ -84,14 +95,6 @@ public class ConsumoImovelCategoriaBO {
 		return calculoExcessoImovel;
 	}
 	
-	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO() {
-		if(consumoImoveisCategoriaTO == null) {
-			initConsumoImoveisCategoriaTOList();
-		}
-		
-		return consumoImoveisCategoriaTO;
-	}
-	
 	private void setConsumoExcedenteCategoria(ConsumoHistorico consumoHistorico, int numeroConsumoMinimo, int qtdTotalEconomias, int consumoPorEconomia) {
 		if(calculoExcessoImovel(consumoHistorico) > 0) {
 			consumoImovelCategoriaTO.setConsumoExcedenteCategoria(calculoExcessoEconomia(consumoHistorico, qtdTotalEconomias));
@@ -115,29 +118,17 @@ public class ConsumoImovelCategoriaBO {
 	}
 
 	private int getConsumoPorEconomia(ConsumoHistorico consumoHistorico, int qtdTotalEconomias) {
-		this.consumoPorEconomia = 0;
+		int consumoPorEconomia = 0;
 		
 		if(qtdTotalEconomias != 0) {
-			this.consumoPorEconomia = consumoHistorico.getNumeroConsumoFaturadoMes() / qtdTotalEconomias;
+			consumoPorEconomia = consumoHistorico.getNumeroConsumoFaturadoMes() / qtdTotalEconomias;
 		}
 		
-		return this.consumoPorEconomia;
-	}
-	
-	public void initConsumoImoveisCategoriaTOList() {
-		consumoImoveisCategoriaTO = new ArrayList<ConsumoImovelCategoriaTO>();
+		return consumoPorEconomia;
 	}
 	
 	private void addConsumoImovelCategoriaTO(ConsumoImovelCategoriaTO consumoImovelTO) {
 		getConsumoImoveisCategoriaTO().add(consumoImovelTO);
-	}
-
-	public void distribuirConsumoPorFaixa(MedicaoHistorico medicaoHistorico) {
-		carregarTarifasConsumoImovelCategoria(medicaoHistorico);
-		
-		for (ConsumoImovelCategoriaTO consumoImovel : getConsumoImoveisCategoriaTO()) {
-			distribuirConsumoFaixaPorCategoria(consumoImovel, medicaoHistorico);
-		}
 	}
 
 	private void carregarTarifasConsumoImovelCategoria(MedicaoHistorico medicaoHistorico) {

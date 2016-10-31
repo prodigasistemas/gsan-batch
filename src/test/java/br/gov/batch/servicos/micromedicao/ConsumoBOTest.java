@@ -126,12 +126,11 @@ public class ConsumoBOTest {
 	}
 
 	private void mockMaiorDataVigencia() {
-		when(consumoTarifaVigenciaRepositorioMock.maiorDataVigenciaConsumoTarifa(any())).thenReturn(consumoTarifaVigenciaTO);
+		when(consumoTarifaVigenciaRepositorioMock.buscarConsumoTarifaVigenciaAtual(any())).thenReturn(consumoTarifaVigenciaTO);
 	}
 
 	private void mockConsumoMinimoTarifa() {
-		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(10);
-		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(20);
+		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(10, 20);
 	}
 
 	private void mockAreaConstruida() {

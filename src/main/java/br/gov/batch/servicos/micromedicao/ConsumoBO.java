@@ -157,13 +157,13 @@ public class ConsumoBO {
 	}
 
 	public BigDecimal getValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtual(idTarifa);
 		
 		return consumoTarifaCategoriaRepositorio.valorMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}
 
 	public int getConsumoMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(idTarifa);
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtual(idTarifa);
 		
 		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}

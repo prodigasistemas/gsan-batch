@@ -2,9 +2,7 @@ package br.gov.batch.servicos.desempenho;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -47,16 +45,9 @@ public class ContratoMedicaoBO {
 	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, Integer referencia) {
 		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovel.getId());
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
-
-		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaMesZero);
-		MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAgua(imovel.getId(), referenciaMesZero);
 		
-		BigDecimal valorConsumoMesZero = calcularValorConsumo(medicaoHistorico, consumoHistorico);
-		
-		consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
-		medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAgua(imovel.getId(), referencia);
-		
-		BigDecimal valorConsumoMesAtual = calcularValorConsumo(medicaoHistorico, consumoHistorico);
+		BigDecimal valorConsumoMesZero = calcularValorConsumo(imovel, referenciaMesZero);
+		BigDecimal valorConsumoMesAtual = calcularValorConsumo(imovel, referencia);
 		
 		return valorConsumoMesAtual.subtract(valorConsumoMesZero);
 	}
@@ -69,19 +60,20 @@ public class ContratoMedicaoBO {
 		return consumoReferencia - consumoMesZero;
 	}
 
-	public BigDecimal calcularValorConsumo(MedicaoHistorico medicaoHistorico, ConsumoHistorico consumoHistorico) {
-		List<ConsumoTarifaVigencia> tarifasVigentes = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(medicaoHistorico.getDataLeituraAnteriorFaturamento(), 
-																											medicaoHistorico.getDataLeituraAtualInformada());
+	public BigDecimal calcularValorConsumo(Imovel imovel, int referencia) {
+		MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAgua(imovel.getId(), referencia);
+		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
+		
+		List<ConsumoTarifaVigencia> tarifasVigentes = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(medicaoHistorico.getDataLeituraAnteriorFaturamento(),
+																												medicaoHistorico.getDataLeituraAtualInformada());
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		
 		for (ConsumoTarifaVigencia consumoTarifaVigencia : tarifasVigentes) {
-			consumoImovelBO.distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico);
-			consumoImovelBO.distribuirConsumoPorFaixa(medicaoHistorico);
+			List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = consumoImovelBO.getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico);
 
-			for (ConsumoImovelCategoriaTO to : consumoImovelBO.getConsumoImoveisCategoriaTO()) {
-				valorTotalConsumo.add(to.getValorConsumo());
+			for (ConsumoImovelCategoriaTO to : consumoImoveisCategoriaTO) {
+				valorTotalConsumo = valorTotalConsumo.add(to.getValorConsumo());
 			}
-			
 		}
 		
 		return valorTotalConsumo;
@@ -93,7 +85,7 @@ public class ContratoMedicaoBO {
 		return qtdDias++;
 	}
 	
-	private Integer getReferenciaMesZero(ContratoMedicao contratoMedicao) {
+	public Integer getReferenciaMesZero(ContratoMedicao contratoMedicao) {
 		Date referenciaAssinatura = contratoMedicao.getDataAssinatura();
 		
 		return Util.getAnoMesComoInteger(referenciaAssinatura);
