@@ -1,6 +1,7 @@
 package br.gov.batch.servicos.micromedicao;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,15 +10,17 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cadastro.ImovelBO;
+import br.gov.batch.servicos.faturamento.tarifa.ConsumoTarifaBO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.ICategoria;
+import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
-import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
+import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoMinimoAreaRepositorio;
@@ -42,9 +45,15 @@ public class ConsumoBO {
 
 	@EJB
 	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorio;
+	
+	@EJB
+	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorio;
 
 	@EJB
 	private ImovelBO imovelBO;
+	
+	@EJB
+	private ConsumoTarifaBO consumoTarifaBO; 
 
 	@EJB
 	private ConsumoMinimoAreaRepositorio consumoMinimoAreaRepositorio;
@@ -159,9 +168,8 @@ public class ConsumoBO {
 		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}
 
-	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovel(Integer imovelId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovel(Integer idImovel) {
+		return imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
 	}
 
 	public Integer getQuantidadeTotalEconomias(Integer idImovel) {
@@ -185,11 +193,28 @@ public class ConsumoBO {
 		return quantidadeEconomias;
 	}
 	
-	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(ConsumoTarifaVigencia consumoTarifaVigencia, ICategoria categoria) {
-		return null;
+	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, MedicaoHistorico medicaoHistorico, ICategoria categoria) {
+		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterTarifasPorReferencia(imovel, medicaoHistorico, sistemaParametros);
+		
+		for (ConsumoTarifaCategoriaTO to : consumoTarifasCategoria) {
+			if (to.getCategoria().getId().intValue() == categoria.getId().intValue()) {
+				consumoTarifasCategoria.remove(to);
+			}
+		}
+		return consumoTarifasCategoria;
 	}
 
 	public List<ConsumoTarifaFaixaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO, MedicaoHistorico medicaoHistorico) {
-		return null;
+		List<Integer> ids = getIdsConsumoTarifasCategoria(consumoImovelCategoriaTO.getConsumoTarifasCategoria());
+		return consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(ids);
+	}
+	
+	private List<Integer> getIdsConsumoTarifasCategoria(List<ConsumoTarifaCategoriaTO> consumotarifasCategoria) {
+		List<Integer> ids = new ArrayList<Integer>();
+
+		consumotarifasCategoria.forEach((consumoTarifacategoria) -> {
+			ids.add(consumoTarifacategoria.getId());
+		});
+		return ids;
 	}
 }

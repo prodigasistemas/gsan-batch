@@ -71,23 +71,20 @@ public class ContratoMedicaoBO {
 
 	public BigDecimal calcularValorConsumo(MedicaoHistorico medicaoHistorico, ConsumoHistorico consumoHistorico) {
 		List<ConsumoTarifaVigencia> tarifasVigentes = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(medicaoHistorico.getDataLeituraAnteriorFaturamento(), 
-																												medicaoHistorico.getDataLeituraAtualInformada());
-		
-		Map<ConsumoTarifaVigencia, List<ConsumoImovelCategoriaTO>> consumoTarifaImoveisMap = new HashMap<ConsumoTarifaVigencia, List<ConsumoImovelCategoriaTO>>();
+																											medicaoHistorico.getDataLeituraAtualInformada());
+		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		
 		for (ConsumoTarifaVigencia consumoTarifaVigencia : tarifasVigentes) {
-			List<ConsumoImovelCategoriaTO> consumoImoveisTO = consumoImovelBO.distribuirConsumoPorCategoria(consumoHistorico, consumoTarifaVigencia);
-			consumoTarifaImoveisMap.put(consumoTarifaVigencia, consumoImoveisTO);
+			consumoImovelBO.distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico);
+			consumoImovelBO.distribuirConsumoPorFaixa(medicaoHistorico);
+
+			for (ConsumoImovelCategoriaTO to : consumoImovelBO.getConsumoImoveisCategoriaTO()) {
+				valorTotalConsumo.add(to.getValorConsumo());
+			}
+			
 		}
 		
-//		int valorMinimoTarifa = consumoBO.valorMinimoTarifa(imovel.getId());
-		
-//		int valorTarifaMinimaCategoria = consumoBO.obterValorMinimoTarifaPorCategoria(consumoTarifaVigencia.getId(), categoria);
-//		int consumoMinimoCategoria = consumoBO.obterConsumoMinimoLigacaoPorCategoria(imovel.getId(), consumoTarifaVigencia.getId(), categoria);
-
-//		int valorEconomiaCategoria = consumoBO.getValorMinimoTarifaPorCategoria(consumoTarifaVigencia.getId(), categoria);
-		
-		return null;
+		return valorTotalConsumo;
 	}
 
 	public int calcularQuantidadeDiasLeitura(DateTime dataLeituraAnterior, DateTime dataLeituraAtual) {

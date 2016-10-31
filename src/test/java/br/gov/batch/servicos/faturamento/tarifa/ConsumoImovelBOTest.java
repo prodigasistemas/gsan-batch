@@ -37,11 +37,11 @@ public class ConsumoImovelBOTest {
 	@Mock private ConsumoHistorico consumoHistoricoMock;
 	@Mock private Imovel imovelMock;
 	@Mock private ConsumoBO consumoBOMock;
-	@Mock private ConsumoTarifaVigencia consumoTarifaVigenciaMock;
+	@Mock private MedicaoHistorico consumoTarifaVigenciaMock;
 	@Mock private ICategoria categoriaResidencialMock;
 	@Mock private ICategoria categoriaComercialMock;
 	@Mock private MedicaoHistorico medicaoHistoricoMock;
-	@Mock private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorioMock;
+	@Mock private ConsumoTarifaVigencia consumotarifaVigenciaMock;
 	
 	@Mock private ConsumoTarifaCategoriaTO consumoTarifaCategoriaResidencialMock;
 	@Mock private ConsumoTarifaCategoriaTO consumoTarifaCategoriaComercialMock;
@@ -49,7 +49,6 @@ public class ConsumoImovelBOTest {
 	@Mock private ConsumoTarifaFaixaTO faixaResidencial11a20;
 	@Mock private ConsumoTarifaFaixaTO faixaResidencial21a30;
 	@Mock private ConsumoTarifaFaixaTO faixaResidencial31a40;
-	
 	@Mock private ConsumoTarifaFaixaTO faixaComercialMaior10;
 	
 	@InjectMocks private ConsumoImovelCategoriaBO bo;
@@ -66,8 +65,8 @@ public class ConsumoImovelBOTest {
 		
 		MockitoAnnotations.initMocks(this);
 		
-		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(consumoTarifaVigenciaMock.getId(), categoriaResidencialMock)).thenReturn(10);
-		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(consumoTarifaVigenciaMock.getId(), categoriaComercialMock)).thenReturn(10);
+		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(medicaoHistoricoMock.getId(), categoriaResidencialMock)).thenReturn(10);
+		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(medicaoHistoricoMock.getId(), categoriaComercialMock)).thenReturn(10);
 		when(consumoHistoricoMock.getImovel()).thenReturn(imovelMock);
 		
 		when(medicaoHistoricoMock.getDataLeituraAnteriorFaturamento()).thenReturn(new Date());
@@ -89,10 +88,10 @@ public class ConsumoImovelBOTest {
 	}
 	
 	@Test
-	public void addConsumoImovelTOUmaCategoriaUmaEconomia() {
+	public void distribuirConsumoPorCategoriaUmaCategoriaUmaEconomia() {
 		configurarImovelUmaCategoriaUmaEconomia();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoImovelCategoriaTO> list = bo.getConsumoImoveisCategoriaTO();
 		
@@ -102,10 +101,10 @@ public class ConsumoImovelBOTest {
 	}
 	
 	@Test
-	public void addConsumoImovelTOUmaCategoriaTresEconomias() {
+	public void distribuirConsumoPorCategoriaUmaCategoriaTresEconomias() {
 		configurarImovelUmaCategoriaTresEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoImovelCategoriaTO> list = bo.getConsumoImoveisCategoriaTO();
 		
@@ -118,7 +117,7 @@ public class ConsumoImovelBOTest {
 	public void distribuirConsumoPorCategoriaDuasCategoriasDuasEconomias() {
 		configurarImovelDuasCategoriasDuasEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoImovelCategoriaTO> list = bo.getConsumoImoveisCategoriaTO();
 		
@@ -131,10 +130,10 @@ public class ConsumoImovelBOTest {
 	}
 	
 	@Test
-	public void addConsumoImovelTODuasCategoriasSeteEconomias() {
+	public void distribuirConsumoPorCategoriaDuasCategoriasSeteEconomias() {
 		configurarImovelDuasCategoriasSeteEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoImovelCategoriaTO> list = bo.getConsumoImoveisCategoriaTO();
 		
@@ -147,10 +146,10 @@ public class ConsumoImovelBOTest {
 	}
 	
 	@Test
-	public void addConsumoImovelTOUmaCategoriaUmaEconomiaConsumoMenorMinimo() {
+	public void distribuirConsumoPorCategoriaUmaCategoriaUmaEconomiaConsumoMenorMinimo() {
 		configurarImovelUmaCategoriaConsumoMenorMinimo();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		List<ConsumoImovelCategoriaTO> list = bo.getConsumoImoveisCategoriaTO();
 		
 		assertEquals(1, list.size());
@@ -162,7 +161,7 @@ public class ConsumoImovelBOTest {
 	public void distribuirConsumoFaixasUmaCategoriaUmaEconomia() {
 		configurarImovelUmaCategoriaUmaEconomia();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(3);
 		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
@@ -182,7 +181,7 @@ public class ConsumoImovelBOTest {
 	public void distribuirConsumoFaixasUmaCategoriaTresEconomias() {
 		configurarImovelUmaCategoriaTresEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(1);
 		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
@@ -200,7 +199,7 @@ public class ConsumoImovelBOTest {
 	public void distribuirConsumoFaixasDuasCategoriasDuasEconomias() {
 		configurarImovelDuasCategoriasDuasEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixasResidenciais = mockarFaixasResidencial(1);
 		List<ConsumoTarifaFaixaTO> faixasComerciais = mockarFaixasComerciais();
@@ -225,7 +224,7 @@ public class ConsumoImovelBOTest {
 	public void distribuirConsumoFaixasDuasCategoriasSeteEconomias() {
 		configurarImovelDuasCategoriasSeteEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixasResidenciais = mockarFaixasResidencial(1);
 		List<ConsumoTarifaFaixaTO> faixasComerciais = mockarFaixasComerciais();
@@ -250,7 +249,7 @@ public class ConsumoImovelBOTest {
 	public void calcularValorConsumoUmaCategoriaUmaEconomia() {
 		configurarImovelUmaCategoriaUmaEconomia();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(3);
 		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
@@ -264,7 +263,7 @@ public class ConsumoImovelBOTest {
 	public void calcularValorConsumoUmaCategoriaTresEconomias() {
 		configurarImovelUmaCategoriaTresEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
 		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(1);
 		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
@@ -278,10 +277,13 @@ public class ConsumoImovelBOTest {
 	public void calcularValorConsumoDuasCategoriaDuasEconomias() {
 		configurarImovelDuasCategoriasDuasEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
-		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(2);
-		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
+		List<ConsumoTarifaFaixaTO> faixasResidenciais = mockarFaixasResidencial(1);
+		List<ConsumoTarifaFaixaTO> faixasComerciais = mockarFaixasComerciais();
+		
+		when(consumoBOMock.obterFaixas(bo.getConsumoImoveisCategoriaTO().get(0), medicaoHistoricoMock)).thenReturn(faixasResidenciais);
+		when(consumoBOMock.obterFaixas(bo.getConsumoImoveisCategoriaTO().get(1), medicaoHistoricoMock)).thenReturn(faixasComerciais);
 		
 		bo.distribuirConsumoPorFaixa(medicaoHistoricoMock);
 		
@@ -293,10 +295,14 @@ public class ConsumoImovelBOTest {
 	public void calcularValorConsumoDuasCategoriaSeteEconomias() {
 		configurarImovelDuasCategoriasSeteEconomias();
 		
-		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, consumoTarifaVigenciaMock);
+		bo.distribuirConsumoPorCategoria(consumoHistoricoMock, medicaoHistoricoMock);
 		
-		List<ConsumoTarifaFaixaTO> faixas = mockarFaixasResidencial(2);
-		when(consumoBOMock.obterFaixas(anyObject(), eq(medicaoHistoricoMock))).thenReturn(faixas);
+		List<ConsumoTarifaFaixaTO> faixasResidenciais = mockarFaixasResidencial(1);
+		List<ConsumoTarifaFaixaTO> faixasComerciais = mockarFaixasComerciais();
+		
+		when(consumoBOMock.obterFaixas(bo.getConsumoImoveisCategoriaTO().get(0), medicaoHistoricoMock)).thenReturn(faixasResidenciais);
+		when(consumoBOMock.obterFaixas(bo.getConsumoImoveisCategoriaTO().get(1), medicaoHistoricoMock)).thenReturn(faixasComerciais);
+		
 		
 		bo.distribuirConsumoPorFaixa(medicaoHistoricoMock);
 		
@@ -309,6 +315,8 @@ public class ConsumoImovelBOTest {
 		when(consumoBOMock.consumoMinimoLigacao(imovelMock.getId())).thenReturn(10);
 		when(consumoHistoricoMock.getNumeroConsumoFaturadoMes()).thenReturn(9);
 		when(consumoBOMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(umaCategoria);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoTarifaCategoriaResidencialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
 	}
 	
 	private void configurarImovelUmaCategoriaUmaEconomia() {
@@ -317,7 +325,9 @@ public class ConsumoImovelBOTest {
 		when(consumoHistoricoMock.getNumeroConsumoFaturadoMes()).thenReturn(40);
 		when(consumoBOMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(umaCategoria);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaResidencialMock)).thenReturn(1);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoTarifaCategoriaResidencialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
+		
 		when(consumoTarifaCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(16.8));
 	}
 	
@@ -327,7 +337,8 @@ public class ConsumoImovelBOTest {
 		when(consumoHistoricoMock.getNumeroConsumoFaturadoMes()).thenReturn(48);
 		when(consumoBOMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(umaCategoria);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaResidencialMock)).thenReturn(3);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoTarifaCategoriaResidencialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
 		when(consumoTarifaCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(16.8));
 	}
 	
@@ -338,8 +349,10 @@ public class ConsumoImovelBOTest {
 		when(consumoBOMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(duasCategorias);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaResidencialMock)).thenReturn(1);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaComercialMock)).thenReturn(1);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaComercialMock)).thenReturn(listConsumoTarifaCategoriaComercial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaComercialMock)).thenReturn(listConsumoTarifaCategoriaComercial);
+		when(consumoTarifaCategoriaResidencialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
+		when(consumoTarifaCategoriaComercialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
 		when(consumoTarifaCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(16.8));
 		when(consumoTarifaCategoriaComercialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(50.2));
 	}
@@ -351,8 +364,10 @@ public class ConsumoImovelBOTest {
 		when(consumoBOMock.buscarQuantidadeEconomiasPorImovel(imovelMock.getId())).thenReturn(duasCategorias);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaResidencialMock)).thenReturn(5);
 		when(consumoBOMock.getQuantidadeEconomiasPorCategoria(categoriaComercialMock)).thenReturn(2);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
-		when(consumoBOMock.getConsumoTarifasCategoria(consumoTarifaVigenciaMock, categoriaComercialMock)).thenReturn(listConsumoTarifaCategoriaComercial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
+		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, medicaoHistoricoMock, categoriaComercialMock)).thenReturn(listConsumoTarifaCategoriaComercial);
+		when(consumoTarifaCategoriaResidencialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
+		when(consumoTarifaCategoriaComercialMock.getConsumotarifaVigencia()).thenReturn(consumotarifaVigenciaMock);
 		when(consumoTarifaCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(16.8));
 		when(consumoTarifaCategoriaComercialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(50.2));
 	}

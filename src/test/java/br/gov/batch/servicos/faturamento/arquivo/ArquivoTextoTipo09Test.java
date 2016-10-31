@@ -3,13 +3,14 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
+import br.gov.batch.servicos.faturamento.tarifa.ConsumoTarifaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
@@ -46,32 +47,23 @@ public class ArquivoTextoTipo09Test {
 	
 	private int TAMANHO_LINHA = 37;
 	
-	@Mock
-	private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorioMock;
+	@Mock private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorioMock;
 
-	@Mock
-	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
+	@Mock private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorioMock;
+	@Mock private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorioMock;
+	@Mock private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorioMock;
 	
-	@Mock
-	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorioMock;
+	@Mock private MedicaoHistoricoRepositorio medicaoHistoricoRepositorioMock;
 	
-	@Mock
-	private FaturamentoAtividadeCronogramaRepositorio faturamentoAtividadeCronogramaRepositorioMock;
+	@Mock private FaturamentoAtividadeCronogramaRepositorio faturamentoAtividadeCronogramaRepositorioMock;
 	
-	@Mock
-	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBOMock;
+	@Mock private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
+	@Mock private SistemaParametros sistemaParametrosMock;
 	
-	@Mock
-	private SistemaParametros sistemaParametrosMock;;
+	@Mock private ConsumoTarifaBO consumotarifaBOMock;
 	
 	private ArquivoTextoTO to;
 	
@@ -86,6 +78,7 @@ public class ArquivoTextoTipo09Test {
 	private Date dataFaturamento;
 	private Subcategoria subcategoria;
 	private ConsumoTarifaCategoria consumoTarifaCategoria;
+	private List<ConsumoTarifaCategoria> consumoTarifasCategoria;
 	
 	@Before
 	public void setup() {
@@ -137,6 +130,8 @@ public class ArquivoTextoTipo09Test {
 		to.addIdsConsumoTarifaCategoria(1);
 		arquivo = new ArquivoTextoTipo09();
 		
+		consumoTarifasCategoria = new ArrayList<ConsumoTarifaCategoria>();
+		consumoTarifasCategoria.add(consumoTarifaCategoria);
 		MockitoAnnotations.initMocks(this);
 	}
 	
@@ -176,5 +171,7 @@ public class ArquivoTextoTipo09Test {
 				consumoTarifaVigenteTO.getIdVigencia(),
 				subcategoria.getCategoria().getId(),
 				subcategoria.getSubcategoria().getId())).thenReturn(consumoTarifaCategoria);
+		
+		when(consumotarifaBOMock.obterDadosTarifa(imovel, sistemaParametrosMock)).thenReturn(consumoTarifasCategoria);
 	}
 }
