@@ -3,6 +3,7 @@ package br.gov.batch.servicos.micromedicao;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +17,6 @@ import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
-import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
@@ -113,16 +113,6 @@ public class ConsumoBO {
 		return obterValorMinimoTarifaCategorias(idTarifa, categorias);
 	}
 
-	private BigDecimal obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
-		BigDecimal valorMinimoTarifa = BigDecimal.ZERO;
-		
-		for (ICategoria categoria : categorias) {
-			valorMinimoTarifa.add(obterValorMinimoTarifaPorCategoria(idTarifa, categoria));
-		}
-
-		return valorMinimoTarifa;
-	}
-
 	public BigDecimal obterValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
 		BigDecimal valorMinimoTarifa = getValorMinimoTarifaPorCategoria(idTarifa, categoria);
 
@@ -193,20 +183,41 @@ public class ConsumoBO {
 		return quantidadeEconomias;
 	}
 	
-	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, MedicaoHistorico medicaoHistorico, ICategoria categoria) {
-		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterTarifasPorReferencia(imovel, medicaoHistorico, sistemaParametros);
+	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, int referencia, ICategoria categoria) {
+		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterConsumoTarifasPorReferencia(imovel, referencia, sistemaParametros);
 		
+		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
+	}
+	
+	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, Date dataLeituraAnterior, Date dataLeituraAtual, ICategoria categoria) {
+		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterConsumoTarifasPorPeriodo(imovel, 
+																									dataLeituraAnterior, dataLeituraAtual, sistemaParametros);
+		
+		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
+	}
+
+	public List<ConsumoTarifaFaixaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
+		List<Integer> ids = getIdsConsumoTarifasCategoria(consumoImovelCategoriaTO.getConsumoTarifasCategoria());
+		return consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(ids);
+	}
+	
+	private BigDecimal obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
+		BigDecimal valorMinimoTarifa = BigDecimal.ZERO;
+		
+		for (ICategoria categoria : categorias) {
+			valorMinimoTarifa.add(obterValorMinimoTarifaPorCategoria(idTarifa, categoria));
+		}
+
+		return valorMinimoTarifa;
+	}
+
+	private List<ConsumoTarifaCategoriaTO> distinctConsumoTarifaCategoriaTO(ICategoria categoria, List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria) {
 		for (ConsumoTarifaCategoriaTO to : consumoTarifasCategoria) {
 			if (to.getCategoria().getId().intValue() == categoria.getId().intValue()) {
 				consumoTarifasCategoria.remove(to);
 			}
 		}
 		return consumoTarifasCategoria;
-	}
-
-	public List<ConsumoTarifaFaixaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO, MedicaoHistorico medicaoHistorico) {
-		List<Integer> ids = getIdsConsumoTarifasCategoria(consumoImovelCategoriaTO.getConsumoTarifasCategoria());
-		return consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(ids);
 	}
 	
 	private List<Integer> getIdsConsumoTarifasCategoria(List<ConsumoTarifaCategoriaTO> consumotarifasCategoria) {
@@ -215,6 +226,7 @@ public class ConsumoBO {
 		consumotarifasCategoria.forEach((consumoTarifacategoria) -> {
 			ids.add(consumoTarifacategoria.getId());
 		});
+		
 		return ids;
 	}
 }

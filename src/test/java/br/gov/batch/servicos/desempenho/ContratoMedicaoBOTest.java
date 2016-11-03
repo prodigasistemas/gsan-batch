@@ -7,9 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -72,8 +70,6 @@ public class ContratoMedicaoBOTest {
 	private Integer referenciaMesZero;
 	private Date dataReferenciaMesZero;
 	
-	private List<ConsumoTarifaVigencia> tarifasVigentes;
-	
 	@Before
 	public void setup() {		
 		bo = new ContratoMedicaoBO();
@@ -89,11 +85,6 @@ public class ContratoMedicaoBOTest {
 		when(consumoHistoricoMesZeroMock.getImovel()).thenReturn(imovelMock);
 		
 		when(contratoMedicacaoRepositorioMock.buscarContratoAtivoPorImovel(imovelMock.getId())).thenReturn(contratoMedicaoMock);
-		
-		tarifasVigentes = new ArrayList<ConsumoTarifaVigencia>();
-		tarifasVigentes.add(consumoTarifaVigenciaMock);
-		
-		when(consumoTarifaVigenciaRepositorioMock.buscarTarifasPorPeriodo(anyObject(),anyObject())).thenReturn(tarifasVigentes);
 	}
 	
 	@Test
@@ -112,7 +103,7 @@ public class ContratoMedicaoBOTest {
 		
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoAtualMock);
 		
-		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, referencia, new BigDecimal(16.80));
 		
 		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(imovelMock, referencia));
 	}
@@ -136,13 +127,13 @@ public class ContratoMedicaoBOTest {
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoMesZeroMock, 
 																													medicaoHistoricoAtualMock);
 		
-		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoMesZeroMock, new BigDecimal(8.40));
-		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoMesZeroMock, referenciaMesZero, new BigDecimal(8.40));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, referencia, new BigDecimal(16.80));
 		
 		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, referencia));
 	}
 	
-	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, BigDecimal valor) {
-		when(consumoImovelCategoriaBOMock.getValorTotalConsumoImovel(consumoHistorico, medicaoHistorico)).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
+	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, int referencia, BigDecimal valor) {
+		when(consumoImovelCategoriaBOMock.getValorTotalConsumoImovel(consumoHistorico, referencia)).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
 	}
 }

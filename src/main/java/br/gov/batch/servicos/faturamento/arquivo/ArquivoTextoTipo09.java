@@ -26,7 +26,7 @@ public class ArquivoTextoTipo09 extends ArquivoTexto {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String build(ArquivoTextoTO to) {
-		List<ConsumoTarifaCategoria> colecaoDadosTarifaCategoria = consumoTarifaBO.obterDadosTarifa(to.getImovel(), sistemaParametros);
+		List<ConsumoTarifaCategoria> colecaoDadosTarifaCategoria = consumoTarifaBO.obterConsumoTarifasCategoria(to.getImovel(), sistemaParametros);
 		
 		for (ConsumoTarifaCategoria dadosTarifaCategoria : colecaoDadosTarifaCategoria) {
 		    if (dadosTarifaCategoria.getConsumoTarifaVigencia() == null || dadosTarifaCategoria.getConsumoTarifaVigencia().getConsumoTarifa() == null){

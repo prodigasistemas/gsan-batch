@@ -172,6 +172,6 @@ public class ArquivoTextoTipo09Test {
 				subcategoria.getCategoria().getId(),
 				subcategoria.getSubcategoria().getId())).thenReturn(consumoTarifaCategoria);
 		
-		when(consumotarifaBOMock.obterDadosTarifa(imovel, sistemaParametrosMock)).thenReturn(consumoTarifasCategoria);
+		when(consumotarifaBOMock.obterConsumoTarifasCategoria(imovel, sistemaParametrosMock)).thenReturn(consumoTarifasCategoria);
 	}
 }

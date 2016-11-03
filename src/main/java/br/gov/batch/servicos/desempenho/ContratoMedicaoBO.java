@@ -2,7 +2,6 @@ package br.gov.batch.servicos.desempenho;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -15,11 +14,8 @@ import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
 import br.gov.batch.util.Util;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
-import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
-import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
-import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
@@ -61,17 +57,9 @@ public class ContratoMedicaoBO {
 	}
 
 	public BigDecimal calcularValorConsumo(Imovel imovel, int referencia) {
-		MedicaoHistorico medicaoHistorico = medicaoHistoricoRepositorio.buscarPorLigacaoAgua(imovel.getId(), referencia);
 		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
-		
-		List<ConsumoTarifaVigencia> tarifasVigentes = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(medicaoHistorico.getDataLeituraAnteriorFaturamento(),
-																												medicaoHistorico.getDataLeituraAtualInformada());
-		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
-		
-		for (ConsumoTarifaVigencia consumoTarifaVigencia : tarifasVigentes) {
-			BigDecimal valorConsumoVigencia = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, medicaoHistorico);
-			valorTotalConsumo = valorTotalConsumo.add(valorConsumoVigencia);
-		}
+
+		BigDecimal valorTotalConsumo = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, referencia);
 		
 		return valorTotalConsumo;
 	}
