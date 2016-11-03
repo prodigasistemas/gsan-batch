@@ -90,8 +90,7 @@ public class ConsumoImovelCategoriaBO {
 		consumoImovelCategoriaTO.setQtdEconomias(qtdEconomiasCategoria);
 		consumoImovelCategoriaTO.setConsumoTarifasCategoria(consumoTarifasCategoria);
 
-		//TODO retornar o consumo minimo da tarifa mais recente
-		int numeroConsumoMinimo = consumoBO.getConsumoMinimoTarifaPorCategoria(consumoTarifasCategoria.get(0).getConsumoTarifaVigencia().getId(), categoria);
+		int numeroConsumoMinimo = consumoBO.getConsumoMinimoTarifaPorCategoria(consumoTarifasCategoria, categoria);
 		
 		setConsumoEconomiaCategoria(consumoHistorico, numeroConsumoMinimo, consumoPorEconomia);
 		setConsumoExcedenteCategoria(consumoHistorico, numeroConsumoMinimo, qtdTotalEconomias, consumoPorEconomia);

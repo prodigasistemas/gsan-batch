@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -150,6 +153,24 @@ public class ConsumoBO {
 		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtual(idTarifa);
 		
 		return consumoTarifaCategoriaRepositorio.valorMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
+	}
+	
+	public int getConsumoMinimoTarifaPorCategoria(List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria, ICategoria categoria) {
+		Set<Integer> consumoMinimoTarifas = new HashSet<Integer>();
+		for (ConsumoTarifaCategoriaTO consumoTarifaCategoriaTO : consumoTarifasCategoria) {
+			Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(consumoTarifaCategoriaTO.getConsumoTarifaVigencia().getId(), categoria);
+			consumoMinimoTarifas.add(consumoMinimoTarifa);
+		}
+		
+		Iterator<Integer> iterator = consumoMinimoTarifas.iterator();
+		int consumoMinimo = iterator.next();
+		for (Integer consumo : consumoMinimoTarifas) {
+			if(consumoMinimo > consumo) {
+				consumoMinimo = consumo;
+			}
+		}
+		
+		return consumoMinimo;
 	}
 
 	public int getConsumoMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {

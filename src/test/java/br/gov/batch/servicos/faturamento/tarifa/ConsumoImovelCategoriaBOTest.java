@@ -1,6 +1,7 @@
 package br.gov.batch.servicos.faturamento.tarifa;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -59,6 +60,7 @@ public class ConsumoImovelCategoriaBOTest {
 	private Integer referencia;
 	
 	@Before
+	@SuppressWarnings("unchecked")
 	public void setup() {
 		this.referencia = 201605;
 		
@@ -66,8 +68,8 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		MockitoAnnotations.initMocks(this);
 		
-		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(anyObject(), eq(categoriaResidencialMock))).thenReturn(10);
-		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(anyObject(), eq(categoriaComercialMock))).thenReturn(10);
+		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(any(List.class), eq(categoriaResidencialMock))).thenReturn(10);
+		when(consumoBOMock.getConsumoMinimoTarifaPorCategoria(any(List.class), eq(categoriaComercialMock))).thenReturn(10);
 		
 		when(consumoHistoricoMock.getImovel()).thenReturn(imovelMock);
 		
