@@ -12,7 +12,9 @@ import br.gov.batch.servicos.micromedicao.ConsumoBO;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
+import br.gov.model.faturamento.tarifas.TabelaTarifas;
 import br.gov.model.micromedicao.ConsumoHistorico;
+import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 
@@ -54,12 +56,12 @@ public class ConsumoImovelCategoriaBO {
 		return getConsumoImoveisCategoriaTO();
 	}
 	
-	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, int referencia) {
+	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, int referencia) {
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, referencia);
 		
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : consumoImoveisCategoria) {
-			valorTotalConsumo = valorTotalConsumo.add(consumoImovelCategoriaTO.getValorConsumo());
+			valorTotalConsumo = valorTotalConsumo.add(consumoImovelCategoriaTO.getValorConsumoTotal(medicaoHistorico));
 		}
 		
 		return valorTotalConsumo;
@@ -145,19 +147,27 @@ public class ConsumoImovelCategoriaBO {
 
 	private void carregarTarifasConsumoImovelCategoria(int referencia) {
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : getConsumoImoveisCategoriaTO()) {
-			List<ConsumoTarifaFaixaTO> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
-			consumoImovelCategoriaTO.setFaixas(faixas);
+			List<TabelaTarifas> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
+			consumoImovelCategoriaTO.setTabelaTarifas(faixas);
 		}
 	}
 
 	private void distribuirConsumoFaixaPorCategoria(ConsumoImovelCategoriaTO consumoImovelCategoria) {	
 		Integer consumo = consumoImovelCategoria.getConsumoExcedenteCategoria();
-		for (ConsumoTarifaFaixaTO faixa : consumoImovelCategoria.getFaixas()) {
-			Integer consumoFinalFaixa = calcularConsumoFaixa(consumo, faixa);
-			
-			consumoImovelCategoria.addFaixaConsumo(faixa, consumoFinalFaixa);
-			consumo = consumo - consumoFinalFaixa;
+
+		List<TabelaTarifas> tabelaTarifasCalculadas = new ArrayList<TabelaTarifas>();
+		for (TabelaTarifas tabelaTarifas : consumoImovelCategoria.getTabelaTarifas()) {
+			for (ConsumoTarifaFaixaTO faixa : tabelaTarifas.getFaixas()) {
+				Integer consumoFinalFaixa = calcularConsumoFaixa(consumo, faixa);
+				
+				tabelaTarifas.addFaixaConsumo(faixa, consumoFinalFaixa);
+				tabelaTarifasCalculadas.add(tabelaTarifas);
+				
+				consumo = consumo - consumoFinalFaixa;
+			}
 		}
+		
+		consumoImovelCategoria.setTabelaTarifas(tabelaTarifasCalculadas);
 	}
 
 	private Integer calcularConsumoFaixa(Integer consumo, ConsumoTarifaFaixaTO faixa) {

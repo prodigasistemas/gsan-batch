@@ -20,6 +20,7 @@ import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
+import br.gov.model.faturamento.tarifas.TabelaTarifas;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
@@ -217,9 +218,20 @@ public class ConsumoBO {
 		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
 	}
 
-	public List<ConsumoTarifaFaixaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
-		List<Integer> ids = getIdsConsumoTarifasCategoria(consumoImovelCategoriaTO.getConsumoTarifasCategoria());
-		return consumoTarifaFaixaRepositorio.dadosConsumoTarifaFaixa(ids);
+	public List<TabelaTarifas> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
+		List<TabelaTarifas> tarifasPorVigencia = new ArrayList<TabelaTarifas>();
+		for (ConsumoTarifaCategoriaTO consumoTarifaCategoria : consumoImovelCategoriaTO.getConsumoTarifasCategoria()) {
+			Date dataVigencia = consumoTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia();
+			
+			List<ConsumoTarifaFaixaTO> consumoTarifasFaixaTO = consumoTarifaFaixaRepositorio.getConsumoTarifaFaixaPelaVigencia(
+																								dataVigencia,
+																								consumoTarifaCategoria.getId());
+			
+			tarifasPorVigencia.add(new TabelaTarifas(dataVigencia, consumoTarifasFaixaTO));
+		}
+		
+		
+		return tarifasPorVigencia;
 	}
 	
 	private BigDecimal obterValorMinimoTarifaCategorias(Integer idTarifa, Collection<ICategoria> categorias) {
@@ -239,15 +251,5 @@ public class ConsumoBO {
 			}
 		}
 		return consumoTarifasCategoria;
-	}
-	
-	private List<Integer> getIdsConsumoTarifasCategoria(List<ConsumoTarifaCategoriaTO> consumotarifasCategoria) {
-		List<Integer> ids = new ArrayList<Integer>();
-
-		consumotarifasCategoria.forEach((consumoTarifacategoria) -> {
-			ids.add(consumoTarifacategoria.getId());
-		});
-		
-		return ids;
 	}
 }
