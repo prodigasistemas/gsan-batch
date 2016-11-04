@@ -20,9 +20,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import br.gov.batch.servicos.faturamento.tarifa.ConsumoImovelCategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
+import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
-import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
 import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
@@ -30,6 +30,7 @@ import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
+import br.gov.servicos.to.ConsumoImovelCategoriaTO;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContratoMedicaoBOTest {
@@ -64,17 +65,21 @@ public class ContratoMedicaoBOTest {
 	@Mock private ConsumoImovelCategoriaTO consumoImovelCategoriaMesZeroMock;
 	@Mock private ConsumoImovelCategoriaTO consumoImovelCategoriaAtualTOMock;
 	
+	@Mock private MedicaoHistoricoBO medicaoHistoricoBOMock;
+	
 	@InjectMocks
 	private ContratoMedicaoBO bo;
 	
 	private Integer referenciaMesZero;
 	private Date dataReferenciaMesZero;
+	private Integer referencia;
 	
 	@Before
 	public void setup() {		
 		bo = new ContratoMedicaoBO();
 		MockitoAnnotations.initMocks(this);
 		
+		this.referencia = 201607;
 		this.referenciaMesZero = 201605;
 		this.dataReferenciaMesZero = new DateTime(2016, 5, 1, 0, 0, 0).toDate();
 		when(contratoMedicaoMock.getDataAssinatura()).thenReturn(dataReferenciaMesZero);
@@ -83,6 +88,8 @@ public class ContratoMedicaoBOTest {
 		
 		when(consumoHistoricoAtualMock.getImovel()).thenReturn(imovelMock);
 		when(consumoHistoricoMesZeroMock.getImovel()).thenReturn(imovelMock);
+		
+		when(medicaoHistoricoBOMock.getMedicaoHistorico(imovelMock.getId(), referencia)).thenReturn(medicaoHistoricoAtualMock);
 		
 		when(contratoMedicacaoRepositorioMock.buscarContratoAtivoPorImovel(imovelMock.getId())).thenReturn(contratoMedicaoMock);
 	}
@@ -97,7 +104,7 @@ public class ContratoMedicaoBOTest {
 	
 	@Test
 	public void calculoTarifaProporcional() {
-		Integer referencia = 201607;
+		
 		
 		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referencia)).thenReturn(consumoHistoricoAtualMock);
 		
@@ -130,7 +137,7 @@ public class ContratoMedicaoBOTest {
 		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoAtualMock, new BigDecimal(8.40));
 		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
-		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, medicaoHistoricoAtualMock, referencia));
+		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, referencia));
 	}
 	
 	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistoricoMock, BigDecimal valor) {

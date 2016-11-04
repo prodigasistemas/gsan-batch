@@ -21,8 +21,6 @@ import br.gov.model.Status;
 import br.gov.model.cadastro.ICategoria;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
-import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
-import br.gov.model.faturamento.tarifas.TabelaTarifas;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
@@ -31,9 +29,11 @@ import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoMinimoAreaRepositorio;
+import br.gov.servicos.to.ConsumoImovelCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
+import br.gov.servicos.to.TabelaTarifasTO;
 
 @Stateless
 public class ConsumoBO {
@@ -225,8 +225,8 @@ public class ConsumoBO {
 		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
 	}
 
-	public List<TabelaTarifas> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
-		List<TabelaTarifas> tarifasPorVigencia = new ArrayList<TabelaTarifas>();
+	public List<TabelaTarifasTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
+		List<TabelaTarifasTO> tarifasPorVigencia = new ArrayList<TabelaTarifasTO>();
 		for (ConsumoTarifaCategoriaTO consumoTarifaCategoria : consumoImovelCategoriaTO.getConsumoTarifasCategoria()) {
 			Date dataVigencia = consumoTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia();
 			
@@ -234,7 +234,7 @@ public class ConsumoBO {
 																								dataVigencia,
 																								consumoTarifaCategoria.getId());
 			
-			tarifasPorVigencia.add(new TabelaTarifas(dataVigencia, consumoTarifasFaixaTO));
+			tarifasPorVigencia.add(new TabelaTarifasTO(dataVigencia, consumoTarifasFaixaTO));
 		}
 		
 		

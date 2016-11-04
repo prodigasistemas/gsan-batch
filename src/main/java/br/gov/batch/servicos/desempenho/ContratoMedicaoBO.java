@@ -2,6 +2,7 @@ package br.gov.batch.servicos.desempenho;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -11,6 +12,7 @@ import org.joda.time.Days;
 
 import br.gov.batch.servicos.faturamento.tarifa.ConsumoImovelCategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
+import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.batch.util.Util;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
@@ -19,7 +21,6 @@ import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
-import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
 @Stateless
 public class ContratoMedicaoBO {
@@ -37,14 +38,21 @@ public class ContratoMedicaoBO {
 	private ContratoMedicaoRepositorio contratoMedicaoRepositorio;
 
 	@EJB
-	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
+	private MedicaoHistoricoBO medicaoHistoricoBO;
 	
-	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, MedicaoHistorico medicaoHistorico, Integer referencia) {
+	public BigDecimal calcularValorRepasse() {
+		//TODO aplicar o coeficiente de acordo com a ligação
+		return null;
+	}
+	
+	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, Integer referencia) {
 		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovel.getId());
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
 		
 		ConsumoHistorico consumoHistoricoMesZero = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaMesZero);
 		ConsumoHistorico consumoHistoricoAtual = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
+		
+		MedicaoHistorico medicaoHistorico = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referencia);
 		
 		BigDecimal valorConsumoMesZero = calcularValorConsumo(consumoHistoricoMesZero, medicaoHistorico);
 		BigDecimal valorConsumoMesAtual = calcularValorConsumo(consumoHistoricoAtual, medicaoHistorico);
@@ -76,5 +84,10 @@ public class ContratoMedicaoBO {
 		Date referenciaAssinatura = contratoMedicao.getDataAssinatura();
 		
 		return Util.getAnoMesComoInteger(referenciaAssinatura);
+	}
+
+	public List<Imovel> getAbrangencia(Integer id) {
+		// TODO falta implementar ou repassar o metodo direto para o repositorio
+		return null;
 	}
 }
