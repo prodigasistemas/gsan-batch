@@ -13,6 +13,8 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import org.joda.time.DateTime;
+
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.batch.servicos.faturamento.tarifa.ConsumoTarifaBO;
 import br.gov.model.Status;
@@ -21,6 +23,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.ConsumoImovelCategoriaTO;
 import br.gov.model.faturamento.tarifas.TabelaTarifas;
+import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
@@ -205,8 +208,12 @@ public class ConsumoBO {
 		return quantidadeEconomias;
 	}
 	
-	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, int referencia, ICategoria categoria) {
-		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterConsumoTarifasPorReferencia(imovel, referencia, sistemaParametros);
+	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, MedicaoHistorico medicaoHistorico, ICategoria categoria) {
+		Date dataLeituraAnterior = new DateTime(medicaoHistorico.getDataLeituraAnteriorFaturamento()).toDate();
+		Date dataAtual = new DateTime(medicaoHistorico.getDataLeituraAnteriorFaturamento()).toDate();
+		
+		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterConsumoTarifasPorPeriodo(imovel, dataLeituraAnterior, dataAtual, 
+																												sistemaParametros);
 		
 		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
 	}

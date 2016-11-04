@@ -27,27 +27,27 @@ public class ConsumoImovelCategoriaBO {
 	@EJB 
 	private ConsumoBO consumoBO;
 	
-	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO(ConsumoHistorico consumoHistorico, int referencia) {
+	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		initConsumoImoveisCategoriaTO();
 		
-		distribuirConsumoPorCategoria(consumoHistorico, referencia);
-		distribuirConsumoPorFaixa(referencia);
+		distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico);
+		distribuirConsumoPorFaixa();
 		
 		return getConsumoImoveisCategoriaTO();		
 	}
 	
-	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorCategoria(ConsumoHistorico consumoHistorico, int referencia) {
+	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorCategoria(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		Collection<ICategoria> categorias = consumoBO.buscarQuantidadeEconomiasPorImovel(consumoHistorico.getImovel().getId());
 		
 		for (ICategoria categoria : categorias) {
-			addConsumoImovelCategoriaTO(consumoHistorico, referencia, categoria);
+			addConsumoImovelCategoriaTO(consumoHistorico, medicaoHistorico, categoria);
 		}	
 		
 		return getConsumoImoveisCategoriaTO();
 	}
 	
-	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorFaixa(int referencia) {
-		carregarTarifasConsumoImovelCategoria(referencia);
+	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorFaixa() {
+		carregarTarifasConsumoImovelCategoria();
 		
 		for (ConsumoImovelCategoriaTO consumoImovel : getConsumoImoveisCategoriaTO()) {
 			distribuirConsumoFaixaPorCategoria(consumoImovel);
@@ -56,12 +56,12 @@ public class ConsumoImovelCategoriaBO {
 		return getConsumoImoveisCategoriaTO();
 	}
 	
-	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, int referencia) {
-		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, referencia);
+	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
+		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico);
 		
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : consumoImoveisCategoria) {
-			valorTotalConsumo = valorTotalConsumo.add(consumoImovelCategoriaTO.getValorConsumoTotal(medicaoHistorico));
+			valorTotalConsumo = valorTotalConsumo.add(consumoImovelCategoriaTO.getValorConsumoTotal());
 		}
 		
 		return valorTotalConsumo;
@@ -79,11 +79,11 @@ public class ConsumoImovelCategoriaBO {
 		consumoImoveisCategoriaTO = new ArrayList<ConsumoImovelCategoriaTO>();
 	}
 	
-	private void addConsumoImovelCategoriaTO(ConsumoHistorico consumoHistorico, int referencia,  ICategoria categoria) {
+	private void addConsumoImovelCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, ICategoria categoria) {
 		consumoImovelCategoriaTO = new ConsumoImovelCategoriaTO();
 		Imovel imovel = consumoHistorico.getImovel();
 		
-		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoBO.getConsumoTarifasCategoria(imovel, referencia, categoria);
+		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoBO.getConsumoTarifasCategoria(imovel, medicaoHistorico, categoria);
 
 		int qtdTotalEconomias = consumoBO.getQuantidadeTotalEconomias(imovel.getId());
 		int consumoPorEconomia = getConsumoPorEconomia(consumoHistorico, qtdTotalEconomias);
@@ -91,6 +91,8 @@ public class ConsumoImovelCategoriaBO {
 		
 		consumoImovelCategoriaTO.setQtdEconomias(qtdEconomiasCategoria);
 		consumoImovelCategoriaTO.setConsumoTarifasCategoria(consumoTarifasCategoria);
+		consumoImovelCategoriaTO.setDataAnterior(medicaoHistorico.getDataLeituraAnteriorFaturamento());
+		consumoImovelCategoriaTO.setDataAtual(medicaoHistorico.getDataLeituraAtualInformada());
 
 		int numeroConsumoMinimo = consumoBO.getConsumoMinimoTarifaPorCategoria(consumoTarifasCategoria, categoria);
 		
@@ -145,7 +147,7 @@ public class ConsumoImovelCategoriaBO {
 		getConsumoImoveisCategoriaTO().add(consumoImovelTO);
 	}
 
-	private void carregarTarifasConsumoImovelCategoria(int referencia) {
+	private void carregarTarifasConsumoImovelCategoria() {
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : getConsumoImoveisCategoriaTO()) {
 			List<TabelaTarifas> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
 			consumoImovelCategoriaTO.setTabelaTarifas(faixas);
@@ -161,10 +163,10 @@ public class ConsumoImovelCategoriaBO {
 				Integer consumoFinalFaixa = calcularConsumoFaixa(consumo, faixa);
 				
 				tabelaTarifas.addFaixaConsumo(faixa, consumoFinalFaixa);
-				tabelaTarifasCalculadas.add(tabelaTarifas);
 				
 				consumo = consumo - consumoFinalFaixa;
 			}
+			tabelaTarifasCalculadas.add(tabelaTarifas);
 		}
 		
 		consumoImovelCategoria.setTabelaTarifas(tabelaTarifasCalculadas);

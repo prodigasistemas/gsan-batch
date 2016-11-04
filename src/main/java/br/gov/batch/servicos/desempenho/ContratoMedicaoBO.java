@@ -16,6 +16,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
+import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
@@ -38,12 +39,15 @@ public class ContratoMedicaoBO {
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
 	
-	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, Integer referencia) {
+	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, MedicaoHistorico medicaoHistorico, Integer referencia) {
 		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovel.getId());
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
 		
-		BigDecimal valorConsumoMesZero = calcularValorConsumo(imovel, referenciaMesZero);
-		BigDecimal valorConsumoMesAtual = calcularValorConsumo(imovel, referencia);
+		ConsumoHistorico consumoHistoricoMesZero = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaMesZero);
+		ConsumoHistorico consumoHistoricoAtual = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
+		
+		BigDecimal valorConsumoMesZero = calcularValorConsumo(consumoHistoricoMesZero, medicaoHistorico);
+		BigDecimal valorConsumoMesAtual = calcularValorConsumo(consumoHistoricoAtual, medicaoHistorico);
 		
 		return valorConsumoMesAtual.subtract(valorConsumoMesZero);
 	}
@@ -56,10 +60,8 @@ public class ContratoMedicaoBO {
 		return consumoReferencia - consumoMesZero;
 	}
 
-	public BigDecimal calcularValorConsumo(Imovel imovel, int referencia) {
-		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
-
-		BigDecimal valorTotalConsumo = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, referencia);
+	public BigDecimal calcularValorConsumo(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
+		BigDecimal valorTotalConsumo = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, medicaoHistorico);
 		
 		return valorTotalConsumo;
 	}

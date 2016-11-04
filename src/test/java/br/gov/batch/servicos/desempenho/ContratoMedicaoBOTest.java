@@ -103,9 +103,9 @@ public class ContratoMedicaoBOTest {
 		
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoAtualMock);
 		
-		mockValorConsumoTotal(consumoHistoricoAtualMock, referencia, new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
-		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(imovelMock, referencia));
+		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(consumoHistoricoAtualMock, medicaoHistoricoAtualMock));
 	}
 	
 	@Test
@@ -127,13 +127,13 @@ public class ContratoMedicaoBOTest {
 		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoMesZeroMock, 
 																													medicaoHistoricoAtualMock);
 		
-		mockValorConsumoTotal(consumoHistoricoMesZeroMock, referenciaMesZero, new BigDecimal(8.40));
-		mockValorConsumoTotal(consumoHistoricoAtualMock, referencia, new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoAtualMock, new BigDecimal(8.40));
+		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
-		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, referencia));
+		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, medicaoHistoricoAtualMock, referencia));
 	}
 	
-	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, int referencia, BigDecimal valor) {
-		when(consumoImovelCategoriaBOMock.getValorTotalConsumoImovel(consumoHistorico, referencia)).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
+	private void mockValorConsumoTotal(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistoricoMock, BigDecimal valor) {
+		when(consumoImovelCategoriaBOMock.getValorTotalConsumoImovel(consumoHistorico, medicaoHistoricoMock)).thenReturn(valor.setScale(2, RoundingMode.HALF_DOWN));
 	}
 }
