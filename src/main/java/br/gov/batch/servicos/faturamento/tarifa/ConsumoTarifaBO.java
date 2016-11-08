@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
@@ -22,6 +23,7 @@ import br.gov.servicos.faturamento.TarifaTipoCalculoRepositorio;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
+@Stateless
 public class ConsumoTarifaBO {
 
 	@EJB
