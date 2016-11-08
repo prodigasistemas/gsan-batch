@@ -16,7 +16,6 @@ public class ArquivoTextoTO implements Serializable {
 
 	private Imovel imovel;
 	
-	//TODO: Deixar apenas o id do imovel
 	private Integer idImovel;
 
 	private Conta conta;

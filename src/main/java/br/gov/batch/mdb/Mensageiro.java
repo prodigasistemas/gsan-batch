@@ -52,6 +52,7 @@ public class Mensageiro implements MessageListener {
             JobOperator jo = BatchRuntime.getJobOperator();
             
             jo.start(mensagem.getNomeArquivo(), processoParametros);
+            
         } catch (JMSException ex) {
             logger.error("Erro na inicializacao do batch: ", ex);
         }

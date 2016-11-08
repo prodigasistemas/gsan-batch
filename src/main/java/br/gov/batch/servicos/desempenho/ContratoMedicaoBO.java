@@ -1,6 +1,7 @@
 package br.gov.batch.servicos.desempenho;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import br.gov.servicos.atendimentopublico.LigacaoAguaSituacaoRepositorio;
 import br.gov.servicos.desempenho.ContratoMedicaoCoeficienteRepositorio;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
+import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.to.MedicaoPerformanceTO;
 
 @Stateless
@@ -54,6 +56,9 @@ public class ContratoMedicaoBO {
 	
 	@EJB
 	private DebitoCreditoSituacaoRepositorio debitoCreditoSituacaoRepositorio;
+	
+	@EJB
+	private ContaRepositorio contaRepositorio;
 	
 	private MedicaoPerformanceTO medicaoPerformanceTO;
 	
@@ -143,12 +148,28 @@ public class ContratoMedicaoBO {
 		return Util.getAnoMesComoInteger(referenciaAssinatura);
 	}
 
-	public List<Imovel> getAbrangencia(Integer id) {
-		// TODO falta implementar ou repassar o metodo direto para o repositorio
-		return null;
-	}
-	
 	public ContratoMedicao getContratoMedicao(Integer imovelId) {
 		return contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovelId);
+	}
+
+	public List<Imovel> getAbrangencia(Integer idContrato, int anoMesReferencia) {
+		List<Imovel> imoveis = contratoMedicaoRepositorio.buscarImoveis(idContrato, anoMesReferencia);
+		List<Imovel> imoveisFaturadosCancelados = new ArrayList<Imovel>();
+		
+		for (Imovel imovel : imoveis) {
+			if(contaRepositorio.possuiFaturamento(imovel.getId(), anoMesReferencia)) {
+				imoveisFaturadosCancelados.add(imovel);
+			}
+			
+			if(contaRepositorio.possuiCancelamento(imovel.getId(), anoMesReferencia)) {
+				imoveisFaturadosCancelados.add(imovel);
+			}
+		}
+		
+		return imoveisFaturadosCancelados;
+	}
+
+	public List<ContratoMedicao> getContratoMedicaoPorReferencia(Integer referencia) {
+		return contratoMedicaoRepositorio.buscarContratosMedicaoPorReferencia(referencia);
 	}
 }

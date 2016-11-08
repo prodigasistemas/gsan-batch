@@ -13,6 +13,7 @@ import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.util.Utilitarios;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
+import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 
 @Stateless
@@ -26,6 +27,9 @@ public class ConsumoHistoricoBO {
 
 	@EJB
 	private ConsumoBO consumoBO;
+	
+	@EJB
+	private ContaRepositorio contaRepositorio;
 
 	SistemaParametros sistemaParametro;
 
@@ -85,12 +89,10 @@ public class ConsumoHistoricoBO {
 	}
 
 	public Integer getConsumoMes(Imovel imovel, Integer referenciaMes, LigacaoTipo agua) {
-		//TODO Falta implementar
-		return null;
+		return contaRepositorio.buscarConsumoAgua(imovel.getId(), referenciaMes, agua.getId());
 	}
 
 	public ConsumoHistorico getConsumoHistoricoPorReferencia(Imovel imovel, Integer referencia) {
-		//TODO Falta implementar
-		return null;
+		return consumoHistoricoRepositorio.buscarConsumoHistoricoPeloImoveEReferencia(imovel.getId(), referencia);
 	}
 }
