@@ -22,7 +22,7 @@ import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.to.ConsumoImovelCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
-import br.gov.servicos.to.TabelaTarifasTO;
+import br.gov.servicos.to.TarifasVigenciaTO;
 
 @Stateless
 public class ConsumoImovelCategoriaBO {
@@ -78,11 +78,16 @@ public class ConsumoImovelCategoriaBO {
 		
 		calcularDiasProporcionaisPorTarifa(consumoImovelCategoriaTO);
 		
-		for (TabelaTarifasTO tarifas : consumoImovelCategoriaTO.getTabelaTarifas()) {
-			BigDecimal valorConsumoMinimoTarifa = getValorConsumoMinimo(consumoImovelCategoriaTO, tarifas.getDataVigencia());
-			valorConsumo = valorConsumo.add(tarifas.getValorConsumoTotal(consumoImovelCategoriaTO.getQtdEconomias(), valorConsumoMinimoTarifa)); 
-			valorConsumo = valorConsumo.multiply(tarifas.getPercentualDiasProporcionais(consumoImovelCategoriaTO.getQtdDiasConsumoTarifa()))
-												.setScale(2, RoundingMode.HALF_DOWN); 
+		for (TarifasVigenciaTO vigencia : consumoImovelCategoriaTO.getTabelaTarifas()) {
+			BigDecimal valorConsumoMinimoTarifa = getValorConsumoMinimo(consumoImovelCategoriaTO, vigencia.getDataVigencia());
+
+			BigDecimal valorConsumoVigencia = BigDecimal.ZERO;
+			valorConsumoVigencia = valorConsumoVigencia.add(vigencia.getValorConsumoTotal(consumoImovelCategoriaTO.getQtdEconomias(), valorConsumoMinimoTarifa));
+			
+			BigDecimal percentualDias = vigencia.getPercentualDiasProporcionais(consumoImovelCategoriaTO.getQtdDiasConsumoTarifa())
+												.setScale(4, RoundingMode.FLOOR);
+			
+			valorConsumo = valorConsumo.add(valorConsumoVigencia.multiply(percentualDias).setScale(2, RoundingMode.HALF_DOWN)); 
 		}
 		
 		return valorConsumo;
@@ -107,14 +112,14 @@ public class ConsumoImovelCategoriaBO {
 																									dataLeituraAnterior, dataAtual));
 	}
 
-	private List<TabelaTarifasTO> getTabelaTarifasQtdDiasProporcionaisCalculado(List<TabelaTarifasTO> tabelaTarifas, DateTime dataLeituraAnterior, DateTime dataAtual) {
+	private List<TarifasVigenciaTO> getTabelaTarifasQtdDiasProporcionaisCalculado(List<TarifasVigenciaTO> tabelaTarifas, DateTime dataLeituraAnterior, DateTime dataAtual) {
 		DateTime dataVigenciaAnterior = null;
-		TabelaTarifasTO tabelaAnterior = null;
-		List<TabelaTarifasTO> tabelaTarifasAtualizada = new ArrayList<TabelaTarifasTO>();
+		TarifasVigenciaTO tabelaAnterior = null;
+		List<TarifasVigenciaTO> tabelaTarifasAtualizada = new ArrayList<TarifasVigenciaTO>();
 		
 		Collections.sort(tabelaTarifas, (o1, o2) -> o1.compareTo(o2));
 
-		for (TabelaTarifasTO tabela : tabelaTarifas) {
+		for (TarifasVigenciaTO tabela : tabelaTarifas) {
 			DateTime dataVigencia = new DateTime(tabela.getDataVigencia());
 			
 			if(dataVigenciaAnterior != null) {
@@ -226,7 +231,7 @@ public class ConsumoImovelCategoriaBO {
 
 	private void carregarTarifasConsumoImovelCategoria() {
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : getConsumoImoveisCategoriaTO()) {
-			List<TabelaTarifasTO> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
+			List<TarifasVigenciaTO> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
 			consumoImovelCategoriaTO.setTabelaTarifas(faixas);
 		}
 	}
@@ -234,8 +239,8 @@ public class ConsumoImovelCategoriaBO {
 	private void distribuirConsumoFaixaPorCategoria(ConsumoImovelCategoriaTO consumoImovelCategoria) {	
 		Integer consumo = consumoImovelCategoria.getConsumoExcedenteCategoria();
 
-		List<TabelaTarifasTO> tabelaTarifasCalculadas = new ArrayList<TabelaTarifasTO>();
-		for (TabelaTarifasTO tabelaTarifas : consumoImovelCategoria.getTabelaTarifas()) {
+		List<TarifasVigenciaTO> tabelaTarifasCalculadas = new ArrayList<TarifasVigenciaTO>();
+		for (TarifasVigenciaTO tabelaTarifas : consumoImovelCategoria.getTabelaTarifas()) {
 			for (ConsumoTarifaFaixaTO faixa : tabelaTarifas.getFaixas()) {
 				Integer consumoFinalFaixa = calcularConsumoFaixa(consumo, faixa);
 				

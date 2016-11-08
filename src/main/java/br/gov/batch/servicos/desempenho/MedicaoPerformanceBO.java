@@ -11,6 +11,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
 import br.gov.model.desempenho.MedicaoPerformance;
 import br.gov.servicos.desempenho.MedicaoPerformanceRepositorio;
+import br.gov.servicos.to.MedicaoPerformanceTO;
 
 @Stateless
 public class MedicaoPerformanceBO {
@@ -24,23 +25,13 @@ public class MedicaoPerformanceBO {
 	public void preencherRelatorioDesempenho(ContratoMedicao contratoMedicao, int referencia) {
 		List<Imovel> imoveisAbrangencia = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId());
 		
-		MedicaoPerformance medicaoPerformance = new MedicaoPerformance();
+		MedicaoPerformance medicaoPerformance;
 		List<MedicaoPerformance> medicaoPerformances = new ArrayList<MedicaoPerformance>();
 		
 		for (Imovel imovel : imoveisAbrangencia) {
-			medicaoPerformance.setContratoMedicao(contratoMedicao);
-			medicaoPerformance.setReferencia(referencia);
-			medicaoPerformance.setImovel(imovel);
-			medicaoPerformance.setDiferencaConsumoAgua(contratoMedicaoBO.calcularDiferencaConsumoAgua(imovel, referencia));
-			medicaoPerformance.setValorDiferencaConsumoAgua(contratoMedicaoBO.calcularValorDiferencaAgua(imovel, referencia));
-			//TODO Calcular a diferenca para o esgoto
-			medicaoPerformance.setPercentualConsumoEsgoto(null);
-			medicaoPerformance.setValorDiferencaConsumoEsgoto(contratoMedicaoBO.calcularValorDiferencaAgua(imovel, referencia));
-			//TODO Pegar a situacao
-			medicaoPerformance.setDebitoCreditoSituacao(null);
+			MedicaoPerformanceTO medicaoPerformanceTO = contratoMedicaoBO.getMedicaoPerformanceTO(contratoMedicao, imovel, referencia);
+			medicaoPerformance = new MedicaoPerformance(medicaoPerformanceTO);			
 			medicaoPerformance.setDataCriacao(new Date());
-
-			//TODO falta mapear o campo com o valor de repasse
 			
 			medicaoPerformances.add(medicaoPerformance);
 		}

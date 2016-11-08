@@ -14,13 +14,19 @@ import br.gov.batch.servicos.faturamento.tarifa.ConsumoImovelCategoriaBO;
 import br.gov.batch.servicos.micromedicao.ConsumoHistoricoBO;
 import br.gov.batch.servicos.micromedicao.MedicaoHistoricoBO;
 import br.gov.batch.util.Util;
+import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
+import br.gov.model.desempenho.ContratoMedicaoCoeficiente;
+import br.gov.model.faturamento.DebitoCreditoSituacaoRepositorio;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.model.micromedicao.MedicaoHistorico;
+import br.gov.servicos.atendimentopublico.LigacaoAguaSituacaoRepositorio;
+import br.gov.servicos.desempenho.ContratoMedicaoCoeficienteRepositorio;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
+import br.gov.servicos.to.MedicaoPerformanceTO;
 
 @Stateless
 public class ContratoMedicaoBO {
@@ -40,32 +46,83 @@ public class ContratoMedicaoBO {
 	@EJB
 	private MedicaoHistoricoBO medicaoHistoricoBO;
 	
-	public BigDecimal calcularValorRepasse() {
-		//TODO aplicar o coeficiente de acordo com a ligação
-		return null;
+	@EJB
+	private LigacaoAguaSituacaoRepositorio ligacaoAguaSituacaoRepositorio;
+	
+	@EJB
+	private ContratoMedicaoCoeficienteRepositorio contratoMedicaoCoeficienteRepositorio;
+	
+	@EJB
+	private DebitoCreditoSituacaoRepositorio debitoCreditoSituacaoRepositorio;
+	
+	private MedicaoPerformanceTO medicaoPerformanceTO;
+	
+	public MedicaoPerformanceTO getMedicaoPerformanceTO(ContratoMedicao contratoMedicao, Imovel imovel, int referencia) {
+		medicaoPerformanceTO = new MedicaoPerformanceTO();
+		medicaoPerformanceTO.setImovel(imovel);
+		medicaoPerformanceTO.setReferencia(referencia);
+		medicaoPerformanceTO.setContratoMedicao(contratoMedicao);
+		
+		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
+		medicaoPerformanceTO.setValorAguaFaturadoMesZero(calcularValorConsumo(imovel, referenciaMesZero, referencia));
+		medicaoPerformanceTO.setValorAguaFaturado(calcularValorConsumo(imovel, referencia, referencia));
+		medicaoPerformanceTO.setValorDiferencaAgua(calcularValorDiferencaAgua(medicaoPerformanceTO.getValorAguaFaturado(), 
+																			  medicaoPerformanceTO.getValorAguaFaturadoMesZero()));
+		medicaoPerformanceTO.setDiferencaConsumoAgua(calcularDiferencaConsumoAgua(imovel, referenciaMesZero, referencia));
+		
+		Integer idDebitoCreditoSituacao = debitoCreditoSituacaoRepositorio.buscarDebitoCreditoSituacaoId(imovel.getId(), referencia);
+		medicaoPerformanceTO.setDebitoCreditoSituacao(idDebitoCreditoSituacao);
+		medicaoPerformanceTO.setValorMedicao(calcularValorMedicao(medicaoPerformanceTO, referencia));
+		
+		return medicaoPerformanceTO;
 	}
 	
+	public BigDecimal calcularValorMedicao(MedicaoPerformanceTO medicaoPerformanceTO, int referencia) {
+		Imovel imovel = medicaoPerformanceTO.getImovel();
+		ContratoMedicao contratoMedicao = medicaoPerformanceTO.getContratoMedicao();
+		
+		LigacaoAguaSituacao ligacaoAguaSituacao = ligacaoAguaSituacaoRepositorio.buscarLigacaoAguaSituacao(imovel.getId(), referencia);
+		if(ligacaoAguaSituacao == null) {
+			ligacaoAguaSituacao = ligacaoAguaSituacaoRepositorio.obterPorID(LigacaoAguaSituacao.FACTIVEL);
+		}
+		
+		ContratoMedicaoCoeficiente contratoMedicaoCoeficiente = contratoMedicaoCoeficienteRepositorio.buscarPorContratoELigacaoAguaSituacao(
+																															 contratoMedicao.getId(), 
+																															 ligacaoAguaSituacao.getId());
+		BigDecimal coeficiente = contratoMedicaoCoeficiente.getCoeficiente();
+		
+		return medicaoPerformanceTO.getValorDiferencaAgua().multiply(coeficiente);
+	}
+
 	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, Integer referencia) {
-		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovel.getId());
+		ContratoMedicao contratoMedicao = getContratoMedicao(imovel.getId());
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
 		
-		ConsumoHistorico consumoHistoricoMesZero = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaMesZero);
-		ConsumoHistorico consumoHistoricoAtual = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
+		return calcularValorDiferencaAgua(imovel, referenciaMesZero, referencia);
+	}
+
+	public BigDecimal calcularValorDiferencaAgua(Imovel imovel, Integer referenciaMesZero, Integer referencia) {
+		BigDecimal valorConsumoMesZero = calcularValorConsumo(imovel, referenciaMesZero, referencia);
+		BigDecimal valorConsumoMesAtual = calcularValorConsumo(imovel, referencia, referencia);
 		
-		MedicaoHistorico medicaoHistorico = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referencia);
-		
-		BigDecimal valorConsumoMesZero = calcularValorConsumo(consumoHistoricoMesZero, medicaoHistorico);
-		BigDecimal valorConsumoMesAtual = calcularValorConsumo(consumoHistoricoAtual, medicaoHistorico);
-		
-		return valorConsumoMesAtual.subtract(valorConsumoMesZero);
+		return calcularValorDiferencaAgua(valorConsumoMesAtual, valorConsumoMesZero);
 	}
 	
-	public Integer calcularDiferencaConsumoAgua(Imovel imovel, Integer referencia) {
-		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovel.getId());
-		Integer consumoMesZero = consumoHistoricoBO.getConsumoMes(imovel, getReferenciaMesZero(contratoMedicao), LigacaoTipo.AGUA);
+	public BigDecimal calcularValorDiferencaAgua(BigDecimal valorConsumoMesZero, BigDecimal valorConsumoReferencia) {
+		return valorConsumoReferencia.subtract(valorConsumoMesZero);
+	}
+	
+	public Integer calcularDiferencaConsumoAgua(Imovel imovel, Integer referencia, Integer referenciaMesZero) {
+		Integer consumoMesZero = consumoHistoricoBO.getConsumoMes(imovel, referenciaMesZero, LigacaoTipo.AGUA);
 		Integer consumoReferencia = consumoHistoricoBO.getConsumoMes(imovel, referencia, LigacaoTipo.AGUA);
 		
 		return consumoReferencia - consumoMesZero;
+	}
+	
+	public BigDecimal calcularValorConsumo(Imovel imovel, Integer referenciaConsumoHistorico, Integer referencia) {
+		MedicaoHistorico medicaoHistorico = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referencia);
+		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaConsumoHistorico);
+		return calcularValorConsumo(consumoHistorico, medicaoHistorico);
 	}
 
 	public BigDecimal calcularValorConsumo(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
@@ -89,5 +146,9 @@ public class ContratoMedicaoBO {
 	public List<Imovel> getAbrangencia(Integer id) {
 		// TODO falta implementar ou repassar o metodo direto para o repositorio
 		return null;
+	}
+	
+	public ContratoMedicao getContratoMedicao(Integer imovelId) {
+		return contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovelId);
 	}
 }

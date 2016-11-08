@@ -121,7 +121,7 @@ public class ContratoMedicaoBOTest {
 		
 		when(consumoHistoricoBOMock.getConsumoMes(imovelMock, referencia, LigacaoTipo.AGUA)).thenReturn(10);
 		
-		assertEquals(new Integer(10), bo.calcularDiferencaConsumoAgua(imovelMock, referencia));
+		assertEquals(new Integer(10), bo.calcularDiferencaConsumoAgua(imovelMock, referenciaMesZero, referencia));
 	}
 	
 	@Test

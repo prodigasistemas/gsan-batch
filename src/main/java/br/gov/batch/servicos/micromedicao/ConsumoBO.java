@@ -33,7 +33,7 @@ import br.gov.servicos.to.ConsumoImovelCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaCategoriaTO;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
-import br.gov.servicos.to.TabelaTarifasTO;
+import br.gov.servicos.to.TarifasVigenciaTO;
 
 @Stateless
 public class ConsumoBO {
@@ -225,8 +225,8 @@ public class ConsumoBO {
 		return distinctConsumoTarifaCategoriaTO(categoria, consumoTarifasCategoria);
 	}
 
-	public List<TabelaTarifasTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
-		List<TabelaTarifasTO> tarifasPorVigencia = new ArrayList<TabelaTarifasTO>();
+	public List<TarifasVigenciaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
+		List<TarifasVigenciaTO> tarifasPorVigencia = new ArrayList<TarifasVigenciaTO>();
 		for (ConsumoTarifaCategoriaTO consumoTarifaCategoria : consumoImovelCategoriaTO.getConsumoTarifasCategoria()) {
 			Date dataVigencia = consumoTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia();
 			
@@ -234,7 +234,7 @@ public class ConsumoBO {
 																								dataVigencia,
 																								consumoTarifaCategoria.getId());
 			
-			tarifasPorVigencia.add(new TabelaTarifasTO(dataVigencia, consumoTarifasFaixaTO));
+			tarifasPorVigencia.add(new TarifasVigenciaTO(dataVigencia, consumoTarifasFaixaTO));
 		}
 		
 		
