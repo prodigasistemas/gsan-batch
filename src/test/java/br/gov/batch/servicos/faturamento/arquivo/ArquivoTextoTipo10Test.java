@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.SistemaParametros;
@@ -23,10 +21,9 @@ import br.gov.model.util.Utilitarios;
 import br.gov.servicos.faturamento.ConsumoTarifaFaixaRepositorio;
 import br.gov.servicos.to.ConsumoTarifaFaixaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo10Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo10 arquivo;
 	
 	private int TAMANHO_LINHA = 42;
@@ -46,6 +43,8 @@ public class ArquivoTextoTipo10Test {
 		to.addIdsConsumoTarifaCategoria(3);
 		
 		arquivo = new ArquivoTextoTipo10();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -71,11 +70,9 @@ public class ArquivoTextoTipo10Test {
 	}
 	
 	private void carregarMock() {
-		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(false);
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.indicadorTarifaCategoria()).thenReturn(false);
 		
-		expect(consumoTarifaFaixaRepositorioMock.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria())).andReturn(getFaixas());
-		replay(consumoTarifaFaixaRepositorioMock);
+		when(consumoTarifaFaixaRepositorioMock.dadosConsumoTarifaFaixa(to.getIdsConsumoTarifaCategoria())).thenReturn(getFaixas());
 	}
 
 	private List<ConsumoTarifaFaixaTO> getFaixas() {

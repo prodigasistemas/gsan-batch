@@ -1,25 +1,24 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import br.gov.batch.servicos.faturamento.FaturamentoAtividadeCronogramaBO;
+import br.gov.batch.servicos.faturamento.tarifa.ConsumoTarifaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
@@ -41,40 +40,30 @@ import br.gov.servicos.faturamento.TarifaTipoCalculoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo09Test {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo09 arquivo;
 	
 	private int TAMANHO_LINHA = 37;
 	
-	@Mock
-	private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorioMock;
+	@Mock private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorioMock;
 
-	@Mock
-	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
+	@Mock private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorioMock;
+	@Mock private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorioMock;
+	@Mock private ConsumoTarifaCategoriaRepositorio consumoTarifaCategoriaRepositorioMock;
 	
-	@Mock
-	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorioMock;
+	@Mock private MedicaoHistoricoRepositorio medicaoHistoricoRepositorioMock;
 	
-	@Mock
-	private FaturamentoAtividadeCronogramaRepositorio faturamentoAtividadeCronogramaRepositorioMock;
+	@Mock private FaturamentoAtividadeCronogramaRepositorio faturamentoAtividadeCronogramaRepositorioMock;
 	
-	@Mock
-	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBOMock;
+	@Mock private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
 	
-	@Mock
-	private ConsumoTarifaFaixaRepositorio consumoTarifaFaixaRepositorioMock;
+	@Mock private SistemaParametros sistemaParametrosMock;
 	
-	@Mock
-	private SistemaParametros sistemaParametrosMock;;
+	@Mock private ConsumoTarifaBO consumotarifaBOMock;
 	
 	private ArquivoTextoTO to;
 	
@@ -89,6 +78,7 @@ public class ArquivoTextoTipo09Test {
 	private Date dataFaturamento;
 	private Subcategoria subcategoria;
 	private ConsumoTarifaCategoria consumoTarifaCategoria;
+	private List<ConsumoTarifaCategoria> consumoTarifasCategoria;
 	
 	@Before
 	public void setup() {
@@ -139,6 +129,10 @@ public class ArquivoTextoTipo09Test {
 		to.setFaturamentoGrupo(faturamentoGrupo);
 		to.addIdsConsumoTarifaCategoria(1);
 		arquivo = new ArquivoTextoTipo09();
+		
+		consumoTarifasCategoria = new ArrayList<ConsumoTarifaCategoria>();
+		consumoTarifasCategoria.add(consumoTarifaCategoria);
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -164,23 +158,20 @@ public class ArquivoTextoTipo09Test {
 	}
 	
 	private void carregarMocks() {
-		expect(sistemaParametrosMock.indicadorTarifaCategoria()).andStubReturn(true);
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.indicadorTarifaCategoria()).thenReturn(true);
 		
-		expect(tarifaTipoCalculoRepositorioMock.tarifaTipoCalculoAtiva()).andReturn(tipoCalculoTarifa).times(3);
-		replay(tarifaTipoCalculoRepositorioMock);
+		when(tarifaTipoCalculoRepositorioMock.tarifaTipoCalculoAtiva()).thenReturn(tipoCalculoTarifa);
 		
-		expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).andReturn(dadosSubcategoria).times(3);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarSubcategoria(imovel.getId())).thenReturn(dadosSubcategoria);
 		
-		expect(consumoTarifaVigenciaRepositorioMock.maiorDataVigenciaConsumoTarifaPorData(anyObject(), anyObject())).andReturn(consumoTarifaVigenteTO).times(3);
-		replay(consumoTarifaVigenciaRepositorioMock);
+		when(consumoTarifaVigenciaRepositorioMock.maiorDataVigenciaConsumoTarifaPorData(any(), any())).thenReturn(consumoTarifaVigenteTO);
 		
-		expect(consumoTarifaCategoriaRepositorioMock.buscarConsumoTarifaCategoriaVigente(
+		when(consumoTarifaCategoriaRepositorioMock.buscarConsumoTarifaCategoriaVigente(
 				consumoTarifaVigenteTO.getDataVigencia(),
 				consumoTarifaVigenteTO.getIdVigencia(),
 				subcategoria.getCategoria().getId(),
-				subcategoria.getSubcategoria().getId())).andReturn(consumoTarifaCategoria).times(3);
-		replay(consumoTarifaCategoriaRepositorioMock);
+				subcategoria.getSubcategoria().getId())).thenReturn(consumoTarifaCategoria);
+		
+		when(consumotarifaBOMock.obterConsumoTarifasCategoria(imovel, sistemaParametrosMock)).thenReturn(consumoTarifasCategoria);
 	}
 }

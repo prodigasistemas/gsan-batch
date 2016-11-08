@@ -1,17 +1,15 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.faturamento.FaturamentoGrupo;
@@ -20,9 +18,8 @@ import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.HidrometroTO;
 
-@RunWith(EasyMockRunner.class)
 public class InstalacaoSubstituicaoHidrometroTest {
-    @TestSubject
+    @InjectMocks
     private HidrometroBO hidrometroBO;
     
     @Mock
@@ -61,6 +58,8 @@ public class InstalacaoSubstituicaoHidrometroTest {
         cal.set(Calendar.DAY_OF_MONTH, 1);
         
         hidrometroTO.setDataInstalacao(cal.getTime());
+        
+        MockitoAnnotations.initMocks(this);
     }
 
     
@@ -94,27 +93,20 @@ public class InstalacaoSubstituicaoHidrometroTest {
 
     
     private void mocksComMedicao() {
-        expect(imovelBO.pesquisarFaturamentoGrupo(1)).andReturn(faturamentoGrupo);
-        replay(imovelBO);
+        when(imovelBO.pesquisarFaturamentoGrupo(1)).thenReturn(faturamentoGrupo);
         
-        expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).andReturn(medicaoHistoricoAtual);
-        replay(medicaoHistoricoRepositorio);
+        when(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).thenReturn(medicaoHistoricoAtual);
         
-        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).andReturn(hidrometroTO);
-        replay(hidrometroInstalacaoHistoricoRepositorio);
+        when(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).thenReturn(hidrometroTO);
     }
 
     private void mocksSemMedicao() {
-        expect(imovelBO.pesquisarFaturamentoGrupo(1)).andReturn(faturamentoGrupo);
-        replay(imovelBO);
+        when(imovelBO.pesquisarFaturamentoGrupo(1)).thenReturn(faturamentoGrupo);
         
-        expect(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).andReturn(null);
-        replay(medicaoHistoricoRepositorio);
+        when(medicaoHistoricoRepositorio.buscarPorLigacaoAgua(1, 201412)).thenReturn(null);
         
-        expect(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).andReturn(hidrometroTO).times(2);
-        replay(hidrometroInstalacaoHistoricoRepositorio);
+        when(hidrometroInstalacaoHistoricoRepositorio.dadosInstalacaoHidrometroAgua(1)).thenReturn(hidrometroTO);
         
-        expect(medicaoHistoricoBO.getMedicaoHistorico(1, 201411)).andReturn(null);
-        replay(medicaoHistoricoBO);
+        when(medicaoHistoricoBO.getMedicaoHistorico(1, 201411)).thenReturn(null);
     }
 }

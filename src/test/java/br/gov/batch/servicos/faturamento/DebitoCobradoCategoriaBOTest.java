@@ -6,20 +6,15 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import br.gov.model.faturamento.DebitoCobradoCategoria;
 import br.gov.model.faturamento.DebitoCobrarCategoria;
 import br.gov.model.faturamento.DebitoCobrarCategoriaPK;
 
-@RunWith(EasyMockRunner.class)
 public class DebitoCobradoCategoriaBOTest {
 
-	@TestSubject
 	private DebitoCobradoCategoriaBO bo;
 
 	@Before

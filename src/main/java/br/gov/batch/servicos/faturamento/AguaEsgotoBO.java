@@ -112,7 +112,7 @@ public class AguaEsgotoBO {
 	private VolumeMedioAguaEsgotoTO gerarVolumeMedioSemConsumoHistorico(Integer idImovel) {
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
 		int idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
-		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoPorCategoria(idImovel, idTarifa, categorias);
+		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoCategorias(idImovel, idTarifa, categorias);
 
 		return new VolumeMedioAguaEsgotoTO(consumoMinimo, 1);
 	}

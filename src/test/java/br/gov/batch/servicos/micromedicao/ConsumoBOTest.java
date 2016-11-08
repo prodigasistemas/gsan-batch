@@ -1,24 +1,20 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.anyInt;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import br.gov.batch.servicos.cadastro.EconomiasBO;
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.Status;
 import br.gov.model.cadastro.Categoria;
@@ -32,10 +28,9 @@ import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoMinimoAreaRepositorio;
 import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ConsumoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private ConsumoBO bo;
 
 	@Mock
@@ -55,9 +50,6 @@ public class ConsumoBOTest {
 
 	@Mock
 	private ConsumoMinimoAreaRepositorio consumoMinimoAreaRepositorioMock;
-
-	@Mock
-	private EconomiasBO economiasBOMock;
 
 	@Mock
 	private ImovelBO imovelBOMock;
@@ -92,6 +84,8 @@ public class ConsumoBOTest {
 		consumoTarifaVigenciaTO = new ConsumoTarifaVigenciaTO(2, new Date());
 		
 		bo = new ConsumoBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -102,13 +96,12 @@ public class ConsumoBOTest {
 		mockMaiorDataVigencia();
 		mockConsumoMinimoTarifa();
 
-		assertEquals(50, bo.consumoNaoMedido(5, 5));
+		assertEquals(80, bo.consumoNaoMedido(5, null));
 	}
 
 	@Test
 	public void consumoNaoMedidoSemTarifa() {
 		mockParametroInativo();
-		mockQuantidadeEconomiasVirtuais();
 		mockAreaConstruida();
 		mockSubcategorias();
 		mockConsumoMinimoArea();
@@ -117,53 +110,38 @@ public class ConsumoBOTest {
 	}
 
 	private void mockParametroAtivo() {
-		expect(sistemaParametrosMock.getIndicadorNaoMedidoTarifa()).andReturn(Status.ATIVO.getId());
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.getIndicadorNaoMedidoTarifa()).thenReturn(Status.ATIVO.getId());
 	}
 
 	private void mockParametroInativo() {
-		expect(sistemaParametrosMock.getIndicadorNaoMedidoTarifa()).andReturn(Status.INATIVO.getId());
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.getIndicadorNaoMedidoTarifa()).thenReturn(Status.INATIVO.getId());
 	}
 
 	private void mockConsumoMinimoLigacao() {
-		expect(consumoTarifaRepositorioMock.consumoTarifaDoImovel(anyInt())).andReturn(1);
-		replay(consumoTarifaRepositorioMock);
+		when(consumoTarifaRepositorioMock.consumoTarifaDoImovel(any())).thenReturn(1);
 	}
 
 	private void mockCategorias() {
-		expect(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(anyInt())).andReturn(categorias);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarQuantidadeEconomiasPorImovel(any())).thenReturn(categorias);
 	}
 
 	private void mockMaiorDataVigencia() {
-		expect(consumoTarifaVigenciaRepositorioMock.maiorDataVigenciaConsumoTarifa(anyInt())).andReturn(consumoTarifaVigenciaTO);
-		replay(consumoTarifaVigenciaRepositorioMock);
+		when(consumoTarifaVigenciaRepositorioMock.buscarConsumoTarifaVigenciaAtual(any())).thenReturn(consumoTarifaVigenciaTO);
 	}
 
 	private void mockConsumoMinimoTarifa() {
-		expect(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(anyObject(), anyInt())).andReturn(10);
-		expect(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(anyObject(), anyInt())).andReturn(20);
-		replay(consumoTarifaCategoriaRepositorioMock);
-	}
-
-	private void mockQuantidadeEconomiasVirtuais() {
-		expect(economiasBOMock.quantidadeEconomiasVirtuais(anyInt())).andReturn(2);
-		replay(economiasBOMock);
+		when(consumoTarifaCategoriaRepositorioMock.consumoMinimoTarifa(any(), any())).thenReturn(10, 20);
 	}
 
 	private void mockAreaConstruida() {
-		expect(imovelBOMock.verificarAreaConstruida(anyInt())).andReturn(BigDecimal.valueOf(4.00));
-		replay(imovelBOMock);
+		when(imovelBOMock.verificarAreaConstruida(any())).thenReturn(BigDecimal.valueOf(4.00));
 	}
 
 	private void mockSubcategorias() {
-		expect(imovelSubcategoriaRepositorioMock.buscarSubcategoria(anyInt())).andReturn(subcategorias);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarSubcategoria(any())).thenReturn(subcategorias);
 	}
 
 	private void mockConsumoMinimoArea() {
-		expect(consumoMinimoAreaRepositorioMock.pesquisarConsumoMinimoArea(anyObject(), anyInt(), anyInt(), anyInt())).andReturn(20).times(2);
-		replay(consumoMinimoAreaRepositorioMock);
+		when(consumoMinimoAreaRepositorioMock.pesquisarConsumoMinimoArea(any(), any(), any(), any())).thenReturn(20);
 	}
 }

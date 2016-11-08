@@ -1,23 +1,20 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.micromedicao.ConsumoAnormalidadeAcao;
 import br.gov.servicos.micromedicao.ConsumoAnormalidadeAcaoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ConsumoAnormalidadeAcaoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private ConsumoAnormalidadeAcaoBO bo;
 
 	@Mock
@@ -26,6 +23,8 @@ public class ConsumoAnormalidadeAcaoBOTest {
 	@Before
 	public void setup() {
 		bo = new ConsumoAnormalidadeAcaoBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -59,26 +58,23 @@ public class ConsumoAnormalidadeAcaoBOTest {
 		ConsumoAnormalidadeAcao anormalidadeAcao = new ConsumoAnormalidadeAcao();
 		anormalidadeAcao.setId(1);
 
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).andReturn(anormalidadeAcao);
-		replay(consumoAnormalidadeAcaoRepositorioMock);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).thenReturn(anormalidadeAcao);
 	}
 	
 	private void mockAnormalidadeAcaoSemPerfil() {
 		ConsumoAnormalidadeAcao anormalidadeAcao = new ConsumoAnormalidadeAcao();
 		anormalidadeAcao.setId(2);
 
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).andReturn(null);
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, null)).andReturn(anormalidadeAcao);
-		replay(consumoAnormalidadeAcaoRepositorioMock);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).thenReturn(null);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, null)).thenReturn(anormalidadeAcao);
 	}
 	
 	private void mockAnormalidadeAcaoSemPerfilESemCategoria() {
 		ConsumoAnormalidadeAcao anormalidadeAcao = new ConsumoAnormalidadeAcao();
 		anormalidadeAcao.setId(3);
 
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).andReturn(null);
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, null)).andReturn(null);
-		expect(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, null, null)).andReturn(anormalidadeAcao);
-		replay(consumoAnormalidadeAcaoRepositorioMock);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, 1)).thenReturn(null);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, 1, null)).thenReturn(null);
+		when(consumoAnormalidadeAcaoRepositorioMock.consumoAnormalidadeAcao(1, null, null)).thenReturn(anormalidadeAcao);
 	}
 }

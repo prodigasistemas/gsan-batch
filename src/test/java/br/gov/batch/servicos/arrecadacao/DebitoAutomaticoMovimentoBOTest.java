@@ -1,17 +1,15 @@
 package br.gov.batch.servicos.arrecadacao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.arrecadacao.DebitoAutomatico;
 import br.gov.model.arrecadacao.DebitoAutomaticoMovimento;
@@ -22,17 +20,16 @@ import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoMovimentoRepositorio;
 import br.gov.servicos.arrecadacao.DebitoAutomaticoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class DebitoAutomaticoMovimentoBOTest {
     
-    @TestSubject
-    private DebitoAutomaticoMovimentoBO bo;
+    @InjectMocks
+    DebitoAutomaticoMovimentoBO bo;
     
     @Mock
-    private DebitoAutomaticoMovimentoRepositorio debitoAutomaticoMovimentoRepositorioMock;
+    DebitoAutomaticoMovimentoRepositorio debitoAutomaticoMovimentoRepositorioMock;
     
     @Mock
-    private DebitoAutomaticoRepositorio debitoAutomaticoRepositorioMock;
+    DebitoAutomaticoRepositorio debitoAutomaticoRepositorioMock;
     
     Imovel imovel = null;
     
@@ -74,6 +71,8 @@ public class DebitoAutomaticoMovimentoBOTest {
                 .faturamentoGrupo(faturamentoGrupo)
                 .dataVencimento(calendar.getTime())
                 .build();
+        
+        MockitoAnnotations.initMocks(this);       
     }
     
     @Test
@@ -84,7 +83,7 @@ public class DebitoAutomaticoMovimentoBOTest {
     
     @Test
     public void testImovelComDebitoAutomatico(){
-        mockImovelComDebitoAutomatico();   
+        mockImovelComDebitoAutomatico();
         bo.gerarMovimentoDebitoAutomatico(imovel, conta, faturamentoGrupo);
     }
     
@@ -108,12 +107,10 @@ public class DebitoAutomaticoMovimentoBOTest {
     }
 
     private void mockImovelSemDebitoAutomatico() {
-        expect(debitoAutomaticoRepositorioMock.obterDebitoAutomaticoPorImovel(imovel.getId())).andReturn(null);
-        replay(debitoAutomaticoRepositorioMock);
+        when(debitoAutomaticoRepositorioMock.obterDebitoAutomaticoPorImovel(imovel.getId())).thenReturn(null);
     }
    
     private void mockImovelComDebitoAutomatico() {
-        expect(debitoAutomaticoRepositorioMock.obterDebitoAutomaticoPorImovel(imovel.getId())).andReturn(debitoAutomatico);
-        replay(debitoAutomaticoRepositorioMock);
+        when(debitoAutomaticoRepositorioMock.obterDebitoAutomaticoPorImovel(imovel.getId())).thenReturn(debitoAutomatico);
     }    
 }

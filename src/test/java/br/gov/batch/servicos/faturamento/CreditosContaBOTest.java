@@ -1,22 +1,19 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.cadastro.CategoriaBO;
-import br.gov.batch.servicos.faturamento.CreditosContaBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.faturamento.CreditoRealizado;
@@ -28,10 +25,9 @@ import br.gov.servicos.faturamento.CreditoRealizarCategoriaRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 import br.gov.servicos.to.CreditosContaTO;
 
-@RunWith(EasyMockRunner.class)
 public class CreditosContaBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private CreditosContaBO creditosContaBO;
 	
 	@Mock
@@ -101,6 +97,8 @@ public class CreditosContaBOTest {
         
         creditosRealizarComDois.add(creditoRealizarDescontoAcrescimosImpontualidade);
         creditosRealizarComDois.add(creditoRealizarDescontoAntiguidadeDebito);
+        
+        MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -158,14 +156,12 @@ public class CreditosContaBOTest {
 	public void gerarCreditoRealizadoSemCreditoRealizar(){
 		SistemaParametros parametros = new SistemaParametros();
 		parametros.setAnoMesFaturamento(201406);
-		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
-			.andReturn(creditosRealizarVazia);
-		expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
-		.andReturn(creditosRealizarVazia);
-		expect(sistemaParametrosRepositorioMock.getSistemaParametros())
-		.andReturn(parametros);
-		replay(sistemaParametrosRepositorioMock);
-		replay(creditoRealizarRepositorioMock);
+		when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+			.thenReturn(creditosRealizarVazia);
+		when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
+		.thenReturn(creditosRealizarVazia);
+		when(sistemaParametrosRepositorioMock.getSistemaParametros())
+		.thenReturn(parametros);
 		
 		CreditosContaTO creditoRealizadoTORetorno = creditosContaBO.gerarCreditosConta(imovel.getId(), anoMesFaturamento);
 		
@@ -220,11 +216,10 @@ public class CreditosContaBOTest {
 	
 	@Test
 	public void buscarCreditosRealizarNormal(){
-        expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
-            .andReturn(creditosRealizarComUm);
-        expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
-        .andReturn(creditosRealizarVazia);
-        replay(creditoRealizarRepositorioMock);
+        when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+            .thenReturn(creditosRealizarComUm);
+        when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
+        .thenReturn(creditosRealizarVazia);
         
         Collection<CreditoRealizar> creditos = creditosContaBO.creditosRealizar(imovel.getId(), anoMesFaturamento);
         
@@ -236,11 +231,10 @@ public class CreditosContaBOTest {
 	
     @Test
     public void buscarCreditosRealizarNormalEPrefaturada(){
-        expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
-            .andReturn(creditosRealizarComUm);
-        expect(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
-        .andReturn(creditosRealizarComUm);
-        replay(creditoRealizarRepositorioMock);
+        when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+            .thenReturn(creditosRealizarComUm);
+        when(creditoRealizarRepositorioMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.PRE_FATURADA, anoMesFaturamento))
+        .thenReturn(creditosRealizarComUm);
         
         Collection<CreditoRealizar> creditos = creditosContaBO.creditosRealizar(imovel.getId(), anoMesFaturamento);
         

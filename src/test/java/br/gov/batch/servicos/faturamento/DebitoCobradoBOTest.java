@@ -1,28 +1,25 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.faturamento.DebitoCobrado;
 import br.gov.model.faturamento.DebitoCobrar;
 import br.gov.servicos.to.DebitosContaTO;
 
-@RunWith(EasyMockRunner.class)
 public class DebitoCobradoBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private DebitosContaBO business;
 	
 	@Mock
@@ -41,23 +38,19 @@ public class DebitoCobradoBOTest {
 	@Before
 	public void setup() {
 		business = new DebitosContaBO();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	protected void preparaMocks(int anoMesFaturamento, List<DebitoCobrar> debitos) {
-		expect(debitoCobrarEJBMock.debitosCobrarVigentes(idImovel))
-									.andReturn(debitos);
-		replay(debitoCobrarEJBMock);
+		when(debitoCobrarEJBMock.debitosCobrarVigentes(idImovel)).thenReturn(debitos);
 		
 		for (DebitoCobrar debitoCobrar : debitos) {
 			BigDecimal valorPrestacao = debitoCobrar.getValorPrestacao();
 			valorPrestacao = valorPrestacao.add(debitoCobrar.getResiduoPrestacao()).setScale(2);
-			expect(debitoCobrarCategoriaEJBMock.dividePrestacaoDebitoPelasEconomias(debitoCobrar.getId(), valorPrestacao)).andReturn(null);
+			when(debitoCobrarCategoriaEJBMock.dividePrestacaoDebitoPelasEconomias(debitoCobrar.getId(), valorPrestacao)).thenReturn(null);
 		}
-		expect(debitoCobradoCategoriaEJBMock.listaDebitoCobradoCategoriaPeloCobrar(null)).andReturn(null);
-		replay(debitoCobrarCategoriaEJBMock);
-		replay(debitoCobradoCategoriaEJBMock);
-		
-		
+		when(debitoCobradoCategoriaEJBMock.listaDebitoCobradoCategoriaPeloCobrar(null)).thenReturn(null);
 	}
 	
 	@Test

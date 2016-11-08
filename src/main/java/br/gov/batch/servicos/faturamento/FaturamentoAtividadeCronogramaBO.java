@@ -39,29 +39,45 @@ public class FaturamentoAtividadeCronogramaBO {
 	}
 	
 	public Date obterDataLeituraAnterior(Imovel imovel, FaturamentoGrupo grupo) {
-		Integer anoMesReferenciaAnterior = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
+		Integer anoMesReferencia = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
 		
-		MedicaoHistorico medicao = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferenciaAnterior);
+		return obterDataLeitura(imovel, grupo, anoMesReferencia);
+	}
+	
+	public Date obterDataLeituraAtual(Imovel imovel, FaturamentoGrupo grupo) {
+		Integer anoMesReferencia = grupo.getAnoMesReferencia();
+		
+		return obterDataLeitura(imovel, grupo, anoMesReferencia);
+	}
+	
+	public Date obterDataLeitura(Imovel imovel, FaturamentoGrupo grupo, Integer anoMesReferencia) {
+		MedicaoHistorico medicao = medicaoHistoricoRepositorio.buscarPorLigacaoAguaOuPoco(imovel.getId(), anoMesReferencia);
 		
 		Date dataLeitura = medicao != null ? medicao.getDataLeituraAtualFaturamento() : null;
 
 		if (dataLeitura == null || dataLeitura.equals("")) {
-			
-			FaturamentoAtividadeCronograma cronograma = repositorio.buscarPorGrupoEAtividadeEReferencia(
+			dataLeitura = obterDataLeituraPeloCronograma(grupo, anoMesReferencia);
+		}
+		
+		return dataLeitura;
+	}
+
+	public Date obterDataLeituraPeloCronograma(FaturamentoGrupo grupo, Integer anoMesReferencia) {
+		Date dataLeitura;
+		FaturamentoAtividadeCronograma cronograma = repositorio.buscarPorGrupoEAtividadeEReferencia(
+				grupo.getId(), 
+				FaturamentoAtividade.GERAR_ARQUIVO_LEITURA, 
+				anoMesReferencia);
+		
+		if (cronograma != null) {
+			dataLeitura = cronograma.getDataPrevista();
+		} else {
+			cronograma = repositorio.buscarPorGrupoEAtividadeEReferencia(
 					grupo.getId(), 
 					FaturamentoAtividade.GERAR_ARQUIVO_LEITURA, 
-					anoMesReferenciaAnterior);
+					grupo.getAnoMesReferencia());
 			
-			if (cronograma != null) {
-				dataLeitura = cronograma.getDataPrevista();
-			} else {
-				cronograma = repositorio.buscarPorGrupoEAtividadeEReferencia(
-						grupo.getId(), 
-						FaturamentoAtividade.GERAR_ARQUIVO_LEITURA, 
-						grupo.getAnoMesReferencia());
-				
-				dataLeitura = Utilitarios.reduzirDias(cronograma.getDataPrevista(), 30);
-			}
+			dataLeitura = Utilitarios.reduzirDias(cronograma.getDataPrevista(), 30);
 		}
 		return dataLeitura;
 	}

@@ -1,18 +1,16 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.servicos.micromedicao.HidrometroInstalacaoHistoricoRepositorio;
@@ -20,10 +18,9 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 import br.gov.servicos.to.HidrometroMedicaoHistoricoTO;
 import br.gov.servicos.to.HidrometroTO;
 
-@RunWith(EasyMockRunner.class)
 public class MedicaoHistoricoBOTest {
 	
-	@TestSubject
+	@InjectMocks
 	private MedicaoHistoricoBO medicaoHistoricoBO;
 	
 	@Mock
@@ -41,6 +38,8 @@ public class MedicaoHistoricoBOTest {
 		medicaoHistoricoBO = new MedicaoHistoricoBO();
 		dataLeituraAtualFaturamento = new Date();
 		dataLeituraAtualInformada = new Date();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -76,20 +75,17 @@ public class MedicaoHistoricoBOTest {
 	}
 	
 	private void mockHidrometroInstalacaoHistoricoRepositorio() {
-		expect(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroAgua(1)).andReturn(getHidrometro());
-		expect(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroPoco(1)).andReturn(null);
-		replay(hidrometroInstalacaoHistoricoRepositorioMock);
+		when(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroAgua(1)).thenReturn(getHidrometro());
+		when(hidrometroInstalacaoHistoricoRepositorioMock.dadosInstalacaoHidrometroPoco(1)).thenReturn(null);
 	}
 	
 	private void mockMedicaoHistoricoNull() {
-		expect(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201501)).andReturn(null);
-		expect(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201412)).andReturn(getMedicaoHistoricoMesAnterior());
-		replay(medicaoHistoricoRepositorioMock);
+		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201501)).thenReturn(null);
+		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201412)).thenReturn(getMedicaoHistoricoMesAnterior());
 	}
 	
 	private void mockMedicaoHistorico() {
-		expect(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201501)).andReturn(getMedicaoHistorico());
-		replay(medicaoHistoricoRepositorioMock);
+		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAguaOuPoco(1, 201501)).thenReturn(getMedicaoHistorico());
 	}
 	
 	private HidrometroTO getHidrometro() {

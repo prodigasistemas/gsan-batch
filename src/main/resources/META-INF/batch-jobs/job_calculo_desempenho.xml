@@ -1,0 +1,14 @@
+<job id="job_calculo_desempenho" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+ 	<listeners>
+		<listener ref="finalizaAtividadeJobListener"/>
+		<listener ref="errorJobListener"/>
+	</listeners>
+	
+	<step id="calcularDesempenho">
+		<chunk checkpoint-policy="item" item-count="10">
+			<reader ref="configuradorCalculadoraDesempenho"/>
+			<processor ref="calculadoraDesempenho" />
+			<writer ref="geradorDesempenho" />
+		</chunk>
+	</step>
+</job>

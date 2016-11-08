@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.cadastro.Quadra;
@@ -28,10 +26,9 @@ import br.gov.model.micromedicao.StatusFaixaFalsa;
 import br.gov.model.micromedicao.StatusUsoFaixaFalsa;
 import br.gov.servicos.micromedicao.FaixaLeituraRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class FaixaLeituraBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private FaixaLeituraBO faixaLeituraBO;
 	
 	@Mock
@@ -58,6 +55,8 @@ public class FaixaLeituraBOTest {
 		faixaLeituraParametros.add(buildFaixa115());
 		
 		hidrometro = new Hidrometro();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	@Test
 	public void calcularFaixaLeituraEsperadaMedia10(){
@@ -210,21 +209,17 @@ public class FaixaLeituraBOTest {
 	}
 	
 	private void carregarMocks() {
-		expect(faixaLeituraRepositorioMock.obterFaixasLeitura()).andReturn(faixaLeituraParametros).times(2);
-		replay(faixaLeituraRepositorioMock);
+		when(faixaLeituraRepositorioMock.obterFaixasLeitura()).thenReturn(faixaLeituraParametros);
 	}
 	
 	private void carregarSistemaParametrosMocks() {
-		expect(sistemaParametrosMock.getIndicadorFaixaFalsa()).andReturn(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO.getId()).times(6);
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.getIndicadorFaixaFalsa()).thenReturn(StatusFaixaFalsa.GERAR_FAIXA_FALSA_DESATIVO.getId());
 	}
 	
 	private void carregarSistemaParametrosFaixaFalsaMocks() {
-		expect(sistemaParametrosMock.getIndicadorFaixaFalsa()).andReturn(StatusFaixaFalsa.GERAR_FAIXA_FALSA_ROTA.getId()).times(10);
-		expect(sistemaParametrosMock.getIndicadorUsoFaixaFalsa()).andReturn(StatusUsoFaixaFalsa.ROTA.getId()).times(10);
-		expect(sistemaParametrosMock.getPercentualFaixaFalsa()).andReturn(new BigDecimal(2.50)).times(10);
-		expect(sistemaParametrosMock.getMesesMediaConsumo()).andReturn(new Short("6")).times(10);
-		replay(sistemaParametrosMock);
-		
+		when(sistemaParametrosMock.getIndicadorFaixaFalsa()).thenReturn(StatusFaixaFalsa.GERAR_FAIXA_FALSA_ROTA.getId());
+		when(sistemaParametrosMock.getIndicadorUsoFaixaFalsa()).thenReturn(StatusUsoFaixaFalsa.ROTA.getId());
+		when(sistemaParametrosMock.getPercentualFaixaFalsa()).thenReturn(new BigDecimal(2.50));
+		when(sistemaParametrosMock.getMesesMediaConsumo()).thenReturn(new Short("6"));
 	}
 }

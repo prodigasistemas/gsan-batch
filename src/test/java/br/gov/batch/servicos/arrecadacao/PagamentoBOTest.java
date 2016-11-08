@@ -1,28 +1,25 @@
 package br.gov.batch.servicos.arrecadacao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.arrecadacao.to.ConsultaCodigoBarrasTO;
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.cobranca.DocumentoTipo;
 import br.gov.model.faturamento.TipoPagamento;
 
-@RunWith(EasyMockRunner.class)
 public class PagamentoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private PagamentoBO pagamentoBO;
 	
 	@Mock
@@ -31,6 +28,7 @@ public class PagamentoBOTest {
 	@Before
 	public void setup() {
 		pagamentoBO = new PagamentoBO();
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -58,9 +56,8 @@ public class PagamentoBOTest {
 	}
 	
 	private void mockParametros() {
-		expect(sistemaParametrosMock.moduloVerificador11()).andReturn(false);
-		expect(sistemaParametrosMock.getCodigoEmpresaFebraban()).andReturn(Short.valueOf("22"));
-		replay(sistemaParametrosMock);
+		when(sistemaParametrosMock.moduloVerificador11()).thenReturn(false);
+		when(sistemaParametrosMock.getCodigoEmpresaFebraban()).thenReturn(Short.valueOf("22"));
 	}
 	
 	private ConsultaCodigoBarrasTO getDadosParaConta() {
