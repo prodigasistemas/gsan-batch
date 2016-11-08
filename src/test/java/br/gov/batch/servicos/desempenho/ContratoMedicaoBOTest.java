@@ -34,18 +34,6 @@ import br.gov.servicos.to.ConsumoImovelCategoriaTO;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContratoMedicaoBOTest {
-
-	/*
-	 * 1 - Matricula do Imovel
-	 * 2 - Referência do calculo
-	 * 3 - Diferença do consumo de água
-	 * 4 - Valor da diferença do consumo de água
-	 * 5 - Percentual de esgoto
-	 * 6 - Valor da diferença do consumo de esgoto
-	 * 7 - id do contrato medicao
-	 * 8 - DebitoCreditoSituacao (Normal, Cancelado, Retificado)
-	 */
-	
 	@Mock private Imovel imovelMock;
 	@Mock private ContratoMedicao contratoMedicaoMock;
 	
@@ -89,7 +77,7 @@ public class ContratoMedicaoBOTest {
 		when(consumoHistoricoAtualMock.getImovel()).thenReturn(imovelMock);
 		when(consumoHistoricoMesZeroMock.getImovel()).thenReturn(imovelMock);
 		
-		when(medicaoHistoricoBOMock.getMedicaoHistorico(imovelMock.getId(), referencia)).thenReturn(medicaoHistoricoAtualMock);
+		when(medicaoHistoricoBOMock.getMedicaoHistorico(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoAtualMock);
 		
 		when(contratoMedicacaoRepositorioMock.buscarContratoAtivoPorImovel(imovelMock.getId())).thenReturn(contratoMedicaoMock);
 	}
@@ -104,11 +92,7 @@ public class ContratoMedicaoBOTest {
 	
 	@Test
 	public void calculoTarifaProporcional() {
-		
-		
 		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referencia)).thenReturn(consumoHistoricoAtualMock);
-		
-		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoAtualMock);
 		
 		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
@@ -131,11 +115,8 @@ public class ContratoMedicaoBOTest {
 		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referenciaMesZero)).thenReturn(consumoHistoricoMesZeroMock);
 		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referencia)).thenReturn(consumoHistoricoAtualMock);
 		
-		when(medicaoHistoricoRepositorioMock.buscarPorLigacaoAgua(eq(imovelMock.getId()), anyObject())).thenReturn(medicaoHistoricoMesZeroMock, 
-																													medicaoHistoricoAtualMock);
-		
-		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoAtualMock, new BigDecimal(8.40));
 		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
+		mockValorConsumoTotal(consumoHistoricoMesZeroMock, medicaoHistoricoAtualMock, new BigDecimal(8.40));
 		
 		assertEquals(new BigDecimal(8.40).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorDiferencaAgua(imovelMock, referencia));
 	}

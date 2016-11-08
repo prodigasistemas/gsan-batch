@@ -110,14 +110,14 @@ public class ContratoMedicaoBO {
 		BigDecimal valorConsumoMesZero = calcularValorConsumo(imovel, referenciaMesZero, referencia);
 		BigDecimal valorConsumoMesAtual = calcularValorConsumo(imovel, referencia, referencia);
 		
-		return calcularValorDiferencaAgua(valorConsumoMesAtual, valorConsumoMesZero);
+		return calcularValorDiferencaAgua(valorConsumoMesZero, valorConsumoMesAtual);
 	}
 	
 	public BigDecimal calcularValorDiferencaAgua(BigDecimal valorConsumoMesZero, BigDecimal valorConsumoReferencia) {
 		return valorConsumoReferencia.subtract(valorConsumoMesZero);
 	}
 	
-	public Integer calcularDiferencaConsumoAgua(Imovel imovel, Integer referencia, Integer referenciaMesZero) {
+	public Integer calcularDiferencaConsumoAgua(Imovel imovel, Integer referenciaMesZero, Integer referencia) {
 		Integer consumoMesZero = consumoHistoricoBO.getConsumoMes(imovel, referenciaMesZero, LigacaoTipo.AGUA);
 		Integer consumoReferencia = consumoHistoricoBO.getConsumoMes(imovel, referencia, LigacaoTipo.AGUA);
 		
