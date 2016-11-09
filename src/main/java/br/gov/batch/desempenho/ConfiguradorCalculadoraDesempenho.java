@@ -1,8 +1,10 @@
 package br.gov.batch.desempenho;
 
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.ejb.EJB;
@@ -40,37 +42,31 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	private MedicaoPerformanceParametrosTO medicaoPerformanceParametros;
 	
 	private Integer referencia;
-	private ContratoMedicao contratoMedicao;
+	private Queue<ContratoMedicao> contratosMedicao = new ArrayDeque<ContratoMedicao>();
 	
 	@Override
 	public void open(Serializable prevCheckpointInfo) throws Exception {
 		logger.info(util.parametroDoJob("idProcessoIniciado"), "Recuperando Contratos para a referencia: " + getReferencia());
 		
-		List<ContratoMedicao> contratosMedicao = contratoMedicaoBO.getContratoMedicaoPorReferencia(getReferencia());
+		contratosMedicao.addAll(contratoMedicaoBO.getContratoMedicaoPorReferencia(getReferencia()));
 		logger.info(util.parametroDoJob("idProcessoIniciado"), "Numero de contratos encontratos para a referencia: " + contratosMedicao.size());
-		
-		if (prevCheckpointInfo != null) {
-			indiceContratoMedicao = (Integer) prevCheckpointInfo;
-		} else {
-			indiceContratoMedicao = 0;
-		}
-		
-		if(!contratosMedicao.isEmpty() && contratosMedicao.size() > indiceContratoMedicao) {
-			logger.info(util.parametroDoJob("idProcessoIniciado"), "Calculando desempenho para o contrato: [Id=" + contratosMedicao.get(indiceContratoMedicao) + "]");
-			contratoMedicao = contratosMedicao.get(indiceContratoMedicao);
-		}
-		
 	}
 	
 	@Override
 	public List<MedicaoPerformanceParametrosTO> readItem() throws Exception {
-		List<MedicaoPerformanceParametrosTO> medicoesPerformanceParametros = new ArrayList<MedicaoPerformanceParametrosTO>();
 
+		ContratoMedicao contratoMedicao = contratosMedicao.poll();
+		if(contratoMedicao == null) {
+			return null;
+		}
+		
 		Integer referencia = getReferencia();
-		if(contratoMedicao != null && referencia != null) {
-			List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), referencia);
-			logger.info(util.parametroDoJob("idProcessoIniciado"), "Quantidade de imoveis do contrato [Id=" + contratoMedicao.getId() + "] = " 
-																																	+ imoveisContrato.size());
+		List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), referencia);
+		logger.info(util.parametroDoJob("idProcessoIniciado"), "Quantidade de imoveis do contrato [Id=" + contratoMedicao.getId() + "] = " 
+																															+ imoveisContrato.size());
+		
+		List<MedicaoPerformanceParametrosTO> medicoesPerformanceParametros =  new ArrayList<MedicaoPerformanceParametrosTO>();
+		if(!imoveisContrato.isEmpty()) {
 			for (Imovel imovelContrato : imoveisContrato) {
 				medicaoPerformanceParametros = new MedicaoPerformanceParametrosTO();
 				medicaoPerformanceParametros.setContratoMedicao(contratoMedicao);
@@ -80,17 +76,11 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 				logger.info(util.parametroDoJob("idProcessoIniciado"), "Imovel [Id=" + imovelContrato.getId() + "] adicionado para calculo de desempenho ");
 				medicoesPerformanceParametros.add(medicaoPerformanceParametros);
 			}
-			
-			controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
-			indiceContratoMedicao++;
 		}
 		
-		logger.info(util.parametroDoJob("idProcessoIniciado"), "Imoveis adicionados para processamento");
+		controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
+		
 		return medicoesPerformanceParametros;
-	}
-	
-	public Serializable checkpointInfo() throws Exception {
-		return indiceContratoMedicao;
 	}
 	
 	private Integer getReferencia() {
