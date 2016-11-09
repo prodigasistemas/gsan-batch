@@ -127,7 +127,12 @@ public class ContratoMedicaoBO {
 	public BigDecimal calcularValorConsumo(Imovel imovel, Integer referenciaConsumoHistorico, Integer referencia) {
 		MedicaoHistorico medicaoHistorico = medicaoHistoricoBO.getMedicaoHistorico(imovel.getId(), referencia);
 		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referenciaConsumoHistorico);
-		return calcularValorConsumo(consumoHistorico, medicaoHistorico);
+		
+		if(medicaoHistorico != null && consumoHistorico != null) {
+			return calcularValorConsumo(consumoHistorico, medicaoHistorico);
+		} else {
+			return BigDecimal.ZERO;
+		}
 	}
 
 	public BigDecimal calcularValorConsumo(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
