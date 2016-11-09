@@ -66,8 +66,9 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	public List<MedicaoPerformanceParametrosTO> readItem() throws Exception {
 		List<MedicaoPerformanceParametrosTO> medicoesPerformanceParametros = new ArrayList<MedicaoPerformanceParametrosTO>();
 
-		if(contratoMedicao != null) {
-			List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), getReferencia());
+		Integer referencia = getReferencia();
+		if(contratoMedicao != null && referencia != null) {
+			List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), referencia);
 			for (Imovel imovelContrato : imoveisContrato) {
 				medicaoPerformanceParametros = new MedicaoPerformanceParametrosTO();
 				medicaoPerformanceParametros.setContratoMedicao(contratoMedicao);
