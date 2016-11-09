@@ -69,12 +69,15 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 		Integer referencia = getReferencia();
 		if(contratoMedicao != null && referencia != null) {
 			List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), referencia);
+			logger.info(util.parametroDoJob("idProcessoIniciado"), "Quantidade de imoveis do contrato [Id=" + contratoMedicao.getId() + "] = " 
+																																	+ imoveisContrato.size());
 			for (Imovel imovelContrato : imoveisContrato) {
 				medicaoPerformanceParametros = new MedicaoPerformanceParametrosTO();
 				medicaoPerformanceParametros.setContratoMedicao(contratoMedicao);
 				medicaoPerformanceParametros.setImovel(imovelContrato);
 				medicaoPerformanceParametros.setReferencia(referencia);
 				
+				logger.info(util.parametroDoJob("idProcessoIniciado"), "Imovel [Id=" + imovelContrato.getId() + "] adicionado para calculo de desempenho ");
 				medicoesPerformanceParametros.add(medicaoPerformanceParametros);
 			}
 			
@@ -82,6 +85,7 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 			indiceContratoMedicao++;
 		}
 		
+		logger.info(util.parametroDoJob("idProcessoIniciado"), "Imoveis adicionados para processamento");
 		return medicoesPerformanceParametros;
 	}
 	
