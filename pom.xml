@@ -4,7 +4,7 @@
 
 	<groupId>br.gov</groupId>
 	<artifactId>gsan-batch</artifactId>
-	<version>0.1</version>
+	<version>2.0</version>
 	<packaging>war</packaging>
 
 	<name>gsan-batch</name>
@@ -28,6 +28,13 @@
 	</dependencyManagement>
 
 	<dependencies>
+	
+		<dependency>
+		  <groupId>joda-time</groupId>
+		  <artifactId>joda-time</artifactId>
+		  <version>2.9.4</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
@@ -38,7 +45,7 @@
 		<dependency>
 			<groupId>br.gov</groupId>
 			<artifactId>gsan-persistence</artifactId>
-			<version>0.1</version>
+			<version>2.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.hibernate</groupId>
@@ -82,11 +89,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>3.2</version>
-			<scope>test</scope>
-		</dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-all</artifactId>
+		    <version>1.10.19</version>
+		</dependency>		
 
 		<dependency>
 			<groupId>org.jboss.arquillian.junit</groupId>
@@ -169,6 +175,7 @@
 					<configuration>
 						<formats>
 							<format>html</format>
+							<format>xml</format>
 						</formats>
 						<instrumentation>
 							<includes>
@@ -176,6 +183,7 @@
 							</includes>
 							<excludes>
 								<exclude>br/gov/batch/servicos/**/to/*.class</exclude>
+								<exclude>br/gov/batch/servicos/batch/*</exclude>
 							</excludes>
 						</instrumentation>
 					</configuration>

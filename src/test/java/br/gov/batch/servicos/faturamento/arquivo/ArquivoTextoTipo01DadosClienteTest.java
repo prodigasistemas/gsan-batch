@@ -3,21 +3,19 @@ package br.gov.batch.servicos.faturamento.arquivo;
 import static br.gov.model.util.Utilitarios.completaComEspacosADireita;
 import static br.gov.model.util.Utilitarios.completaComZerosEsquerda;
 import static br.gov.model.util.Utilitarios.completaTexto;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.ContaBO;
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
@@ -31,10 +29,9 @@ import br.gov.servicos.cadastro.ClienteEnderecoRepositorio;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.faturamento.FaturamentoParametroRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosClienteTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01DadosCliente arquivo;
 
 	@Mock
@@ -92,6 +89,7 @@ public class ArquivoTextoTipo01DadosClienteTest {
 		arquivoTextoTO = new ArquivoTextoTO();
 		arquivoTextoTO.setImovel(imovel);
 		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -128,18 +126,14 @@ public class ArquivoTextoTipo01DadosClienteTest {
 	}
 
 	private void carregarMocks() {
-	    expect(contaBO.emitirConta(imovel)).andReturn(Boolean.FALSE);
-	    replay(contaBO);
+	    when(contaBO.emitirConta(imovel)).thenReturn(Boolean.FALSE);
 	    
-	    expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-	    replay(repositorioImovel);
+	    when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
 	    
-	    expect(clienteEnderecoRepositorio.pesquisarEnderecoCliente(clienteResponsavel.getId())).andReturn(null);
-	    replay(clienteEnderecoRepositorio);
+	    when(clienteEnderecoRepositorio.pesquisarEnderecoCliente(clienteResponsavel.getId())).thenReturn(null);
 	    
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).andReturn("true").times(2);
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).andReturn("false").times(2);
-		expect(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).andReturn("false").times(2);
-		replay(repositorioParametros);
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.ESCREVER_MENSAGEM_CONTA_TRES_PARTES)).thenReturn("true");
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.EMITIR_CONTA_CODIGO_FEBRABAN)).thenReturn("false");
+		when(repositorioParametros.recuperaPeloNome(NOME_PARAMETRO_FATURAMENTO.REFERENCIA_ANTERIOR_PARA_QUALIDADE_AGUA)).thenReturn("false");
 	}
 }

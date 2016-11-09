@@ -1,19 +1,18 @@
 package br.gov.batch.servicos.micromedicao;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.Categoria;
 import br.gov.model.cadastro.ICategoria;
@@ -24,10 +23,9 @@ import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.to.AnormalidadeHistoricoConsumoTO;
 
-@RunWith(EasyMockRunner.class)
 public class MensagemAnormalidadeConsumoBOTest {
 
-	@TestSubject
+	@InjectMocks
 	private MensagemAnormalidadeConsumoBO bo;
 
 	@Mock
@@ -53,6 +51,8 @@ public class MensagemAnormalidadeConsumoBOTest {
 		categoria = new Categoria(2);
 		categoria.setQuantidadeEconomias(5);
 		categorias.add(categoria);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -77,27 +77,23 @@ public class MensagemAnormalidadeConsumoBOTest {
 
 	private void mockAnormalidadeHistoricoConsumoAguaMensagemNula() {
 		AnormalidadeHistoricoConsumoTO anormalidade = new AnormalidadeHistoricoConsumoTO(null, ConsumoAnormalidade.CONSUMO_ALTERADO, null, null);
-		expect(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201504)).andReturn(anormalidade);
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201504)).thenReturn(anormalidade);
 	}
 	
 	private void mockAnormalidadeHistoricoConsumoMensagemAgua() {
 		AnormalidadeHistoricoConsumoTO anormalidade = new AnormalidadeHistoricoConsumoTO(null, ConsumoAnormalidade.BAIXO_CONSUMO, null, null);
-		expect(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201504)).andReturn(anormalidade).once();
-		expect(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201503, ConsumoAnormalidade.BAIXO_CONSUMO)).andReturn(null);
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201504)).thenReturn(anormalidade);
+		when(consumoHistoricoRepositorioMock.anormalidadeHistoricoConsumo(1, LigacaoTipo.AGUA, 201503, ConsumoAnormalidade.BAIXO_CONSUMO)).thenReturn(null);
 	}
 
 	private void mockCategorias() {
-		expect(imovelSubcategoriaRepositorioMock.buscarCategoria(1)).andReturn(categorias);
-		replay(imovelSubcategoriaRepositorioMock);
+		when(imovelSubcategoriaRepositorioMock.buscarCategoria(1)).thenReturn(categorias);
 	}
 
 	private void mockAcaoASerTomadaMes1() {
 		ConsumoAnormalidadeAcao acao = new ConsumoAnormalidadeAcao();
 		acao.setDescricaoContaMensagemMes1("TESTE MES 1");
 
-		expect(consumoAnormalidadeAcaoBOMock.acaoASerTomada(ConsumoAnormalidade.BAIXO_CONSUMO, 2, 1)).andReturn(acao);
-		replay(consumoAnormalidadeAcaoBOMock);
+		when(consumoAnormalidadeAcaoBOMock.acaoASerTomada(ConsumoAnormalidade.BAIXO_CONSUMO, 2, 1)).thenReturn(acao);
 	}
 }

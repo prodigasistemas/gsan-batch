@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.GerenciaRegional;
@@ -27,10 +25,9 @@ import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.micromedicao.Rota;
 import br.gov.servicos.cadastro.ImovelRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
 
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo01DadosLocalizacaoImovel arquivo;
 	
 	@Mock
@@ -75,6 +72,8 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     	arquivoTextoTO = new ArquivoTextoTO();
     	arquivoTextoTO.setRota(rota);
     	arquivoTextoTO.setImovel(imovel);
+    	
+    	MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -110,7 +109,6 @@ public class ArquivoTextoTipo01DadosLoalizacaoImovelTest {
     }
     
     public void carregarMocks() {
-        expect(repositorioImovel.obterPorID(imovel.getId())).andReturn(imovel);
-        replay(repositorioImovel);
+        when(repositorioImovel.obterPorID(imovel.getId())).thenReturn(imovel);
     }
 }

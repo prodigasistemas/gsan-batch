@@ -1,19 +1,17 @@
 package br.gov.batch.servicos.faturamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.Status;
 import br.gov.model.atendimentopublico.LigacaoAguaSituacao;
@@ -30,17 +28,16 @@ import br.gov.servicos.arrecadacao.pagamento.PagamentoRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.CreditoRealizarRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class AnalisadorGeracaoContaTest {
 
-	@TestSubject
+	@InjectMocks
 	private AnalisadorGeracaoConta analisadorGeracaoConta;
 	
 	private Imovel imovel;
 	private LigacaoAguaSituacao aguaLigada;
-	private LigacaoAguaSituacao aguaNaoLigada;
+	private LigacaoAguaSituacao aguaDesligada;
 	private LigacaoEsgotoSituacao esgotoLigado;
-	private LigacaoEsgotoSituacao esgotoNaoLigado;
+	private LigacaoEsgotoSituacao esgotoDesligado;
 	private int anoMesFaturamento;
 	
 	@Mock
@@ -69,71 +66,81 @@ public class AnalisadorGeracaoContaTest {
 		aguaLigada = new LigacaoAguaSituacao();
 		aguaLigada.setId(LigacaoAguaSituacao.LIGADO);
 		imovel.setLigacaoAguaSituacao(aguaLigada);
-		aguaNaoLigada = new LigacaoAguaSituacao();
-		aguaNaoLigada.setId(LigacaoAguaSituacao.POTENCIAL);
+		aguaDesligada = new LigacaoAguaSituacao();
+		aguaDesligada.setId(LigacaoAguaSituacao.POTENCIAL);
 		
 		esgotoLigado = new LigacaoEsgotoSituacao();
 		esgotoLigado.setId(LigacaoEsgotoSituacao.LIGADO);
 		imovel.setLigacaoEsgotoSituacao(esgotoLigado);
-		esgotoNaoLigado = new LigacaoEsgotoSituacao();
-		esgotoNaoLigado.setId(LigacaoEsgotoSituacao.POTENCIAL);
+		esgotoDesligado = new LigacaoEsgotoSituacao();
+		esgotoDesligado.setId(LigacaoEsgotoSituacao.POTENCIAL);
 
 		analisadorGeracaoConta = new AnalisadorGeracaoConta();
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
-
 	@Test
-	public void naoGeraContaComAguaEsgotoZeradosAguaLigadaEsgotoLigadoNaoCondominio() throws Exception {
+	public void naoGeraContaSemConsumo_AguaLigada_EsgotoLigado_NaoPertenceACondominio() throws Exception {
 		aguaEsgotoZerados = true;
 		
 		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
 	}
 	
 	@Test
-	public void geraContaSemAguaEsgotoZeradosAguaLigadaEsgotoDesligadoNaoCondominio() throws Exception {
-		aguaEsgotoZerados = false;
-		imovel.setLigacaoEsgotoSituacao(esgotoNaoLigado);
+	public void naoGeraContaSemConsumo_AguaDesligada_EsgotoDesligado_NaoPertenceACondominio() throws Exception {
+        aguaEsgotoZerados = true;
+        imovel.setLigacaoAguaSituacao(aguaLigada);
+        imovel.setLigacaoEsgotoSituacao(esgotoDesligado);
 		
-		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
+		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
 	}
 	
 	@Test
-	public void geraContaSemAguaEsgotoZeradosELigado() throws Exception {
+	public void geraContaComConsumoDeAguaEEsgoto_AguaLigada_EsgotoDesligado_NaoPertenceACondominio() throws Exception {
 		aguaEsgotoZerados = false;
+		imovel.setLigacaoEsgotoSituacao(esgotoDesligado);
 		
 		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
 	}
 
+   @Test
+    public void geraContaComConsumoDeAguaEEsgoto_AguaLigada() throws Exception {
+        aguaEsgotoZerados = false;
+        
+        assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
+    }
+
 	@Test
-	public void naoGeraContaSemAguaEsgotoZeradoEDesligado() throws Exception {
+	public void naoGeraContaComConsumoDeAguaEsgoto_AguaDesligada_EsgotoDesligado() throws Exception {
 		aguaEsgotoZerados = false;
 		
-		aguaLigada.setId(0);
-		esgotoLigado.setId(0);
+        imovel.setLigacaoAguaSituacao(aguaDesligada);
+        imovel.setLigacaoEsgotoSituacao(esgotoDesligado);
 		
 		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
 	}
 	
 	@Test
-	public void naoGeraContaSemAguaEsgotoZeradosDesligadoESemCondominio() throws Exception {
-		aguaEsgotoZerados = false;
-		
-		aguaLigada.setId(0);
-		esgotoLigado.setId(0);
+	public void naoGeraContaComConsumoDeAguaEsgoto_AguaEsgotoDesligados_ESemCondominio() throws Exception {
+        aguaEsgotoZerados = false;
+        
+        imovel.setLigacaoAguaSituacao(aguaDesligada);
+        imovel.setLigacaoEsgotoSituacao(esgotoDesligado);
 		
 		assertFalse(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
 	}
 	
 	@Test
-	public void naoGeraContaSemAguaEsgotoZeradosDesligadoEComCondominio() throws Exception {
-		aguaEsgotoZerados = false;
+	public void geraContaSemConsumo_AguaDesligada_EsgotoDesligado_EPerterceACondominio() throws Exception {
+		aguaEsgotoZerados = true;
 		
-		aguaLigada.setId(0);
-		esgotoLigado.setId(0);
+        imovel.setLigacaoAguaSituacao(aguaDesligada);
+        imovel.setLigacaoEsgotoSituacao(esgotoDesligado);
+        
+        imovel.setImovelCondominio(new Imovel());
 		
-		imovel.setImovelCondominio(new Imovel());
-		
-		assertTrue(analisadorGeracaoConta.verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel));
+		assertTrue(analisadorGeracaoConta.verificarSituacaoDeCondominio(aguaEsgotoZerados, imovel));
 	}
 
 	@Test
@@ -213,7 +220,6 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
 		mockSistemaParametrosRepositorio();
-		replay(creditoRealizarEJBMock);
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -232,7 +238,6 @@ public class AnalisadorGeracaoContaTest {
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		
 		mockExisteCreditoComDevolucao(creditosRealizar, true);
-		replay(creditoRealizarEJBMock);
 		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
@@ -252,8 +257,6 @@ public class AnalisadorGeracaoContaTest {
 		
 		mockPesquisarCreditoARealizar(creditosRealizar);
 		mockExisteCreditoComDevolucao(creditosRealizar, false);
-		replay(creditoRealizarEJBMock);
-		mockSistemaParametrosRepositorio();
 		
 		adicionaFaturamentoSituacaoTipoParaImovel(Status.INATIVO);
 		
@@ -268,20 +271,18 @@ public class AnalisadorGeracaoContaTest {
 	}
 	
 	private void mockPesquisarCreditoARealizar(Collection<CreditoRealizar> retorno) {
-		expect(creditoRealizarEJBMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
-			.andReturn(retorno);
+		when(creditoRealizarEJBMock.buscarCreditoRealizarPorImovel(imovel.getId(), DebitoCreditoSituacao.NORMAL, anoMesFaturamento))
+			.thenReturn(retorno);
 	}
 	
 	private void mockExisteCreditoComDevolucao(Collection<CreditoRealizar> creditosRealizar, boolean retorno) {
-		expect(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
-			.andReturn(retorno);
-		replay(devolucaoEJBMock);
+		when(devolucaoEJBMock.existeCreditoComDevolucao(creditosRealizar))
+			.thenReturn(retorno);
 	}
 	
 	private void mockExisteDebitoSemPagamento(Collection<DebitoCobrar> debitosCobrar, boolean retorno) {
-		expect(pagamentoEJBMock.existeDebitoSemPagamento(debitosCobrar))
-			.andReturn(retorno);
-		replay(pagamentoEJBMock);
+		when(pagamentoEJBMock.existeDebitoSemPagamento(debitosCobrar))
+			.thenReturn(retorno);
 	}
 	
 	private void adicionaFaturamentoSituacaoTipoParaImovel(Status status) {
@@ -292,17 +293,15 @@ public class AnalisadorGeracaoContaTest {
 
 
 	private void mockDebitosCobrarPorImovelComPendenciaESemRevisao(Collection<DebitoCobrar> debitosCobrar) {
-		expect(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel.getId()))
-			.andReturn(debitosCobrar);
-		replay(debitoCobrarEJBMock);
+		when(debitoCobrarEJBMock.debitosCobrarSemPagamentos(imovel.getId()))
+			.thenReturn(debitosCobrar);
 	}
 	
 	private void mockSistemaParametrosRepositorio() {
 		SistemaParametros sistemaParametros = new SistemaParametros();
 		sistemaParametros.setAnoMesFaturamento(anoMesFaturamento);
-		expect(sistemaParametrosRepositorioMock.getSistemaParametros())
-		.andReturn(sistemaParametros);
-		replay(sistemaParametrosRepositorioMock);
+		when(sistemaParametrosRepositorioMock.getSistemaParametros())
+		.thenReturn(sistemaParametros);
 	}
 	
 	private Collection<DebitoCobrar> buildCollectionDebitosCobrarVazio(boolean vazio){

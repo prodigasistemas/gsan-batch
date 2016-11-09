@@ -7,4 +7,5 @@ src/test/resources/arquillian.xml
 scripts/build/build_dev.sh
 scripts/build/build_hml.sh
 scripts/build/build_prd.sh
-
+/bin
+.project

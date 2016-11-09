@@ -28,6 +28,6 @@ public class EsgotoBO {
             percentualEsgoto = ligacaoEsgoto != null ? ligacaoEsgoto.getPercentual() : BigDecimal.ZERO;
         }
 
-        return percentualEsgoto;        
+        return percentualEsgoto;
     }
 }

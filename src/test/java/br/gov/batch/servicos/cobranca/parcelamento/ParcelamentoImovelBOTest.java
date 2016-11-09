@@ -1,20 +1,18 @@
 package br.gov.batch.servicos.cobranca.parcelamento;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.cobranca.Parcelamento;
@@ -28,10 +26,9 @@ import br.gov.servicos.cobranca.parcelamento.ParcelamentoRepositorio;
 import br.gov.servicos.faturamento.ContaRepositorio;
 import br.gov.servicos.to.ConsultaDebitoImovelTO;
 
-@RunWith(EasyMockRunner.class)
 public class ParcelamentoImovelBOTest {
 
-    @TestSubject
+    @InjectMocks
     private ParcelamentoImovelBO bo;
 
     @Mock
@@ -60,6 +57,8 @@ public class ParcelamentoImovelBOTest {
         bo = new ParcelamentoImovelBO();
         parametros = new SistemaParametros();
         parametros.setAnoMesArrecadacao(201412);
+        
+        MockitoAnnotations.initMocks(this);
     }
     
     @Test
@@ -156,42 +155,34 @@ public class ParcelamentoImovelBOTest {
     }
     
     private void mockPesquisaParcelamento(Parcelamento parcelamento){
-        expect(parcelamentoRepositorio.pesquisaParcelamento(1, 201412, ParcelamentoSituacao.NORMAL)).andReturn(parcelamento);
-        replay(parcelamentoRepositorio);
+        when(parcelamentoRepositorio.pesquisaParcelamento(1, 201412, ParcelamentoSituacao.NORMAL)).thenReturn(parcelamento);
     }
     
     private void mockGuiasPagas(Integer idGuia){
-        expect(pagamentoRepositorio.guiaPaga(1)).andReturn(true);
-        replay(pagamentoRepositorio);
+        when(pagamentoRepositorio.guiaPaga(1)).thenReturn(true);
     }
     
     private void mockGuiasPendentes(Integer idGuia){
-        expect(pagamentoRepositorio.guiaPaga(1)).andReturn(false);
-        replay(pagamentoRepositorio);
+        when(pagamentoRepositorio.guiaPaga(1)).thenReturn(false);
     }
     
     private void mockSistemaParametros(){
-        expect(sistemaParametrosRepositorio.getSistemaParametros()).andReturn(parametros);
-        replay(sistemaParametrosRepositorio);
+        when(sistemaParametrosRepositorio.getSistemaParametros()).thenReturn(parametros);
     }
     
     private void mockGuiasParcelamento(GuiaPagamento guia){
-        expect(guiaPagamentoRepositorio.guiaDoParcelamento(1)).andReturn(guia);
-        replay(guiaPagamentoRepositorio);
+        when(guiaPagamentoRepositorio.guiaDoParcelamento(1)).thenReturn(guia);
     }
     
     private void mockContasDeParcelamento(List<Conta> contas){
-        expect(contaRepositorio.recuperarPeloParcelamento(1)).andReturn(contas);
-        replay(contaRepositorio);
+        when(contaRepositorio.recuperarPeloParcelamento(1)).thenReturn(contas);
     }
     
     private void mockContaPaga(Integer idConta){
-        expect(pagamentoRepositorio.contaPaga(1)).andReturn(true);
-        replay(pagamentoRepositorio);
+        when(pagamentoRepositorio.contaPaga(1)).thenReturn(true);
     }
     
     private void mockContaNaoPaga(Integer idConta){
-        expect(pagamentoRepositorio.contaPaga(1)).andReturn(false);
-        replay(pagamentoRepositorio);
+        when(pagamentoRepositorio.contaPaga(1)).thenReturn(false);
     }
 }

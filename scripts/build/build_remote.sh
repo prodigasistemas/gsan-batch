@@ -1,26 +1,27 @@
-#!bin/bash
+#!/bin/bash
 
 CURRENT_PATH=$(pwd)
 
-# Constroi o build
+# Realiza o build
 cd $GSAN_BATCH_PATH
 
 project_version=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec)
 
-zip_file="gsan-batch-${project_version}.war.zip"
+echo "$project_version" > .version
 
-mvn clean package -Dmaven.test.skip=true
+war_file="gsan-batch-${project_version}.war"
 
+if [ -z "$NAO_EXECUTAR_MAVEN" ]; then
+  echo "Realizando o build ..."
 
-# Compacta o build
+  mvn clean package -Dmaven.test.skip=true
+fi
 
 cd target
 
-zip -vr $zip_file *.war
-
 # Transfere o build para o servidor
-echo "Porta SSH (22):"
 if [ -z $PORTA ]; then
+  echo "Porta SSH (22):"
   read porta
   if [ -z $porta ]; then
     porta=22
@@ -29,8 +30,8 @@ else
   porta=$PORTA
 fi
 
-echo "Usuario Remoto ($USER):"
 if [ -z $USUARIO ]; then
+  echo "Usuario Remoto ($USER):"
   read usuario
   if [ -z $usuario ]; then
     usuario=$USER
@@ -39,8 +40,8 @@ else
   usuario=$USUARIO
 fi
 
-echo "IP Remoto (127.0.0.1):"
 if [ -z $IP_REMOTO ]; then
+  echo "IP Remoto (127.0.0.1):"
   read ip_remoto
   if [ -z $ip_remoto ]; then
     ip_remoto=127.0.0.1
@@ -49,8 +50,8 @@ else
   ip_remoto=$IP_REMOTO
 fi
 
-echo "Caminho Remoto (/tmp):"
 if [ -z $CAMINHO_REMOTO ]; then
+  echo "Caminho Remoto (/tmp):"
   read caminho_remoto
   if [ -z $caminho_remoto ]; then
     caminho_remoto=/
@@ -59,9 +60,10 @@ else
   caminho_remoto=$CAMINHO_REMOTO
 fi
 
-scp -P $porta $zip_file $usuario@$ip_remoto:$caminho_remoto
+echo "> Transferindo $war_file para $ip_remoto:$caminho_remoto ..."
 
-# Apaga o build transferido e volta ao local inicial
-rm -rf $zip_file
+scp -P $porta $war_file $usuario@$ip_remoto:$caminho_remoto
 
 cd $CURRENT_PATH
+
+exit 0

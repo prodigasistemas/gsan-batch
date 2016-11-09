@@ -32,9 +32,13 @@ public class AnalisadorGeracaoConta {
 	public AnalisadorGeracaoConta(){}
 	
 	public boolean verificarGeracaoConta(boolean aguaEsgotoZerados, int anoMesFaturamento, Imovel imovel) throws Exception {
-		return verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel) || verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel);
+		return verificarSituacaoImovelParaGerarConta(aguaEsgotoZerados, imovel) || verificarDebitosECreditosParaGerarConta(anoMesFaturamento, imovel) || verificarSituacaoDeCondominio(aguaEsgotoZerados, imovel);
 	}
 
+    public boolean verificarSituacaoDeCondominio(boolean aguaEsgotoZerados, Imovel imovel) {
+        return aguaEsgotoZerados && !imovel.aguaLigada() && !imovel.esgotoLigado() && imovel.pertenceACondominio();
+    }
+	
 	public boolean verificarDebitosECreditosParaGerarConta(int anoMesFaturamento, Imovel imovel) {
 		
 		Collection<DebitoCobrar> debitosACobrar = debitoCobrarBO.debitosCobrarSemPagamentos(imovel.getId());

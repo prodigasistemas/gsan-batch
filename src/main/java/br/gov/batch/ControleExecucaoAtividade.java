@@ -1,4 +1,4 @@
-package br.gov.batch.gerardadosleitura;
+package br.gov.batch;
 
 import java.util.HashMap;
 import java.util.Map;

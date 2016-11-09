@@ -1,27 +1,24 @@
 package br.gov.batch.servicos.cadastro;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.model.cadastro.ICategoria;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.to.ImovelSubcategoriaTO;
 
-@RunWith(EasyMockRunner.class)
 public class ImovelSubcategoriaBOTest {
     
-    @TestSubject
+    @InjectMocks
     private ImovelSubcategoriaBO imovelSubcategoriaBO;
     
     @Mock
@@ -42,12 +39,13 @@ public class ImovelSubcategoriaBOTest {
         to = new ImovelSubcategoriaTO(1, 2);
         to.setSubcategoriaQuantidadeEconomias(4L);
         categorias.add(to);
+        
+        MockitoAnnotations.initMocks(this);
     }
     
     @Test
     public void testBuscaIdCategoriaComMaisEconomias(){
-        expect(imovelSubcategoriaRepositorio.buscarCategoria(1)).andReturn(categorias);
-        replay(imovelSubcategoriaRepositorio);
+        when(imovelSubcategoriaRepositorio.buscarCategoria(1)).thenReturn(categorias);
         
         Integer id = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1);
         
@@ -56,8 +54,7 @@ public class ImovelSubcategoriaBOTest {
     
     @Test
     public void testBuscaIdCategoriaSemEconomias(){
-        expect(imovelSubcategoriaRepositorio.buscarCategoria(1)).andReturn(new ArrayList<ICategoria>());
-        replay(imovelSubcategoriaRepositorio);
+        when(imovelSubcategoriaRepositorio.buscarCategoria(1)).thenReturn(new ArrayList<ICategoria>());
         
         Integer id = imovelSubcategoriaBO.buscaIdCategoriaComMaisEconomias(1);
         

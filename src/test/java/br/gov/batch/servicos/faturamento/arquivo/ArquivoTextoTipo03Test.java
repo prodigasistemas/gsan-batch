@@ -1,19 +1,17 @@
 package br.gov.batch.servicos.faturamento.arquivo;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-import org.easymock.TestSubject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.gov.batch.servicos.faturamento.to.ArquivoTextoTO;
 import br.gov.model.cadastro.Imovel;
@@ -23,10 +21,9 @@ import br.gov.model.micromedicao.LigacaoTipo;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
-@RunWith(EasyMockRunner.class)
 public class ArquivoTextoTipo03Test {
 	
-	@TestSubject
+	@InjectMocks
 	private ArquivoTextoTipo03 arquivo;
 	
 	private int TAMANHO_LINHA = 29;
@@ -60,6 +57,8 @@ public class ArquivoTextoTipo03Test {
 		
 		consumosHistoricos = new ArrayList<ConsumoHistorico>();
 		consumosHistoricos.add(consumoHistorico);
+		
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -76,10 +75,8 @@ public class ArquivoTextoTipo03Test {
 	}
 	
 	private void carregarMocks() {
-		expect(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(to.getIdImovel())).andReturn(consumosHistoricos);
-		replay(consumoHistoricoRepositorioMock);
+		when(consumoHistoricoRepositorioMock.buscarUltimos6ConsumosAguaImovel(to.getIdImovel())).thenReturn(consumosHistoricos);
 		
-		expect(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).andReturn(1);
-		replay(medicaoHistoricoRepositorioMock);
+		when(medicaoHistoricoRepositorioMock.buscarLeituraAnormalidadeFaturamento(consumoHistorico)).thenReturn(1);
 	}
 }
