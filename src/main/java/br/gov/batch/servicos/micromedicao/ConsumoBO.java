@@ -142,8 +142,8 @@ public class ConsumoBO {
 		return consumoMinimoLigacao;
 	}
 
-	public int obterConsumoMinimoLigacaoPorCategoria(int consumoMinimoLigacao, Integer idTarifa, ICategoria categoria) {
-		Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(idTarifa, categoria);
+	public int obterConsumoMinimoLigacaoPorCategoria(int consumoMinimoLigacao, Integer idVigencia, ICategoria categoria) {
+		Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(idVigencia, categoria);
 
 		if (categoria.getFatorEconomias() != null) {
 			consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
@@ -154,7 +154,7 @@ public class ConsumoBO {
 	}
 
 	public BigDecimal getValorMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtual(idTarifa);
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtualPelaTarifa(idTarifa);
 		
 		return consumoTarifaCategoriaRepositorio.valorMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}
@@ -177,8 +177,8 @@ public class ConsumoBO {
 		return consumoMinimo;
 	}
 
-	public int getConsumoMinimoTarifaPorCategoria(Integer idTarifa, ICategoria categoria) {
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtual(idTarifa);
+	public int getConsumoMinimoTarifaPorCategoria(Integer idVigencia, ICategoria categoria) {
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtualPelaVigencia(idVigencia);
 		
 		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
 	}

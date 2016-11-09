@@ -126,7 +126,7 @@ public class ConsumoBOTest {
 	}
 
 	private void mockMaiorDataVigencia() {
-		when(consumoTarifaVigenciaRepositorioMock.buscarConsumoTarifaVigenciaAtual(any())).thenReturn(consumoTarifaVigenciaTO);
+		when(consumoTarifaVigenciaRepositorioMock.buscarConsumoTarifaVigenciaAtualPelaTarifa(any())).thenReturn(consumoTarifaVigenciaTO);
 	}
 
 	private void mockConsumoMinimoTarifa() {

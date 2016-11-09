@@ -84,11 +84,11 @@ public class ConsumoTarifaBO {
 	public ConsumoTarifaCategoria obterConsumoTarifaCategoriaVigente(ConsumoTarifaVigenciaTO tarifaTO, ICategoria subcategoria) {
 
 		ConsumoTarifaCategoria consumoTarifaCategoria = consumoTarifaCategoriaRepositorio.buscarConsumoTarifaCategoriaVigente(
-				tarifaTO.getDataVigencia(), tarifaTO.getIdVigencia(), subcategoria.getCategoria().getId(), subcategoria.getSubcategoria().getId());
+				tarifaTO.getDataVigencia(), subcategoria.getCategoria().getId(), subcategoria.getSubcategoria().getId());
 
 		if (consumoTarifaCategoria == null) {
 			consumoTarifaCategoria = consumoTarifaCategoriaRepositorio.buscarConsumoTarifaCategoriaVigente(tarifaTO.getDataVigencia(),
-					tarifaTO.getIdVigencia(), subcategoria.getCategoria().getId(), 0);
+					subcategoria.getCategoria().getId(), 0);
 		}
 
 		return consumoTarifaCategoria;
@@ -126,7 +126,7 @@ public class ConsumoTarifaBO {
 
 				if (!dataVigenciaIgualAnterior) {
 					ConsumoTarifaVigenciaTO tarifaTO = consumoTarifaVigenciaRepositorio
-							.buscarConsumoTarifaVigenciaAtual(imovel.getConsumoTarifa().getId());
+							.buscarConsumoTarifaVigenciaAtualPelaTarifa(imovel.getConsumoTarifa().getId());
 
 					ConsumoTarifaCategoria tarifa = obterConsumoTarifaCategoriaVigente(tarifaTO, subcategoria);
 					adicionarTarifaCategoriaVigente(tarifasCategoriaConsumo, tarifa);

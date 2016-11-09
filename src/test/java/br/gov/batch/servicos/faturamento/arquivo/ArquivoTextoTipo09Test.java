@@ -168,7 +168,6 @@ public class ArquivoTextoTipo09Test {
 		
 		when(consumoTarifaCategoriaRepositorioMock.buscarConsumoTarifaCategoriaVigente(
 				consumoTarifaVigenteTO.getDataVigencia(),
-				consumoTarifaVigenteTO.getIdVigencia(),
 				subcategoria.getCategoria().getId(),
 				subcategoria.getSubcategoria().getId())).thenReturn(consumoTarifaCategoria);
 		
