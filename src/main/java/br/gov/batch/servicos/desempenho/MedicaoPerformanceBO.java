@@ -1,6 +1,7 @@
 package br.gov.batch.servicos.desempenho;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -18,10 +19,12 @@ public class MedicaoPerformanceBO {
 	@EJB
 	private MedicaoPerformanceRepositorio medicaoPerformanceRepositorio;
 	
-	public void preencherRelatorioDesempenho(MedicaoPerformanceTO medicaoPerformanceTO) {
-		MedicaoPerformance medicaoPerformance = new MedicaoPerformance(medicaoPerformanceTO);			
-		medicaoPerformance.setDataCriacao(new Date());
+	public void preencherRelatorioDesempenho(List<MedicaoPerformanceTO> medicoesPerformanceTO) {
+		for (MedicaoPerformanceTO medicaoPerformanceTO : medicoesPerformanceTO) {
+			MedicaoPerformance medicaoPerformance = new MedicaoPerformance(medicaoPerformanceTO);			
+			medicaoPerformance.setDataCriacao(new Date());
 			
-		medicaoPerformanceRepositorio.salvar(medicaoPerformance);
+			medicaoPerformanceRepositorio.salvar(medicaoPerformance);
+		}
 	}
 }

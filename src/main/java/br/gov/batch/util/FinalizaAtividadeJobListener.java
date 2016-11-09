@@ -4,7 +4,7 @@ import javax.batch.api.listener.JobListener;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
+import br.gov.batch.ControleExecucaoAtividade;
 
 @Named
 public class FinalizaAtividadeJobListener implements JobListener{

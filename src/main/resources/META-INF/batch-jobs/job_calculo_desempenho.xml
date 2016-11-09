@@ -5,7 +5,7 @@
 	</listeners>
 	
 	<step id="calcularDesempenho">
-		<chunk checkpoint-policy="item" item-count="10">
+		<chunk checkpoint-policy="item" item-count="1">
 			<reader ref="configuradorCalculadoraDesempenho"/>
 			<processor ref="calculadoraDesempenho" />
 			<writer ref="geradorDesempenho" />

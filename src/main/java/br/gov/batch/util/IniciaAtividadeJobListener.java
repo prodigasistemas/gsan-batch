@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
-import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
+import br.gov.batch.ControleExecucaoAtividade;
 import br.gov.batch.servicos.batch.ControleExecucaoBO;
 import br.gov.batch.to.ControleExecucaoTO;
 import br.gov.model.batch.ProcessoSituacao;

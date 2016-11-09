@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.batch.BatchLogger;
-import br.gov.batch.gerardadosleitura.ControleExecucaoAtividade;
+import br.gov.batch.ControleExecucaoAtividade;
 import br.gov.batch.util.BatchUtil;
 import br.gov.model.batch.ProcessoIniciado;
 import br.gov.model.micromedicao.LeituraTipo;

@@ -1,7 +1,7 @@
 package br.gov.batch.desempenho;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.batch.api.chunk.AbstractItemReader;
@@ -12,6 +12,7 @@ import javax.inject.Named;
 import org.joda.time.DateTime;
 
 import br.gov.batch.BatchLogger;
+import br.gov.batch.ControleExecucaoAtividade;
 import br.gov.batch.servicos.desempenho.ContratoMedicaoBO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.batch.util.Util;
@@ -31,63 +32,71 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	@EJB
 	private ContratoMedicaoBO contratoMedicaoBO;
 	
-	private HashMap<String, Integer> indices;
+	@Inject
+    private ControleExecucaoAtividade controle;
+	
 	private Integer indiceContratoMedicao;
-	private Integer indiceImovelContrato;
 
 	private MedicaoPerformanceParametrosTO medicaoPerformanceParametros;
 	
-	@SuppressWarnings("unchecked")
+	private Integer referencia;
+	private ContratoMedicao contratoMedicao;
+	
+	@Override
 	public void open(Serializable prevCheckpointInfo) throws Exception {
-		Integer referencia = null;
-		try {
-			referencia = new Integer(util.parametroDoJob("anoMesFaturamento"));
-		} catch(NumberFormatException e) {
-			referencia = Util.getAnoMesComoInteger(DateTime.now().toDate()); 
-		}
+		logger.info(util.parametroDoJob("idProcessoIniciado"), "Recuperando Contratos para a referencia: " + getReferencia());
 		
-		List<ContratoMedicao> contratosMedicao = contratoMedicaoBO.getContratoMedicaoPorReferencia(referencia);
-				
-        if (prevCheckpointInfo != null) {
-        	indiceContratoMedicao = ((HashMap<String,Integer>) prevCheckpointInfo).get("contratoMedicao");
-        	indiceImovelContrato = ((HashMap<String,Integer>) prevCheckpointInfo).get("imovelContrato");
-        }
-        
-        for (int i = indiceContratoMedicao; i < contratosMedicao.size(); i++) {
-        	ContratoMedicao contratoMedicao = contratosMedicao.get(indiceContratoMedicao);
-        	List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), referencia);
-        	for (int j = indiceImovelContrato; j < imoveisContrato.size(); j++) {
-        		medicaoPerformanceParametros = new MedicaoPerformanceParametrosTO();
-        		medicaoPerformanceParametros.setContratoMedicao(contratoMedicao);
-        		medicaoPerformanceParametros.setImovel(imoveisContrato.get(indiceImovelContrato));
-        		medicaoPerformanceParametros.setReferencia(referencia);
-			}
-        } 
-       
-        logger.info(util.parametroDoJob("idProcessoIniciado"), "Calculando desempenho para o contrato: [Id=" + contratosMedicao.get(indiceContratoMedicao) + "]");
-	}
-	
-	@Override
-	public MedicaoPerformanceParametrosTO readItem() throws Exception {
-		if(medicaoPerformanceParametros != null) {
-			indiceContratoMedicao++;
-			indiceImovelContrato++;
-		}
+		List<ContratoMedicao> contratosMedicao = contratoMedicaoBO.getContratoMedicaoPorReferencia(getReferencia());
+		logger.info(util.parametroDoJob("idProcessoIniciado"), "Numero de contratos encontratos para a referencia: " + contratosMedicao.size());
 		
-		return medicaoPerformanceParametros;
-	}
-	
-	@Override
-	public Serializable checkpointInfo() throws Exception {
-		if(indices == null) {
-			indices = new HashMap<String, Integer>();
-			indices.put("contratoMedicao", 0);
-			indices.put("imovelContrato", 0);
+		if (prevCheckpointInfo != null) {
+			indiceContratoMedicao = (Integer) prevCheckpointInfo;
 		} else {
-			indices.put("contratoMedicao", indiceContratoMedicao);
-			indices.put("imovelContrato", indiceImovelContrato);
+			indiceContratoMedicao = 0;
 		}
 		
-		return indices;
+		if(!contratosMedicao.isEmpty() && contratosMedicao.size() > indiceContratoMedicao) {
+			logger.info(util.parametroDoJob("idProcessoIniciado"), "Calculando desempenho para o contrato: [Id=" + contratosMedicao.get(indiceContratoMedicao) + "]");
+			contratoMedicao = contratosMedicao.get(indiceContratoMedicao);
+		}
+		
+	}
+	
+	@Override
+	public List<MedicaoPerformanceParametrosTO> readItem() throws Exception {
+		List<MedicaoPerformanceParametrosTO> medicoesPerformanceParametros = new ArrayList<MedicaoPerformanceParametrosTO>();
+
+		if(contratoMedicao != null) {
+			List<Imovel> imoveisContrato = contratoMedicaoBO.getAbrangencia(contratoMedicao.getId(), getReferencia());
+			for (Imovel imovelContrato : imoveisContrato) {
+				medicaoPerformanceParametros = new MedicaoPerformanceParametrosTO();
+				medicaoPerformanceParametros.setContratoMedicao(contratoMedicao);
+				medicaoPerformanceParametros.setImovel(imovelContrato);
+				medicaoPerformanceParametros.setReferencia(referencia);
+				
+				medicoesPerformanceParametros.add(medicaoPerformanceParametros);
+			}
+			
+			controle.iniciaProcessamentoItem(Integer.valueOf(util.parametroDoJob("idControleAtividade")));
+			indiceContratoMedicao++;
+		}
+		
+		return medicoesPerformanceParametros;
+	}
+	
+	public Serializable checkpointInfo() throws Exception {
+		return indiceContratoMedicao;
+	}
+	
+	private Integer getReferencia() {
+		try {
+			if(referencia == null) {
+				referencia = new Integer(util.parametroDoJob("anoMesFaturamento"));
+			}
+		} catch(NumberFormatException e) {
+			return Util.getAnoMesComoInteger(DateTime.now().toDate()); 
+		}
+
+		return referencia;
 	}
 }

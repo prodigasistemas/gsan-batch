@@ -16,7 +16,8 @@ public class GeradorDesempenho extends AbstractItemWriter {
 	private MedicaoPerformanceBO medicaoPerformanceBO; 
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public void writeItems(List<Object> items) throws Exception {
-		items.forEach(item -> medicaoPerformanceBO.preencherRelatorioDesempenho((MedicaoPerformanceTO) item));
+		items.forEach(item -> medicaoPerformanceBO.preencherRelatorioDesempenho((List<MedicaoPerformanceTO>) item));
 	}
 }
