@@ -210,7 +210,7 @@ public class ConsumoBO {
 	
 	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, MedicaoHistorico medicaoHistorico, ICategoria categoria) {
 		Date dataLeituraAnterior = new DateTime(medicaoHistorico.getDataLeituraAnteriorFaturamento()).toDate();
-		Date dataAtual = new DateTime(medicaoHistorico.getDataLeituraAnteriorFaturamento()).toDate();
+		Date dataAtual = new DateTime(medicaoHistorico.getDataLeituraAtualInformada()).toDate();
 		
 		List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria = consumoTarifaBO.obterConsumoTarifasPorPeriodo(imovel, dataLeituraAnterior, dataAtual, 
 																												sistemaParametros);
