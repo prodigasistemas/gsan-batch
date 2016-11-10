@@ -71,8 +71,8 @@ public class ContratoMedicaoBO {
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
 		medicaoPerformanceTO.setValorAguaFaturadoMesZero(calcularValorConsumo(imovel, referenciaMesZero, referencia));
 		medicaoPerformanceTO.setValorAguaFaturado(calcularValorConsumo(imovel, referencia, referencia));
-		medicaoPerformanceTO.setValorDiferencaAgua(calcularValorDiferencaAgua(medicaoPerformanceTO.getValorAguaFaturado(), 
-																			  medicaoPerformanceTO.getValorAguaFaturadoMesZero()));
+		medicaoPerformanceTO.setValorDiferencaAgua(calcularValorDiferencaAgua(medicaoPerformanceTO.getValorAguaFaturadoMesZero(),
+																			  medicaoPerformanceTO.getValorAguaFaturado()));
 		medicaoPerformanceTO.setDiferencaConsumoAgua(calcularDiferencaConsumoAgua(imovel, referenciaMesZero, referencia));
 		
 		Integer idDebitoCreditoSituacao = debitoCreditoSituacaoRepositorio.buscarDebitoCreditoSituacaoId(imovel.getId(), referencia);
@@ -95,6 +95,7 @@ public class ContratoMedicaoBO {
 																															 contratoMedicao.getId(), 
 																															 ligacaoAguaSituacao.getId());
 		BigDecimal coeficiente = contratoMedicaoCoeficiente.getCoeficiente();
+		coeficiente = coeficiente.divide(new BigDecimal(100));
 		
 		return medicaoPerformanceTO.getValorDiferencaAgua().multiply(coeficiente);
 	}
