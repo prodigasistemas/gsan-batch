@@ -96,7 +96,9 @@ public class ContratoMedicaoBOTest {
 		
 		mockValorConsumoTotal(consumoHistoricoAtualMock, medicaoHistoricoAtualMock, new BigDecimal(16.80));
 		
-		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(consumoHistoricoAtualMock, medicaoHistoricoAtualMock));
+		assertEquals(new BigDecimal(16.80).setScale(2, RoundingMode.HALF_DOWN), bo.calcularValorConsumo(imovelMock, 
+																										referencia, 
+																										referencia));
 	}
 	
 	@Test

@@ -37,8 +37,6 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	@Inject
     private ControleExecucaoAtividade controle;
 	
-	private Integer indiceContratoMedicao;
-
 	private MedicaoPerformanceParametrosTO medicaoPerformanceParametros;
 	
 	private Integer referencia;

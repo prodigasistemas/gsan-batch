@@ -186,6 +186,10 @@ public class ConsumoBO {
 	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovel(Integer idImovel) {
 		return imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);
 	}
+	
+	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovelAbrangencia(Integer idContratoMedicao, Integer idImovel) {
+		return imovelSubcategoriaRepositorio.buscarSubcategoriaAbrangencia(idContratoMedicao, idImovel);
+	}
 
 	public Integer getQuantidadeTotalEconomias(Integer idImovel) {
 		Collection<ICategoria> subcategorias = imovelSubcategoriaRepositorio.buscarSubcategoria(idImovel);

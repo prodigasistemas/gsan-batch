@@ -33,6 +33,16 @@ public class ConsumoImovelCategoriaBO {
 	@EJB 
 	private ConsumoBO consumoBO;
 	
+	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico,
+																		Collection<ICategoria> categorias) {
+		initConsumoImoveisCategoriaTO();
+		
+		distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico, categorias);
+		distribuirConsumoPorFaixa();
+		
+		return getConsumoImoveisCategoriaTO();
+	}
+	
 	public List<ConsumoImovelCategoriaTO> getConsumoImoveisCategoriaTO(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		initConsumoImoveisCategoriaTO();
 		
@@ -45,6 +55,11 @@ public class ConsumoImovelCategoriaBO {
 	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorCategoria(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		Collection<ICategoria> categorias = consumoBO.buscarQuantidadeEconomiasPorImovel(consumoHistorico.getImovel().getId());
 		
+		return distribuirConsumoPorCategoria(consumoHistorico, medicaoHistorico, categorias);
+	}
+	
+	public List<ConsumoImovelCategoriaTO> distribuirConsumoPorCategoria(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, 
+																		Collection<ICategoria> categorias) {
 		for (ICategoria categoria : categorias) {
 			addConsumoImovelCategoriaTO(consumoHistorico, medicaoHistorico, categoria);
 		}	
@@ -62,9 +77,19 @@ public class ConsumoImovelCategoriaBO {
 		return getConsumoImoveisCategoriaTO();
 	}
 	
+	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico, Collection<ICategoria> categorias) {
+		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico, categorias);
+		
+		return getValorTotalConsumoImovel(consumoImoveisCategoria);
+	}
+	
 	public BigDecimal getValorTotalConsumoImovel(ConsumoHistorico consumoHistorico, MedicaoHistorico medicaoHistorico) {
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = getConsumoImoveisCategoriaTO(consumoHistorico, medicaoHistorico);
 		
+		return getValorTotalConsumoImovel(consumoImoveisCategoria);
+	}
+	
+	private BigDecimal getValorTotalConsumoImovel(List<ConsumoImovelCategoriaTO> consumoImoveisCategoria) {
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : consumoImoveisCategoria) {
 			valorTotalConsumo = valorTotalConsumo.add(getValorConsumoTotal(consumoImovelCategoriaTO));
