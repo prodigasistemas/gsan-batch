@@ -34,6 +34,16 @@ public class ImovelBO {
 
 		return faturamentoGrupo;
 	}
+	
+	public FaturamentoGrupo pesquisarFaturamentoGrupoPelaReferencia(Integer idImovel, Integer anoMesReferencia) {
+		FaturamentoGrupo faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoRotaAlternativaPelaReferencia(idImovel, anoMesReferencia);
+
+		if (faturamentoGrupo == null) {
+			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoPelaReferencia(idImovel, anoMesReferencia);
+		}
+
+		return faturamentoGrupo;
+	}
 
 	public BigDecimal verificarAreaConstruida(Integer idImovel) {
 		BigDecimal areaConstruida = BigDecimal.ONE;
