@@ -42,7 +42,9 @@ public class CalculadoraDesempenho implements ItemProcessor {
 			
 			logger.info(util.parametroDoJob("idProcessoIniciado"), 
 					"\tDesempenho calculado para o imovel [Id=" + medicaoPerformanceParametrosTO.getImovel().getId() + "] = " 
-																+ medicaoPerformanceTO.getValorMedicao());
+																+ medicaoPerformanceTO.getValorMedicao() 
+																+ " | mes zero = " + medicaoPerformanceTO.getValorAguaFaturadoMesZero()
+																+ " | mes refe = " + medicaoPerformanceTO.getValorAguaFaturado());
 			
 			medicoesPerformanceTO.add(medicaoPerformanceTO);
 		}
