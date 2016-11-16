@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoAtividade;
 import br.gov.model.faturamento.FaturamentoAtividadeCronograma;
@@ -24,6 +25,9 @@ public class FaturamentoAtividadeCronogramaBO {
 	@EJB
 	private MedicaoHistoricoRepositorio medicaoHistoricoRepositorio;
 	
+	@EJB
+	private ImovelBO imovelBO;
+	
 	
 	public Date obterDataPrevistaDoCronogramaAnterior(FaturamentoGrupo faturamentoGrupo, Integer idAtividade) {
 		Integer referenciaAnterior = Utilitarios.reduzirMeses(faturamentoGrupo.getAnoMesReferencia(), 1);
@@ -36,6 +40,22 @@ public class FaturamentoAtividadeCronogramaBO {
 		}
 		
 		return dataLeitura;
+	}
+	
+	public Date obterDataLeituraAnterior(Imovel imovel, Integer referencia) {
+		FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
+		
+		Integer anoMesReferencia = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
+		
+		return obterDataLeitura(imovel, grupo, anoMesReferencia);
+	}
+	
+	public Date obterDataLeituraAtual(Imovel imovel, Integer referencia) {
+		FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
+		
+		Integer anoMesReferencia = grupo.getAnoMesReferencia();
+		
+		return obterDataLeitura(imovel, grupo, anoMesReferencia);
 	}
 	
 	public Date obterDataLeituraAnterior(Imovel imovel, FaturamentoGrupo grupo) {

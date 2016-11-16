@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import br.gov.batch.BatchLogger;
 import br.gov.batch.ControleExecucaoAtividade;
 import br.gov.batch.servicos.desempenho.ContratoMedicaoBO;
+import br.gov.batch.servicos.desempenho.MedicaoPerformanceBO;
 import br.gov.batch.util.BatchUtil;
 import br.gov.batch.util.Util;
 import br.gov.model.cadastro.Imovel;
@@ -34,6 +35,9 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	@EJB
 	private ContratoMedicaoBO contratoMedicaoBO;
 	
+	@EJB
+	private MedicaoPerformanceBO medicaoPerformanceBO;
+	
 	@Inject
     private ControleExecucaoAtividade controle;
 	
@@ -44,6 +48,9 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	
 	@Override
 	public void open(Serializable prevCheckpointInfo) throws Exception {
+		logger.info(util.parametroDoJob("idProcessoIniciado"), "Limpando a base de desempenho para a referencia: " + getReferencia());
+		medicaoPerformanceBO.removerDesempenhosParaReferencia(getReferencia());
+		
 		logger.info(util.parametroDoJob("idProcessoIniciado"), "Recuperando Contratos para a referencia: " + getReferencia());
 		
 		contratosMedicao.addAll(contratoMedicaoBO.getContratoMedicaoPorReferencia(getReferencia()));

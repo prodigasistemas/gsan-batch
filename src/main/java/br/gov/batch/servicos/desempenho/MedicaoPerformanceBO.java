@@ -27,4 +27,8 @@ public class MedicaoPerformanceBO {
 			medicaoPerformanceRepositorio.salvar(medicaoPerformance);
 		}
 	}
+
+	public void removerDesempenhosParaReferencia(Integer referencia) {
+		medicaoPerformanceRepositorio.removerPelaReferencia(referencia);
+	}
 }
