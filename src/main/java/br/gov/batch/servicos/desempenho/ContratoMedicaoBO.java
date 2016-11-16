@@ -130,14 +130,16 @@ public class ContratoMedicaoBO {
 	}
 	
 	public Integer calcularDiferencaConsumoAgua(Imovel imovel, Integer referenciaMesZero, Integer referencia) {
-		Integer consumoMesZero = consumoHistoricoBO.getConsumoMesNaConta(imovel, referenciaMesZero);
-		Integer consumoReferencia = consumoHistoricoBO.getConsumoMesNaConta(imovel, referencia);
+		Integer consumoMesZero = getConsumoMes(imovel, referenciaMesZero);
+		Integer consumoReferencia = getConsumoMes(imovel, referencia);
 		
 		return calcularDiferencaConsumoAgua(consumoMesZero, consumoReferencia);
 	}
 	
 	public Integer getConsumoMes(Imovel imovel, Integer referencia) {
-		return consumoHistoricoBO.getConsumoMesNaConta(imovel, referencia);
+		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
+		
+		return consumoHistorico.getNumeroConsumoFaturadoMes();
 	}
 	
 	private Integer calcularDiferencaConsumoAgua(Integer consumoMesZero, Integer consumoReferencia) {

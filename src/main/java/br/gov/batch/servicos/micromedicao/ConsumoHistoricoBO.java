@@ -88,10 +88,6 @@ public class ConsumoHistoricoBO {
 		return mesesConsumo > 0 ? somaConsumo / mesesConsumo : 0;
 	}
 
-	public Integer getConsumoMesNaConta(Imovel imovel, Integer referenciaMes) {
-		return contaRepositorio.buscarConsumoAgua(imovel.getId(), referenciaMes);
-	}
-
 	public ConsumoHistorico getConsumoHistoricoPorReferencia(Imovel imovel, Integer referencia) {
 		return consumoHistoricoRepositorio.buscarConsumoHistoricoPeloImoveEReferencia(imovel.getId(), referencia);
 	}

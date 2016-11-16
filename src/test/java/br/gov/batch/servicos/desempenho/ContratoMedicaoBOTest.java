@@ -68,10 +68,13 @@ public class ContratoMedicaoBOTest {
 		this.dataReferenciaMesZero = new DateTime(2016, 5, 1, 0, 0, 0).toDate();
 		when(contratoMedicaoMock.getDataAssinatura()).thenReturn(dataReferenciaMesZero);
 
-		when(consumoHistoricoBOMock.getConsumoMesNaConta(imovelMock, referenciaMesZero)).thenReturn(0);
+		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referenciaMesZero)).thenReturn(consumoHistoricoMesZeroMock);
 		
 		when(consumoHistoricoAtualMock.getImovel()).thenReturn(imovelMock);
 		when(consumoHistoricoMesZeroMock.getImovel()).thenReturn(imovelMock);
+		
+		when(consumoHistoricoAtualMock.getNumeroConsumoFaturadoMes()).thenReturn(10);
+		when(consumoHistoricoMesZeroMock.getNumeroConsumoFaturadoMes()).thenReturn(0);
 		
 		when(faturamentoAtividadeCronogramaBO.obterDataLeituraAnterior(imovelMock, referencia)).thenReturn(new DateTime(2016,5,1,0,0).toDate());
 		when(faturamentoAtividadeCronogramaBO.obterDataLeituraAtual(imovelMock, referencia)).thenReturn(new DateTime(2016,6,1,0,0).toDate());
@@ -102,7 +105,7 @@ public class ContratoMedicaoBOTest {
 	public void calculoDiferencaConsumoAguaPositivo() {
 		Integer referencia = 201607;
 		
-		when(consumoHistoricoBOMock.getConsumoMesNaConta(imovelMock, referencia)).thenReturn(10);
+		when(consumoHistoricoBOMock.getConsumoHistoricoPorReferencia(imovelMock, referencia)).thenReturn(consumoHistoricoAtualMock);
 		
 		assertEquals(new Integer(10), bo.calcularDiferencaConsumoAgua(imovelMock, referenciaMesZero, referencia));
 	}
