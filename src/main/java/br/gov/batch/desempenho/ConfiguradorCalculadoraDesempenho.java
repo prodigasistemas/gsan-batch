@@ -11,16 +11,14 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.joda.time.DateTime;
-
 import br.gov.batch.BatchLogger;
 import br.gov.batch.ControleExecucaoAtividade;
 import br.gov.batch.servicos.desempenho.ContratoMedicaoBO;
 import br.gov.batch.servicos.desempenho.MedicaoPerformanceBO;
 import br.gov.batch.util.BatchUtil;
-import br.gov.batch.util.Util;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.to.MedicaoPerformanceParametrosTO;
 
 @Named
@@ -40,6 +38,9 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 	
 	@Inject
     private ControleExecucaoAtividade controle;
+	
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 	
 	private MedicaoPerformanceParametrosTO medicaoPerformanceParametros;
 	
@@ -94,7 +95,7 @@ public class ConfiguradorCalculadoraDesempenho extends AbstractItemReader {
 				referencia = new Integer(util.parametroDoJob("anoMesFaturamento"));
 			}
 		} catch(NumberFormatException e) {
-			return Util.getAnoMesComoInteger(DateTime.now().toDate()); 
+			referencia = sistemaParametrosRepositorio.getSistemaParametros().getAnoMesFaturamento();
 		}
 
 		return referencia;
