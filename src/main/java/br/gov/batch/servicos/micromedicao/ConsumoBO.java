@@ -73,7 +73,7 @@ public class ConsumoBO {
 	}
 
 	public int consumoNaoMedido(Integer idImovel, Integer anoMesReferencia) {
-		if (sistemaParametros.getIndicadorNaoMedidoTarifa() == Status.ATIVO.getId()) {
+		if (sistemaParametros.getIndicadorNaoMedidoTarifa().shortValue() == Status.ATIVO.getId()) {
 			return this.consumoMinimoLigacao(idImovel);
 		} else {
 			return this.obterConsumoNaoMedidoSemTarifa(idImovel, anoMesReferencia);
@@ -178,9 +178,7 @@ public class ConsumoBO {
 	}
 
 	public int getConsumoMinimoTarifaPorCategoria(Integer idVigencia, ICategoria categoria) {
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtualPelaVigencia(idVigencia);
-		
-		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, consumoTarifaVigencia.getIdVigencia());
+		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifa(categoria, idVigencia);
 	}
 
 	public Collection<ICategoria> buscarQuantidadeEconomiasPorImovel(Integer idImovel) {
