@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import org.jboss.logging.Logger;
+
 import br.gov.batch.servicos.cadastro.ImovelBO;
 import br.gov.model.cadastro.Imovel;
 import br.gov.model.faturamento.FaturamentoAtividade;
@@ -18,6 +20,8 @@ import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
 
 @Stateless
 public class FaturamentoAtividadeCronogramaBO {
+	
+	private static Logger logger = Logger.getLogger(FaturamentoAtividadeCronogramaBO.class);
 
 	@EJB
 	private FaturamentoAtividadeCronogramaRepositorio repositorio;
@@ -43,11 +47,17 @@ public class FaturamentoAtividadeCronogramaBO {
 	}
 	
 	public Date obterDataLeituraAnterior(Imovel imovel, Integer referencia) {
-		FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
-		
-		Integer anoMesReferencia = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
-		
-		return obterDataLeitura(imovel, grupo, anoMesReferencia);
+		try {
+			FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
+			
+			Integer anoMesReferencia = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
+			
+			return obterDataLeitura(imovel, grupo, anoMesReferencia);
+			
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao obter cronograma para o imovel [%s] na referencia [%s]",imovel.getId(), referencia), e);
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public Date obterDataLeituraAtual(Imovel imovel, Integer referencia) {

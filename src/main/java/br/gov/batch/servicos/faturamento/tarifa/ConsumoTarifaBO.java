@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -17,6 +18,7 @@ import br.gov.model.faturamento.FaturamentoGrupo;
 import br.gov.model.faturamento.TarifaTipoCalculo;
 import br.gov.model.micromedicao.MedicaoHistorico;
 import br.gov.model.util.Utilitarios;
+import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaCategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.faturamento.TarifaTipoCalculoRepositorio;
@@ -25,6 +27,9 @@ import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 @Stateless
 public class ConsumoTarifaBO {
+
+	@EJB
+	private SistemaParametrosRepositorio sistemaParametrosRepositorio;
 
 	@EJB
 	private TarifaTipoCalculoRepositorio tarifaTipoCalculoRepositorio;
@@ -41,7 +46,14 @@ public class ConsumoTarifaBO {
 	@EJB
 	private ImovelBO imovelBO;
 
-	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorPeriodo(Imovel imovel, Date dataAnterior, Date dataAtual, SistemaParametros sistemaParametros) {
+	private SistemaParametros sistemaParametros;
+
+	@PostConstruct
+	public void init() {
+		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
+	}
+	
+	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorPeriodo(Imovel imovel, Date dataAnterior, Date dataAtual) {
 		List<ICategoria> categorias = imovelBO.obterCategorias(imovel, sistemaParametros);
 		
 		List<ConsumoTarifaVigenciaTO> tarifaTO = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(imovel.getConsumoTarifa().getId(),
@@ -56,14 +68,14 @@ public class ConsumoTarifaBO {
 		return getConsumoTarifaCategoriaTOList(consumoTarifasCategoria);
 	}
 
-	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorReferencia(Imovel imovel, MedicaoHistorico medicaoHistorico, SistemaParametros sistemaParametros) {
+	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorReferencia(Imovel imovel, MedicaoHistorico medicaoHistorico) {
 		Integer referencia = medicaoHistorico.getAnoMesReferencia();
 
-		return obterConsumoTarifasPorReferencia(imovel, referencia, sistemaParametros);
+		return obterConsumoTarifasPorReferencia(imovel, referencia);
 	}
 
-	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorReferencia(Imovel imovel, Integer referencia, SistemaParametros sistemaParametros) {
-		List<ConsumoTarifaCategoria> consumoTarifasCategoria = this.obterTarifasParaCalculoPorReferencia(referencia, imovel, sistemaParametros);
+	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorReferencia(Imovel imovel, Integer referencia) {
+		List<ConsumoTarifaCategoria> consumoTarifasCategoria = this.obterTarifasParaCalculoPorReferencia(referencia, imovel);
 
 		return getConsumoTarifaCategoriaTOList(consumoTarifasCategoria);
 	}
@@ -75,9 +87,9 @@ public class ConsumoTarifaBO {
 		TarifaTipoCalculo tipoCalculoTarifa = tarifaTipoCalculoRepositorio.tarifaTipoCalculoAtiva();
 
 		if (tipoCalculoTarifa != null && tipoCalculoTarifa.getId().equals(TarifaTipoCalculo.CALCULO_POR_REFERENCIA)) {
-			return obterTarifasParaCalculoPorReferencia(faturamentoGrupo.getAnoMesReferencia(), imovel, sistemaParametros);
+			return obterTarifasParaCalculoPorReferencia(faturamentoGrupo.getAnoMesReferencia(), imovel);
 		} else {
-			return obterConsumoTarifasParaCalculoPorReferenciaAnterior(imovel, faturamentoGrupo, sistemaParametros);
+			return obterConsumoTarifasParaCalculoPorReferenciaAnterior(imovel, faturamentoGrupo);
 		}
 	}
 
@@ -95,8 +107,7 @@ public class ConsumoTarifaBO {
 	}
 
 	//TODO Refatorar esse método, muito extenso.
-	public List<ConsumoTarifaCategoria> obterConsumoTarifasParaCalculoPorReferenciaAnterior(Imovel imovel, FaturamentoGrupo faturamentoGrupo, 
-																					SistemaParametros sistemaParametros) {
+	public List<ConsumoTarifaCategoria> obterConsumoTarifasParaCalculoPorReferenciaAnterior(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
 
 		List<ICategoria> subcategorias = imovelBO.obterCategorias(imovel, sistemaParametros);
 
@@ -154,8 +165,7 @@ public class ConsumoTarifaBO {
 		return tos;
 	}
 
-	private List<ConsumoTarifaCategoria> obterTarifasParaCalculoPorReferencia(Integer anoMesReferencia, Imovel imovel,
-			SistemaParametros sistemaParametros) {
+	private List<ConsumoTarifaCategoria> obterTarifasParaCalculoPorReferencia(Integer anoMesReferencia, Imovel imovel) {
 		Date dataReferencia = Utilitarios.criarData(1, Utilitarios.extrairMes(anoMesReferencia), Utilitarios.extrairAno(anoMesReferencia));
 
 		List<ICategoria> categorias = imovelBO.obterCategorias(imovel, sistemaParametros);

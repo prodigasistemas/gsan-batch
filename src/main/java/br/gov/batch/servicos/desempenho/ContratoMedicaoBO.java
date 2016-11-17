@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -139,7 +143,11 @@ public class ContratoMedicaoBO {
 	public Integer getConsumoMes(Imovel imovel, Integer referencia) {
 		ConsumoHistorico consumoHistorico = consumoHistoricoBO.getConsumoHistoricoPorReferencia(imovel, referencia);
 		
-		return consumoHistorico.getNumeroConsumoFaturadoMes();
+		if (consumoHistorico == null){
+			return 0;
+		}else{
+			return consumoHistorico.getNumeroConsumoFaturadoMes();
+		}
 	}
 	
 	private Integer calcularDiferencaConsumoAgua(Integer consumoMesZero, Integer consumoReferencia) {
@@ -194,26 +202,37 @@ public class ContratoMedicaoBO {
 		return contratoMedicaoRepositorio.buscarContratoAtivoPorImovel(imovelId); 
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public List<Imovel> getAbrangencia(int idContrato, int anoMesReferencia) {
 		ContratoMedicao contratoMedicao = contratoMedicaoRepositorio.obterPorID(idContrato);
-		List<Imovel> imoveis = contratoMedicaoRepositorio.buscarImoveis(idContrato, anoMesReferencia);
+		List<Integer> idsImoveis = contratoMedicaoRepositorio.buscarImoveis(idContrato, anoMesReferencia);
 		List<Imovel> imoveisFaturadosCancelados = new ArrayList<Imovel>();
 		
-		for (Imovel imovel : imoveis) {
-			if(contratoMedicaoRepositorio.possuiContaFaturadaNormal(imovel.getId(), anoMesReferencia)
-				|| contratoMedicaoRepositorio.possuiContaFaturadaIncluida(imovel.getId(), anoMesReferencia)
-				|| contratoMedicaoRepositorio.possuiContaFaturadaRetificada(contratoMedicao.getVigenciaInicial(), 
-																			contratoMedicao.getVigenciaFinal(), 
-																			imovel.getId(), 
-																			anoMesReferencia)) {
-				imoveisFaturadosCancelados.add(imovel);
-			}
+		
+		while (idsImoveis.size() > 0 ){
+			List<Integer> subList = idsImoveis.subList(0, idsImoveis.size() < 500 ? idsImoveis.size() : 499);
 			
-			if(contratoMedicaoRepositorio.possuiCancelamento(contratoMedicao.getVigenciaInicial(), 
-															 contratoMedicao.getVigenciaFinal(),
-															 imovel.getId(), 
-															 anoMesReferencia)) {
-				imoveisFaturadosCancelados.add(imovel);
+			if (idsImoveis.size() < 500)
+				idsImoveis = new ArrayList<Integer>();
+			else
+				idsImoveis = idsImoveis.subList(500, idsImoveis.size() - 1);
+			
+			
+			Set<Integer> ids = new TreeSet<Integer>();
+			
+			ids.addAll(contratoMedicaoRepositorio.imoveisContaFaturadaNormal(subList, anoMesReferencia));
+			ids.addAll(contratoMedicaoRepositorio.imoveisContaFaturadaIncluida(subList, anoMesReferencia));
+			ids.addAll(contratoMedicaoRepositorio.imoveisContaFaturadaRetificada(contratoMedicao.getVigenciaInicial(), 
+					contratoMedicao.getVigenciaFinal(), 
+					subList, 
+					anoMesReferencia));
+			ids.addAll(contratoMedicaoRepositorio.imoveisCancelamento(contratoMedicao.getVigenciaInicial(), 
+					contratoMedicao.getVigenciaFinal(),
+					subList, 
+					anoMesReferencia));
+			
+			for (Integer id : ids) {
+				imoveisFaturadosCancelados.add(new Imovel(id));
 			}
 		}
 		
