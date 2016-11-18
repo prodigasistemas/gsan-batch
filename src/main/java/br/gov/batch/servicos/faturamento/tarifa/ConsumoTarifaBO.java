@@ -75,7 +75,7 @@ public class ConsumoTarifaBO {
 	}
 
 	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorReferencia(Imovel imovel, Integer referencia) {
-		List<ConsumoTarifaCategoria> consumoTarifasCategoria = this.obterTarifasParaCalculoPorReferencia(referencia, imovel);
+		List<ConsumoTarifaCategoria> consumoTarifasCategoria = this.obterTarifasConsumoParaCalculoPorReferencia(referencia, imovel);
 
 		return getConsumoTarifaCategoriaTOList(consumoTarifasCategoria);
 	}
@@ -87,9 +87,9 @@ public class ConsumoTarifaBO {
 		TarifaTipoCalculo tipoCalculoTarifa = tarifaTipoCalculoRepositorio.tarifaTipoCalculoAtiva();
 
 		if (tipoCalculoTarifa != null && tipoCalculoTarifa.getId().equals(TarifaTipoCalculo.CALCULO_POR_REFERENCIA)) {
-			return obterTarifasParaCalculoPorReferencia(faturamentoGrupo.getAnoMesReferencia(), imovel);
+			return obterTarifasConsumoParaCalculoPorReferencia(faturamentoGrupo.getAnoMesReferencia(), imovel);
 		} else {
-			return obterConsumoTarifasParaCalculoPorReferenciaAnterior(imovel, faturamentoGrupo);
+			return obterTarifasConsumoParaCalculoPorReferenciaAnterior(imovel, faturamentoGrupo);
 		}
 	}
 
@@ -105,9 +105,9 @@ public class ConsumoTarifaBO {
 
 		return consumoTarifaCategoria;
 	}
-
+	
 	//TODO Refatorar esse método, muito extenso.
-	public List<ConsumoTarifaCategoria> obterConsumoTarifasParaCalculoPorReferenciaAnterior(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
+	private List<ConsumoTarifaCategoria> obterTarifasConsumoParaCalculoPorReferenciaAnterior(Imovel imovel, FaturamentoGrupo faturamentoGrupo) {
 
 		List<ICategoria> subcategorias = imovelBO.obterCategorias(imovel, sistemaParametros);
 
@@ -156,16 +156,7 @@ public class ConsumoTarifaBO {
 		return tarifasCategoriaConsumo;
 	}
 
-	private List<ConsumoTarifaCategoriaTO> getConsumoTarifaCategoriaTOList(List<ConsumoTarifaCategoria> consumoTarifasCategoria) {
-		List<ConsumoTarifaCategoriaTO> tos = new ArrayList<ConsumoTarifaCategoriaTO>();
-		for (ConsumoTarifaCategoria consumoTarifaCategoria : consumoTarifasCategoria) {
-			tos.add(new ConsumoTarifaCategoriaTO(consumoTarifaCategoria));
-		}
-
-		return tos;
-	}
-
-	private List<ConsumoTarifaCategoria> obterTarifasParaCalculoPorReferencia(Integer anoMesReferencia, Imovel imovel) {
+	private List<ConsumoTarifaCategoria> obterTarifasConsumoParaCalculoPorReferencia(Integer anoMesReferencia, Imovel imovel) {
 		Date dataReferencia = Utilitarios.criarData(1, Utilitarios.extrairMes(anoMesReferencia), Utilitarios.extrairAno(anoMesReferencia));
 
 		List<ICategoria> categorias = imovelBO.obterCategorias(imovel, sistemaParametros);
@@ -174,6 +165,15 @@ public class ConsumoTarifaBO {
 				.buscarConsumoTarifaVigenciaRecentePorData(imovel.getConsumoTarifa().getId(), dataReferencia);
 		
 		return getConsumoTarifaCategoriaVigenteList(categorias, tarifaTO);
+	}
+	
+	private List<ConsumoTarifaCategoriaTO> getConsumoTarifaCategoriaTOList(List<ConsumoTarifaCategoria> consumoTarifasCategoria) {
+		List<ConsumoTarifaCategoriaTO> tos = new ArrayList<ConsumoTarifaCategoriaTO>();
+		for (ConsumoTarifaCategoria consumoTarifaCategoria : consumoTarifasCategoria) {
+			tos.add(new ConsumoTarifaCategoriaTO(consumoTarifaCategoria));
+		}
+
+		return tos;
 	}
 
 	private List<ConsumoTarifaCategoria> getConsumoTarifaCategoriaVigenteList(List<ICategoria> categoriasSubcategorias, 

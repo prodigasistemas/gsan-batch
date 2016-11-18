@@ -45,27 +45,16 @@ public class FaturamentoAtividadeCronogramaBO {
 		
 		return dataLeitura;
 	}
-	
-	public Date obterDataLeituraAnterior(Imovel imovel, Integer referencia) {
+		
+	public Date obterDataLeituraPorReferencia(Imovel imovel, Integer referencia) {
 		try {
-			FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
+			FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId());
 			
-			Integer anoMesReferencia = Utilitarios.reduzirMeses(grupo.getAnoMesReferencia(), 1);
-			
-			return obterDataLeitura(imovel, grupo, anoMesReferencia);
-			
+			return obterDataLeitura(imovel, grupo, referencia);
 		} catch (Exception e) {
-			logger.error(String.format("Erro ao obter cronograma para o imovel [%s] na referencia [%s]",imovel.getId(), referencia), e);
+			logger.error(String.format("Erro ao obter data de leitura para o imovel [%s] na referencia [%s]",imovel.getId(), referencia), e);
 			throw new RuntimeException(e);
 		}
-	}
-	
-	public Date obterDataLeituraAtual(Imovel imovel, Integer referencia) {
-		FaturamentoGrupo grupo = imovelBO.pesquisarFaturamentoGrupoPelaReferencia(imovel.getId(), referencia);
-		
-		Integer anoMesReferencia = grupo.getAnoMesReferencia();
-		
-		return obterDataLeitura(imovel, grupo, anoMesReferencia);
 	}
 	
 	public Date obterDataLeituraAnterior(Imovel imovel, FaturamentoGrupo grupo) {

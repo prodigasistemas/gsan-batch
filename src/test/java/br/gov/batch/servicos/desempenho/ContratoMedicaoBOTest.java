@@ -25,6 +25,7 @@ import br.gov.model.cadastro.Imovel;
 import br.gov.model.desempenho.ContratoMedicao;
 import br.gov.model.faturamento.ConsumoTarifaVigencia;
 import br.gov.model.micromedicao.ConsumoHistorico;
+import br.gov.model.util.Utilitarios;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.MedicaoHistoricoRepositorio;
@@ -76,8 +77,8 @@ public class ContratoMedicaoBOTest {
 		when(consumoHistoricoAtualMock.getNumeroConsumoFaturadoMes()).thenReturn(10);
 		when(consumoHistoricoMesZeroMock.getNumeroConsumoFaturadoMes()).thenReturn(0);
 		
-		when(faturamentoAtividadeCronogramaBO.obterDataLeituraAnterior(imovelMock, referencia)).thenReturn(new DateTime(2016,5,1,0,0).toDate());
-		when(faturamentoAtividadeCronogramaBO.obterDataLeituraAtual(imovelMock, referencia)).thenReturn(new DateTime(2016,6,1,0,0).toDate());
+		when(faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovelMock, Utilitarios.reduzirMeses(referencia, 1))).thenReturn(new DateTime(2016,5,1,0,0).toDate());
+		when(faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovelMock, referencia)).thenReturn(new DateTime(2016,6,1,0,0).toDate());
 		
 		when(contratoMedicacaoRepositorioMock.buscarContratoAtivoPorImovel(imovelMock.getId())).thenReturn(contratoMedicaoMock);
 	}

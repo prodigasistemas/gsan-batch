@@ -35,11 +35,11 @@ public class ImovelBO {
 		return faturamentoGrupo;
 	}
 	
-	public FaturamentoGrupo pesquisarFaturamentoGrupoPelaReferencia(Integer idImovel, Integer anoMesReferencia) {
-		FaturamentoGrupo faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoRotaAlternativaPelaReferencia(idImovel, anoMesReferencia);
+	public FaturamentoGrupo pesquisarFaturamentoGrupoPelaReferencia(Integer idImovel) {
+		FaturamentoGrupo faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoRotaAlternativaPelaReferencia(idImovel);
 
 		if (faturamentoGrupo == null) {
-			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoPelaReferencia(idImovel, anoMesReferencia);
+			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoPelaReferencia(idImovel);
 		}
 
 		return faturamentoGrupo;

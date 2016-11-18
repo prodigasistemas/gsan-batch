@@ -31,6 +31,7 @@ import br.gov.model.desempenho.ContratoMedicao;
 import br.gov.model.desempenho.ContratoMedicaoCoeficiente;
 import br.gov.model.faturamento.DebitoCreditoSituacaoRepositorio;
 import br.gov.model.micromedicao.ConsumoHistorico;
+import br.gov.model.util.Utilitarios;
 import br.gov.servicos.atendimentopublico.LigacaoAguaSituacaoRepositorio;
 import br.gov.servicos.desempenho.ContratoMedicaoCoeficienteRepositorio;
 import br.gov.servicos.desempenho.ContratoMedicaoRepositorio;
@@ -161,8 +162,8 @@ public class ContratoMedicaoBO {
 			return BigDecimal.ZERO;
 		}
 
-		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraAnterior(imovel, referencia);
-		Date dataLeituraAtual = faturamentoAtividadeCronogramaBO.obterDataLeituraAtual(imovel, referencia);
+		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovel, Utilitarios.reduzirMeses(referencia, 1));
+		Date dataLeituraAtual    = faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovel, referencia);
 		
 		Collection<ICategoria> categorias = consumoBO.buscarQuantidadeEconomiasPorImovelAbrangencia(contratoMedicao.getId(), 
 																									consumoHistorico.getImovel().getId());
@@ -178,8 +179,8 @@ public class ContratoMedicaoBO {
 			return BigDecimal.ZERO;
 		}
 		
-		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraAnterior(imovel, referencia);
-		Date dataLeituraAtual = faturamentoAtividadeCronogramaBO.obterDataLeituraAtual(imovel, referencia);
+		Date dataLeituraAnterior = faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovel, Utilitarios.reduzirMeses(referencia, 1));
+		Date dataLeituraAtual    = faturamentoAtividadeCronogramaBO.obterDataLeituraPorReferencia(imovel, referencia);
 		
 		BigDecimal valorTotalConsumo = consumoImovelBO.getValorTotalConsumoImovel(consumoHistorico, dataLeituraAnterior, dataLeituraAtual);
 		

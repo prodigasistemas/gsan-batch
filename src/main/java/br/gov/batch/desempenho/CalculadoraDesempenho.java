@@ -33,9 +33,6 @@ public class CalculadoraDesempenho implements ItemProcessor {
 		
 		List<MedicaoPerformanceTO> medicoesPerformanceTO = new ArrayList<MedicaoPerformanceTO>();
 		for (MedicaoPerformanceParametrosTO medicaoPerformanceParametrosTO : medicoesPerformanceParametrosTO) {
-			logger.info(util.parametroDoJob("idProcessoIniciado"), 
-					"\tCalculando desempenho para o imovel: [Id=" + medicaoPerformanceParametrosTO.getImovel().getId() + "]");
-			
 			MedicaoPerformanceTO medicaoPerformanceTO = contratoMedicaoBO.getMedicaoPerformanceTO(medicaoPerformanceParametrosTO.getContratoMedicao(), 
 																								  medicaoPerformanceParametrosTO.getImovel(), 
 																								  medicaoPerformanceParametrosTO.getReferencia());
@@ -43,8 +40,6 @@ public class CalculadoraDesempenho implements ItemProcessor {
 			logger.info(util.parametroDoJob("idProcessoIniciado"), 
 					"\tDesempenho calculado para o imovel [Id=" + medicaoPerformanceParametrosTO.getImovel().getId() + "] = " 
 																+ medicaoPerformanceTO.getValorMedicao() + "\n" 
-																+ " | consumo mes zero = " + medicaoPerformanceTO.getConsumoMesZero()
-																+ " | consumo mes refe = " + medicaoPerformanceTO.getConsumoReferencia()
 																+ " | valor mes zero = " + medicaoPerformanceTO.getValorAguaFaturadoMesZero()
 																+ " | valor mes refe = " + medicaoPerformanceTO.getValorAguaFaturado());
 			
