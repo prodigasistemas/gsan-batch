@@ -323,6 +323,9 @@ public class ConsumoImovelCategoriaBOTest {
 	@Test
 	public void calcularValorTotalConsumoUmaCategoriaUmaEconomiaDuasVigencias() {
 		Date dataVigenciaAnterior = new DateTime(2009, 7, 7, 0, 0).toDate();
+		
+		dataAnterior = new DateTime(2016, 4, 1, 0, 0).toDate();
+		dataAtual= new DateTime(2016, 5, 1, 0, 0).toDate();
 
 		configurarImovelUmaCategoriaUmaEconomia();
 		configurarVigenciasUmaCategoria(dataVigenciaAnterior);
@@ -334,7 +337,7 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		BigDecimal valorConsumoTotal = bo.getValorTotalConsumoImovel(consumoHistoricoMock, dataAnterior, dataAtual);
 		
-		assertEquals(new BigDecimal(60.33).setScale(2, BigDecimal.ROUND_HALF_UP), valorConsumoTotal);
+		assertEquals(new BigDecimal(52.29).setScale(2, BigDecimal.ROUND_HALF_UP), valorConsumoTotal);
 	}
 	
 	@Test
@@ -342,6 +345,9 @@ public class ConsumoImovelCategoriaBOTest {
 	public void calcularValorTotalConsumoDuasCategoriaDuasEconomiaDuasVigencias() {
 		Date dataVigenciaAnterior = new DateTime(2009, 7, 7, 0, 0).toDate();
 
+		dataAnterior = new DateTime(2016, 4, 1, 0, 0).toDate();
+		dataAtual= new DateTime(2016, 5, 1, 0, 0).toDate();
+		
 		configurarImovelDuasCategoriasDuasEconomias();
 		configurarVigenciasDuasCategoria(dataVigenciaAnterior);
 		
@@ -355,7 +361,7 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		BigDecimal valorConsumoTotal = bo.getValorTotalConsumoImovel(consumoHistoricoMock, dataAnterior, dataAtual);
 		
-		assertEquals(new BigDecimal(79.55).setScale(2, BigDecimal.ROUND_HALF_UP), valorConsumoTotal);
+		assertEquals(new BigDecimal(102.17).setScale(2, BigDecimal.ROUND_HALF_UP), valorConsumoTotal);
 	}
 
 	private void configurarImovelUmaCategoriaConsumoMenorMinimo() {
@@ -386,18 +392,12 @@ public class ConsumoImovelCategoriaBOTest {
 	}
 	
 	private void configurarVigenciasUmaCategoria(Date dataVigenciaAnterior) {
-		Date dataAnterior = this.dataAnterior;
-		Date dataAtual = this.dataAtual;
-		
 		if(dataVigenciaAnterior != null) {
-			dataAnterior = new DateTime(2016, 4, 10, 0, 0).toDate();
-			dataAtual = new DateTime(2016, 5, 10, 0, 0).toDate();
-			
-			listConsumoTarifaCategoriaResidencial.add(consumoTarifaAnteriorCategoriaResidencialMock);
-			
 			when(consumoTarifaAnteriorCategoriaResidencialMock.possuiVigencia(dataVigenciaAnterior)).thenReturn(true);
 			when(consumoTarifaAnteriorCategoriaResidencialMock.getConsumoTarifaVigencia()).thenReturn(consumoTarifaVigenciaAnteriorMock);
 			when(consumoTarifaAnteriorCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(14));
+
+			listConsumoTarifaCategoriaResidencial.add(consumoTarifaAnteriorCategoriaResidencialMock);
 		}
 		
 		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, dataAnterior, dataAtual, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
@@ -425,22 +425,16 @@ public class ConsumoImovelCategoriaBOTest {
 	}
 	
 	private void configurarVigenciasDuasCategoria(Date dataVigenciaAnterior) {
-		Date dataAnterior = this.dataAnterior;
-		Date dataAtual = this.dataAtual;
-		
 		if(dataVigenciaAnterior != null) {
-			dataAnterior = new DateTime(2016, 4, 10, 0, 0).toDate();
-			dataAtual= new DateTime(2016, 5, 10, 0, 0).toDate();
-			
-			listConsumoTarifaCategoriaResidencial.add(consumoTarifaAnteriorCategoriaResidencialMock);
-			listConsumoTarifaCategoriaComercial.add(consumoTarifaAnteriorCategoriaComercialMock);
-			
 			when(consumoTarifaAnteriorCategoriaResidencialMock.possuiVigencia(dataVigenciaAnterior)).thenReturn(true);
 			when(consumoTarifaAnteriorCategoriaComercialMock.possuiVigencia(dataVigenciaAnterior)).thenReturn(true);
 			when(consumoTarifaAnteriorCategoriaResidencialMock.getConsumoTarifaVigencia()).thenReturn(consumoTarifaVigenciaAnteriorMock);
 			when(consumoTarifaAnteriorCategoriaComercialMock.getConsumoTarifaVigencia()).thenReturn(consumoTarifaVigenciaAnteriorMock);
 			when(consumoTarifaAnteriorCategoriaResidencialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(14));
 			when(consumoTarifaAnteriorCategoriaComercialMock.getValorConsumoMinimo()).thenReturn(new BigDecimal(41.8));
+			
+			listConsumoTarifaCategoriaResidencial.add(consumoTarifaAnteriorCategoriaResidencialMock);
+			listConsumoTarifaCategoriaComercial.add(consumoTarifaAnteriorCategoriaComercialMock);
 		}
 		
 		when(consumoBOMock.getConsumoTarifasCategoria(imovelMock, dataAnterior, dataAtual, categoriaResidencialMock)).thenReturn(listConsumoTarifaCategoriaResidencial);
