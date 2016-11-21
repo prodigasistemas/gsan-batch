@@ -208,7 +208,7 @@ public class ConsumoBO {
 	}
 		
 	public List<ConsumoTarifaCategoriaTO> getConsumoTarifasCategoria(Imovel imovel, Date dataLeituraAnterior, Date dataLeituraAtual, ICategoria categoria) {
-		return consumoTarifaBO.obterConsumoTarifasPorPeriodo(imovel, dataLeituraAnterior, dataLeituraAtual);
+		return consumoTarifaBO.obterConsumoTarifasPorPeriodo(imovel, dataLeituraAnterior, dataLeituraAtual, categoria);
 	}
 
 	public List<TarifasVigenciaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {

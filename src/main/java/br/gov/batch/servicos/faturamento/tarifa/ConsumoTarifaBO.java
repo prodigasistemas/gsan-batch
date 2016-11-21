@@ -53,13 +53,16 @@ public class ConsumoTarifaBO {
 		sistemaParametros = sistemaParametrosRepositorio.getSistemaParametros();
 	}
 	
-	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorPeriodo(Imovel imovel, Date dataAnterior, Date dataAtual) {
-		List<ICategoria> categorias = imovelBO.obterCategorias(imovel, sistemaParametros);
+	public List<ConsumoTarifaCategoriaTO> obterConsumoTarifasPorPeriodo(Imovel imovel, Date dataAnterior, Date dataAtual, ICategoria categoria) {
 		
 		List<ConsumoTarifaVigenciaTO> tarifaTO = consumoTarifaVigenciaRepositorio.buscarTarifasPorPeriodo(imovel.getConsumoTarifa().getId(),
 				dataAnterior, dataAtual);
 		
 		List<ConsumoTarifaCategoria> consumoTarifasCategoria = new ArrayList<ConsumoTarifaCategoria>();
+
+		List<ICategoria> categorias = new ArrayList<>();
+		
+		categorias.add(categoria);
 		
 		for (ConsumoTarifaVigenciaTO consumoTarifaVigenciaTO : tarifaTO) {
 			consumoTarifasCategoria.addAll(getConsumoTarifaCategoriaVigenteList(categorias, consumoTarifaVigenciaTO));
