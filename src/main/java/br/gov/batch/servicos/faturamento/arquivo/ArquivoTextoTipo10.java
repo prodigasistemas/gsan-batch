@@ -46,7 +46,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 			builder.append(getIdSubcategoria(faixaTO.getIdSubcategoria()));
 			builder.append(completaComZerosEsquerda(6, faixaTO.getNumeroConsumoFaixaInicio()));
 			builder.append(completaComZerosEsquerda(6, faixaTO.getNumeroConsumoFaixaFim()));
-			builder.append(getValorConsumoTarifa(faixaTO.getValorConsumoTarifa()));
+			builder.append(getValorConsumoTarifa(faixaTO.getValorTarifa()));
 			
 			if (obterQuantidadeLinhasTexto(builder) < listaConsumoTarifaFaixa.size()) {
 				builder.append(System.getProperty("line.separator"));

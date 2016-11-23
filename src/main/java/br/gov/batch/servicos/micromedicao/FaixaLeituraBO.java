@@ -195,9 +195,9 @@ public class FaixaLeituraBO {
 	
 	public Integer pesquisarConsumoMinimoTarifa(Integer idImovel) {
 		ConsumoTarifaCategoriaTO consumoTarifaCategoria =  consumoTarifaRepositorio.consumoTarifaCategoriaDoImovel(idImovel);
-		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(consumoTarifaCategoria.getConsumoTarifa().getId());
+		ConsumoTarifaVigenciaTO consumoTarifaVigencia = consumoTarifaVigenciaRepositorio.maiorDataVigenciaConsumoTarifa(consumoTarifaCategoria.getIdTarifa());
 
-		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifaCategoria(consumoTarifaCategoria.getCategoria().getId(), consumoTarifaVigencia.getIdVigencia());
+		return consumoTarifaCategoriaRepositorio.consumoMinimoTarifaCategoria(consumoTarifaCategoria.getIdCategoria(), consumoTarifaVigencia.getIdVigencia());
 	}
 	
 	private boolean isGerarFaixaNormal(Imovel imovel) {

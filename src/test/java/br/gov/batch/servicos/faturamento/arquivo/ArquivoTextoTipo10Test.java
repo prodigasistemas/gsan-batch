@@ -83,7 +83,7 @@ public class ArquivoTextoTipo10Test {
 		to.setDataVigencia(Utilitarios.converterStringParaData("2014-09-01", FormatoData.ANO_MES_DIA_SEPARADO));
 		to.setNumeroConsumoFaixaInicio(0);
 		to.setNumeroConsumoFaixaFim(10);
-		to.setValorConsumoTarifa(new BigDecimal("14.00"));
+		to.setValorTarifa(new BigDecimal("14.00"));
 		to.setIdCategoria(1);
 		to.setIdSubcategoria(1);
 		lista.add(to);
@@ -93,7 +93,7 @@ public class ArquivoTextoTipo10Test {
 		to.setDataVigencia(Utilitarios.converterStringParaData("2014-02-20", FormatoData.ANO_MES_DIA_SEPARADO));
 		to.setNumeroConsumoFaixaInicio(21);
 		to.setNumeroConsumoFaixaFim(30);
-		to.setValorConsumoTarifa(new BigDecimal("100.00"));
+		to.setValorTarifa(new BigDecimal("100.00"));
 		to.setIdCategoria(3);
 		to.setIdSubcategoria(3);
 		lista.add(to);

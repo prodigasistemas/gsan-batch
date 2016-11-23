@@ -39,7 +39,7 @@ public class ImovelBO {
 		FaturamentoGrupo faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoRotaAlternativaPelaReferencia(idImovel);
 
 		if (faturamentoGrupo == null) {
-			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupoPelaReferencia(idImovel);
+			faturamentoGrupo = imovelRepositorio.pesquisarFaturamentoGrupo(idImovel);
 		}
 
 		return faturamentoGrupo;

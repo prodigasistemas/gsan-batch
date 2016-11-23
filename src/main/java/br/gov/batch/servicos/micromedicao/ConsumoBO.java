@@ -159,7 +159,7 @@ public class ConsumoBO {
 	public int getConsumoMinimoTarifaPorCategoria(List<ConsumoTarifaCategoriaTO> consumoTarifasCategoria, ICategoria categoria) {
 		Set<Integer> consumoMinimoTarifas = new HashSet<Integer>();
 		for (ConsumoTarifaCategoriaTO consumoTarifaCategoriaTO : consumoTarifasCategoria) {
-			Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(consumoTarifaCategoriaTO.getConsumoTarifaVigencia().getId(), categoria);
+			Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(consumoTarifaCategoriaTO.getIdVigencia(), categoria);
 			consumoMinimoTarifas.add(consumoMinimoTarifa);
 		}
 		
@@ -214,7 +214,7 @@ public class ConsumoBO {
 	public List<TarifasVigenciaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
 		List<TarifasVigenciaTO> tarifasPorVigencia = new ArrayList<TarifasVigenciaTO>();
 		for (ConsumoTarifaCategoriaTO consumoTarifaCategoria : consumoImovelCategoriaTO.getConsumoTarifasCategoria()) {
-			Date dataVigencia = consumoTarifaCategoria.getConsumoTarifaVigencia().getDataVigencia();
+			Date dataVigencia = consumoTarifaCategoria.getDataVigencia();
 			
 			List<ConsumoTarifaFaixaTO> consumoTarifasFaixaTO = consumoTarifaFaixaRepositorio.getConsumoTarifaFaixaPelaVigencia(
 																								dataVigencia,

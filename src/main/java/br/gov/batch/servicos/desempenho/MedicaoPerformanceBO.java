@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import br.gov.model.desempenho.MedicaoPerformance;
 import br.gov.servicos.desempenho.MedicaoPerformanceRepositorio;
@@ -19,6 +21,7 @@ public class MedicaoPerformanceBO {
 	@EJB
 	private MedicaoPerformanceRepositorio medicaoPerformanceRepositorio;
 	
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void preencherRelatorioDesempenho(List<MedicaoPerformanceTO> medicoesPerformanceTO) {
 		for (MedicaoPerformanceTO medicaoPerformanceTO : medicoesPerformanceTO) {
 			MedicaoPerformance medicaoPerformance = new MedicaoPerformance(medicaoPerformanceTO);			

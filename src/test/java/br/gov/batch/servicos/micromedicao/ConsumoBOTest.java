@@ -147,18 +147,20 @@ public class ConsumoBOTest {
 		
 		ConsumoTarifaCategoriaTO consumoTarifaCatgResidencial = new ConsumoTarifaCategoriaTO();
 		consumoTarifaCatgResidencial.setId(1);
-		consumoTarifaCatgResidencial.setCategoria(residencial);
+		consumoTarifaCatgResidencial.setIdCategoria(residencial.getId());
 		consumoTarifaCatgResidencial.setConsumoMinimo(10);
-		consumoTarifaCatgResidencial.setConsumoTarifa(tarifa);
-		consumoTarifaCatgResidencial.setConsumoTarifaVigencia(vigencia);
+		consumoTarifaCatgResidencial.setIdTarifa(tarifa.getId());
+		consumoTarifaCatgResidencial.setIdVigencia(vigencia.getId());
+		consumoTarifaCatgResidencial.setDataVigencia(vigencia.getDataVigencia());
 		consumoTarifaCatgResidencial.setValorTarifaMinima(new BigDecimal(16.80));
 		
 		ConsumoTarifaCategoriaTO consumoTarifaCatgComercial = new ConsumoTarifaCategoriaTO();
 		consumoTarifaCatgComercial.setId(2);
-		consumoTarifaCatgComercial.setCategoria(comercial);
+		consumoTarifaCatgComercial.setIdCategoria(comercial.getId());
 		consumoTarifaCatgComercial.setConsumoMinimo(10);
-		consumoTarifaCatgComercial.setConsumoTarifa(tarifa);
-		consumoTarifaCatgComercial.setConsumoTarifaVigencia(vigencia);
+		consumoTarifaCatgComercial.setIdTarifa(tarifa.getId());
+		consumoTarifaCatgComercial.setIdVigencia(vigencia.getId());
+		consumoTarifaCatgResidencial.setDataVigencia(vigencia.getDataVigencia());
 		consumoTarifaCatgComercial.setValorTarifaMinima(new BigDecimal(50.20));
 
 		ConsumoImovelCategoriaTO consumoImovelCategoriaTO = new ConsumoImovelCategoriaTO();
@@ -170,35 +172,35 @@ public class ConsumoBOTest {
 		faixa01.setIdConsumoTarifa(tarifa.getId());
 		faixa01.setNumeroConsumoFaixaInicio(11);
 		faixa01.setNumeroConsumoFaixaFim(20);
-		faixa01.setValorConsumoTarifa(new BigDecimal(2.40));
+		faixa01.setValorTarifa(new BigDecimal(2.40));
 		
 	    ConsumoTarifaFaixaTO faixa02 = new ConsumoTarifaFaixaTO();
 	    faixa02.setDataVigencia(data2016_01_23);
 	    faixa02.setIdConsumoTarifa(tarifa.getId());
 	    faixa02.setNumeroConsumoFaixaInicio(21);
 	    faixa02.setNumeroConsumoFaixaFim(30);
-	    faixa02.setValorConsumoTarifa(new BigDecimal(3.22));
+	    faixa02.setValorTarifa(new BigDecimal(3.22));
 	    
 	    ConsumoTarifaFaixaTO faixa03 = new ConsumoTarifaFaixaTO();
 	    faixa03.setDataVigencia(data2016_01_23);
 	    faixa03.setIdConsumoTarifa(tarifa.getId());
 	    faixa03.setNumeroConsumoFaixaInicio(31);
 	    faixa03.setNumeroConsumoFaixaFim(40);
-	    faixa03.setValorConsumoTarifa(new BigDecimal(3.62));
+	    faixa03.setValorTarifa(new BigDecimal(3.62));
 	    
 	    ConsumoTarifaFaixaTO faixa04 = new ConsumoTarifaFaixaTO();
 	    faixa04.setDataVigencia(data2016_01_23);
 	    faixa04.setIdConsumoTarifa(tarifa.getId());
 	    faixa04.setNumeroConsumoFaixaInicio(41);
 	    faixa04.setNumeroConsumoFaixaFim(50);
-	    faixa04.setValorConsumoTarifa(new BigDecimal(5.02));
+	    faixa04.setValorTarifa(new BigDecimal(5.02));
 	    
 	    ConsumoTarifaFaixaTO faixa05 = new ConsumoTarifaFaixaTO();
 	    faixa05.setDataVigencia(data2016_01_23);
 	    faixa05.setIdConsumoTarifa(tarifa.getId());
 	    faixa05.setNumeroConsumoFaixaInicio(51);
 	    faixa05.setNumeroConsumoFaixaFim(999999);
-	    faixa05.setValorConsumoTarifa(new BigDecimal(6.52));
+	    faixa05.setValorTarifa(new BigDecimal(6.52));
 		
 		List<ConsumoTarifaFaixaTO> faixasResidenciais = new ArrayList<>();
 		faixasResidenciais.add(faixa01);
@@ -212,7 +214,7 @@ public class ConsumoBOTest {
 	    faixaComercial.setIdConsumoTarifa(tarifa.getId());
 	    faixaComercial.setNumeroConsumoFaixaInicio(11);
 	    faixaComercial.setNumeroConsumoFaixaFim(999999);
-	    faixaComercial.setValorConsumoTarifa(new BigDecimal(6.26));
+	    faixaComercial.setValorTarifa(new BigDecimal(6.26));
 		
 	    List<ConsumoTarifaFaixaTO> faixasComerciais = new ArrayList<>();
 	    faixasComerciais.add(faixaComercial);

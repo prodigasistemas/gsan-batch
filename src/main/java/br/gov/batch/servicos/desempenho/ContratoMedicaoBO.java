@@ -70,6 +70,7 @@ public class ContratoMedicaoBO {
 	@EJB
 	private FaturamentoAtividadeCronogramaBO faturamentoAtividadeCronogramaBO;
 	
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public MedicaoPerformanceTO getMedicaoPerformanceTO(ContratoMedicao contratoMedicao, Imovel imovel, int referencia) {
 		MedicaoPerformanceTO medicaoPerformanceTO = new MedicaoPerformanceTO();
 		medicaoPerformanceTO.setImovel(imovel);

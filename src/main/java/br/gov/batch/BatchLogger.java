@@ -16,12 +16,12 @@ import org.jboss.logging.Logger;
 @Stateless
 public class BatchLogger {
 
-	@Inject
-    @JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")	
-	private JMSContext contexto;
-
-	@Resource(mappedName="java:global/jms/loggerProcessos")
-	private Queue loggerProcessos;
+//	@Inject
+//    @JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")	
+//	private JMSContext contexto;
+//
+//	@Resource(mappedName="java:global/jms/loggerProcessos")
+//	private Queue loggerProcessos;
 
 	private String mensagem;
 	private Logger logger;
@@ -80,7 +80,7 @@ public class BatchLogger {
 	}
 	
 	private void enviaLog(String idProcesso, String log) {
-		TextMessage mensagem = contexto.createTextMessage(idProcesso + " :: " + log);
-		contexto.createProducer().send(loggerProcessos, mensagem);
+//		TextMessage mensagem = contexto.createTextMessage(idProcesso + " :: " + log);
+//		contexto.createProducer().send(loggerProcessos, mensagem);
 	}
 }
