@@ -169,7 +169,7 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = bo.distribuirConsumoPorFaixa();
 
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumo = consumoImoveisCategoriaTO.get(0).getTabelaTarifas().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumo = consumoImoveisCategoriaTO.get(0).getVigencias().get(0).getFaixas();
 		
 		assertEquals(3, faixasConsumo.values().size());
 		assertEquals(new Integer(10), faixasConsumo.get(faixaResidencial11a20.getIdConsumoTarifa()).getConsumo());
@@ -188,7 +188,7 @@ public class ConsumoImovelCategoriaBOTest {
 
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = bo.distribuirConsumoPorFaixa();
 		
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumo = consumoImoveisCategoriaTO.get(0).getTabelaTarifas().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumo = consumoImoveisCategoriaTO.get(0).getVigencias().get(0).getFaixas();
 		
 		assertEquals(1, faixasConsumo.values().size());
 		assertEquals(new Integer(6), faixasConsumo.get(faixaResidencial11a20.getIdConsumoTarifa()).getConsumo());
@@ -208,8 +208,8 @@ public class ConsumoImovelCategoriaBOTest {
 
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = bo.distribuirConsumoPorFaixa();
 		
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoResidencial = consumoImoveisCategoriaTO.get(0).getTabelaTarifas().get(0).getFaixas();
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoComercial   = consumoImoveisCategoriaTO.get(1).getTabelaTarifas().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoResidencial = consumoImoveisCategoriaTO.get(0).getVigencias().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoComercial   = consumoImoveisCategoriaTO.get(1).getVigencias().get(0).getFaixas();
 		
 		assertEquals(1, faixasConsumoResidencial.values().size());
 		assertEquals(new Integer(10), faixasConsumoResidencial.get(faixaResidencial11a20.getIdConsumoTarifa()).getConsumo());
@@ -233,8 +233,8 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoriaTO = bo.distribuirConsumoPorFaixa();
 
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoResidencial = consumoImoveisCategoriaTO.get(0).getTabelaTarifas().get(0).getFaixas();
-		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoComercial   = consumoImoveisCategoriaTO.get(1).getTabelaTarifas().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoResidencial = consumoImoveisCategoriaTO.get(0).getVigencias().get(0).getFaixas();
+		Map<Integer, ConsumoTarifaFaixaTO> faixasConsumoComercial   = consumoImoveisCategoriaTO.get(1).getVigencias().get(0).getFaixas();
 		
 		assertEquals(1, faixasConsumoResidencial.values().size());
 		assertEquals(new Integer(1), faixasConsumoResidencial.get(faixaResidencial11a20.getIdConsumoTarifa()).getConsumo());
@@ -255,7 +255,7 @@ public class ConsumoImovelCategoriaBOTest {
 		
 		ConsumoImovelCategoriaTO consumoImovel = consumoImoveisCategoriaTO.get(0);
 		
-		consumoImovel.setTabelaTarifas(vigencias);
+		consumoImovel.setVigencias(vigencias);
 		
 		assertEquals(new BigDecimal(109.20).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorConsumoTotal(consumoImovel));
 	}

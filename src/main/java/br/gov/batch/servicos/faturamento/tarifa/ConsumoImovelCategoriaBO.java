@@ -70,7 +70,7 @@ public class ConsumoImovelCategoriaBO {
 		carregarTarifasConsumoImovelCategoria();
 		
 		for (ConsumoImovelCategoriaTO consumoImovel : getConsumoImoveisCategoriaTO()) {
-			distribuirConsumoFaixaPorCategoria(consumoImovel);
+			distribuirConsumoExcedenteFaixaPorCategoria(consumoImovel);
 		}
 		
 		return getConsumoImoveisCategoriaTO();
@@ -88,7 +88,7 @@ public class ConsumoImovelCategoriaBO {
 		return getValorTotalConsumoImovel(consumoImoveisCategoria);
 	}
 	
-	private BigDecimal getValorTotalConsumoImovel(List<ConsumoImovelCategoriaTO> consumoImoveisCategoria) {
+	public BigDecimal getValorTotalConsumoImovel(List<ConsumoImovelCategoriaTO> consumoImoveisCategoria) {
 		BigDecimal valorTotalConsumo = BigDecimal.ZERO;
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : consumoImoveisCategoria) {
 			valorTotalConsumo = valorTotalConsumo.add(getValorConsumoTotal(consumoImovelCategoriaTO));
@@ -102,7 +102,7 @@ public class ConsumoImovelCategoriaBO {
 		
 		calcularDiasProporcionaisPorTarifa(consumoImovelCategoriaTO);
 		
-		for (TarifasVigenciaTO vigencia : consumoImovelCategoriaTO.getTabelaTarifas()) {
+		for (TarifasVigenciaTO vigencia : consumoImovelCategoriaTO.getVigencias()) {
 			BigDecimal valorConsumoMinimoTarifa = getValorConsumoMinimo(consumoImovelCategoriaTO, vigencia.getDataVigencia());
 
 			BigDecimal valorConsumoVigencia = vigencia.getValorConsumoTotal(consumoImovelCategoriaTO.getQtdEconomias(), valorConsumoMinimoTarifa);
@@ -131,7 +131,7 @@ public class ConsumoImovelCategoriaBO {
 		DateTime dataLeituraAnterior = new DateTime(consumoImovelCategoriaTO.getDataAnterior());
 		DateTime dataAtual = new DateTime(consumoImovelCategoriaTO.getDataAtual());
 		
-		List<TarifasVigenciaTO> tabelaTarifas = consumoImovelCategoriaTO.getTabelaTarifas();
+		List<TarifasVigenciaTO> tabelaTarifas = consumoImovelCategoriaTO.getVigencias();
 
 		DateTime dataVigenciaAnterior = null;
 		TarifasVigenciaTO tabelaAnterior = null;
@@ -248,45 +248,21 @@ public class ConsumoImovelCategoriaBO {
 	private void carregarTarifasConsumoImovelCategoria() {
 		for (ConsumoImovelCategoriaTO consumoImovelCategoriaTO : getConsumoImoveisCategoriaTO()) {
 			List<TarifasVigenciaTO> faixas = consumoBO.obterFaixas(consumoImovelCategoriaTO);
-			consumoImovelCategoriaTO.setTabelaTarifas(faixas);
+			consumoImovelCategoriaTO.setVigencias(faixas);
 		}
 	}
 
-	private void distribuirConsumoFaixaPorCategoria(ConsumoImovelCategoriaTO consumoImovelCategoria) {	
+	private void distribuirConsumoExcedenteFaixaPorCategoria(ConsumoImovelCategoriaTO consumoImovelCategoria) {	
 		Integer consumo = consumoImovelCategoria.getConsumoExcedenteCategoria();
 
-		for (TarifasVigenciaTO vigencia : consumoImovelCategoria.getTabelaTarifas()) {
+		for (TarifasVigenciaTO vigencia : consumoImovelCategoria.getVigencias()) {
 			Collection<ConsumoTarifaFaixaTO> faixas = vigencia.getFaixas().values();
 			
 			for (ConsumoTarifaFaixaTO faixa : faixas) {
-				Integer consumoFinalFaixa = calcularConsumoFaixa(consumo, faixa);
-				
-				faixa.setConsumo(consumoFinalFaixa);
-				
+				Integer consumoFinalFaixa = faixa.calcularConsumoFaixa(consumo);
+								
 				consumo = consumo - consumoFinalFaixa;
 			}
 		}
-	}
-
-	private Integer calcularConsumoFaixa(Integer consumo, ConsumoTarifaFaixaTO faixa) {
-		Integer consumoMaximoFaixa = getValorConsumoFaixa(consumo, faixa);
-		
-		Integer consumofaixa = 0;
-		if(consumo <= consumoMaximoFaixa) {
-			consumofaixa = consumo;
-		} else {
-			consumofaixa = consumo - consumoMaximoFaixa;
-		}
-		return consumofaixa;
-	}
-
-	private int getValorConsumoFaixa(Integer consumo, ConsumoTarifaFaixaTO faixa) {
-		int valorConsumoFaixa;
-		if(consumo < faixa.getNumeroConsumoFaixaFim()) {
-			valorConsumoFaixa = faixa.getConsumoTotalFaixa();
-		} else {
-			valorConsumoFaixa = faixa.getNumeroConsumoFaixaFim();
-		}
-		return valorConsumoFaixa;
 	}
 }
