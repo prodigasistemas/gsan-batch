@@ -30,6 +30,7 @@ public class ValorConsumoTotalTest {
 	private Date data_2016_01_23 = null;
 	private Date data_2016_08_25 = null;
 	private Date data_2016_09_26 = null;
+	private int consumoFaixa = 7;
 	
 	@Before
 	public void init(){
@@ -148,7 +149,7 @@ public class ValorConsumoTotalTest {
 		faixa.setNumeroConsumoFaixaInicio(11);
 		faixa.setValorTarifa(new BigDecimal(6.26));
 		faixa.setIdConsumoTarifa(1);
-		faixa.setConsumo(7);
+		faixa.setConsumo(consumoFaixa);
 		
 		faixas.add(faixa);
 		
@@ -173,7 +174,7 @@ public class ValorConsumoTotalTest {
 		faixa.setNumeroConsumoFaixaInicio(51);
 		faixa.setValorTarifa(new BigDecimal(6.52));
 		faixa.setIdConsumoTarifa(1);
-		faixa.setConsumo(7);
+		faixa.setConsumo(consumoFaixa);
 		
 		faixas.add(faixa);
 		
