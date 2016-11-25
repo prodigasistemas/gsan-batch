@@ -19,7 +19,9 @@ import br.gov.servicos.cadastro.ImovelRepositorio;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.cadastro.SistemaParametrosRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
+import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
+import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 @Stateless
 public class AguaEsgotoBO {
@@ -33,6 +35,9 @@ public class AguaEsgotoBO {
 	@EJB
 	private ImovelSubcategoriaRepositorio imovelSubcategoriaRepositorio;
 
+	@EJB
+	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorio;
+	
 	@EJB
 	private ConsumoHistoricoBO consumoHistoricoBO;
 
@@ -111,8 +116,12 @@ public class AguaEsgotoBO {
 
 	private VolumeMedioAguaEsgotoTO gerarVolumeMedioSemConsumoHistorico(Integer idImovel) {
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
+		
 		int idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
-		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoCategorias(idImovel, idTarifa, categorias);
+		
+		ConsumoTarifaVigenciaTO vigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtualPelaTarifa(idTarifa);
+		
+		int consumoMinimo = consumoBO.obterConsumoMinimoLigacaoCategorias(idImovel, vigencia.getIdVigencia(), categorias);
 
 		return new VolumeMedioAguaEsgotoTO(consumoMinimo, 1);
 	}

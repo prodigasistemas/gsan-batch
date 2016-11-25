@@ -18,7 +18,9 @@ import br.gov.model.cadastro.SistemaParametros;
 import br.gov.model.micromedicao.ConsumoHistorico;
 import br.gov.servicos.cadastro.ImovelSubcategoriaRepositorio;
 import br.gov.servicos.faturamento.ConsumoTarifaRepositorio;
+import br.gov.servicos.faturamento.ConsumoTarifaVigenciaRepositorio;
 import br.gov.servicos.micromedicao.ConsumoHistoricoRepositorio;
+import br.gov.servicos.to.ConsumoTarifaVigenciaTO;
 
 public class AguaEsgotoBOTest {
 
@@ -40,9 +42,15 @@ public class AguaEsgotoBOTest {
 	@Mock
 	private ConsumoTarifaRepositorio consumoTarifaRepositorioMock;
 	
+	@Mock
+	private ConsumoTarifaVigenciaRepositorio consumoTarifaVigenciaRepositorioMock;
+	
+	private ConsumoTarifaVigenciaTO consumoTarifaVigenciaTO;
+	
 	@Before
 	public void setup() {
 		aguaEsgotoBO = new AguaEsgotoBO();
+		consumoTarifaVigenciaTO = new ConsumoTarifaVigenciaTO(1, null);
 		MockitoAnnotations.initMocks(this);
 	}
 	
@@ -74,6 +82,7 @@ public class AguaEsgotoBOTest {
 		mockConsumoHistoricoNulo();
 		mockCategoria();
 		mockConsumoTarifa();
+		mockConsumoTarifaVigencia();
 		mockConsumoMinimoPorLigacao();
 		
 		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(1, 201408, 1);
@@ -88,6 +97,7 @@ public class AguaEsgotoBOTest {
 		mockConsumoHistoricoVazio();
 		mockCategoria();
 		mockConsumoTarifa();
+		mockConsumoTarifaVigencia();
 		mockConsumoMinimoPorLigacao();
 		
 		VolumeMedioAguaEsgotoTO volumeMedioAguaEsgotoTO = aguaEsgotoBO.obterVolumeMedioAguaEsgoto(1, 201408, 1);
@@ -124,6 +134,10 @@ public class AguaEsgotoBOTest {
 	
 	private void mockConsumoTarifa() {
 		when(consumoTarifaRepositorioMock.consumoTarifaDoImovel(1)).thenReturn(1);
+	}
+	
+	private void mockConsumoTarifaVigencia() {
+		when(consumoTarifaVigenciaRepositorioMock.buscarConsumoTarifaVigenciaAtualPelaTarifa(1)).thenReturn(consumoTarifaVigenciaTO);
 	}
 	
 	private void mockConsumoMinimoPorLigacao() {

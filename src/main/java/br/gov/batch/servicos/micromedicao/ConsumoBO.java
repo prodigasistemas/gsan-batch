@@ -103,10 +103,12 @@ public class ConsumoBO {
 
 	public Integer consumoMinimoLigacao(Integer idImovel) {
 		Integer idTarifa = consumoTarifaRepositorio.consumoTarifaDoImovel(idImovel);
+		
+		ConsumoTarifaVigenciaTO vigencia = consumoTarifaVigenciaRepositorio.buscarConsumoTarifaVigenciaAtualPelaTarifa(idTarifa);
 
 		Collection<ICategoria> categorias = imovelSubcategoriaRepositorio.buscarQuantidadeEconomiasPorImovel(idImovel);
 
-		return obterConsumoMinimoLigacaoCategorias(idImovel, idTarifa, categorias);
+		return obterConsumoMinimoLigacaoCategorias(idImovel, vigencia.getIdVigencia(), categorias);
 	}
 	
 	public BigDecimal valorMinimoTarifa(Integer idImovel) {
@@ -129,24 +131,13 @@ public class ConsumoBO {
 	}
 
 
-	public int obterConsumoMinimoLigacaoCategorias(Integer idImovel, Integer idTarifa, Collection<ICategoria> categorias) {
+	public int obterConsumoMinimoLigacaoCategorias(Integer idImovel, Integer idVigencia, Collection<ICategoria> categorias) {
 		int consumoMinimoLigacao = 0;
 
 		for (ICategoria categoria : categorias) {
-			consumoMinimoLigacao += obterConsumoMinimoLigacaoPorCategoria(consumoMinimoLigacao, idTarifa, categoria);
+			consumoMinimoLigacao += obterConsumoMinimoLigacaoPorCategoria(idVigencia, categoria);
 		}
 
-		return consumoMinimoLigacao;
-	}
-
-	public int obterConsumoMinimoLigacaoPorCategoria(int consumoMinimoLigacao, Integer idVigencia, ICategoria categoria) {
-		Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(idVigencia, categoria);
-
-		if (categoria.getFatorEconomias() != null) {
-			consumoMinimoLigacao += consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
-		} else {
-			consumoMinimoLigacao += consumoMinimoTarifa * categoria.getQuantidadeEconomias();
-		}
 		return consumoMinimoLigacao;
 	}
 
@@ -236,4 +227,14 @@ public class ConsumoBO {
 
 		return valorMinimoTarifa;
 	}
+	
+	private int obterConsumoMinimoLigacaoPorCategoria(Integer idVigencia, ICategoria categoria) {
+		Integer consumoMinimoTarifa = getConsumoMinimoTarifaPorCategoria(idVigencia, categoria);
+
+		if (categoria.getFatorEconomias() != null) {
+			return consumoMinimoTarifa * categoria.getFatorEconomias().intValue();
+		} else {
+			return consumoMinimoTarifa * categoria.getQuantidadeEconomias();
+		}
+	}	
 }

@@ -78,7 +78,7 @@ public class ContratoMedicaoBO {
 		medicaoPerformanceTO.setContratoMedicao(contratoMedicao);
 		
 		Integer referenciaMesZero = getReferenciaMesZero(contratoMedicao);
-//		medicaoPerformanceTO.setValorAguaFaturadoMesZero(calcularValorConsumoMesZero(contratoMedicao, imovel, referenciaMesZero, referencia));
+		medicaoPerformanceTO.setValorAguaFaturadoMesZero(calcularValorConsumoMesZero(contratoMedicao, imovel, referenciaMesZero, referencia));
 		medicaoPerformanceTO.setValorAguaFaturado(calcularValorConsumo(imovel, referencia, referencia));
 		medicaoPerformanceTO.setValorDiferencaAgua(calcularValorDiferencaAgua(medicaoPerformanceTO.getValorAguaFaturadoMesZero(),
 																			  medicaoPerformanceTO.getValorAguaFaturado()));

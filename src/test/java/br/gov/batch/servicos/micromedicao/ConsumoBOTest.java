@@ -114,7 +114,7 @@ public class ConsumoBOTest {
 		mockMaiorDataVigencia();
 		mockConsumoMinimoTarifa();
 
-		assertEquals(80, bo.consumoNaoMedido(5, null));
+		assertEquals(50, bo.consumoNaoMedido(5, null));
 	}
 
 	@Test
