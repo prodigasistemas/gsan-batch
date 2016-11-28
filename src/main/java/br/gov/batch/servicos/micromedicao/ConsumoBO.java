@@ -203,7 +203,7 @@ public class ConsumoBO {
 	}
 
 	public List<TarifasVigenciaTO> obterFaixas(ConsumoImovelCategoriaTO consumoImovelCategoriaTO) {
-		List<TarifasVigenciaTO> tarifasPorVigencia = new ArrayList<TarifasVigenciaTO>();
+		List<TarifasVigenciaTO> tarifasPorVigencia = new ArrayList<>();
 		for (ConsumoTarifaCategoriaTO consumoTarifaCategoria : consumoImovelCategoriaTO.getConsumoTarifasCategoria()) {
 			Date dataVigencia = consumoTarifaCategoria.getDataVigencia();
 			

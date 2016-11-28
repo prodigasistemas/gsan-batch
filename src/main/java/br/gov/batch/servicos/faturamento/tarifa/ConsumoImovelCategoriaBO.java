@@ -256,12 +256,12 @@ public class ConsumoImovelCategoriaBO {
 		Integer consumo = consumoImovelCategoria.getConsumoExcedenteCategoria();
 
 		for (TarifasVigenciaTO vigencia : consumoImovelCategoria.getVigencias()) {
-			Collection<ConsumoTarifaFaixaTO> faixas = vigencia.getFaixas().values();
+			List<ConsumoTarifaFaixaTO> faixas = vigencia.getFaixasOrdenadasPeloInicioConsumo();
 			
 			for (ConsumoTarifaFaixaTO faixa : faixas) {
 				Integer consumoFinalFaixa = faixa.calcularConsumoFaixa(consumo);
 								
-				consumo = consumo - consumoFinalFaixa;
+				consumo -= consumoFinalFaixa;
 			}
 		}
 	}
