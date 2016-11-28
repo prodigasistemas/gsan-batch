@@ -79,7 +79,7 @@ public class ArquivoTextoTipo10Test {
 		List<ConsumoTarifaFaixaTO> lista = new ArrayList<ConsumoTarifaFaixaTO>();
 		
 		ConsumoTarifaFaixaTO to = new ConsumoTarifaFaixaTO();
-		to.setIdConsumoTarifa(1);
+		to.setIdConsumoTarifaFaixa(1);
 		to.setDataVigencia(Utilitarios.converterStringParaData("2014-09-01", FormatoData.ANO_MES_DIA_SEPARADO));
 		to.setNumeroConsumoFaixaInicio(0);
 		to.setNumeroConsumoFaixaFim(10);
@@ -89,7 +89,7 @@ public class ArquivoTextoTipo10Test {
 		lista.add(to);
 		
 		to = new ConsumoTarifaFaixaTO();
-		to.setIdConsumoTarifa(3);
+		to.setIdConsumoTarifaFaixa(3);
 		to.setDataVigencia(Utilitarios.converterStringParaData("2014-02-20", FormatoData.ANO_MES_DIA_SEPARADO));
 		to.setNumeroConsumoFaixaInicio(21);
 		to.setNumeroConsumoFaixaFim(30);

@@ -40,7 +40,7 @@ public class ArquivoTextoTipo10 extends ArquivoTexto {
 
 		for (ConsumoTarifaFaixaTO faixaTO : listaConsumoTarifaFaixa) {
 			builder.append(TIPO_REGISTRO_10_FAIXA_CONSUMO);
-			builder.append(completaComZerosEsquerda(2, faixaTO.getIdConsumoTarifa()));
+			builder.append(completaComZerosEsquerda(2, faixaTO.getIdConsumoTarifaFaixa()));
 			builder.append(getDataVigencia(faixaTO.getDataVigencia()));
 			builder.append(completaComZerosEsquerda(1, faixaTO.getIdCategoria()));
 			builder.append(getIdSubcategoria(faixaTO.getIdSubcategoria()));

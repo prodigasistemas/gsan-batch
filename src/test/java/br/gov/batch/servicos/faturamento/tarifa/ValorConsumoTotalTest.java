@@ -30,7 +30,6 @@ public class ValorConsumoTotalTest {
 	private Date data_2016_01_23 = null;
 	private Date data_2016_08_25 = null;
 	private Date data_2016_09_26 = null;
-	private int consumoFaixa = 7;
 	
 	@Before
 	public void init(){
@@ -44,19 +43,19 @@ public class ValorConsumoTotalTest {
 	@Test
 	public void calcularValorConsumoCategoriaComercialUmaEconomia(){
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = buildConsumosPorCategoria(buildConsumoComercial());
-		assertEquals(new BigDecimal(94.02).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
+		assertEquals(new BigDecimal(144.10).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
 	}
 	
 	@Test
 	public void calcularValorConsumoCategoriaResidencialTresEconomias(){
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = buildConsumosPorCategoria(buildConsumoResidencial());
-		assertEquals(new BigDecimal(187.32).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
+		assertEquals(new BigDecimal(170.70).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
 	}
 	
 	@Test
 	public void calcularValorConsumoCategoriaResidencialEComercialUmaEcoComercialTresEcoResidencial(){
 		List<ConsumoImovelCategoriaTO> consumoImoveisCategoria = buildConsumosPorCategoria(buildConsumoComercial(), buildConsumoResidencial());
-		assertEquals(new BigDecimal(281.34).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
+		assertEquals(new BigDecimal(314.80).setScale(2, BigDecimal.ROUND_HALF_UP), bo.getValorTotalConsumoImovel(consumoImoveisCategoria));
 	}
 	
 	private List<ConsumoImovelCategoriaTO> buildConsumosPorCategoria(ConsumoImovelCategoriaTO... consumos){
@@ -148,8 +147,8 @@ public class ValorConsumoTotalTest {
 		faixa.setNumeroConsumoFaixaFim(999999);
 		faixa.setNumeroConsumoFaixaInicio(11);
 		faixa.setValorTarifa(new BigDecimal(6.26));
-		faixa.setIdConsumoTarifa(1);
-		faixa.setConsumo(consumoFaixa);
+		faixa.setIdConsumoTarifaFaixa(1);
+		faixa.setConsumo(15);
 		
 		faixas.add(faixa);
 		
@@ -169,14 +168,23 @@ public class ValorConsumoTotalTest {
 	private List<ConsumoTarifaFaixaTO> buildFaixasConsumoResidencial(){
 		List<ConsumoTarifaFaixaTO> faixas = new ArrayList<>();
 		
-		ConsumoTarifaFaixaTO faixa = new ConsumoTarifaFaixaTO();
-		faixa.setNumeroConsumoFaixaFim(999999);
-		faixa.setNumeroConsumoFaixaInicio(51);
-		faixa.setValorTarifa(new BigDecimal(6.52));
-		faixa.setIdConsumoTarifa(1);
-		faixa.setConsumo(consumoFaixa);
+		ConsumoTarifaFaixaTO faixa01 = new ConsumoTarifaFaixaTO();
+		faixa01.setNumeroConsumoFaixaFim(20);
+		faixa01.setNumeroConsumoFaixaInicio(11);
+		faixa01.setValorTarifa(new BigDecimal(2.40));
+		faixa01.setIdConsumoTarifaFaixa(1);
+		faixa01.setConsumo(10);
+
+		faixas.add(faixa01);
 		
-		faixas.add(faixa);
+		ConsumoTarifaFaixaTO faixa02 = new ConsumoTarifaFaixaTO();
+		faixa02.setNumeroConsumoFaixaFim(30);
+		faixa02.setNumeroConsumoFaixaInicio(21);
+		faixa02.setValorTarifa(new BigDecimal(3.22));
+		faixa02.setIdConsumoTarifaFaixa(2);
+		faixa02.setConsumo(5);
+		
+		faixas.add(faixa02);
 		
 		return faixas;
 	}
